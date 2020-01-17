@@ -33,6 +33,31 @@ rxHorizLobe theta = cos theta
 rxLoVertLobe alpha = sin (7 * alpha)
 rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
+-- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
+type alias Target = { latitude : Float
+                    , longitude : Float
+                    , height : Float
+                    , bearing : Float
+                    , speed : Float
+                    , iff : Bool }
+
+type alias PolarTarget = { r : Float
+                         , theta : Float
+                         , alpha : Float
+                         , iff : Bool
+                         }
+
+type alias Station = { latitude : Float
+                     , longitude : Float
+                     , lineOfShoot : Float
+                     }
+
+type alias Echo = { t : Float -- timebase is range/2c
+                  , theta : Float
+                  , phase : Float
+                  , duration : Float
+                  }
+
 -- MAIN
 main =
   Browser.element
