@@ -23,11 +23,15 @@ stringifyPoint (x, y) = (String.fromInt x )++
 polyLineFromCoords coords = List.foldr (++) "" 
   (List.map stringifyPoint coords)
 
--- Some RDF lobe functions
-TxVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sine (24 * alpha))
-TxVertOmniLobe alpha = sin (7 * alpha)
-TxHorizReflectedLobe theta = (cos theta)^2
-TxHorizOmniLobe theta = cos theta
+-- Some RDF lobe functions TO GO IN DIFFERENT NODULE
+txHiVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
+txHiVertOmniLobe alpha = sin (7 * alpha)
+txHorizReflectedLobe theta = (cos theta)^2
+txHorizOmniLobe theta = cos theta
+
+rxHorizLobe theta = cos theta
+rxLoVertLobe alpha = sin (7 * alpha)
+rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
 -- MAIN
 main =
