@@ -14,6 +14,8 @@ import Time
 myLineData t= List.map (\x -> ( x, truncate <| ((*) 100) <| sin <| toFloat <| x * t ))
   (List.range 1 800)
 
+-- SVG requires a line to be expressed as a space separated string of
+-- integer pairs. So it is.
 stringifyPoint (x, y) = (String.fromInt x )++ 
     "," ++ 
     (String.fromInt y) ++ " "
@@ -21,6 +23,11 @@ stringifyPoint (x, y) = (String.fromInt x )++
 polyLineFromCoords coords = List.foldr (++) "" 
   (List.map stringifyPoint coords)
 
+-- Some RDF lobe functions
+TxVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sine (24 * alpha))
+TxVertOmniLobe alpha = sin (7 * alpha)
+TxHorizReflectedLobe theta = (cos theta)^2
+TxHorizOmniLobe theta = cos theta
 
 -- MAIN
 main =
@@ -97,7 +104,7 @@ view m = svg
         [ points (polyLineFromCoords m.lineData)
         , fill "none"
         , stroke "lightgreen"
-        , strokeWidth "4"
+        , strokeWidth "2"
         ]
         []
     ]
