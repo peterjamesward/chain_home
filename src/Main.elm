@@ -73,12 +73,35 @@ bomber = { latitude = 2.0
          , iff = False }
 
 -- Need some coordinate mangling
+-- https://www.movable-type.co.uk/scripts/latlong.html
+
+meanRadius = 6371000
+
+toRadians degrees = pi * degrees / 180
+
+-- Equirectangular approximation
+range (lat1, long1) (lat2, long2) = 
+  let lat1Rad = toRadians lat1
+      lat2Rad = toRadians lat2
+      lng1Rad = toRadians long1
+      lng2Rad = toRadians long2
+      x = (lng2Rad - lng1Rad) * cos((lat1Rad + lat2Rad)/2)
+      y = (lng2Rad - lng1Rad) 
+  in 
+      sqrt (x*x + y*y) * meanRadius
+
+bearing (sLat, sLong) (tLat, tLong) = 
+  let lat1Rad = toRadians sLat
+      lat2Rad = toRadians tLat
+      lng1Rad = toRadians sLong
+      lng2Rad = toRadians tLong
+      y = (sin lng2Rad - lng1Rad) * (cos lat2Rad)
+      x = (cos lat1Rad) * (sin lat2Rad) - 
+          (sin lat1Rad) * (cos lat2Rad) * (cos (lng2Rad - lng1Rad))
+  in
+      atan2 y x
 
 mapToPolar target = ...
-
-bearing station target = ...
-
-range station target = ...
 
 -- MAIN
 main =
