@@ -36,15 +36,15 @@ rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 type alias Target = { latitude : Float
                     , longitude : Float
-                    , height : Float
-                    , bearing : Float
-                    , speed : Float
+                    , height : Float  -- in thousands of feet
+                    , bearing : Float -- in degrees
+                    , speed : Float   -- degrees from North
                     , iff : Bool }
 
-type alias PolarTarget = { r : Float
-                         , theta : Float
-                         , alpha : Float
-                         , iff : Bool
+type alias PolarTarget = { r : Float -- metres
+                         , theta : Float -- radians
+                         , alpha : Float -- radians, ignoring curvature for now
+                         , iff : Bool -- is this a pipsqueak equipped friendly?
                          }
 
 type alias Station = { latitude : Float
@@ -57,6 +57,28 @@ type alias Echo = { t : Float -- timebase is range/2c
                   , phase : Float
                   , duration : Float
                   }
+
+type alias LineData = List Float
+
+-- Let's make ourselves a station and a target
+ch1 = { latitude = 1.408614
+      ,longitude = 51.993661 
+      ,lineOfShoot = 90.0 }  -- Bawdsey, assuming LOS due East.
+
+bomber = { latitude = 2.0
+         , longitude = 51.993661
+         , height = 20
+         , bearing = 270
+         , speed = 200
+         , iff = False }
+
+-- Need some coordinate mangling
+
+mapToPolar target = ...
+
+bearing station target = ...
+
+range station target = ...
 
 -- MAIN
 main =
