@@ -37,8 +37,8 @@ rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 type alias Target = { latitude : Float
                      , longitude : Float
                      , height : Float  -- in thousands of feet
-                     , bearing : Float -- in degrees
-                     , speed : Float   -- degrees from North
+                     , bearing : Float -- in degrees from North
+                     , speed : Float   -- miles per hour (!)
                      , iff : Bool }
 
 type alias PolarTarget = { r : Float -- metres
@@ -60,49 +60,33 @@ type alias Echo = { t : Float -- timebase is range/2c
 
 type alias LineData = List Float
 
--- Let's make ourselves a station and a target
--- Bawdsey, assuming LOS South East.
-bawdsey = { latitude = 1.408614
-          , longitude = 51.993661 
-          , lineOfShoot = 135.0 
-          }  
-
-bomber = { latitude = 2.0
-         , longitude = 51.993661
-         , height = 20
-         , bearing = 270
-         , speed = 200
-         , iff = False 
-         }
-
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
 
 meanRadius = 6371000
 
-toRadians degrees = pi * degrees / 180
-
 -- Equirectangular approximation
-range (lat1, long1) (lat2, long2) = 
-  let lat1Rad = toRadians lat1
-      lat2Rad = toRadians lat2
-      lng1Rad = toRadians long1
-      lng2Rad = toRadians long2
-      x = (lng2Rad - lng1Rad) * cos((lat1Rad + lat2Rad)/2)
-      y = (lng2Rad - lng1Rad) 
+range (φ1, λ1) (φ2, λ2) = 
+  let 
+      x = (λ2 - λ1) * cos((φ1 + φ2)/2)
+      y = (λ2 - λ1) 
   in 
       sqrt (x*x + y*y) * meanRadius
 
-bearing (sLat, sLong) (tLat, tLong) = 
-  let lat1Rad = toRadians sLat
-      lat2Rad = toRadians tLat
-      lng1Rad = toRadians sLong
-      lng2Rad = toRadians tLong
-      y = (sin lng2Rad - lng1Rad) * (cos lat2Rad)
-      x = (cos lat1Rad) * (sin lat2Rad) - 
-          (sin lat1Rad) * (cos lat2Rad) * (cos (lng2Rad - lng1Rad))
+bearing (φ1, λ1) (φ2, λ2) = 
+  let y = (sin λ2 - λ1) * (cos φ2)
+      x = (cos φ1) * (sin φ2) - 
+          (sin φ1) * (cos φ2) * (cos (λ2 - λ1))
   in
       atan2 y x
+
+-- Find new lat long after travellin d metres on given bearing.
+newPosition (φ1, λ1) d θ =
+  let  δ = d / meanRadius
+       φ2 = asin ( sin φ1 * cos δ + cos φ1 * sin δ * cos θ )
+       λ2 = λ1 + atan2 (sin θ * sin δ * cos φ1) (cos δ - sin φ1 * sin φ2)
+  in
+    (φ2, λ2)
 
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -119,6 +103,32 @@ mapToPolar station target =
      , iff = target.iff
      }
 
+-- Let's make ourselves a station and a target
+-- Bawdsey, assuming LOS due East.
+bawdsey = { latitude = degrees 1.408614
+          , longitude = degrees 51.993661 
+          , lineOfShoot = degrees 90.0 
+          }  
+
+bomber = { latitude = degrees 2.0
+         , longitude = degrees 51.993661
+         , height = 20 -- ,000 ft
+         , bearing = degrees 270
+         , speed = 200 -- mph
+         , iff = False 
+         }
+
+-- Targets move! t in seconds to at least centisecond resolution please
+targetAtTime : Float -> Target -> Target
+targetAtTime t target = 
+  let distanceTravelled = target.speed * 1609 / 3600
+      (newLat, newLong) = newPosition (target.latitude, target.longitude) 
+                                       distanceTravelled target.bearing
+  in 
+    { target | latitude = newLat
+             , longitude = newLong 
+             }
+
 -- MAIN
 main =
   Browser.element
@@ -133,17 +143,32 @@ type alias Model =
   { zone : Time.Zone
   , time : Time.Posix
   , lineData : List (Int, Int)
+  , station : Station
+  , targets : List Target
+  , movedTargets : List Target
+  , polarTargets : List PolarTarget
+  , echoes : List Echo
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( { zone = Time.utc 
-    , time = Time.millisToPosix 0
-    , lineData = myLineData 0
-    }
-  , Task.perform AdjustTimeZone Time.here
-  )
+  let
+    targetsBaseline = [ bomber ]
+    targetsNow = List.map (targetAtTime 0) targetsBaseline
+    convertedTargets = List.map (mapToPolar bawdsey) targetsNow
+  in
+    ( { zone = Time.utc 
+      , time = Time.millisToPosix 0
+      , lineData = myLineData 0
+      , station = bawdsey
+      , targets = targetsBaseline
+      , movedTargets = targetsNow
+      , polarTargets = convertedTargets
+      , echoes = []
+      }
+    , Task.perform AdjustTimeZone Time.here
+    )
 
 -- UPDATE
 type Msg
@@ -170,7 +195,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 40 Tick
+  Time.every 4000 Tick
 
 -- VIEW
 
