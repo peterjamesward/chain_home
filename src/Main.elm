@@ -35,11 +35,11 @@ rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 type alias Target = { latitude : Float
-                    , longitude : Float
-                    , height : Float  -- in thousands of feet
-                    , bearing : Float -- in degrees
-                    , speed : Float   -- degrees from North
-                    , iff : Bool }
+                     , longitude : Float
+                     , height : Float  -- in thousands of feet
+                     , bearing : Float -- in degrees
+                     , speed : Float   -- degrees from North
+                     , iff : Bool }
 
 type alias PolarTarget = { r : Float -- metres
                          , theta : Float -- radians
@@ -61,16 +61,19 @@ type alias Echo = { t : Float -- timebase is range/2c
 type alias LineData = List Float
 
 -- Let's make ourselves a station and a target
-ch1 = { latitude = 1.408614
-      ,longitude = 51.993661 
-      ,lineOfShoot = 90.0 }  -- Bawdsey, assuming LOS due East.
+-- Bawdsey, assuming LOS South East.
+bawdsey = { latitude = 1.408614
+          , longitude = 51.993661 
+          , lineOfShoot = 135.0 
+          }  
 
 bomber = { latitude = 2.0
          , longitude = 51.993661
          , height = 20
          , bearing = 270
          , speed = 200
-         , iff = False }
+         , iff = False 
+         }
 
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
@@ -101,7 +104,20 @@ bearing (sLat, sLong) (tLat, tLong) =
   in
       atan2 y x
 
-mapToPolar target = ...
+-- Convert from Cartesian (and imperial) map coordinates to 
+-- polar (and metric) relative to station position and line of shoot.
+
+mapToPolar : Station -> Target -> PolarTarget
+mapToPolar station target = 
+  let stationPos = (station.latitude, station.longitude)
+      targetPos = (target.latitude, target.longitude)
+      rng = range stationPos targetPos
+  in
+     { r = rng
+     , theta = (bearing stationPos targetPos) - station.lineOfShoot
+     , alpha = atan2 (target.height * 304.8) rng
+     , iff = target.iff
+     }
 
 -- MAIN
 main =
