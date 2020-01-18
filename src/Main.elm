@@ -113,18 +113,26 @@ bawdsey = { longitude = degrees 1.408614
           , lineOfShoot = degrees 90.0 
           }  
 
-bomber = { longitude = degrees 2.0
-         , latitude = degrees 51.993661
-         , height = 20 -- ,000 ft
-         , bearing = degrees 270
-         , speed = 200 -- mph
-         , iff = False 
-         }
-
+bomber1 = { longitude = degrees 2.0
+          , latitude = degrees 51.993661
+          , height = 20 -- ,000 ft
+          , bearing = degrees 270
+          , speed = 220 -- mph
+          , iff = False 
+          }
+ 
+bomber2 = { longitude = degrees 1.9
+          , latitude = degrees 51.993
+          , height = 20 -- ,000 ft
+          , bearing = degrees 275
+          , speed = 200 -- mph
+          , iff = False 
+          }
+ 
 -- Targets move! t in seconds to at least centisecond resolution please
 targetAtTime : Int -> Int -> Target -> Target
 targetAtTime t startTime target = 
-  let tempusFugit = (t) - (startTime)
+  let tempusFugit = t - startTime  -- milliseconds elapsed
       distanceTravelled = (toFloat tempusFugit) * target.speed * 1609 / 3600000
       (newLat, newLong) = newPosition (target.latitude, target.longitude) 
                                        distanceTravelled target.bearing
@@ -159,7 +167,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber ]
+    targetsBaseline = [ bomber1, bomber2 ]
   in
     ( { zone = Time.utc 
       , startTime = 0
@@ -178,7 +186,7 @@ init _ =
 -- Initially, just try to show range info with no echoing.
 bucketize : List PolarTarget -> List (Int, Int)
 bucketize targets =
-  let emptyLineArray = Array.repeat 1000 (toFloat 0)
+  let emptyLineArray = Array.repeat 1000 (toFloat 10)
       filledLineArray = List.foldl addSignal emptyLineArray targets
       asList = Array.toIndexedList filledLineArray
   in
@@ -190,8 +198,10 @@ addSignal : PolarTarget -> Array Float -> Array Float
 addSignal signal array =
   let index = truncate <| (signal.r) / 100  
       currentValue = Maybe.withDefault 0 (Array.get index array)
+      a1 = Array.set index (currentValue + 100) array
+      a2 = Array.set index (currentValue + 100) a1
   in
-      Array.set index (currentValue + 100) array
+      Array.set index (currentValue + 100) a2
 
 -- UPDATE
 type Msg
@@ -230,7 +240,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 40 Tick
+  Time.every 100 Tick
 
 -- VIEW
 
