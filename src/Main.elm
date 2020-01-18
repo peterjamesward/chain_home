@@ -244,6 +244,13 @@ subscriptions model =
 
 -- VIEW
 
+-- Just see if interpolation reduces the digital artefactnessittude.
+lineSmoother : List (Int, Int) -> List (Int, Int)
+lineSmoother lineData = List.map2 
+                        (\(i1, x1) (i2, x2) -> (i2, (x1+x2) // 2))
+                        lineData
+                        (List.drop 1 lineData)
+
 view : Model -> Svg Msg
 view m = 
 {-  let t1 = Maybe.withDefault bomber (List.head m.movedTargets)
@@ -293,7 +300,7 @@ view m =
         ]
         []
     , polyline
-        [ points (polyLineFromCoords m.lineData)
+        [ points (polyLineFromCoords <| lineSmoother m.lineData)
         , fill "none"
         , stroke "lightgreen"
         , strokeWidth "1"
