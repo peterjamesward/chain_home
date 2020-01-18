@@ -61,6 +61,8 @@ type alias Echo = { t : Float -- timebase is range/2c
 
 type alias LineData = List Float
 
+defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
+
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
 
@@ -120,9 +122,9 @@ bomber = { longitude = degrees 2.0
          }
 
 -- Targets move! t in seconds to at least centisecond resolution please
-targetAtTime : Time.Posix -> Time.Posix -> Target -> Target
+targetAtTime : Int -> Int -> Target -> Target
 targetAtTime t startTime target = 
-  let tempusFugit = (Time.posixToMillis t) - (Time.posixToMillis startTime)
+  let tempusFugit = (t) - (startTime)
       distanceTravelled = (toFloat tempusFugit) * target.speed * 1609 / 3600000
       (newLat, newLong) = newPosition (target.latitude, target.longitude) 
                                        distanceTravelled target.bearing
@@ -143,8 +145,8 @@ main =
 -- MODEL
 type alias Model =
   { zone : Time.Zone
-  , startTime : Time.Posix
-  , time : Time.Posix
+  , startTime : Int -- millseconds from t-zero
+  , time : Int
   , lineData : List (Int, Int)
   , station : Station
   , targets : List Target
@@ -160,8 +162,8 @@ init _ =
     targetsBaseline = [ bomber ]
   in
     ( { zone = Time.utc 
-      , startTime = Time.millisToPosix 0
-      , time = Time.millisToPosix 0
+      , startTime = 0
+      , time = 0
       , lineData = myLineData 0
       , station = bawdsey
       , targets = targetsBaseline
@@ -197,13 +199,14 @@ type Msg
   | AdjustTimeZone Time.Zone
 
 -- THIS IS IT. This is the place where it all comes together.
-deriveModelAtTime : Model -> Time.Posix -> Model
+deriveModelAtTime : Model -> Int -> Model
 deriveModelAtTime model t =
   let
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
   in
-      { model | time = t
+      { model | startTime = if model.startTime == 0 then t else model.startTime 
+              , time = t
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes = []
@@ -214,13 +217,12 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick newTime ->
-      ( deriveModelAtTime model newTime
+      ( deriveModelAtTime model (Time.posixToMillis newTime)
       , Cmd.none
       )
 
     AdjustTimeZone newZone ->
-      ( { model | zone = newZone 
-                , lineData = myLineData (Time.toSecond model.zone model.time)}
+      ( { model | zone = newZone }
       , Cmd.none
       )
 
@@ -228,12 +230,44 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 400 Tick
+  Time.every 40 Tick
 
 -- VIEW
 
 view : Model -> Svg Msg
-view m = svg
+view m = 
+{-  let t1 = Maybe.withDefault bomber (List.head m.movedTargets)
+      p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
+      info = [ Html.text "Start time "
+             , Html.text <| String.fromInt m.startTime
+             , Html.br [] []
+             , Html.text "At time "
+             , Html.text <| String.fromInt m.time
+             , Html.br [] []
+             , Html.text "Longitude (radians) "
+             , Html.text <| String.fromFloat <| t1.longitude
+             , Html.br [] []
+             , Html.text "Latitude (radians) "
+             , Html.text <| String.fromFloat <| t1.latitude
+             , Html.br [] []
+             , Html.text "r "
+             , Html.text <| String.fromFloat <| p1.r
+             , Html.br [] []
+             , Html.text "theta "
+             , Html.text <| String.fromFloat <| p1.theta
+             , Html.br [] []
+             , Html.text "alpha "
+             , Html.text <| String.fromFloat <| p1.alpha
+             , Html.br [] []
+             ]
+      lineInfo = List.concatMap
+                   (\(i,x) -> [ Html.text <| String.fromInt i
+                              , Html.text <| String.fromInt x
+                              , Html.br [] []])
+                   m.lineData
+  in
+    div [] lineInfo-}
+  svg
     [ viewBox "0 0 800 400"
     , width "800"
     , height "400"
@@ -252,7 +286,7 @@ view m = svg
         [ points (polyLineFromCoords m.lineData)
         , fill "none"
         , stroke "lightgreen"
-        , strokeWidth "2"
+        , strokeWidth "1"
         ]
         []
     ]
