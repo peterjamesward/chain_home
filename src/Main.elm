@@ -9,6 +9,7 @@ import Browser
 import Html exposing (..)
 import Task
 import Time
+import Array exposing (..)
 
 -- This is dummy line for me to practise with floats and trig.
 myLineData t= List.map (\x -> ( x, truncate <| ((*) 100) <| sin <| toFloat <| x * t ))
@@ -105,13 +106,13 @@ mapToPolar station target =
 
 -- Let's make ourselves a station and a target
 -- Bawdsey, assuming LOS due East.
-bawdsey = { latitude = degrees 1.408614
-          , longitude = degrees 51.993661 
+bawdsey = { longitude = degrees 1.408614
+          , latitude = degrees 51.993661 
           , lineOfShoot = degrees 90.0 
           }  
 
-bomber = { latitude = degrees 2.0
-         , longitude = degrees 51.993661
+bomber = { longitude = degrees 2.0
+         , latitude = degrees 51.993661
          , height = 20 -- ,000 ft
          , bearing = degrees 270
          , speed = 200 -- mph
@@ -119,9 +120,10 @@ bomber = { latitude = degrees 2.0
          }
 
 -- Targets move! t in seconds to at least centisecond resolution please
-targetAtTime : Float -> Target -> Target
-targetAtTime t target = 
-  let distanceTravelled = target.speed * 1609 / 3600
+targetAtTime : Time.Posix -> Time.Posix -> Target -> Target
+targetAtTime t startTime target = 
+  let tempusFugit = (Time.posixToMillis t) - (Time.posixToMillis startTime)
+      distanceTravelled = (toFloat tempusFugit) * target.speed * 1609 / 3600000
       (newLat, newLong) = newPosition (target.latitude, target.longitude) 
                                        distanceTravelled target.bearing
   in 
@@ -141,6 +143,7 @@ main =
 -- MODEL
 type alias Model =
   { zone : Time.Zone
+  , startTime : Time.Posix
   , time : Time.Posix
   , lineData : List (Int, Int)
   , station : Station
@@ -155,33 +158,63 @@ init : () -> (Model, Cmd Msg)
 init _ =
   let
     targetsBaseline = [ bomber ]
-    targetsNow = List.map (targetAtTime 0) targetsBaseline
-    convertedTargets = List.map (mapToPolar bawdsey) targetsNow
   in
     ( { zone = Time.utc 
+      , startTime = Time.millisToPosix 0
       , time = Time.millisToPosix 0
       , lineData = myLineData 0
       , station = bawdsey
       , targets = targetsBaseline
-      , movedTargets = targetsNow
-      , polarTargets = convertedTargets
-      , echoes = []
+      , movedTargets = []
+      , polarTargets = []
+      , echoes = [] 
       }
     , Task.perform AdjustTimeZone Time.here
     )
+
+-- Starting point for our bucket filling function.
+-- Initially, just try to show range info with no echoing.
+bucketize : List PolarTarget -> List (Int, Int)
+bucketize targets =
+  let emptyLineArray = Array.repeat 1000 (toFloat 0)
+      filledLineArray = List.foldl addSignal emptyLineArray targets
+      asList = Array.toIndexedList filledLineArray
+  in
+      List.map (\(i,x)->(i,truncate x)) asList
+
+-- For now, assume 100km range so 1000 buckets of 100m each, 
+-- Use a 20 bucket pulse width. 
+addSignal : PolarTarget -> Array Float -> Array Float
+addSignal signal array =
+  let index = truncate <| (signal.r) / 100  
+      currentValue = Maybe.withDefault 0 (Array.get index array)
+  in
+      Array.set index (currentValue + 100) array
 
 -- UPDATE
 type Msg
   = Tick Time.Posix
   | AdjustTimeZone Time.Zone
 
+-- THIS IS IT. This is the place where it all comes together.
+deriveModelAtTime : Model -> Time.Posix -> Model
+deriveModelAtTime model t =
+  let
+    targetsNow = List.map (targetAtTime t model.startTime) model.targets
+    convertedTargets = List.map (mapToPolar bawdsey) targetsNow
+  in
+      { model | time = t
+              , movedTargets = targetsNow
+              , polarTargets = convertedTargets
+              , echoes = []
+              , lineData = bucketize model.polarTargets 
+      }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick newTime ->
-      ( { model | time = newTime
-                , lineData = myLineData (Time.toMillis model.zone model.time)}
+      ( deriveModelAtTime model newTime
       , Cmd.none
       )
 
@@ -195,7 +228,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 4000 Tick
+  Time.every 400 Tick
 
 -- VIEW
 
