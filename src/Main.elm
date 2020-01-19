@@ -12,51 +12,50 @@ import Time
 import Array exposing (..)
 
 -- This is dummy line for me to practise with floats and trig.
-myLineData t= List.map (\x -> ( x, truncate <| ((*) 100) <| sin <| toFloat <| x * t ))
-  (List.range 1 800)
+myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
 
--- SVG requires a line to be expressed as a space separated string of
--- integer pairs. So it is.
-stringifyPoint (x, y) = (String.fromInt x )++ 
+-- SVG requires a line to be expressed as a space separated string of pairs.
+stringifyPoint (x, y) = (String.fromFloat x )++ 
     "," ++ 
-    (String.fromInt y) ++ " "
+    (String.fromFloat y) ++ " "
 
 polyLineFromCoords coords = List.foldr (++) "" 
   (List.map stringifyPoint coords)
 
 -- Some RDF lobe functions TO GO IN DIFFERENT NODULE
-txHiVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
-txHiVertOmniLobe alpha = sin (7 * alpha)
-txHorizReflectedLobe theta = (cos theta)^2
-txHorizOmniLobe theta = cos theta
+txHiVertReflectedLobe 𝛂 = (1 - 6 * 𝛂) * abs (sin (24 * 𝛂))
+txHiVertOmniLobe 𝛂      = sin (7 * 𝛂)
+txHorizReflectedLobe θ  = (cos θ)^2
+txHorizOmniLobe θ       = cos θ
 
-rxHorizLobe theta = cos theta
-rxLoVertLobe alpha = sin (7 * alpha)
-rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
+rxHorizLobe θ  = cos θ
+rxLoVertLobe 𝛂 = sin (7 * 𝛂)
+rxHiVertLobe 𝛂 = (1 - 6 * 𝛂) * abs (sin (24 * 𝛂))
 
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
-type alias Target = { latitude : Float
+type alias Target = { latitude   : Float
                      , longitude : Float
-                     , height : Float  -- in thousands of feet
-                     , bearing : Float -- in degrees from North
-                     , speed : Float   -- miles per hour (!)
-                     , iff : Bool }
+                     , height    : Float  -- in thousands of feet
+                     , bearing   : Float -- in degrees from North
+                     , speed     : Float   -- miles per hour (!)
+                     , iff       : Bool }
 
-type alias PolarTarget = { r : Float -- metres
+type alias PolarTarget = { r     : Float -- metres
                          , theta : Float -- radians
                          , alpha : Float -- radians, ignoring curvature for now
-                         , iff : Bool -- is this a pipsqueak equipped friendly?
+                         , iff   : Bool -- is this a pipsqueak equipped friendly?
                          }
 
-type alias Station = { latitude : Float
-                     , longitude : Float
+type alias Station = { latitude    : Float
+                     , longitude   : Float
                      , lineOfShoot : Float
                      }
 
-type alias Echo = { t : Float -- timebase is range/2c
-                  , theta : Float
-                  , phase : Float
-                  , duration : Float
+type alias Echo = { r         : Float 
+                  , theta     : Float
+                  , phase     : Float
+                  , duration  : Float
+                  , amplitude : Float
                   }
 
 type alias LineData = List Float
@@ -108,25 +107,25 @@ mapToPolar station target =
 
 -- Let's make ourselves a station and a target
 -- Bawdsey, assuming LOS due East.
-bawdsey = { longitude = degrees 1.408614
-          , latitude = degrees 51.993661 
+bawdsey = { longitude   = degrees 1.408614
+          , latitude    = degrees 51.993661 
           , lineOfShoot = degrees 90.0 
           }  
 
 bomber1 = { longitude = degrees 2.0
-          , latitude = degrees 51.993661
-          , height = 20 -- ,000 ft
-          , bearing = degrees 270
-          , speed = 220 -- mph
-          , iff = False 
+          , latitude  = degrees 51.993661
+          , height    = 20 -- ,000 ft
+          , bearing   = degrees 270
+          , speed     = 220 -- mph
+          , iff       = False 
           }
  
 bomber2 = { longitude = degrees 1.9
-          , latitude = degrees 51.993
-          , height = 20 -- ,000 ft
-          , bearing = degrees 275
-          , speed = 200 -- mph
-          , iff = False 
+          , latitude  = degrees 51.993
+          , height    = 20 -- ,000 ft
+          , bearing   = degrees 275
+          , speed     = 200 -- mph
+          , iff       = False 
           }
  
 -- Targets move! t in seconds to at least centisecond resolution please
@@ -140,6 +139,24 @@ targetAtTime t startTime target =
     { target | latitude = newLat
              , longitude = newLong 
              }
+
+-- Non-bucketized line generation.
+There will be some set of echoes, and shall probably manage these as a set not a list.
+We sort by range of leading edge of echo. Maybe we have one sort of both leading and
+trailing edges.
+We process the echoes in order of range, skipping to the next edge. Range will be fractional,
+and we rely on SVG to draw nice lines. (We may try various quality options.) As we 
+encounter leading edges, we add the echo to the active echo set and sum the echoes in 
+the active set accounting for phase and magnitude. This gives deflection and is valid
+until the next edge.
+On a trailing edge, we remove the relevant echo from the active set and derive the
+new deflection.
+On each edge, we output a line segment. We can prepend these to a list.
+We end with a line to (800,0). 
+
+-- This version uses the polar targets, not the echoes, so we can see how the line looks.
+deriveTrace : List PolarTarget -> LineData
+deriveTrace signals =
 
 -- MAIN
 main =
@@ -155,7 +172,7 @@ type alias Model =
   { zone : Time.Zone
   , startTime : Int -- millseconds from t-zero
   , time : Int
-  , lineData : List (Int, Int)
+  , lineData : List (Int, Float)
   , station : Station
   , targets : List Target
   , movedTargets : List Target
@@ -182,27 +199,6 @@ init _ =
     , Task.perform AdjustTimeZone Time.here
     )
 
--- Starting point for our bucket filling function.
--- Initially, just try to show range info with no echoing.
-bucketize : List PolarTarget -> List (Int, Int)
-bucketize targets =
-  let emptyLineArray = Array.repeat 1000 (toFloat 10)
-      filledLineArray = List.foldl addSignal emptyLineArray targets
-      asList = Array.toIndexedList filledLineArray
-  in
-      List.map (\(i,x)->(i,truncate x)) asList
-
--- For now, assume 100km range so 1000 buckets of 100m each, 
--- Use a 20 bucket pulse width. 
-addSignal : PolarTarget -> Array Float -> Array Float
-addSignal signal array =
-  let index = truncate <| (signal.r) / 100  
-      currentValue = Maybe.withDefault 0 (Array.get index array)
-      a1 = Array.set index (currentValue + 100) array
-      a2 = Array.set index (currentValue + 100) a1
-  in
-      Array.set index (currentValue + 100) a2
-
 -- UPDATE
 type Msg
   = Tick Time.Posix
@@ -220,7 +216,7 @@ deriveModelAtTime model t =
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes = []
-              , lineData = bucketize model.polarTargets 
+              , lineData = deriveTrace model.polarTargets 
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -240,16 +236,9 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 100 Tick
+  Time.every 1000 Tick
 
 -- VIEW
-
--- Just see if interpolation reduces the digital artefactnessittude.
-lineSmoother : List (Int, Int) -> List (Int, Int)
-lineSmoother lineData = List.map2 
-                        (\(i1, x1) (i2, x2) -> (i2, (x1+x2) // 2))
-                        lineData
-                        (List.drop 1 lineData)
 
 view : Model -> Svg Msg
 view m = 
@@ -300,7 +289,7 @@ view m =
         ]
         []
     , polyline
-        [ points (polyLineFromCoords <| lineSmoother m.lineData)
+        [ points (polyLineFromCoords m.lineData)
         , fill "none"
         , stroke "lightgreen"
         , strokeWidth "1"
