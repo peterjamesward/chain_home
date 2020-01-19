@@ -10,6 +10,7 @@ import Html exposing (..)
 import Task
 import Time
 import Array exposing (..)
+import Dict exposing (..)
 
 -- This is dummy line for me to practise with floats and trig.
 myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
@@ -58,7 +59,7 @@ type alias Echo = { r         : Float
                   , amplitude : Float
                   }
 
-type alias LineData = List Float
+type alias LineData = List (Float, Float)
 
 defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
 
@@ -141,7 +142,7 @@ targetAtTime t startTime target =
              }
 
 -- Non-bucketized line generation.
-There will be some set of echoes, and shall probably manage these as a set not a list.
+{-There will be some set of echoes, and shall probably manage these as a set not a list.
 We sort by range of leading edge of echo. Maybe we have one sort of both leading and
 trailing edges.
 We process the echoes in order of range, skipping to the next edge. Range will be fractional,
@@ -152,11 +153,47 @@ until the next edge.
 On a trailing edge, we remove the relevant echo from the active set and derive the
 new deflection.
 On each edge, we output a line segment. We can prepend these to a list.
-We end with a line to (800,0). 
+We end with a line to (800,0). -}
+
+type alias EdgeInfo = (Float, Float, Bool)  -- x coord of edge, leading edge,  and whether leading edge.
 
 -- This version uses the polar targets, not the echoes, so we can see how the line looks.
+
+combineSignals : Dict Float PolarTarget -> Float
+combineSignals activeSignals = 100.0 * toFloat (size activeSignals)
+
+processEdge : EdgeInfo -> (LineData, Dict Float PolarTarget, Dict Float PolarTarget) 
+                       -> (LineData, Dict Float PolarTarget, Dict Float PolarTarget)
+processEdge (position, leading, isLeading) (lineData, activeSignals, allSignals) = 
+  let  signal = Maybe.withDefault defaultPolarTarget <| Dict.get position allSignals
+       newActiveSignals = case isLeading of
+                              True  -> (Dict.insert position signal activeSignals)
+                              False -> (Dict.remove leading activeSignals)
+       newX = position / 100.0
+       newY = combineSignals newActiveSignals
+       (prevX, prevY) = Maybe.withDefault (0.0, 0.0) <| List.head lineData
+  in
+       ( (newX, newY) 
+         :: (newX, prevY) 
+         :: lineData
+       , newActiveSignals
+       , allSignals )
+
 deriveTrace : List PolarTarget -> LineData
 deriveTrace signals =
+  -- Let's put the targets in a dictionary, indexed by range (probably unique!).
+  -- Then we need a sorted list of edges (front and back).
+  -- Sorted list will index into the dictionary, for easy access to each target.
+  let allSignals = List.foldl (\p a -> Dict.insert p.r p a) Dict.empty signals
+      activeSignals = Dict.empty
+      theLine = [(0.0,0.0)]
+      leadingEdges = List.map (\p -> (p.r, p.r, True)) signals
+      trailingEdges = List.map (\p -> (p.r + 200, p.r, False )) signals
+      allEdgesSorted = List.sortBy (\(a,b,c) -> a) <| leadingEdges ++ trailingEdges
+      extractLineData (line, _, _) = line
+  in
+      ((::) (1000.0, 0.0)) <| extractLineData <| List.foldl processEdge (theLine, activeSignals, allSignals) allEdgesSorted
+      
 
 -- MAIN
 main =
@@ -172,7 +209,7 @@ type alias Model =
   { zone : Time.Zone
   , startTime : Int -- millseconds from t-zero
   , time : Int
-  , lineData : List (Int, Float)
+  , lineData : List (Float, Float)
   , station : Station
   , targets : List Target
   , movedTargets : List Target
@@ -189,7 +226,7 @@ init _ =
     ( { zone = Time.utc 
       , startTime = 0
       , time = 0
-      , lineData = myLineData 0
+      , lineData = myLineData 0.0
       , station = bawdsey
       , targets = targetsBaseline
       , movedTargets = []
@@ -236,43 +273,44 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 1000 Tick
+  Time.every 40 Tick
 
 -- VIEW
 
 view : Model -> Svg Msg
 view m = 
-{-  let t1 = Maybe.withDefault bomber (List.head m.movedTargets)
-      p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
-      info = [ Html.text "Start time "
-             , Html.text <| String.fromInt m.startTime
-             , Html.br [] []
-             , Html.text "At time "
-             , Html.text <| String.fromInt m.time
-             , Html.br [] []
-             , Html.text "Longitude (radians) "
-             , Html.text <| String.fromFloat <| t1.longitude
-             , Html.br [] []
-             , Html.text "Latitude (radians) "
-             , Html.text <| String.fromFloat <| t1.latitude
-             , Html.br [] []
-             , Html.text "r "
-             , Html.text <| String.fromFloat <| p1.r
-             , Html.br [] []
-             , Html.text "theta "
-             , Html.text <| String.fromFloat <| p1.theta
-             , Html.br [] []
-             , Html.text "alpha "
-             , Html.text <| String.fromFloat <| p1.alpha
-             , Html.br [] []
-             ]
-      lineInfo = List.concatMap
-                   (\(i,x) -> [ Html.text <| String.fromInt i
-                              , Html.text <| String.fromInt x
-                              , Html.br [] []])
-                   m.lineData
-  in
-    div [] lineInfo-}
+  --let t1 = Maybe.withDefault bomber1 (List.head m.movedTargets)
+  --    p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
+  --    info = [ Html.text "Start time "
+  --           , Html.text <| String.fromInt m.startTime
+  --           , Html.br [] []
+  --           , Html.text "At time "
+  --           , Html.text <| String.fromInt m.time
+  --           , Html.br [] []
+  --           , Html.text "Longitude (radians) "
+  --           , Html.text <| String.fromFloat <| t1.longitude
+  --           , Html.br [] []
+  --           , Html.text "Latitude (radians) "
+  --           , Html.text <| String.fromFloat <| t1.latitude
+  --           , Html.br [] []
+  --           , Html.text "r "
+  --           , Html.text <| String.fromFloat <| p1.r
+  --           , Html.br [] []
+  --           , Html.text "theta "
+  --           , Html.text <| String.fromFloat <| p1.theta
+  --           , Html.br [] []
+  --           , Html.text "alpha "
+  --           , Html.text <| String.fromFloat <| p1.alpha
+  --           , Html.br [] []
+  --           ]
+  --    lineInfo = List.concatMap
+  --                 (\(i,x) -> [ Html.text <| String.fromFloat i
+  --                            , Html.text " "
+  --                            , Html.text <| String.fromFloat x
+  --                            , Html.br [] []])
+  --                 m.lineData
+  --in
+  --  div [] lineInfo
   svg
     [ viewBox "0 0 800 400"
     , width "800"
