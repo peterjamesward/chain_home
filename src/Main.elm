@@ -37,7 +37,7 @@ lightSpeed = 300000000
 frequency  = 20000000
 wavelength = lightSpeed / frequency
 pulseDuration = 40  -- microseconds 
-pulseWidth = lightSpeed * pulseDuration / 10000000
+pulseWidth = lightSpeed * pulseDuration / 10000000  -- TODO: scale seems wrong here.
 
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 type alias Target = { latitude   : Float
@@ -124,7 +124,7 @@ bomber1 = { longitude = degrees 2.0
           , latitude  = degrees 51.993661
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 220 -- mph
+          , speed     = 400 -- mph
           , iff       = False 
           }
  
@@ -169,14 +169,15 @@ type alias EdgeInfo = (Float, Float, Bool)  -- x coord of edge, leading edge,  a
 combineEchoes : Dict Float Echo -> Float
 
 combineEchoes activeEchoes = 
-  100.0 * toFloat (Dict.size activeEchoes)
-  ---- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
-  --let asPolar = Dict.map (\_ e -> (e.amplitude, e.phase)) activeEchoes
-  --    asRect  = List.map (fromPolar << second) <| Dict.toList asPolar
-  --    combinedAsRect = List.foldl (\(x1,y1) (x2,y2) -> (x1+x2,y1+y2)) (0.0,0.0) asRect
-  --    combinedAsPolar = toPolar combinedAsRect
-  --in
-  --    first combinedAsPolar
+  --Dict.foldl (\_ e acc -> e.amplitude + acc) 0.0 activeEchoes
+--  100.0 * toFloat (Dict.size activeEchoes)  --OK!
+  -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
+  let asPolar = Dict.map (\_ e -> (e.amplitude, e.phase) ) activeEchoes
+      asRect  = Dict.map (\_ p -> fromPolar p)  asPolar
+      combinedAsRect = Dict.foldl (\_ (x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
+      combinedAsPolar = toPolar combinedAsRect
+  in
+      100.0 * first combinedAsPolar
 
 processEdge : EdgeInfo -> (LineData, Dict Float Echo, Dict Float Echo) 
                        -> (LineData, Dict Float Echo, Dict Float Echo)
@@ -221,7 +222,7 @@ deriveEchoes targets =
                             , theta     = target.theta
                             , phase     = ph target.r
                             , duration  = pulseDuration    -- microseconds
-                            , amplitude = 1 / target.r -- representative only
+                            , amplitude = 1  -- TODO: consider distance 
                             }
   in   List.map deriveEcho targets
 
@@ -344,15 +345,15 @@ view m =
   --in
   --  div [] lineInfo
   svg
-    [ viewBox "0 0 800 400"
+    [ viewBox "0 -10 800 410"
     , width "800"
-    , height "400"
+    , height "410"
     ]
     [ rect
         [ x "0"
-        , y "0"
+        , y "-10"
         , width "800"
-        , height "400"
+        , height "410"
         , fill "black"
         , stroke "black"
         , strokeWidth "2"
