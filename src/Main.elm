@@ -33,6 +33,12 @@ rxHorizLobe θ  = cos θ
 rxLoVertLobe 𝛂 = sin (7 * 𝛂)
 rxHiVertLobe 𝛂 = (1 - 6 * 𝛂) * abs (sin (24 * 𝛂))
 
+lightSpeed = 300000000
+frequency  = 20000000
+wavelength = lightSpeed / frequency
+pulseDuration = 40  -- microseconds 
+pulseWidth = lightSpeed * pulseDuration / 10000000
+
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 type alias Target = { latitude   : Float
                      , longitude : Float
@@ -62,6 +68,7 @@ type alias Echo = { r         : Float
 type alias LineData = List (Float, Float)
 
 defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
+defaultEcho = { r = 0, theta = 0, phase = 0, amplitude = 0, duration = 0 }
 
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
@@ -159,41 +166,65 @@ type alias EdgeInfo = (Float, Float, Bool)  -- x coord of edge, leading edge,  a
 
 -- This version uses the polar targets, not the echoes, so we can see how the line looks.
 
-combineSignals : Dict Float PolarTarget -> Float
-combineSignals activeSignals = 100.0 * toFloat (size activeSignals)
+combineEchoes : Dict Float Echo -> Float
 
-processEdge : EdgeInfo -> (LineData, Dict Float PolarTarget, Dict Float PolarTarget) 
-                       -> (LineData, Dict Float PolarTarget, Dict Float PolarTarget)
-processEdge (position, leading, isLeading) (lineData, activeSignals, allSignals) = 
-  let  signal = Maybe.withDefault defaultPolarTarget <| Dict.get position allSignals
-       newActiveSignals = case isLeading of
-                              True  -> (Dict.insert position signal activeSignals)
-                              False -> (Dict.remove leading activeSignals)
+combineEchoes activeEchoes = 
+  100.0 * toFloat (Dict.size activeEchoes)
+  ---- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
+  --let asPolar = Dict.map (\_ e -> (e.amplitude, e.phase)) activeEchoes
+  --    asRect  = List.map (fromPolar << second) <| Dict.toList asPolar
+  --    combinedAsRect = List.foldl (\(x1,y1) (x2,y2) -> (x1+x2,y1+y2)) (0.0,0.0) asRect
+  --    combinedAsPolar = toPolar combinedAsRect
+  --in
+  --    first combinedAsPolar
+
+processEdge : EdgeInfo -> (LineData, Dict Float Echo, Dict Float Echo) 
+                       -> (LineData, Dict Float Echo, Dict Float Echo)
+processEdge (position, leading, isLeading) (lineData, activeEchoes, allEchoes) = 
+  let  echo = Maybe.withDefault defaultEcho <| Dict.get position allEchoes
+       newActiveEchoes = case isLeading of
+                              True  -> (Dict.insert position echo activeEchoes)
+                              False -> (Dict.remove leading activeEchoes)
        newX = position / 100.0
-       newY = combineSignals newActiveSignals
+       newY = combineEchoes newActiveEchoes
        (prevX, prevY) = Maybe.withDefault (0.0, 0.0) <| List.head lineData
   in
        ( (newX, newY) 
          :: (newX, prevY) 
          :: lineData
-       , newActiveSignals
-       , allSignals )
+       , newActiveEchoes
+       , allEchoes )
 
-deriveTrace : List PolarTarget -> LineData
-deriveTrace signals =
+deriveTrace : List Echo -> LineData
+deriveTrace echoes =
   -- Let's put the targets in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
-  let allSignals = List.foldl (\p a -> Dict.insert p.r p a) Dict.empty signals
-      activeSignals = Dict.empty
+  let allEchoes = List.foldl (\p a -> Dict.insert p.r p a) Dict.empty echoes
+      activeEchoes = Dict.empty
       theLine = [(0.0,0.0)]
-      leadingEdges = List.map (\p -> (p.r, p.r, True)) signals
-      trailingEdges = List.map (\p -> (p.r + 200, p.r, False )) signals
+      leadingEdges = List.map (\p -> (p.r, p.r, True)) echoes
+      trailingEdges = List.map (\p -> (p.r + pulseWidth, p.r, False )) echoes -- TODO: Duration
       allEdgesSorted = List.sortBy (\(a,b,c) -> a) <| leadingEdges ++ trailingEdges
       extractLineData (line, _, _) = line
   in
-      ((::) (1000.0, 0.0)) <| extractLineData <| List.foldl processEdge (theLine, activeSignals, allSignals) allEdgesSorted
+      ((::) (1000.0, 0.0)) 
+        <| extractLineData 
+        <| List.foldl processEdge (theLine, activeEchoes, allEchoes) allEdgesSorted
       
+-- Deriving echoes is just applying the transmitter lobe function so
+-- amplitude is function of ltheta and range. Later, IFF figures.
+deriveEchoes : List PolarTarget -> List Echo
+deriveEchoes targets = 
+  let ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
+      deriveEcho target = { r         = target.r
+                            , theta     = target.theta
+                            , phase     = ph target.r
+                            , duration  = pulseDuration    -- microseconds
+                            , amplitude = 1 / target.r -- representative only
+                            }
+  in   List.map deriveEcho targets
+
 
 -- MAIN
 main =
@@ -247,13 +278,14 @@ deriveModelAtTime model t =
   let
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
+    echoSignals = deriveEchoes convertedTargets
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
-              , echoes = []
-              , lineData = deriveTrace model.polarTargets 
+              , echoes       = echoSignals
+              , lineData     = deriveTrace echoSignals 
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
