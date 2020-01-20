@@ -136,6 +136,14 @@ bomber2 = { longitude = degrees 1.9
           , iff       = False 
           }
  
+fighter1 = { longitude = degrees 1.4
+           , latitude  = degrees 52.0
+           , height    = 20 -- ,000 ft
+           , bearing   = degrees 90
+           , speed     = 400 -- mph
+           , iff       = False 
+           }
+ 
 -- Targets move! t in seconds to at least centisecond resolution please
 targetAtTime : Int -> Int -> Target -> Target
 targetAtTime t startTime target = 
@@ -222,7 +230,7 @@ deriveEchoes targets =
                             , theta     = target.theta
                             , phase     = ph target.r
                             , duration  = pulseDuration    -- microseconds
-                            , amplitude = 1  -- TODO: consider distance 
+                            , amplitude = txHorizReflectedLobe target.theta  -- TODO: consider distance 
                             }
   in   List.map deriveEcho targets
 
@@ -253,7 +261,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber1, bomber2 ]
+    targetsBaseline = [ bomber1, bomber2, fighter1 ]
   in
     ( { zone = Time.utc 
       , startTime = 0
