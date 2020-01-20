@@ -231,7 +231,7 @@ deriveEchoes targets =
                             , phase     = ph target.r
                             , duration  = pulseDuration    -- microseconds
                             , amplitude = ( txHorizReflectedLobe target.theta )
-                                          * ( txHiVertReflectedLobe target.alpha ) -- TODO: consider distance 
+                                          * ( txHiVertOmniLobe target.alpha ) -- TODO: consider distance 
                             }
   in   List.map deriveEcho targets
 
