@@ -24,14 +24,14 @@ polyLineFromCoords coords = List.foldr (++) ""
   (List.map stringifyPoint coords)
 
 -- Some RDF lobe functions TO GO IN DIFFERENT NODULE
-txHiVertReflectedLobe 𝛂 = (1 - 6 * 𝛂) * abs (sin (24 * 𝛂))
-txHiVertOmniLobe 𝛂      = sin (7 * 𝛂)
+txHiVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
+txHiVertOmniLobe alpha      = sin (7 * alpha)
 txHorizReflectedLobe θ  = (cos θ)^2
 txHorizOmniLobe θ       = cos θ
 
 rxHorizLobe θ  = cos θ
-rxLoVertLobe 𝛂 = sin (7 * 𝛂)
-rxHiVertLobe 𝛂 = (1 - 6 * 𝛂) * abs (sin (24 * 𝛂))
+rxLoVertLobe alpha = sin (7 * alpha)
+rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
 lightSpeed = 300000000
 frequency  = 20000000
@@ -63,7 +63,7 @@ type alias Echo = { r         : Float
                   , phase     : Float
                   , duration  : Float
                   , amplitude : Float
-                  }
+                  } -- TODO: Add alpga to echo??
 
 type alias LineData = List (Float, Float)
 
@@ -230,7 +230,8 @@ deriveEchoes targets =
                             , theta     = target.theta
                             , phase     = ph target.r
                             , duration  = pulseDuration    -- microseconds
-                            , amplitude = txHorizReflectedLobe target.theta  -- TODO: consider distance 
+                            , amplitude = ( txHorizReflectedLobe target.theta )
+                                          * ( txHiVertReflectedLobe target.alpha ) -- TODO: consider distance 
                             }
   in   List.map deriveEcho targets
 
