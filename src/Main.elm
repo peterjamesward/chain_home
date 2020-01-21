@@ -139,7 +139,7 @@ bomber2 = { longitude = degrees 1.9
  
 fighter1 = { longitude = degrees 1.4
            , latitude  = degrees 52.0
-           , height    = 20 -- ,000 ft
+           , height    = 5 -- ,000 ft
            , bearing   = degrees 90
            , speed     = 400 -- mph
            , iff       = False 
@@ -188,9 +188,10 @@ combineEchoes activeEchoes =
   in
       100.0 * first combinedAsPolar
 
-processEdge : EdgeInfo -> (LineData, Dict Float Echo, Dict Float Echo) 
-                       -> (LineData, Dict Float Echo, Dict Float Echo)
-processEdge (position, leading, isLeading) (lineData, activeEchoes, allEchoes) = 
+processEdge : Float -> EdgeInfo 
+                    -> (LineData, Dict Float Echo, Dict Float Echo) 
+                    -> (LineData, Dict Float Echo, Dict Float Echo)
+processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes) = 
   let  echo = Maybe.withDefault defaultEcho <| Dict.get position allEchoes
        newActiveEchoes = case isLeading of
                               True  -> (Dict.insert position echo activeEchoes)
@@ -205,38 +206,42 @@ processEdge (position, leading, isLeading) (lineData, activeEchoes, allEchoes) =
        , newActiveEchoes
        , allEchoes )
 
-deriveTrace : List Echo -> LineData
-deriveTrace echoes =
+deriveTrace : Dict Float Echo -> LineData
+deriveTrace allEchoes =
   -- Let's put the targets in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
-  let allEchoes = List.foldl (\p a -> Dict.insert p.r p a) Dict.empty echoes
-      activeEchoes = Dict.empty
+  let activeEchoes = Dict.empty
       theLine = [(0.0,0.0)]
-      leadingEdges = List.map (\p -> (p.r, p.r, True)) echoes
-      trailingEdges = List.map (\p -> (p.r + pulseWidth, p.r, False )) echoes -- TODO: Duration
-      allEdgesSorted = List.sortBy (\(a,b,c) -> a) <| leadingEdges ++ trailingEdges
+      leadingEdges = Dict.foldl (\r e d -> Dict.insert r (r, r, True) d) 
+                                Dict.empty allEchoes
+      trailingEdges = Dict.foldl (\r e d -> Dict.insert (r + pulseWidth) (r + pulseWidth, r, False ) d) 
+                                 Dict.empty allEchoes 
+      allEdges = Dict.union leadingEdges trailingEdges
       extractLineData (line, _, _) = line
   in
       ((::) (1000.0, 0.0)) 
         <| extractLineData 
-        <| List.foldl processEdge (theLine, activeEchoes, allEchoes) allEdgesSorted
+        <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
+
       
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
 -- 22/01 Want to change this to be Dict r Echo; probably Dict r PolarTargets as well.
-deriveEchoes : List PolarTarget -> List Echo
+deriveEchoes : List PolarTarget -> Dict Float Echo
 deriveEchoes targets = 
   let ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
-      deriveEcho target = { r         = target.r
-                          , theta     = target.theta
-                          , alpha     = target.alpha
-                          , phase     = ph target.r
-                          , duration  = pulseDuration    -- microseconds
-                          , amplitude = ( txHorizReflectedLobe target.theta )
-                                        * ( txHiVertOmniLobe target.alpha ) -- TODO: consider distance 
-                          }
-  in   List.map deriveEcho targets
+      echoFromTarget target = { r         = target.r
+                              , theta     = target.theta
+                              , alpha     = target.alpha
+                              , phase     = ph target.r
+                              , duration  = pulseDuration    -- microseconds
+                              , amplitude = ( txHorizReflectedLobe target.theta )
+                                            * ( txHiVertOmniLobe target.alpha )
+                              }
+      deriveEcho t d = Dict.insert t.r (echoFromTarget t) d
+  in
+      List.foldl deriveEcho Dict.empty targets
 
 
 -- MAIN
@@ -258,7 +263,7 @@ type alias Model =
   , targets : List Target
   , movedTargets : List Target
   , polarTargets : List PolarTarget
-  , echoes : List Echo
+  , echoes : Dict Float Echo
   }
 
 
@@ -275,7 +280,7 @@ init _ =
       , targets = targetsBaseline
       , movedTargets = []
       , polarTargets = []
-      , echoes = [] 
+      , echoes = Dict.empty
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -357,15 +362,15 @@ view m =
   --in
   --  div [] lineInfo
   svg
-    [ viewBox "0 -10 800 410"
-    , width "800"
-    , height "410"
+    [ viewBox "-10 -10 1020 420"
+    , width "1020"
+    , height "420"
     ]
     [ rect
-        [ x "0"
+        [ x "-10"
         , y "-10"
-        , width "800"
-        , height "410"
+        , width "1020"
+        , height "420"
         , fill "black"
         , stroke "black"
         , strokeWidth "2"
