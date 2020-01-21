@@ -60,6 +60,7 @@ type alias Station = { latitude    : Float
 
 type alias Echo = { r         : Float 
                   , theta     : Float
+                  , alpha     : Float
                   , phase     : Float
                   , duration  : Float
                   , amplitude : Float
@@ -68,7 +69,7 @@ type alias Echo = { r         : Float
 type alias LineData = List (Float, Float)
 
 defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
-defaultEcho = { r = 0, theta = 0, phase = 0, amplitude = 0, duration = 0 }
+defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
@@ -223,16 +224,18 @@ deriveTrace echoes =
       
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
+-- 22/01 Want to change this to be Dict r Echo; probably Dict r PolarTargets as well.
 deriveEchoes : List PolarTarget -> List Echo
 deriveEchoes targets = 
   let ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
       deriveEcho target = { r         = target.r
-                            , theta     = target.theta
-                            , phase     = ph target.r
-                            , duration  = pulseDuration    -- microseconds
-                            , amplitude = ( txHorizReflectedLobe target.theta )
-                                          * ( txHiVertOmniLobe target.alpha ) -- TODO: consider distance 
-                            }
+                          , theta     = target.theta
+                          , alpha     = target.alpha
+                          , phase     = ph target.r
+                          , duration  = pulseDuration    -- microseconds
+                          , amplitude = ( txHorizReflectedLobe target.theta )
+                                        * ( txHiVertOmniLobe target.alpha ) -- TODO: consider distance 
+                          }
   in   List.map deriveEcho targets
 
 
