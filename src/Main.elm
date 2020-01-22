@@ -127,7 +127,7 @@ bomber1 = { longitude = degrees 2.0
 bomber2 = { longitude = degrees 1.99
           , latitude  = degrees 51.993660
           , height    = 20 -- ,000 ft
-          , bearing   = degrees 275
+          , bearing   = degrees 270
           , speed     = 200 -- mph
           , iff       = False 
           }
@@ -384,15 +384,16 @@ view m = case viewMode of
 
   AsImage ->  
     svg
-      [ viewBox "-10 -10 1020 420"
+      [ viewBox "-10 -20 1020 430"
       , width "1020"
       , height "420"
       ]
-      [ rect
+      (List.append 
+        [ rect
           [ x "-10"
-          , y "-10"
+          , y "-20"
           , width "1020"
-          , height "420"
+          , height "430"
           , fill "black"
           , stroke "black"
           , strokeWidth "3"
@@ -406,4 +407,8 @@ view m = case viewMode of
           , strokeWidth "1"
           ]
           []
-      ]
+      ] rangeScale)
+
+rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-5", fill "lightgreen", textAnchor "right" ] 
+                                       [ Svg.text (String.fromInt (i*5)) ])
+  (List.range 0 20)
