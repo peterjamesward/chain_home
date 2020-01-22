@@ -91,7 +91,7 @@ type alias Echo = { r         : Float
                   , phase     : Float
                   , duration  : Float
                   , amplitude : Float
-                  } -- TODO: Add alpga to echo??
+                  }
 
 type alias LineData = List (Float, Float)
 
@@ -99,7 +99,7 @@ type alias EdgeSegment = ((Float, Float), (Float, Float))
 
 defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
-beamSweepMax = 30 -- Maximum vertical displacement for one microsecond.
+beamSweepMax = 5 -- Maximum vertical displacement for one microsecond.
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -237,8 +237,9 @@ lineSmoother rawEdges =
         else
           ((e1x1,e1y1),(e2x1,e1y1 - beamSweepMax * (e2x1-e1x1))) -- e1 truncated
       toLineData (p1,p2) = [p2,p1]
+      removeZeroEdges = List.filter (\((x1,_),(x2,_)) -> x2 > x1) 
   in
-      (1000.0,0.0) :: List.concatMap toLineData nonOverlappingPoints 
+      (1000.0,0.0) :: List.concatMap toLineData (removeZeroEdges nonOverlappingPoints)
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
@@ -285,7 +286,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber1, bomber2, fighter1 ] ++ (stationClutter bawdsey)
+    targetsBaseline = [ bomber1, bomber2, fighter1 ] --++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
