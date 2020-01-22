@@ -264,8 +264,10 @@ lineSmoother rawEdges =
           ((e1x1,e1y1),(e1x2,e1y2)) -- no overlap
         else if e2x1 < e1x1 then
           ((e2x1,e2y1),(e2x1,e2y1)) -- edge completely obscured
-        else
+        else if e1y2 >= e1y1 then
           ((e1x1,e1y1),(e2x1,e1y1 + beamSweepMax * (e2x1-e1x1))) -- e1 truncated
+        else
+          ((e1x1,e1y1),(e2x1,e1y1 - beamSweepMax * (e2x1-e1x1))) -- e1 truncated
       toLineData (p1,p2) = [p2,p1]
   in
       (1000.0,0.0) :: List.concatMap toLineData nonOverlappingPoints 
