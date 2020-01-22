@@ -68,6 +68,8 @@ type alias Echo = { r         : Float
 
 type alias LineData = List (Float, Float)
 
+type alias EdgeSegment = ((Float, Float), (Float, Float))
+
 defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
 defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
@@ -129,7 +131,7 @@ bomber1 = { longitude = degrees 2.0
           , iff       = False 
           }
  
-bomber2 = { longitude = degrees 1.9
+bomber2 = { longitude = degrees 1.95
           , latitude  = degrees 51.993
           , height    = 20 -- ,000 ft
           , bearing   = degrees 275
@@ -189,8 +191,8 @@ combineEchoes activeEchoes =
       100.0 * first combinedAsPolar
 
 processEdge : Float -> EdgeInfo 
-                    -> (LineData, Dict Float Echo, Dict Float Echo) 
-                    -> (LineData, Dict Float Echo, Dict Float Echo)
+                    -> (List EdgeSegment, Dict Float Echo, Dict Float Echo) 
+                    -> (List EdgeSegment, Dict Float Echo, Dict Float Echo)
 processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes) = 
   let  echo = Maybe.withDefault defaultEcho <| Dict.get position allEchoes
        newActiveEchoes = case isLeading of
@@ -198,21 +200,19 @@ processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes)
                               False -> (Dict.remove leading activeEchoes)
        newX = position / 100.0
        newY = combineEchoes newActiveEchoes
-       (prevX, prevY) = Maybe.withDefault (0.0, 0.0) <| List.head lineData
+       (_,(prevX, prevY)) = Maybe.withDefault ((0.0, 0.0),(0.0, 0.0)) <| List.head lineData
   in
-       ( (newX, newY) 
-         :: (newX, prevY) 
-         :: lineData
+       ( ((newX, prevY), (newX, newY)) :: lineData
        , newActiveEchoes
        , allEchoes )
 
-deriveTrace : Dict Float Echo -> LineData
+deriveTrace : Dict Float Echo -> List EdgeSegment
 deriveTrace allEchoes =
   -- Let's put the targets in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
   let activeEchoes = Dict.empty
-      theLine = [(0.0,0.0)]
+      theLine = [((0.0,0.0),(0.0,0.0))]
       leadingEdges = Dict.foldl (\r e d -> Dict.insert r (r, r, True) d) 
                                 Dict.empty allEchoes
       trailingEdges = Dict.foldl (\r e d -> Dict.insert (r + pulseWidth) (r + pulseWidth, r, False ) d) 
@@ -220,11 +220,43 @@ deriveTrace allEchoes =
       allEdges = Dict.union leadingEdges trailingEdges
       extractLineData (line, _, _) = line
   in
-      ((::) (1000.0, 0.0)) 
-        <| extractLineData 
-        <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
+        extractLineData <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
 
+-- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
+-- on the deflection plated. We shall simulate that here.
+-- We shall not bother to limit acceleration, unless we have to.
+-- This is an interesting fold over the raw edge list.
+-- For each edge, if the edge exceeds the maxmimum sweep, we have two pieces of
+-- information - the desired Y and the achievable Y. We don't want to output a 
+-- line segment yet, lest the next edge is very close and moves contrarily.
+-- Looking at the next edge, we work out how far the beam would have moved in
+-- trying to draw the first edge and we output a line segment to that point, and
+-- update the desired and actual coordinates to suit.
+-- In other (simpler) words, we always lag behind so we can see what's coming next
+-- and then output the first segment, which may or may not reach its goal.
+-- We will have to finish (unless we are outside the bounds) with a return to the zero line.
+-- Note it's a right fold as the raw list happens to be build backwards.
+
+beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
       
+-- Should be easier using Edges rather than line segment list...
+-- How about we apply the maximum slope to each edge, moving its right hand X rightwards.
+-- e.g. (100,0)->(100,100) becomes (100,0)->(102.5,100)
+-- Given that we want to truncate edges that will now overlap.
+-- Conceivably, some edges might disappear completely!
+-- Think we can do the second thing with a fold from large X down to zero X,
+-- keeping track of lowest X we pass. 
+lineSmoother : List EdgeSegment -> LineData
+lineSmoother rawEdges = 
+  let edgeSloper ((x1,y1),(_,y2)) = ((x1,y1),(x1 + abs ((y2-y1)/beamSweepMax),y2))
+      slopingEdges = List.map edgeSloper rawEdges
+      dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
+      dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
+      paddedEdges = dummyTrailingEdge :: slopingEdges ++ [dummyLeadingEdge]
+      toLineData (p1,p2) = [p2,p1]
+  in
+      List.concatMap toLineData paddedEdges 
+
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
 -- 22/01 Want to change this to be Dict r Echo; probably Dict r PolarTargets as well.
@@ -275,7 +307,7 @@ init _ =
     ( { zone = Time.utc 
       , startTime = 0
       , time = 0
-      , lineData = myLineData 0.0
+      , lineData = lineSmoother []
       , station = bawdsey
       , targets = targetsBaseline
       , movedTargets = []
@@ -303,7 +335,7 @@ deriveModelAtTime model t =
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes       = echoSignals
-              , lineData     = deriveTrace echoSignals 
+              , lineData     = lineSmoother <| deriveTrace echoSignals 
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -373,7 +405,8 @@ view m =
         , height "420"
         , fill "black"
         , stroke "black"
-        , strokeWidth "2"
+        , strokeWidth "3"
+        , strokeLinejoin "round"
         ]
         []
     , polyline
