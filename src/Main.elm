@@ -237,7 +237,7 @@ deriveTrace allEchoes =
 -- We will have to finish (unless we are outside the bounds) with a return to the zero line.
 -- Note it's a right fold as the raw list happens to be build backwards.
 
-beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
+beamSweepMax = 30 -- Maximum vertical displacement for one microsecond.
       
 -- Should be easier using Edges rather than line segment list...
 -- How about we apply the maximum slope to each edge, moving its right hand X rightwards.
@@ -250,12 +250,26 @@ lineSmoother : List EdgeSegment -> LineData
 lineSmoother rawEdges = 
   let edgeSloper ((x1,y1),(_,y2)) = ((x1,y1),(x1 + abs ((y2-y1)/beamSweepMax),y2))
       slopingEdges = List.map edgeSloper rawEdges
+      -- Now going to try to make sure that the sloped edges cannot overlap.
+      -- We do this by concentrating on the end points, not the edges.
       dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
       dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
       paddedEdges = dummyTrailingEdge :: slopingEdges ++ [dummyLeadingEdge]
+      nonOverlappingPoints = List.map2 removeAnyOverlap paddedEdges 
+                             <| Maybe.withDefault [] <| List.tail paddedEdges
+      -- Remember edges are in 'reverse' order still.
+      -- We require that e1x2 <= e2x1 with corresponding adjustment to e1y2.
+      -- We do not need to return EdgeSegments now, we can return line segments.
+      removeAnyOverlap  ((e2x1,e2y1),(e2x2,e2y2)) ((e1x1,e1y1),(e1x2,e1y2)) =
+        if e2x1 >= e1x2 then 
+          ((e1x1,e1y1),(e1x2,e1y2)) -- no overlap
+        else if e2x1 < e1x1 then
+          ((e2x1,e2y1),(e2x1,e2y1)) -- edge completely obscured
+        else
+          ((e1x1,e1y1),(e2x1,e1y1 + beamSweepMax * (e2x1-e1x1))) -- e1 truncated
       toLineData (p1,p2) = [p2,p1]
   in
-      List.concatMap toLineData paddedEdges 
+      (1000.0,0.0) :: List.concatMap toLineData nonOverlappingPoints 
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
@@ -359,61 +373,67 @@ subscriptions model =
 
 -- VIEW
 
+type ViewMode = AsText | AsImage
+viewMode = AsImage
+
 view : Model -> Svg Msg
-view m = 
-  --let t1 = Maybe.withDefault bomber1 (List.head m.movedTargets)
-  --    p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
-  --    info = [ Html.text "Start time "
-  --           , Html.text <| String.fromInt m.startTime
-  --           , Html.br [] []
-  --           , Html.text "At time "
-  --           , Html.text <| String.fromInt m.time
-  --           , Html.br [] []
-  --           , Html.text "Longitude (radians) "
-  --           , Html.text <| String.fromFloat <| t1.longitude
-  --           , Html.br [] []
-  --           , Html.text "Latitude (radians) "
-  --           , Html.text <| String.fromFloat <| t1.latitude
-  --           , Html.br [] []
-  --           , Html.text "r "
-  --           , Html.text <| String.fromFloat <| p1.r
-  --           , Html.br [] []
-  --           , Html.text "theta "
-  --           , Html.text <| String.fromFloat <| p1.theta
-  --           , Html.br [] []
-  --           , Html.text "alpha "
-  --           , Html.text <| String.fromFloat <| p1.alpha
-  --           , Html.br [] []
-  --           ]
-  --    lineInfo = List.concatMap
-  --                 (\(i,x) -> [ Html.text <| String.fromFloat i
-  --                            , Html.text " "
-  --                            , Html.text <| String.fromFloat x
-  --                            , Html.br [] []])
-  --                 m.lineData
-  --in
-  --  div [] lineInfo
-  svg
-    [ viewBox "-10 -10 1020 420"
-    , width "1020"
-    , height "420"
-    ]
-    [ rect
-        [ x "-10"
-        , y "-10"
-        , width "1020"
-        , height "420"
-        , fill "black"
-        , stroke "black"
-        , strokeWidth "3"
-        , strokeLinejoin "round"
-        ]
-        []
-    , polyline
-        [ points (polyLineFromCoords m.lineData)
-        , fill "none"
-        , stroke "lightgreen"
-        , strokeWidth "1"
-        ]
-        []
-    ]
+view m = case viewMode of
+  AsText ->
+    let t1 = Maybe.withDefault bomber1 (List.head m.movedTargets)
+        p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
+        info = [ Html.text "Start time "
+               , Html.text <| String.fromInt m.startTime
+               , Html.br [] []
+               , Html.text "At time "
+               , Html.text <| String.fromInt m.time
+               , Html.br [] []
+               , Html.text "Longitude (radians) "
+               , Html.text <| String.fromFloat <| t1.longitude
+               , Html.br [] []
+               , Html.text "Latitude (radians) "
+               , Html.text <| String.fromFloat <| t1.latitude
+               , Html.br [] []
+               , Html.text "r "
+               , Html.text <| String.fromFloat <| p1.r
+               , Html.br [] []
+               , Html.text "theta "
+               , Html.text <| String.fromFloat <| p1.theta
+               , Html.br [] []
+               , Html.text "alpha "
+               , Html.text <| String.fromFloat <| p1.alpha
+               , Html.br [] []
+               ]
+        lineInfo = List.concatMap
+                     (\(i,x) -> [ Html.text <| String.fromFloat i
+                                , Html.text " "
+                                , Html.text <| String.fromFloat x
+                                , Html.br [] []])
+                     m.lineData
+    in
+      div [] lineInfo
+
+  AsImage ->  
+    svg
+      [ viewBox "-10 -10 1020 420"
+      , width "1020"
+      , height "420"
+      ]
+      [ rect
+          [ x "-10"
+          , y "-10"
+          , width "1020"
+          , height "420"
+          , fill "black"
+          , stroke "black"
+          , strokeWidth "3"
+          , strokeLinejoin "round"
+          ]
+          []
+      , polyline
+          [ points (polyLineFromCoords m.lineData)
+          , fill "none"
+          , stroke "lightgreen"
+          , strokeWidth "1"
+          ]
+          []
+      ]
