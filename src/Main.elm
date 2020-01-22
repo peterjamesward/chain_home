@@ -29,8 +29,8 @@ stationClutter station =
   List.map (\i -> { latitude = station.latitude + 0.01 * (sin (toFloat i))
                   , longitude = station.longitude + 0.01 * (sin (toFloat i))
                   , height = 0.1 * sqrt (toFloat i) 
-                  , bearing = 0.0
-                  , speed = 0.0
+                  , bearing = toFloat i
+                  , speed = toFloat i * 0.001
                   , iff = False
                   })
     (List.range 1 100)
@@ -238,25 +238,13 @@ deriveTrace allEchoes =
 -- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
 -- on the deflection plated. We shall simulate that here.
 -- We shall not bother to limit acceleration, unless we have to.
--- This is an interesting fold over the raw edge list.
--- For each edge, if the edge exceeds the maxmimum sweep, we have two pieces of
--- information - the desired Y and the achievable Y. We don't want to output a 
--- line segment yet, lest the next edge is very close and moves contrarily.
--- Looking at the next edge, we work out how far the beam would have moved in
--- trying to draw the first edge and we output a line segment to that point, and
--- update the desired and actual coordinates to suit.
--- In other (simpler) words, we always lag behind so we can see what's coming next
--- and then output the first segment, which may or may not reach its goal.
--- We will have to finish (unless we are outside the bounds) with a return to the zero line.
--- Note it's a right fold as the raw list happens to be build backwards.
 
 -- Should be easier using Edges rather than line segment list...
 -- How about we apply the maximum slope to each edge, moving its right hand X rightwards.
 -- e.g. (100,0)->(100,100) becomes (100,0)->(102.5,100)
 -- Given that we want to truncate edges that will now overlap.
 -- Conceivably, some edges might disappear completely!
--- Think we can do the second thing with a fold from large X down to zero X,
--- keeping track of lowest X we pass. 
+
 lineSmoother : List EdgeSegment -> LineData
 lineSmoother rawEdges = 
   let edgeSloper ((x1,y1),(_,y2)) = ((x1,y1),(x1 + abs ((y2-y1)/beamSweepMax),y2))
