@@ -99,7 +99,7 @@ type alias EdgeSegment = ((Float, Float), (Float, Float))
 
 defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
-beamSweepMax = 5 -- Maximum vertical displacement for one microsecond.
+beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -286,7 +286,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber1, bomber2, fighter1 ] --++ (stationClutter bawdsey)
+    targetsBaseline = [ bomber1, bomber2, fighter1 ] ++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
