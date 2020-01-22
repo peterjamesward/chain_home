@@ -20,8 +20,20 @@ stringifyPoint (x, y) = (String.fromFloat x )++
     "," ++ 
     (String.fromFloat y) ++ " "
 
-polyLineFromCoords coords = List.foldr (++) "" 
-  (List.map stringifyPoint coords)
+polyLineFromCoords coords = List.foldr (++) "" (List.map stringifyPoint coords)
+
+-- Generate a bunch of nearby clutter. Also stress test.
+
+stationClutter : Station -> List Target
+stationClutter station = 
+  List.map (\i -> { latitude = station.latitude + 0.01 * (sin (toFloat i))
+                  , longitude = station.longitude + 0.01 * (sin (toFloat i))
+                  , height = 0.1 * sqrt (toFloat i) 
+                  , bearing = 0.0
+                  , speed = 0.0
+                  , iff = False
+                  })
+    (List.range 1 100)
 
 -- Some RDF lobe functions TO GO IN DIFFERENT NODULE
 txHiVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
@@ -77,7 +89,8 @@ defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration 
 -- https://www.movable-type.co.uk/scripts/latlong.html
 
 meanRadius = 6371000
-
+beamSweepMax = 30 -- Maximum vertical displacement for one microsecond.
+      
 -- Equirectangular approximation
 range (φ1, λ1) (φ2, λ2) = 
   let 
@@ -127,12 +140,12 @@ bomber1 = { longitude = degrees 2.0
           , latitude  = degrees 51.993661
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 400 -- mph
+          , speed     = 210 -- mph
           , iff       = False 
           }
  
-bomber2 = { longitude = degrees 1.95
-          , latitude  = degrees 51.993
+bomber2 = { longitude = degrees 1.99
+          , latitude  = degrees 51.993660
           , height    = 20 -- ,000 ft
           , bearing   = degrees 275
           , speed     = 200 -- mph
@@ -237,8 +250,6 @@ deriveTrace allEchoes =
 -- We will have to finish (unless we are outside the bounds) with a return to the zero line.
 -- Note it's a right fold as the raw list happens to be build backwards.
 
-beamSweepMax = 30 -- Maximum vertical displacement for one microsecond.
-      
 -- Should be easier using Edges rather than line segment list...
 -- How about we apply the maximum slope to each edge, moving its right hand X rightwards.
 -- e.g. (100,0)->(100,100) becomes (100,0)->(102.5,100)
@@ -316,7 +327,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber1, bomber2, fighter1 ]
+    targetsBaseline = [ bomber1, bomber2, fighter1 ] ++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
