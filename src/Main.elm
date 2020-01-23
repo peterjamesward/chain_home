@@ -145,7 +145,7 @@ bomber1 = { longitude = degrees 2.0
           , latitude  = degrees 52.0
           , height    = 30 -- ,000 ft
           , bearing   = degrees 280
-          , speed     = 0.0 -- mph
+          , speed     = 200.0 -- mph
           , iff       = False 
           }
  
@@ -153,7 +153,7 @@ bomber2 = { longitude = degrees 2.000
           , latitude  = degrees 52.05
           , height    = 30.2 -- ,000 ft
           , bearing   = degrees 280
-          , speed     = 0.0 -- mph
+          , speed     = 200.0 -- mph
           , iff       = False 
           }
  
@@ -161,7 +161,7 @@ bomber3 = { longitude = bawdsey.longitude + (degrees 0.8)
           , latitude  = bawdsey.latitude + (degrees 0.5)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 0 -- mph
+          , speed     = 220 -- mph
           , iff       = False 
           }
  
@@ -169,7 +169,7 @@ bomber4 = { longitude = bawdsey.longitude + (degrees 0.8)
           , latitude  = bawdsey.latitude - (degrees 0.5)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 0 -- mph
+          , speed     = 220 -- mph
           , iff       = False 
           }
  
@@ -320,7 +320,7 @@ scalePathToDisplay unscaled =
 deriveEchoes : List PolarTarget -> Int -> Dict Float Echo
 deriveEchoes targets time = 
   let 
-      ph rng = asin <| sin (2 * (toFloat time) * rng/wavelength / 1000)  -- clearer not cheaper
+      ph rng = asin <| sin (2 * (toFloat time) * rng) --/wavelength / 1000)  -- clearer not cheaper
       --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
       echoFromTarget target = { r         = target.r
                               , theta     = target.theta
