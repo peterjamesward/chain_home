@@ -78,18 +78,20 @@ rxHorizLobe θ  = cos θ
 rxLoVertLobe alpha = sin (7 * alpha)
 rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
-lightSpeed = 300000000
-frequency  = 20000000
+lightSpeed = 300000000.0
+frequency  = 20000000.0
 wavelength = lightSpeed / frequency
-pulseDuration = 40  -- microseconds 
-pulseWidth = lightSpeed * pulseDuration / 10000000  -- TODO: scale seems wrong here.
+pulseDuration = 40.0  -- microseconds 
+pulseWidth = lightSpeed * pulseDuration / 10000000.0  -- TODO: scale seems wrong here.
 
 -- Some facts about our display
-beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
+beamSweepMax = 0.001 -- Maximum vertical displacement for one microsecond.
+beamSweepDown = 0.003 -- Visually, they seem to return the beam more slowly.
+beamSweepUp   = -0.0005  
 scaleWidthKilometers = 150
 viewWidth = 1000
 viewHeight = 400
-strengthToHeightFactor = 100
+strengthToHeightFactor = 100.0
 rangeToXFactor = viewWidth / (scaleWidthKilometers * 1000.0)
 rangeDeltaPerMicrosecond = scaleWidthKilometers * 2
 
@@ -109,6 +111,20 @@ type alias EdgeSegment = ((Float, Float), (Float, Float))
 
 defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
+dummyFinalEcho = { r = scaleWidthKilometers * 1000
+                 , theta = 0
+                 , alpha = 0
+                 , phase = 0
+                 , amplitude = 0
+                 , duration = 0
+                 }
+
+dummyInitialEcho = { dummyFinalEcho | r = 0 }
+
+addEchoToDict e d = Dict.insert e.r e d
+
+-- A way to make sure that we start and end cleanly??
+dummyEchoes = List.foldl addEchoToDict Dict.empty [dummyInitialEcho, dummyFinalEcho]
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -126,16 +142,16 @@ mapToPolar station target =
      }
 
 bomber1 = { longitude = degrees 2.0
-          , latitude  = degrees 51.993661
-          , height    = 20 -- ,000 ft
+          , latitude  = degrees 52.0
+          , height    = 30 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 210 -- mph
+          , speed     = 200 -- mph
           , iff       = False 
           }
  
-bomber2 = { longitude = degrees 1.99
-          , latitude  = degrees 51.993660
-          , height    = 20 -- ,000 ft
+bomber2 = { longitude = degrees 2.001
+          , latitude  = degrees 51.5
+          , height    = 30 -- ,000 ft
           , bearing   = degrees 270
           , speed     = 200 -- mph
           , iff       = False 
@@ -180,7 +196,7 @@ combineEchoes activeEchoes =
       combinedAsRect = Dict.foldl (\_ (x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
       combinedAsPolar = toPolar combinedAsRect
   in
-      strengthToHeightFactor * first combinedAsPolar
+      first combinedAsPolar
 
 processEdge : Float -> EdgeInfo 
                     -> (List EdgeSegment, Dict Float Echo, Dict Float Echo) 
@@ -190,7 +206,7 @@ processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes)
        newActiveEchoes = case isLeading of
                               True  -> (Dict.insert position echo activeEchoes)
                               False -> (Dict.remove leading activeEchoes)
-       newX = position * rangeToXFactor
+       newX = position
        newY = combineEchoes newActiveEchoes
        (_,(prevX, prevY)) = Maybe.withDefault dummyLeadingEdge <| List.head lineData
   in
@@ -198,21 +214,25 @@ processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes)
        , newActiveEchoes
        , allEchoes )
 
-deriveTrace : Dict Float Echo -> List EdgeSegment
-deriveTrace allEchoes =
-  -- Let's put the targets in a dictionary, indexed by range (probably unique!).
+
+deriveSkyline : Dict Float Echo -> List EdgeSegment
+deriveSkyline allEchoes =
+  -- Let's put the echoes in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
   let activeEchoes = Dict.empty
-      theLine = [ dummyLeadingEdge ]
-      leadingEdges = Dict.foldl (\r e d -> Dict.insert r (r, r, True) d) 
-                                Dict.empty allEchoes
-      trailingEdges = Dict.foldl (\r e d -> Dict.insert (r + pulseWidth) (r + pulseWidth, r, False ) d) 
-                                 Dict.empty allEchoes 
+      leadingEdges = Dict.foldr (\rng ech acc -> Dict.insert rng (rng, rng, True) acc) 
+                                Dict.empty 
+                                allEchoes
+      trailingEdges = Dict.foldr (\rng ech acc -> Dict.insert (rng + pulseWidth) (rng + pulseWidth, rng, False ) acc) 
+                                 Dict.empty 
+                                 allEchoes 
       allEdges = Dict.union leadingEdges trailingEdges
       extractLineData (line, _, _) = line
   in
-      extractLineData <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
+      extractLineData <| Dict.foldl processEdge 
+                                    ([], activeEchoes, allEchoes) 
+                                    allEdges
 
 -- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
 -- on the deflection plated. We shall simulate that here.
@@ -221,49 +241,61 @@ deriveTrace allEchoes =
 dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
 dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
 
--- This version uses the concept of beam movement time - the beam can only
--- move so far before the next edge comes along.
+-- Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
+-- The beam goes left to right, the edges go up and down.
+-- When affected by an edge the beam can only go up or down at at fixed speed - beanSweepMax..
+-- If the beam reaches its goal Y before the next edge, it will move horizontally only.
+-- If the next edge comes before the beam reaches its goal, the new edge takes precedence
+-- and its (far) end becomes the new goal for the beam.
+-- When there are no more edges the beam returns to vertical zero.
+-- The implementation is a fold with nuance.
+-- As we encounter an edge, it becomes the new goal but we do not yet 'draw' anything, because
+-- we know not yet the next edge.
+-- So, the second part is to complete the processing of the previous edge.
+-- If it had time to reach the goal from its previous position, 
+--    we have a line segment from previous position to goal, AND
+--    a horizontal segment to the start of the new egde.
+-- If it had not time to reach the goal, 
+--    we draw a line segment from its previous position as far as it went
+-- In either case, we update the beam position and set the new goal from the new edge.
 
-truncateEdge ((e2x1,e2y1),(e2x2,e2y2)) ((e1x1,e1y1),(e1x2,e1y2)) =
-  let e1X = e1x2 - e1x1
-      e1Y = e1y2 - e1y1
-      e1Direction = e1Y / (abs e1Y)
-      traversalTime = e1Y / beamSweepMax
-      timeBeforeE2 = (e2x1 - e1x1)/rangeDeltaPerMicrosecond
-      movementTime = Basics.min traversalTime timeBeforeE2
-      newX2 = e1x1 + movementTime * rangeDeltaPerMicrosecond
-      newY2 = e1y1 + movementTime * beamSweepMax * e1Direction / strengthToHeightFactor
-  in  ((e1x1,e1y1),(newX2,newY2))
 
-lineSmoother : List EdgeSegment -> LineData
-lineSmoother rawEdges = 
-  let edgeSloper ((x1,y1),(_,y2)) = ((x1,y1),(x1 + abs ((y2-y1)/beamSweepMax),y2))
+beamSmoothingFunction : EdgeSegment -> 
+    (LineData,  EdgeSegment) -> 
+    (LineData,  EdgeSegment) 
+beamSmoothingFunction newEdge (lines, prevEdge) =
+    let
+        ((newX1, newY1),(newX2, newY2)) = newEdge
+        ((prevX1, prevY1),(prevX2, prevY2)) = prevEdge
+        (beamX, beamY) = Maybe.withDefault (0.0,0.0) <| List.head lines
+        
+        beamDirection = if (prevY2 > prevY1) then 1 else -1
+        beamSpeed = if (prevY2 > prevY1) then beamSweepDown else beamSweepUp
+        edgeInterval = (newX1 - prevX1)  -- in metres range (!)
+        intervalNeededToReachGoal = abs (prevY2 - beamY) / (abs beamSpeed)
 
-      slopingEdges = List.map edgeSloper rawEdges
-      paddedEdges = dummyTrailingEdge :: slopingEdges ++ [dummyLeadingEdge]
+        newLines =  if (edgeInterval >= intervalNeededToReachGoal) then
+                        -- reached goal, and we can work out when
+                        [(newX1, prevY2), (beamX + intervalNeededToReachGoal, prevY2)]
+                    else 
+                        -- did not reach goal, record where it arrived
+                        [(newX1, beamY + edgeInterval * beamDirection * beamSpeed)]
+    in              
+        ( newLines ++ lines, newEdge )
 
-      removeAnyOverlap  ((e2x1,e2y1),(e2x2,e2y2)) ((e1x1,e1y1),(e1x2,e1y2)) =
-        if e2x1 >= e1x2 then 
-          ((e1x1,e1y1),(e1x2,e1y2)) -- no overlap
-        else if e2x1 < e1x1 then
-          ((e2x1,e2y1),(e2x1,e2y1)) -- edge completely obscured
-        else if e1y2 >= e1y1 then
-          ((e1x1,e1y1),(e2x1,e1y1 + beamSweepMax * (e2x1-e1x1))) -- e1 truncated
-        else
-          ((e1x1,e1y1),(e2x1,e1y1 - beamSweepMax * (e2x1-e1x1))) -- e1 truncated
+beamPath : List EdgeSegment -> LineData
+beamPath edges =
+    let
+        (lines, _) = List.foldr beamSmoothingFunction 
+                     ( [], dummyLeadingEdge ) 
+                     edges
+    in
+        lines
 
-      nonOverlappingPoints = List.map2 removeAnyOverlap paddedEdges 
-                             <| Maybe.withDefault [] <| List.tail paddedEdges
-
-      (linePath,_) = List.foldr (\((x1,y1),(x2,y2)) (linesOut, (beamX, beamY)) -> 
-                                    ( (x2,y2) :: (x1,beamY) :: (beamX,beamY) :: linesOut
-                                    , (x2,y2))
-                                )
-                                ([(0.0,0.0)], (0.0,0.0))  -- line accumulator and beam position
-                                nonOverlappingPoints
-  in
-      (scaleWidthKilometers,0.0) :: linePath
-
+scalePathToDisplay : LineData -> LineData
+scalePathToDisplay unscaled =
+    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, y * strengthToHeightFactor)
+    in  List.map scalePoint unscaled
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
@@ -276,13 +308,12 @@ deriveEchoes targets =
                               , alpha     = target.alpha
                               , phase     = ph target.r
                               , duration  = pulseDuration    -- microseconds
-                              , amplitude = ( txHorizReflectedLobe target.theta )
-                                            * ( txHiVertOmniLobe target.alpha )
+                              , amplitude = abs <| ( txHorizReflectedLobe target.theta )
+                                                 * ( txHiVertOmniLobe target.alpha )
                               }
       deriveEcho t d = Dict.insert t.r (echoFromTarget t) d
   in
       List.foldl deriveEcho Dict.empty targets
-
 
 -- MAIN
 main =
@@ -304,23 +335,29 @@ type alias Model =
   , movedTargets : List Target
   , polarTargets : List PolarTarget
   , echoes : Dict Float Echo
+  , skyline : List ((Float, Float),(Float, Float))
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    targetsBaseline = [ bomber1, bomber2, fighter1 ] ++ (stationClutter bawdsey)
+    targetsBaseline = [ bomber1
+                      , bomber2
+                      , fighter1 
+                      ]
+                      --++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
       , time = 0
-      , lineData = lineSmoother []
+      , lineData = beamPath []
       , station = bawdsey
       , targets = targetsBaseline
       , movedTargets = []
       , polarTargets = []
-      , echoes = Dict.empty
+      , echoes = dummyEchoes
+      , skyline = []
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -337,13 +374,15 @@ deriveModelAtTime model t =
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
     echoSignals = deriveEchoes convertedTargets
+    skyline = deriveSkyline <| Dict.union dummyEchoes echoSignals
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes       = echoSignals
-              , lineData     = lineSmoother <| deriveTrace echoSignals 
+              , skyline      = skyline
+              , lineData     = scalePathToDisplay <| beamPath skyline
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -370,41 +409,76 @@ subscriptions model =
 type ViewMode = AsText | AsImage
 viewMode = AsImage
 
+viewPolarTarget p1 =   [ Html.text "r "
+                        , Html.text <| String.fromFloat <| p1.r
+                       , Html.br [] []
+                       , Html.text "theta "
+                       , Html.text <| String.fromFloat <| p1.theta
+                       , Html.br [] []
+                       , Html.text "alpha "
+                       , Html.text <| String.fromFloat <| p1.alpha
+                       , Html.br [] []
+                       , Html.hr [] []
+                       ]
+
+viewEcho (_,e) = [ Html.text "r "
+                , Html.text <| String.fromFloat <| e.r
+                , Html.br [] []
+                , Html.text "theta "
+                , Html.text <| String.fromFloat <| e.theta
+                , Html.br [] []
+                , Html.text "alpha "
+                , Html.text <| String.fromFloat <| e.alpha
+                , Html.br [] []
+                , Html.text "phase "
+                , Html.text <| String.fromFloat <| e.phase
+                , Html.br [] []
+                , Html.text "duration "
+                , Html.text <| String.fromFloat <| e.duration
+                , Html.br [] []
+                , Html.text "amplitude "
+                , Html.text <| String.fromFloat <| e.amplitude
+                , Html.br [] []
+               , Html.hr [] []
+               ]
+
+viewEdge ((x1,y1),(x2,y2)) = [ Html.text "( "
+                , Html.text <| String.fromFloat <| x1
+                , Html.text " , "
+                , Html.text <| String.fromFloat <| y1
+                , Html.text " ), ( "
+                , Html.text <| String.fromFloat <| x2
+                , Html.text " , "
+                , Html.text <| String.fromFloat <| y2
+                , Html.text " )"
+                , Html.br [] []
+               , Html.hr [] []
+               ]
+
+viewLineSegment (x,y) = [ Html.text "( "
+                , Html.text <| stringifyPoint (x,y)
+                --, Html.text <| String.fromFloat <| x
+                --, Html.text " , "
+                --, Html.text <| String.fromFloat <| y
+                , Html.text " )"
+                , Html.br [] []
+               , Html.hr [] []
+               ]
+
 view : Model -> Svg Msg
 view m = case viewMode of
   AsText ->
-    let t1 = Maybe.withDefault bomber1 (List.head m.movedTargets)
-        p1 = Maybe.withDefault defaultPolarTarget (List.head m.polarTargets)
-        info = [ Html.text "Start time "
-               , Html.text <| String.fromInt m.startTime
-               , Html.br [] []
-               , Html.text "At time "
-               , Html.text <| String.fromInt m.time
-               , Html.br [] []
-               , Html.text "Longitude (radians) "
-               , Html.text <| String.fromFloat <| t1.longitude
-               , Html.br [] []
-               , Html.text "Latitude (radians) "
-               , Html.text <| String.fromFloat <| t1.latitude
-               , Html.br [] []
-               , Html.text "r "
-               , Html.text <| String.fromFloat <| p1.r
-               , Html.br [] []
-               , Html.text "theta "
-               , Html.text <| String.fromFloat <| p1.theta
-               , Html.br [] []
-               , Html.text "alpha "
-               , Html.text <| String.fromFloat <| p1.alpha
-               , Html.br [] []
-               ]
-        lineInfo = List.concatMap
-                     (\(i,x) -> [ Html.text <| String.fromFloat i
-                                , Html.text " "
-                                , Html.text <| String.fromFloat x
-                                , Html.br [] []])
-                     m.lineData
+    let polarInfo = List.concatMap viewPolarTarget m.polarTargets
+        echoInfo = List.concatMap viewEcho (Dict.toList m.echoes)
+        edgeInfo = List.concatMap viewEdge m.skyline
+        lineInfo = List.concatMap viewLineSegment m.lineData
     in
-      div [] lineInfo
+      div [] ( [] 
+               --++ polarInfo 
+               --++ echoInfo 
+               ++ edgeInfo
+               ++ lineInfo
+             )
 
   AsImage ->  
     svg
