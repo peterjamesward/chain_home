@@ -157,6 +157,14 @@ bomber2 = { longitude = degrees 2.001
           , iff       = False 
           }
  
+bomber3 = { longitude = degrees 2.002
+          , latitude  = degrees 51.55
+          , height    = 30 -- ,000 ft
+          , bearing   = degrees 270
+          , speed     = 200 -- mph
+          , iff       = False 
+          }
+ 
 fighter1 = { longitude = degrees 1.4
            , latitude  = degrees 52.0
            , height    = 5 -- ,000 ft
@@ -294,7 +302,7 @@ beamPath edges =
 
 scalePathToDisplay : LineData -> LineData
 scalePathToDisplay unscaled =
-    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, y * strengthToHeightFactor)
+    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, (sqrt y) * strengthToHeightFactor)
     in  List.map scalePoint unscaled
 
 -- Deriving echoes is just applying the transmitter lobe function so
@@ -344,6 +352,7 @@ init _ =
   let
     targetsBaseline = [ bomber1
                       , bomber2
+                      , bomber3
                       , fighter1 
                       ]
                       --++ (stationClutter bawdsey)
@@ -402,7 +411,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 100 Tick
+  Time.every 50 Tick
 
 -- VIEW
 
