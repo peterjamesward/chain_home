@@ -343,6 +343,7 @@ type alias Model =
   , lineData : List (Float, Float)
   , prevLine : List (Float, Float)
   , olderLine : List (Float, Float)
+  , oldestLine : List (Float, Float)
   , station : Station
   , targets : List Target
   , movedTargets : List Target
@@ -360,7 +361,7 @@ init _ =
                       , bomber3
                       , fighter1 
                       ]
-                      --++ (stationClutter bawdsey)
+                      ++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
@@ -368,6 +369,7 @@ init _ =
       , lineData = beamPath []
       , prevLine = beamPath []
       , olderLine = beamPath []
+      , oldestLine = beamPath []
       , station = bawdsey
       , targets = targetsBaseline
       , movedTargets = []
@@ -398,6 +400,7 @@ deriveModelAtTime model t =
               , polarTargets = convertedTargets
               , echoes       = echoSignals
               , skyline      = skyline
+              , oldestLine   = model.olderLine
               , olderLine    = model.prevLine
               , prevLine     = model.lineData
               , lineData     = scalePathToDisplay <| beamPath skyline
@@ -516,22 +519,30 @@ view m = case viewMode of
           , strokeLinejoin "round"
           ]
           []
-      , polyline
-          [ points (polyLineFromCoords m.olderLine)
-          , fill "none"
-          , stroke "darkolivegreen"
-          , opacity "20%"
-          , strokeWidth "1"
-          ]
-          []
-      , polyline
-          [ points (polyLineFromCoords m.prevLine)
-          , fill "none"
-          , stroke "forestgreen"
-          , opacity "60%"
-          , strokeWidth "1"
-          ]
-          []
+      --, polyline
+      --    [ points (polyLineFromCoords m.oldestLine)
+      --    , fill "none"
+      --    , stroke "darkslategrey"
+      --    , opacity "20%"
+      --    , strokeWidth "5"
+      --    ]
+      --    []
+      --, polyline
+      --    [ points (polyLineFromCoords m.olderLine)
+      --    , fill "none"
+      --    , stroke "darkolivegreen"
+      --    , opacity "20%"
+      --    , strokeWidth "5"
+      --    ]
+      --    []
+      --, polyline
+      --    [ points (polyLineFromCoords m.prevLine)
+      --    , fill "none"
+      --    , stroke "forestgreen"
+      --    , opacity "60%"
+      --    , strokeWidth "3"
+      --    ]
+      --    []
       , polyline
           [ points (polyLineFromCoords m.lineData)
           , fill "none"
