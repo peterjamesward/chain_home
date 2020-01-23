@@ -546,6 +546,14 @@ view m = case viewMode of
       , polyline
           [ points (polyLineFromCoords m.lineData)
           , fill "none"
+          , stroke "forestgreen"
+          , opacity "60%"
+          , strokeWidth "3"
+          ]
+          []
+      , polyline
+          [ points (polyLineFromCoords m.lineData)
+          , fill "none"
           , stroke "springgreen"
           , strokeWidth "1"
           ]
