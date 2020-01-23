@@ -157,11 +157,19 @@ bomber2 = { longitude = degrees 2.000
           , iff       = False 
           }
  
-bomber3 = { longitude = degrees 2.1
-          , latitude  = degrees 50.5
-          , height    = 30 -- ,000 ft
-          , bearing   = degrees 260
-          , speed     = 250 -- mph
+bomber3 = { longitude = bawdsey.longitude + (degrees 0.8)
+          , latitude  = bawdsey.latitude + (degrees 0.5)
+          , height    = 20 -- ,000 ft
+          , bearing   = degrees 270
+          , speed     = 0 -- mph
+          , iff       = False 
+          }
+ 
+bomber4 = { longitude = bawdsey.longitude + (degrees 0.8)
+          , latitude  = bawdsey.latitude - (degrees 0.5)
+          , height    = 20 -- ,000 ft
+          , bearing   = degrees 270
+          , speed     = 0 -- mph
           , iff       = False 
           }
  
@@ -359,9 +367,10 @@ init _ =
     targetsBaseline = [ bomber1
                       , bomber2
                       , bomber3
-                      , fighter1 
+                      , bomber4
+                      --, fighter1 
                       ]
-                      ++ (stationClutter bawdsey)
+                      --++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
@@ -487,79 +496,57 @@ viewLineSegment (x,y) = [ Html.text "( "
                ]
 
 view : Model -> Svg Msg
-view m = case viewMode of
-  AsText ->
-    let polarInfo = List.concatMap viewPolarTarget m.polarTargets
-        echoInfo = List.concatMap viewEcho (Dict.toList m.echoes)
-        edgeInfo = List.concatMap viewEdge m.skyline
-        lineInfo = List.concatMap viewLineSegment m.lineData
-    in
-      div [] ( [] 
-               ++ polarInfo 
-               ++ echoInfo 
-               --++ edgeInfo
-               --++ lineInfo
-             )
+view m = 
+  let svgPointList = (polyLineFromCoords m.lineData) in 
+  case viewMode of
+    AsText ->
+      let polarInfo = List.concatMap viewPolarTarget m.polarTargets
+          echoInfo = List.concatMap viewEcho (Dict.toList m.echoes)
+          edgeInfo = List.concatMap viewEdge m.skyline
+          lineInfo = List.concatMap viewLineSegment m.lineData
+      in
+        div [] ( [] 
+                 ++ polarInfo 
+                 ++ echoInfo 
+                 --++ edgeInfo
+                 --++ lineInfo
+               )
 
-  AsImage ->  
-    svg
-      [ viewBox "-10 -40 1020 450"
-      , width "1020"
-      , height "420"
-      ]
-      (List.append 
-        [ rect
-          [ x "-10"
-          , y "-40"
-          , width "1020"
-          , height "450"
-          , fill "black"
-          , stroke "black"
-          , strokeWidth "3"
-          , strokeLinejoin "round"
-          ]
-          []
-      --, polyline
-      --    [ points (polyLineFromCoords m.oldestLine)
-      --    , fill "none"
-      --    , stroke "darkslategrey"
-      --    , opacity "20%"
-      --    , strokeWidth "5"
-      --    ]
-      --    []
-      --, polyline
-      --    [ points (polyLineFromCoords m.olderLine)
-      --    , fill "none"
-      --    , stroke "darkolivegreen"
-      --    , opacity "20%"
-      --    , strokeWidth "5"
-      --    ]
-      --    []
-      --, polyline
-      --    [ points (polyLineFromCoords m.prevLine)
-      --    , fill "none"
-      --    , stroke "forestgreen"
-      --    , opacity "60%"
-      --    , strokeWidth "3"
-      --    ]
-      --    []
-      , polyline
-          [ points (polyLineFromCoords m.lineData)
-          , fill "none"
-          , stroke "forestgreen"
-          , opacity "60%"
-          , strokeWidth "3"
-          ]
-          []
-      , polyline
-          [ points (polyLineFromCoords m.lineData)
-          , fill "none"
-          , stroke "springgreen"
-          , strokeWidth "1"
-          ]
-          []
-      ] rangeScale)
+    AsImage ->  
+      svg
+        [ viewBox "-10 -40 1020 450"
+        , width "1020"
+        , height "420"
+        ]
+        (List.append 
+          [ rect
+            [ x "-10"
+            , y "-40"
+            , width "1020"
+            , height "450"
+            , fill "black"
+            , stroke "black"
+            , strokeWidth "3"
+            , strokeLinejoin "round"
+            ]
+            []
+        , polyline
+            [ points svgPointList
+            , fill "none"
+            , stroke "forestgreen"
+            , opacity "60%"
+            , strokeWidth "2.5"
+            ]
+            []
+        , polyline
+            [ points svgPointList
+            , fill "none"
+            , stroke "springgreen"
+            , strokeWidth "0.8"
+            ]
+            []
+        ] rangeScale)
 
 rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
                                        [ Svg.text (String.fromInt (i*5)) ])
-  (List.range 0 20)
+  (List.range 0 19)
