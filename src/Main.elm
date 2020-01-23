@@ -84,6 +84,16 @@ wavelength = lightSpeed / frequency
 pulseDuration = 40  -- microseconds 
 pulseWidth = lightSpeed * pulseDuration / 10000000  -- TODO: scale seems wrong here.
 
+-- Some facts about our display
+beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
+scaleWidthKilometers = 150
+viewWidth = 1000
+viewHeight = 400
+strengthToHeightFactor = 100
+rangeToXFactor = viewWidth / (scaleWidthKilometers * 1000.0)
+rangeDeltaPerMicrosecond = scaleWidthKilometers * 2
+
+
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 type alias Echo = { r         : Float 
                   , theta     : Float
@@ -99,7 +109,6 @@ type alias EdgeSegment = ((Float, Float), (Float, Float))
 
 defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
 
-beamSweepMax = 20 -- Maximum vertical displacement for one microsecond.
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -140,23 +149,25 @@ fighter1 = { longitude = degrees 1.4
            , iff       = False 
            }
  
--- Non-bucketized line generation.
+-- Skyline algorithm works out the trace from combined echoes.
+
 {-There will be some set of echoes, and shall probably manage these as a set not a list.
-We sort by range of leading edge of echo. Maybe we have one sort of both leading and
-trailing edges.
-We process the echoes in order of range, skipping to the next edge. Range will be fractional,
-and we rely on SVG to draw nice lines. (We may try various quality options.) As we 
-encounter leading edges, we add the echo to the active echo set and sum the echoes in 
-the active set accounting for phase and magnitude. This gives deflection and is valid
-until the next edge.
-On a trailing edge, we remove the relevant echo from the active set and derive the
-new deflection.
-On each edge, we output a line segment. We can prepend these to a list.
-We end with a line to (800,0). -}
+  We sort by range of leading edge of echo. Maybe we have one sort of both leading and
+  trailing edges.
+  We process the echoes in order of range, skipping to the next edge. Range will be fractional,
+  and we rely on SVG to draw nice lines. (We may try various quality options.) As we 
+  encounter leading edges, we add the echo to the active echo set and sum the echoes in 
+  the active set accounting for phase and magnitude. This gives deflection and is valid
+  until the next edge.
+  On a trailing edge, we remove the relevant echo from the active set and derive the
+  new deflection.
+  On each edge, we output a line segment. We can prepend these to a list.
+  We end with a line to (800,0). -}
 
 type alias EdgeInfo = (Float, Float, Bool)  -- x coord of edge, leading edge,  and whether leading edge.
 
--- This version uses the polar targets, not the echoes, so we can see how the line looks.
+-- This version uses the Echoes, but really this doesn't happen until
+-- the echoes are received at the (two) antenna, where they become a voltage.
 
 combineEchoes : Dict Float Echo -> Float
 
@@ -169,7 +180,7 @@ combineEchoes activeEchoes =
       combinedAsRect = Dict.foldl (\_ (x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
       combinedAsPolar = toPolar combinedAsRect
   in
-      100.0 * first combinedAsPolar
+      strengthToHeightFactor * first combinedAsPolar
 
 processEdge : Float -> EdgeInfo 
                     -> (List EdgeSegment, Dict Float Echo, Dict Float Echo) 
@@ -179,9 +190,9 @@ processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes)
        newActiveEchoes = case isLeading of
                               True  -> (Dict.insert position echo activeEchoes)
                               False -> (Dict.remove leading activeEchoes)
-       newX = position / 100.0
+       newX = position * rangeToXFactor
        newY = combineEchoes newActiveEchoes
-       (_,(prevX, prevY)) = Maybe.withDefault ((0.0, 0.0),(0.0, 0.0)) <| List.head lineData
+       (_,(prevX, prevY)) = Maybe.withDefault dummyLeadingEdge <| List.head lineData
   in
        ( ((newX, prevY), (newX, newY)) :: lineData
        , newActiveEchoes
@@ -193,7 +204,7 @@ deriveTrace allEchoes =
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
   let activeEchoes = Dict.empty
-      theLine = [((0.0,0.0),(0.0,0.0))]
+      theLine = [ dummyLeadingEdge ]
       leadingEdges = Dict.foldl (\r e d -> Dict.insert r (r, r, True) d) 
                                 Dict.empty allEchoes
       trailingEdges = Dict.foldl (\r e d -> Dict.insert (r + pulseWidth) (r + pulseWidth, r, False ) d) 
@@ -201,32 +212,36 @@ deriveTrace allEchoes =
       allEdges = Dict.union leadingEdges trailingEdges
       extractLineData (line, _, _) = line
   in
-        extractLineData <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
+      extractLineData <| Dict.foldl processEdge (theLine, activeEchoes, allEchoes) allEdges
 
 -- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
 -- on the deflection plated. We shall simulate that here.
 -- We shall not bother to limit acceleration, unless we have to.
 
--- Should be easier using Edges rather than line segment list...
--- How about we apply the maximum slope to each edge, moving its right hand X rightwards.
--- e.g. (100,0)->(100,100) becomes (100,0)->(102.5,100)
--- Given that we want to truncate edges that will now overlap.
--- Conceivably, some edges might disappear completely!
+dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
+dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
+
+-- This version uses the concept of beam movement time - the beam can only
+-- move so far before the next edge comes along.
+
+truncateEdge ((e2x1,e2y1),(e2x2,e2y2)) ((e1x1,e1y1),(e1x2,e1y2)) =
+  let e1X = e1x2 - e1x1
+      e1Y = e1y2 - e1y1
+      e1Direction = e1Y / (abs e1Y)
+      traversalTime = e1Y / beamSweepMax
+      timeBeforeE2 = (e2x1 - e1x1)/rangeDeltaPerMicrosecond
+      movementTime = Basics.min traversalTime timeBeforeE2
+      newX2 = e1x1 + movementTime * rangeDeltaPerMicrosecond
+      newY2 = e1y1 + movementTime * beamSweepMax * e1Direction / strengthToHeightFactor
+  in  ((e1x1,e1y1),(newX2,newY2))
 
 lineSmoother : List EdgeSegment -> LineData
 lineSmoother rawEdges = 
   let edgeSloper ((x1,y1),(_,y2)) = ((x1,y1),(x1 + abs ((y2-y1)/beamSweepMax),y2))
+
       slopingEdges = List.map edgeSloper rawEdges
-      -- Now going to try to make sure that the sloped edges cannot overlap.
-      -- We do this by concentrating on the end points, not the edges.
-      dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
-      dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
       paddedEdges = dummyTrailingEdge :: slopingEdges ++ [dummyLeadingEdge]
-      nonOverlappingPoints = List.map2 removeAnyOverlap paddedEdges 
-                             <| Maybe.withDefault [] <| List.tail paddedEdges
-      -- Remember edges are in 'reverse' order still.
-      -- We require that e1x2 <= e2x1 with corresponding adjustment to e1y2.
-      -- We do not need to return EdgeSegments now, we can return line segments.
+
       removeAnyOverlap  ((e2x1,e2y1),(e2x2,e2y2)) ((e1x1,e1y1),(e1x2,e1y2)) =
         if e2x1 >= e1x2 then 
           ((e1x1,e1y1),(e1x2,e1y2)) -- no overlap
@@ -236,10 +251,19 @@ lineSmoother rawEdges =
           ((e1x1,e1y1),(e2x1,e1y1 + beamSweepMax * (e2x1-e1x1))) -- e1 truncated
         else
           ((e1x1,e1y1),(e2x1,e1y1 - beamSweepMax * (e2x1-e1x1))) -- e1 truncated
-      toLineData (p1,p2) = [p2,p1]
-      removeZeroEdges = List.filter (\((x1,_),(x2,_)) -> x2 > x1) 
+
+      nonOverlappingPoints = List.map2 removeAnyOverlap paddedEdges 
+                             <| Maybe.withDefault [] <| List.tail paddedEdges
+
+      (linePath,_) = List.foldr (\((x1,y1),(x2,y2)) (linesOut, (beamX, beamY)) -> 
+                                    ( (x2,y2) :: (x1,beamY) :: (beamX,beamY) :: linesOut
+                                    , (x2,y2))
+                                )
+                                ([(0.0,0.0)], (0.0,0.0))  -- line accumulator and beam position
+                                nonOverlappingPoints
   in
-      (1000.0,0.0) :: List.concatMap toLineData (removeZeroEdges nonOverlappingPoints)
+      (scaleWidthKilometers,0.0) :: linePath
+
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
@@ -339,7 +363,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 40 Tick
+  Time.every 100 Tick
 
 -- VIEW
 
