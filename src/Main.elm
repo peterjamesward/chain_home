@@ -144,24 +144,24 @@ mapToPolar station target =
 bomber1 = { longitude = degrees 2.0
           , latitude  = degrees 52.0
           , height    = 30 -- ,000 ft
-          , bearing   = degrees 270
-          , speed     = 200 -- mph
+          , bearing   = degrees 280
+          , speed     = 0.0 -- mph
           , iff       = False 
           }
  
-bomber2 = { longitude = degrees 2.001
-          , latitude  = degrees 51.5
-          , height    = 30 -- ,000 ft
-          , bearing   = degrees 270
-          , speed     = 200 -- mph
+bomber2 = { longitude = degrees 2.000
+          , latitude  = degrees 52.05
+          , height    = 30.2 -- ,000 ft
+          , bearing   = degrees 280
+          , speed     = 0.0 -- mph
           , iff       = False 
           }
  
-bomber3 = { longitude = degrees 2.002
-          , latitude  = degrees 51.55
+bomber3 = { longitude = degrees 2.1
+          , latitude  = degrees 50.5
           , height    = 30 -- ,000 ft
-          , bearing   = degrees 270
-          , speed     = 200 -- mph
+          , bearing   = degrees 260
+          , speed     = 250 -- mph
           , iff       = False 
           }
  
@@ -302,15 +302,18 @@ beamPath edges =
 
 scalePathToDisplay : LineData -> LineData
 scalePathToDisplay unscaled =
-    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, (sqrt y) * strengthToHeightFactor)
+    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, ( y) * strengthToHeightFactor)
     in  List.map scalePoint unscaled
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
 -- 22/01 Want to change this to be Dict r Echo; probably Dict r PolarTargets as well.
-deriveEchoes : List PolarTarget -> Dict Float Echo
-deriveEchoes targets = 
-  let ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
+-- Including time here is just experimental for visual effects.
+deriveEchoes : List PolarTarget -> Int -> Dict Float Echo
+deriveEchoes targets time = 
+  let 
+      ph rng = asin <| sin (2 * (toFloat time) * rng/wavelength / 1000)  -- clearer not cheaper
+      --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
       echoFromTarget target = { r         = target.r
                               , theta     = target.theta
                               , alpha     = target.alpha
@@ -338,6 +341,8 @@ type alias Model =
   , startTime : Int -- millseconds from t-zero
   , time : Int
   , lineData : List (Float, Float)
+  , prevLine : List (Float, Float)
+  , olderLine : List (Float, Float)
   , station : Station
   , targets : List Target
   , movedTargets : List Target
@@ -361,6 +366,8 @@ init _ =
       , startTime = 0
       , time = 0
       , lineData = beamPath []
+      , prevLine = beamPath []
+      , olderLine = beamPath []
       , station = bawdsey
       , targets = targetsBaseline
       , movedTargets = []
@@ -382,7 +389,7 @@ deriveModelAtTime model t =
   let
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
-    echoSignals = deriveEchoes convertedTargets
+    echoSignals = deriveEchoes convertedTargets t
     skyline = deriveSkyline <| Dict.union dummyEchoes echoSignals
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
@@ -391,6 +398,8 @@ deriveModelAtTime model t =
               , polarTargets = convertedTargets
               , echoes       = echoSignals
               , skyline      = skyline
+              , olderLine    = model.prevLine
+              , prevLine     = model.lineData
               , lineData     = scalePathToDisplay <| beamPath skyline
       }
 
@@ -411,7 +420,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 50 Tick
+  Time.every 100 Tick
 
 -- VIEW
 
@@ -491,16 +500,16 @@ view m = case viewMode of
 
   AsImage ->  
     svg
-      [ viewBox "-10 -20 1020 430"
+      [ viewBox "-10 -40 1020 450"
       , width "1020"
       , height "420"
       ]
       (List.append 
         [ rect
           [ x "-10"
-          , y "-20"
+          , y "-40"
           , width "1020"
-          , height "430"
+          , height "450"
           , fill "black"
           , stroke "black"
           , strokeWidth "3"
@@ -508,14 +517,30 @@ view m = case viewMode of
           ]
           []
       , polyline
+          [ points (polyLineFromCoords m.olderLine)
+          , fill "none"
+          , stroke "darkolivegreen"
+          , opacity "20%"
+          , strokeWidth "1"
+          ]
+          []
+      , polyline
+          [ points (polyLineFromCoords m.prevLine)
+          , fill "none"
+          , stroke "forestgreen"
+          , opacity "60%"
+          , strokeWidth "1"
+          ]
+          []
+      , polyline
           [ points (polyLineFromCoords m.lineData)
           , fill "none"
-          , stroke "lightgreen"
+          , stroke "springgreen"
           , strokeWidth "1"
           ]
           []
       ] rangeScale)
 
-rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-5", fill "lightgreen", textAnchor "right" ] 
+rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
                                        [ Svg.text (String.fromInt (i*5)) ])
   (List.range 0 20)
