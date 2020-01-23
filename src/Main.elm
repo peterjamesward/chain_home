@@ -199,12 +199,12 @@ combineEchoes activeEchoes =
   --Dict.foldl (\_ e acc -> e.amplitude + acc) 0.0 activeEchoes
 --  100.0 * toFloat (Dict.size activeEchoes)  --OK!
   -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
-  let asPolar = Dict.map (\_ e -> (e.amplitude, e.phase) ) activeEchoes
-      asRect  = Dict.map (\_ p -> fromPolar p)  asPolar
+  let --asPolar = Dict.map (\_ e -> (e.amplitude, e.phase) ) activeEchoes
+      asRect  = Dict.map (\_ e -> fromPolar (e.amplitude, e.phase)) activeEchoes
       combinedAsRect = Dict.foldl (\_ (x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
-      combinedAsPolar = toPolar combinedAsRect
+      (mag, phase) = toPolar combinedAsRect
   in
-      first combinedAsPolar
+      mag
 
 processEdge : Float -> EdgeInfo 
                     -> (List EdgeSegment, Dict Float Echo, Dict Float Echo) 
@@ -483,10 +483,10 @@ view m = case viewMode of
         lineInfo = List.concatMap viewLineSegment m.lineData
     in
       div [] ( [] 
-               --++ polarInfo 
-               --++ echoInfo 
-               ++ edgeInfo
-               ++ lineInfo
+               ++ polarInfo 
+               ++ echoInfo 
+               --++ edgeInfo
+               --++ lineInfo
              )
 
   AsImage ->  
