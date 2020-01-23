@@ -18,7 +18,7 @@ stationClutter station =
                   , speed = toFloat i * 0.001
                   , iff = False
                   })
-    (List.range 1 200)
+    (List.range 1 10)
 
 -- Let's make ourselves a station and a target
 -- Bawdsey, assuming LOS due East.
