@@ -11,6 +11,7 @@ import Task
 import Time
 import Array exposing (..)
 import Dict exposing (..)
+import Set exposing (..)
 
 import Station exposing (..)
 import Target exposing (..)
@@ -124,7 +125,7 @@ dummyInitialEcho = { dummyFinalEcho | r = 0 }
 addEchoToDict e d = Dict.insert e.r e d
 
 -- A way to make sure that we start and end cleanly??
-dummyEchoes = List.foldl addEchoToDict Dict.empty [dummyInitialEcho, dummyFinalEcho]
+dummyEchoes = [dummyInitialEcho, dummyFinalEcho]
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -196,58 +197,53 @@ fighter1 = { longitude = degrees 1.4
   On each edge, we output a line segment. We can prepend these to a list.
   We end with a line to (800,0). -}
 
-type alias EdgeInfo = (Float, Float, Bool)  -- x coord of edge, leading edge,  and whether leading edge.
+type alias EdgeInfo = (Float, Echo, Bool)  -- x coord of edge, leading edge,  and whether leading edge.
 
 -- This version uses the Echoes, but really this doesn't happen until
 -- the echoes are received at the (two) antenna, where they become a voltage.
 
-combineEchoes : Dict Float Echo -> Float
+combineEchoes : List Echo -> Float
 
 combineEchoes activeEchoes = 
   --Dict.foldl (\_ e acc -> e.amplitude + acc) 0.0 activeEchoes
 --  100.0 * toFloat (Dict.size activeEchoes)  --OK!
   -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
   let --asPolar = Dict.map (\_ e -> (e.amplitude, e.phase) ) activeEchoes
-      asRect  = Dict.map (\_ e -> fromPolar (e.amplitude, e.phase)) activeEchoes
-      combinedAsRect = Dict.foldl (\_ (x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
+      asRect  = List.map (\e -> fromPolar (e.amplitude, e.phase)) activeEchoes
+      combinedAsRect = List.foldl (\(x, y) (xAcc, yAcc) -> (x + xAcc, y + yAcc) ) (0.0,0.0) asRect
       (mag, phase) = toPolar combinedAsRect
   in
       mag
 
-processEdge : Float -> EdgeInfo 
-                    -> (List EdgeSegment, Dict Float Echo, Dict Float Echo) 
-                    -> (List EdgeSegment, Dict Float Echo, Dict Float Echo)
-processEdge _ (position, leading, isLeading) (lineData, activeEchoes, allEchoes) = 
-  let  echo = Maybe.withDefault defaultEcho <| Dict.get position allEchoes
-       newActiveEchoes = case isLeading of
-                              True  -> (Dict.insert position echo activeEchoes)
-                              False -> (Dict.remove leading activeEchoes)
-       newX = position
+processEdge : EdgeInfo 
+              -> (List EdgeSegment, List Echo)
+              -> (List EdgeSegment, List Echo)
+processEdge (p, echo, isLeading) (lineData, activeEchoes) = 
+  let  newActiveEchoes = case isLeading of
+                              True  -> echo :: activeEchoes
+                              False -> List.filter ((/=) echo) activeEchoes
+       newX = p
        newY = combineEchoes newActiveEchoes
        (_,(prevX, prevY)) = Maybe.withDefault dummyLeadingEdge <| List.head lineData
   in
        ( ((newX, prevY), (newX, newY)) :: lineData
        , newActiveEchoes
-       , allEchoes )
+       )
 
 
-deriveSkyline : Dict Float Echo -> List EdgeSegment
+deriveSkyline : List Echo -> List EdgeSegment
 deriveSkyline allEchoes =
   -- Let's put the echoes in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
-  let activeEchoes = Dict.empty
-      leadingEdges = Dict.foldr (\rng ech acc -> Dict.insert rng (rng, rng, True) acc) 
-                                Dict.empty 
-                                allEchoes
-      trailingEdges = Dict.foldr (\rng ech acc -> Dict.insert (rng + pulseWidth) (rng + pulseWidth, rng, False ) acc) 
-                                 Dict.empty 
-                                 allEchoes 
-      allEdges = Dict.union leadingEdges trailingEdges
-      extractLineData (line, _, _) = line
+  let activeEchoes = []
+      leadingEdges = List.map (\e-> (e.r, e, True) ) allEchoes
+      trailingEdges = List.map (\e -> (e.r + pulseWidth, e, False )) allEchoes 
+      allEdges = List.sortBy (\(r,_,_) -> r) (leadingEdges ++ trailingEdges)
+      --extractLineData (line, _, _) = line
   in
-      extractLineData <| Dict.foldl processEdge 
-                                    ([], activeEchoes, allEchoes) 
+      first <| List.foldl processEdge 
+                                    ([], activeEchoes) 
                                     allEdges
 
 -- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
@@ -315,9 +311,11 @@ scalePathToDisplay unscaled =
 
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
--- 22/01 Want to change this to be Dict r Echo; probably Dict r PolarTargets as well.
 -- Including time here is just experimental for visual effects.
-deriveEchoes : List PolarTarget -> Int -> Dict Float Echo
+
+-- 224/01 We're losing edges I think. Let's simplify even if at cost of performance.
+
+deriveEchoes : List PolarTarget -> Int -> List Echo
 deriveEchoes targets time = 
   let 
       ph rng = asin <| sin (2 * (toFloat time) * rng) --/wavelength / 1000)  -- clearer not cheaper
@@ -330,9 +328,8 @@ deriveEchoes targets time =
                               , amplitude = abs <| ( txHorizReflectedLobe target.theta )
                                                  * ( txHiVertOmniLobe target.alpha )
                               }
-      deriveEcho t d = Dict.insert t.r (echoFromTarget t) d
   in
-      List.foldl deriveEcho Dict.empty targets
+      List.map echoFromTarget targets
 
 -- MAIN
 main =
@@ -356,7 +353,7 @@ type alias Model =
   , targets : List Target
   , movedTargets : List Target
   , polarTargets : List PolarTarget
-  , echoes : Dict Float Echo
+  , echoes : List Echo
   , skyline : List ((Float, Float),(Float, Float))
   }
 
@@ -368,7 +365,7 @@ init _ =
                       , bomber2
                       , bomber3
                       , bomber4
-                      --, fighter1 
+                      , fighter1 
                       ]
                       --++ (stationClutter bawdsey)
   in
@@ -401,7 +398,7 @@ deriveModelAtTime model t =
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
     echoSignals = deriveEchoes convertedTargets t
-    skyline = deriveSkyline <| Dict.union dummyEchoes echoSignals
+    skyline = deriveSkyline <| dummyEchoes ++ echoSignals
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
@@ -451,7 +448,7 @@ viewPolarTarget p1 =   [ Html.text "r "
                        , Html.hr [] []
                        ]
 
-viewEcho (_,e) = [ Html.text "r "
+viewEcho e = [ Html.text "r "
                 , Html.text <| String.fromFloat <| e.r
                 , Html.br [] []
                 , Html.text "theta "
@@ -501,7 +498,7 @@ view m =
   case viewMode of
     AsText ->
       let polarInfo = List.concatMap viewPolarTarget m.polarTargets
-          echoInfo = List.concatMap viewEcho (Dict.toList m.echoes)
+          echoInfo = List.concatMap viewEcho m.echoes
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
       in
