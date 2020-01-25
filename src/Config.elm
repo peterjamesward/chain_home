@@ -55,8 +55,28 @@ fighter1 = { longitude = degrees 1.8
            , iff       = False 
            }
 
+bomberInFormation baseLocation latIndex longIndex =
+    { baseLocation  | longitude = baseLocation.longitude + (degrees (toFloat longIndex-5) * 0.003)
+                    , latitude  = baseLocation.latitude + (degrees (toFloat latIndex-5) * 0.0011)
+                    , height = baseLocation.height + (toFloat (latIndex + longIndex) * 5)
+                    , speed = baseLocation.speed + toFloat (latIndex + longIndex)
+    }
+
+massRaid = 
+    let base =  { longitude = bawdsey.longitude + (degrees 0.9)
+                , latitude  = bawdsey.latitude
+                , height    = 25
+                , bearing   = 270
+                , speed     = 200
+                , iff       = False
+                }
+    in 
+        List.map 
+        (\i -> bomberInFormation base (i // 10) (modBy i 10))
+        <| List.range 1 100
+
 tenAbreast = List.map (\i ->
-                { longitude = bawdsey.longitude + (degrees 0.7)
+                { longitude = bawdsey.longitude + (degrees 0.8)
                 , latitude  = bawdsey.latitude + (degrees (toFloat i-5) * 0.001)
                 , height    = 25
                 , bearing   = 270
@@ -67,7 +87,7 @@ tenAbreast = List.map (\i ->
             <| List.range 1 10
 
 tenAligned = List.map (\i ->
-                { longitude = bawdsey.longitude + (degrees 0.9) + (degrees (toFloat i-5) * 0.004)
+                { longitude = bawdsey.longitude + (degrees 1.0) + (degrees (toFloat i-5) * 0.004)
                 , latitude  = bawdsey.latitude
                 , height    = 25
                 , bearing   = 270
@@ -87,5 +107,6 @@ targetsBaseline =   [ bomber1
                     ]
                     ++ tenAligned
                     ++ tenAbreast
+                    --++ massRaid
 
 
