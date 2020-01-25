@@ -86,9 +86,8 @@ pulseDuration = 40.0  -- microseconds
 pulseWidth = lightSpeed * pulseDuration / 10000000.0  -- TODO: scale seems wrong here.
 
 -- Some facts about our display
-beamSweepMax = 0.001 -- Maximum vertical displacement for one microsecond.
-beamSweepDown = 0.003 -- Visually, they seem to return the beam more slowly.
-beamSweepUp   = -0.0005  
+beamSweepIncreasingAmplitude = 0.003
+beamSweepDecreasingAmplitude = -0.0005 
 scaleWidthKilometers = 150
 viewWidth = 1000
 viewHeight = 400
@@ -121,11 +120,6 @@ dummyFinalEcho = { r = scaleWidthKilometers * 1000
                  }
 
 dummyInitialEcho = { dummyFinalEcho | r = 0 }
-
-addEchoToDict e d = Dict.insert e.r e d
-
--- A way to make sure that we start and end cleanly??
-dummyEchoes = [dummyInitialEcho, dummyFinalEcho]
       
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
@@ -151,8 +145,16 @@ bomber1 = { longitude = degrees 2.0
           }
  
 bomber2 = { longitude = degrees 2.000
+          , latitude  = degrees 52.0
+          , height    = 30.1 -- ,000 ft
+          , bearing   = degrees 280
+          , speed     = 200.0 -- mph
+          , iff       = False 
+          }
+ 
+bomber2A = { longitude = degrees 2.000
           , latitude  = degrees 52.05
-          , height    = 30.2 -- ,000 ft
+          , height    = 30.1 -- ,000 ft
           , bearing   = degrees 280
           , speed     = 200.0 -- mph
           , iff       = False 
@@ -215,24 +217,40 @@ combineEchoes activeEchoes =
   in
       mag
 
+-- Why do I find this so hard. Look at each edge. It's the beginning or end of an echo.
+-- They should be sorted by X (they are). There may be several with the same X.
+-- We do not output for each edge. We output only when X and Y change.
 processEdge : EdgeInfo 
-              -> (List EdgeSegment, List Echo)
-              -> (List EdgeSegment, List Echo)
-processEdge (p, echo, isLeading) (lineData, activeEchoes) = 
-  let  newActiveEchoes = case isLeading of
+              -> (List EdgeSegment, List Echo, (Float, Float))
+              -> (List EdgeSegment, List Echo, (Float, Float))
+processEdge (p, echo, isLeading) 
+            (roofline, activeEchoes, (lastX,lastY)) = 
+  let   ((x1,y),(x2,_)) = Maybe.withDefault dummyLeadingEdge <| List.head roofline -- the last output.
+        newActiveEchoes = case isLeading of
                               True  -> echo :: activeEchoes
                               False -> List.filter ((/=) echo) activeEchoes
-       newX = p
-       newY = combineEchoes newActiveEchoes
-       (_,(prevX, prevY)) = Maybe.withDefault dummyLeadingEdge <| List.head lineData
+        newX = p
+        newY = combineEchoes newActiveEchoes
   in
-       ( ((newX, prevY), (newX, newY)) :: lineData
-       , newActiveEchoes
-       )
+        if  newX <= x2 then
+            -- We're not moving horizontally but we need to track the roof height.
+            (roofline, newActiveEchoes, (newX, newY))
+        else if newY == y then
+            -- We have moved horizontally, but the height is the same so
+            -- there's nothing to say or do. Move along.
+            (roofline, newActiveEchoes, (x1,y))
+        else
+            -- A significant edge, so we can now output the previous bit of roof.
+            (((x2, lastY), (newX, lastY)) :: roofline, newActiveEchoes, (newX, newY))
 
 
-deriveSkyline : List Echo -> List EdgeSegment
-deriveSkyline allEchoes =
+
+-- NEW PLAN 
+-- Change the skyline function so it returns horizontal line segments not verticals.
+-- This seems logical and should be straightforward and makes beam smpothing surely easier.
+
+deriveSkyline : Float -> List Echo -> List EdgeSegment
+deriveSkyline maxX allEchoes =
   -- Let's put the echoes in a dictionary, indexed by range (probably unique!).
   -- Then we need a sorted list of edges (front and back).
   -- Sorted list will index into the dictionary, for easy access to each target.
@@ -240,11 +258,11 @@ deriveSkyline allEchoes =
       leadingEdges = List.map (\e-> (e.r, e, True) ) allEchoes
       trailingEdges = List.map (\e -> (e.r + pulseWidth, e, False )) allEchoes 
       allEdges = List.sortBy (\(r,_,_) -> r) (leadingEdges ++ trailingEdges)
-      --extractLineData (line, _, _) = line
+      -- We have one in hand so we need to flush it out
+      (roofline, remainingEchoes, ((lastX, lastY))) = List.foldl processEdge ([], activeEchoes, (0.0,0.0)) allEdges
+      finalY = combineEchoes remainingEchoes
   in
-      first <| List.foldl processEdge 
-                                    ([], activeEchoes) 
-                                    allEdges
+      ((lastX, finalY), (maxX, finalY)) :: roofline
 
 -- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
 -- on the deflection plated. We shall simulate that here.
@@ -279,22 +297,18 @@ beamSmoothingFunction newEdge (lines, prevEdge) =
     let
         ((newX1, newY1),(newX2, newY2)) = newEdge
         ((prevX1, prevY1),(prevX2, prevY2)) = prevEdge
-        (beamX, beamY) = Maybe.withDefault (0.0,0.0) <| List.head lines
-        
-        beamDirection = if (prevY2 > prevY1) then 1 else -1
-        beamSpeed = if (prevY2 > prevY1) then beamSweepDown else beamSweepUp
-        edgeInterval = (newX1 - prevX1)  -- in metres range (!)
-        intervalNeededToReachGoal = abs (prevY2 - beamY) / (abs beamSpeed)
+    in
+        ( (newX2, newY2)
+        :: (newX1, newY1)    
+        :: (prevX2, prevY2) 
+        :: (prevX1, prevY1) 
+        :: lines
+        , newEdge
+        )
 
-        newLines =  if (edgeInterval >= intervalNeededToReachGoal) then
-                        -- reached goal, and we can work out when
-                        [(newX1, prevY2), (beamX + intervalNeededToReachGoal, prevY2)]
-                    else 
-                        -- did not reach goal, record where it arrived
-                        [(newX1, beamY + edgeInterval * beamDirection * beamSpeed)]
-    in              
-        ( newLines ++ lines, newEdge )
 
+-- We are now taking a list of horizontal segments and we have to join them.
+-- Let's try straight lines first.
 beamPath : List EdgeSegment -> LineData
 beamPath edges =
     let
@@ -363,9 +377,10 @@ init _ =
   let
     targetsBaseline = [ bomber1
                       , bomber2
-                      , bomber3
-                      , bomber4
-                      , fighter1 
+                      --, bomber2A
+                      --, bomber3
+                      --, bomber4
+                      --, fighter1 
                       ]
                       --++ (stationClutter bawdsey)
   in
@@ -380,7 +395,7 @@ init _ =
       , targets = targetsBaseline
       , movedTargets = []
       , polarTargets = []
-      , echoes = dummyEchoes
+      , echoes = [ dummyFinalEcho ]
       , skyline = []
       }
     , Task.perform AdjustTimeZone Time.here
@@ -398,7 +413,7 @@ deriveModelAtTime model t =
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
     echoSignals = deriveEchoes convertedTargets t
-    skyline = deriveSkyline <| dummyEchoes ++ echoSignals
+    skyline = deriveSkyline (scaleWidthKilometers * 1000) echoSignals
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
@@ -429,12 +444,12 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 100 Tick
+  Time.every 1000 Tick
 
 -- VIEW
 
 type ViewMode = AsText | AsImage
-viewMode = AsImage
+viewMode = AsText
 
 viewPolarTarget p1 =   [ Html.text "r "
                         , Html.text <| String.fromFloat <| p1.r
@@ -492,26 +507,10 @@ viewLineSegment (x,y) = [ Html.text "( "
                , Html.hr [] []
                ]
 
-view : Model -> Svg Msg
-view m = 
-  let svgPointList = (polyLineFromCoords m.lineData) in 
-  case viewMode of
-    AsText ->
-      let polarInfo = List.concatMap viewPolarTarget m.polarTargets
-          echoInfo = List.concatMap viewEcho m.echoes
-          edgeInfo = List.concatMap viewEdge m.skyline
-          lineInfo = List.concatMap viewLineSegment m.lineData
-      in
-        div [] ( [] 
-                 ++ polarInfo 
-                 ++ echoInfo 
-                 --++ edgeInfo
-                 --++ lineInfo
-               )
-
-    AsImage ->  
-      svg
-        [ viewBox "-10 -40 1020 450"
+crt m =
+  let svgPointList = (polyLineFromCoords m.lineData) 
+  in 
+    svg [ viewBox "-10 -40 1020 450"
         , width "1020"
         , height "420"
         ]
@@ -543,6 +542,26 @@ view m =
             ]
             []
         ] rangeScale)
+
+
+view : Model -> Svg Msg
+view m = 
+  --case viewMode of
+  --  AsText ->
+      let polarInfo = List.concatMap viewPolarTarget m.polarTargets
+          echoInfo = List.concatMap viewEcho m.echoes
+          edgeInfo = List.concatMap viewEdge m.skyline
+          lineInfo = List.concatMap viewLineSegment m.lineData
+      in
+        (div []) <| List.concat [  [crt m]
+                              , [Html.hr [] []]
+                              , polarInfo 
+                              , echoInfo 
+                              , edgeInfo
+                              , lineInfo
+                            ]
+
+    --AsImage ->  
 
 rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
                                        [ Svg.text (String.fromInt (i*5)) ])
