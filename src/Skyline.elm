@@ -84,25 +84,24 @@ deriveSkyline maxX allEchoes =
   in
       ((lastX, finalY), (maxX, finalY)) :: roofline
 
-viewEdge ((x1,y1),(x2,y2)) = [ Html.text "( "
-                , Html.text <| String.fromFloat <| x1
-                , Html.text " , "
-                , Html.text <| String.fromFloat <| y1
-                , Html.text " ), ( "
-                , Html.text <| String.fromFloat <| x2
-                , Html.text " , "
-                , Html.text <| String.fromFloat <| y2
-                , Html.text " )"
-                , Html.br [] []
-               , Html.hr [] []
-               ]
+viewEdge ((x1,y1),(x2,y2)) = 
+  [ Html.text "( "
+  , Html.text <| String.fromFloat <| x1
+  , Html.text " , "
+  , Html.text <| String.fromFloat <| y1
+  , Html.text " ), ( "
+  , Html.text <| String.fromFloat <| x2
+  , Html.text " , "
+  , Html.text <| String.fromFloat <| y2
+  , Html.text " )"
+  , Html.br [] []
+  , Html.hr [] []
+  ]
 
-viewLineSegment (x,y) = [ Html.text "( "
-                , Html.text <| stringifyPoint (x,y)
-                --, Html.text <| String.fromFloat <| x
-                --, Html.text " , "
-                --, Html.text <| String.fromFloat <| y
-                , Html.text " )"
-                , Html.br [] []
-               , Html.hr [] []
-               ]
+viewLineSegment (x,y) = 
+  [ Html.text "( "
+  , Html.text <| stringifyPoint (x,y)
+  , Html.text " )"
+  , Html.br [] []
+  , Html.hr [] []
+  ]
