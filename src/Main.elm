@@ -87,7 +87,7 @@ pulseWidth = lightSpeed * pulseDuration / 10000000.0  -- TODO: scale seems wrong
 
 -- Some facts about our display
 beamSweepIncreasingAmplitude = 0.003
-beamSweepDecreasingAmplitude = -0.0005 
+beamSweepDecreasingAmplitude = -0.001 
 scaleWidthKilometers = 150
 viewWidth = 1000
 viewHeight = 400
