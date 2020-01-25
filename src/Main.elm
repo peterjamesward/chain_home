@@ -19,100 +19,20 @@ import Spherical exposing (..)
 import Echo exposing (..)
 import Constants exposing (..)
 import Config exposing (..)
-import Skyline exposing (deriveSkyline, EdgeSegment)
+import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
+import BeamSmoother exposing (beamPath)
+import Utils exposing (..)
 
 -- This is dummy line for me to practise with floats and trig.
 myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
-
--- SVG requires a line to be expressed as a space separated string of pairs.
-stringifyPoint (x, y) = (String.fromFloat x )++ 
-    "," ++ 
-    (String.fromFloat y) ++ " "
-
-polyLineFromCoords coords = List.foldr (++) "" (List.map stringifyPoint coords)
-
--- Some RDF lobe functions TO GO IN DIFFERENT NODULE
-txHiVertReflectedLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
-txHiVertOmniLobe alpha      = sin (7 * alpha)
-txHorizReflectedLobe θ  = (cos θ)^2
-txHorizOmniLobe θ       = cos θ
-
-rxHorizLobe θ  = cos θ
-rxLoVertLobe alpha = sin (7 * alpha)
-rxHiVertLobe alpha = (1 - 6 * alpha) * abs (sin (24 * alpha))
 
 -- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
 
 type alias LineData = List (Float, Float)
 
-
--- Convert from Cartesian (and imperial) map coordinates to 
--- polar (and metric) relative to station position and line of shoot.
-
-mapToPolar : Station -> Target -> PolarTarget
-mapToPolar station target = 
-  let stationPos = (station.latitude, station.longitude)
-      targetPos = (target.latitude, target.longitude)
-      rng = range stationPos targetPos
-  in
-     { r = rng
-     , theta = (bearing stationPos targetPos) - station.lineOfShoot
-     , alpha = atan2 (target.height * 304.8) rng
-     , iff = target.iff
-     }
-
-
-
-
--- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
--- on the deflection plated. We shall simulate that here.
--- We shall not bother to limit acceleration, unless we have to.
-
-dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
-
--- Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
--- Should be MUCH easier now the skyline is represented by horizontal roof segments
--- instead of vertical wall segments!
--- Note that the roof segments are horizontal but not vertically contiguous- the height transitions are abrupt/
--- Note the Float here is where the beam ended, not necessarily on the last edge, if that 
--- edge was too short.
-
-beamSmoothingFunction : EdgeSegment -> 
-    (LineData,  Float) -> 
-    (LineData,  Float) 
-beamSmoothingFunction newRoof (lines, beamY) =
-    let
-        ((roofLeft, roofHeight),(roofRight, _)) = newRoof
-        beamVelocity = if roofHeight > beamY then beamSweepIncreasingAmplitude else beamSweepDecreasingAmplitude
-        beamSweepTime = abs <| (roofHeight - beamY) / beamVelocity
-        beamYForShortRoof = beamY + (roofRight - roofLeft) * beamVelocity
-    in
-        if beamSweepTime <= roofRight - roofLeft then
-            -- We have time to get the beam on the roof.
-            ( (roofRight, roofHeight)
-              :: (roofLeft + beamSweepTime, roofHeight)
-              :: (roofLeft, beamY)
-              :: lines
-              , roofHeight
-            )
-        else
-            -- Won't reach the roof but see how far we go.
-            ( (roofRight, beamYForShortRoof)
-              :: (roofLeft, beamY)
-              :: lines
-              , beamYForShortRoof
-            )
-
-
--- We are now taking a list of horizontal segments and we have to join them.
-beamPath : List EdgeSegment -> LineData
-beamPath edges =
-    let
-        (lines, _) = List.foldr beamSmoothingFunction 
-                     ( [], 0.0 ) 
-                     edges
-    in
-        lines
+rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
+                                       [ Svg.text (String.fromInt (i*5)) ])
+  (List.range 0 19)
 
 scalePathToDisplay : LineData -> LineData
 scalePathToDisplay unscaled =
@@ -122,24 +42,6 @@ scalePathToDisplay unscaled =
 -- Deriving echoes is just applying the transmitter lobe function so
 -- amplitude is function of ltheta and range. Later, IFF figures.
 -- Including time here is just experimental for visual effects.
-
--- 224/01 We're losing edges I think. Let's simplify even if at cost of performance.
-
-deriveEchoes : List PolarTarget -> Int -> List Echo
-deriveEchoes targets time = 
-  let 
-      ph rng = asin <| sin (2 * (toFloat time) * rng) --/wavelength / 1000)  -- clearer not cheaper
-      --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
-      echoFromTarget target = { r         = target.r
-                              , theta     = target.theta
-                              , alpha     = target.alpha
-                              , phase     = ph target.r
-                              , duration  = pulseDuration    -- microseconds
-                              , amplitude = abs <| ( txHorizReflectedLobe target.theta )
-                                                 * ( txHiVertOmniLobe target.alpha )
-                              }
-  in
-      List.map echoFromTarget targets
 
 -- MAIN
 main =
@@ -170,16 +72,6 @@ type alias Model =
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  let
-    targetsBaseline = [ bomber1
-                      , bomber2
-                      , bomber2A
-                      , bomber3
-                      , bomber4
-                      , fighter1 
-                      ]
-                      ++ (stationClutter bawdsey)
-  in
     ( { zone = Time.utc 
       , startTime = 0
       , time = 0
@@ -188,7 +80,7 @@ init _ =
       , olderLine = beamPath []
       , oldestLine = beamPath []
       , station = bawdsey
-      , targets = targetsBaseline
+      , targets = targetsBaseline ++ (stationClutter bawdsey)
       , movedTargets = []
       , polarTargets = []
       , echoes = [ dummyFinalEcho ]
@@ -247,62 +139,6 @@ subscriptions model =
 type ViewMode = AsText | AsImage
 viewMode = AsText
 
-viewPolarTarget p1 =   [ Html.text "r "
-                        , Html.text <| String.fromFloat <| p1.r
-                       , Html.br [] []
-                       , Html.text "theta "
-                       , Html.text <| String.fromFloat <| p1.theta
-                       , Html.br [] []
-                       , Html.text "alpha "
-                       , Html.text <| String.fromFloat <| p1.alpha
-                       , Html.br [] []
-                       , Html.hr [] []
-                       ]
-
-viewEcho e = [ Html.text "r "
-                , Html.text <| String.fromFloat <| e.r
-                , Html.br [] []
-                , Html.text "theta "
-                , Html.text <| String.fromFloat <| e.theta
-                , Html.br [] []
-                , Html.text "alpha "
-                , Html.text <| String.fromFloat <| e.alpha
-                , Html.br [] []
-                , Html.text "phase "
-                , Html.text <| String.fromFloat <| e.phase
-                , Html.br [] []
-                , Html.text "duration "
-                , Html.text <| String.fromFloat <| e.duration
-                , Html.br [] []
-                , Html.text "amplitude "
-                , Html.text <| String.fromFloat <| e.amplitude
-                , Html.br [] []
-               , Html.hr [] []
-               ]
-
-viewEdge ((x1,y1),(x2,y2)) = [ Html.text "( "
-                , Html.text <| String.fromFloat <| x1
-                , Html.text " , "
-                , Html.text <| String.fromFloat <| y1
-                , Html.text " ), ( "
-                , Html.text <| String.fromFloat <| x2
-                , Html.text " , "
-                , Html.text <| String.fromFloat <| y2
-                , Html.text " )"
-                , Html.br [] []
-               , Html.hr [] []
-               ]
-
-viewLineSegment (x,y) = [ Html.text "( "
-                , Html.text <| stringifyPoint (x,y)
-                --, Html.text <| String.fromFloat <| x
-                --, Html.text " , "
-                --, Html.text <| String.fromFloat <| y
-                , Html.text " )"
-                , Html.br [] []
-               , Html.hr [] []
-               ]
-
 crt m =
   let svgPointList = (polyLineFromCoords m.lineData) 
   in 
@@ -357,8 +193,3 @@ view m =
                               --, lineInfo
                             ]
 
-    --AsImage ->  
-
-rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
-                                       [ Svg.text (String.fromInt (i*5)) ])
-  (List.range 0 19)

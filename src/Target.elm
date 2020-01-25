@@ -1,6 +1,8 @@
 module Target exposing (..)
 
 import Spherical exposing (..)
+import Station exposing (Station)
+import Html exposing (..)
 
 type alias Target = { latitude   : Float
                      , longitude : Float
@@ -17,6 +19,20 @@ type alias PolarTarget = { r     : Float -- metres
 
 defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
 
+-- Convert from Cartesian (and imperial) map coordinates to 
+-- polar (and metric) relative to station position and line of shoot.
+
+mapToPolar : Station -> Target -> PolarTarget
+mapToPolar station target = 
+  let stationPos = (station.latitude, station.longitude)
+      targetPos = (target.latitude, target.longitude)
+      rng = range stationPos targetPos
+  in
+     { r = rng
+     , theta = (bearing stationPos targetPos) - station.lineOfShoot
+     , alpha = atan2 (target.height * 304.8) rng
+     , iff = target.iff
+     }
 
 -- Targets move! t in seconds to at least centisecond resolution please
 targetAtTime : Int -> Int -> Target -> Target
@@ -30,3 +46,14 @@ targetAtTime t startTime target =
              , longitude = newLong 
              }
 
+viewPolarTarget p1 =   [ Html.text "r "
+                        , Html.text <| String.fromFloat <| p1.r
+                       , Html.br [] []
+                       , Html.text "theta "
+                       , Html.text <| String.fromFloat <| p1.theta
+                       , Html.br [] []
+                       , Html.text "alpha "
+                       , Html.text <| String.fromFloat <| p1.alpha
+                       , Html.br [] []
+                       , Html.hr [] []
+                       ]

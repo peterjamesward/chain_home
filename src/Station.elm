@@ -1,6 +1,5 @@
 module Station exposing (..)
 
-import Target exposing (..)
 
 type alias Station = { latitude    : Float
                      , longitude   : Float
@@ -9,7 +8,7 @@ type alias Station = { latitude    : Float
 
 -- Generate a bunch of nearby clutter. Also stress test.
 
-stationClutter : Station -> List Target
+--stationClutter : Station -> List Target
 stationClutter station = 
   List.map (\i -> { latitude = station.latitude + 0.01 * (sin (toFloat i))
                   , longitude = station.longitude + 0.01 * (sin (toFloat i))

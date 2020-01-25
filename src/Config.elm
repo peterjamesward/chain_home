@@ -54,3 +54,13 @@ fighter1 = { longitude = degrees 1.8
            , speed     = 400 -- mph
            , iff       = False 
            }
+
+targetsBaseline = [ bomber1
+                  , bomber2
+                  , bomber2A
+                  , bomber3
+                  , bomber4
+                  , fighter1 
+                  ]
+
+
