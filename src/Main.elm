@@ -145,7 +145,7 @@ bomber1 = { longitude = degrees 2.0
           }
  
 bomber2 = { longitude = degrees 2.000
-          , latitude  = degrees 52.0
+          , latitude  = degrees 52.05
           , height    = 30.1 -- ,000 ft
           , bearing   = degrees 280
           , speed     = 200.0 -- mph
@@ -176,9 +176,9 @@ bomber4 = { longitude = bawdsey.longitude + (degrees 0.8)
           , iff       = False 
           }
  
-fighter1 = { longitude = degrees 1.4
-           , latitude  = degrees 52.0
-           , height    = 5 -- ,000 ft
+fighter1 = { longitude = degrees 1.8
+           , latitude  = bawdsey.latitude - (degrees 0.1)
+           , height    = 10 -- ,000 ft
            , bearing   = degrees 90
            , speed     = 400 -- mph
            , iff       = False 
@@ -272,48 +272,45 @@ dummyLeadingEdge = ((0.0,0.0),(0.0,0.0))
 dummyTrailingEdge = ((1000.0,0.0),(1000.0,0.0))
 
 -- Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
--- The beam goes left to right, the edges go up and down.
--- When affected by an edge the beam can only go up or down at at fixed speed - beanSweepMax..
--- If the beam reaches its goal Y before the next edge, it will move horizontally only.
--- If the next edge comes before the beam reaches its goal, the new edge takes precedence
--- and its (far) end becomes the new goal for the beam.
--- When there are no more edges the beam returns to vertical zero.
--- The implementation is a fold with nuance.
--- As we encounter an edge, it becomes the new goal but we do not yet 'draw' anything, because
--- we know not yet the next edge.
--- So, the second part is to complete the processing of the previous edge.
--- If it had time to reach the goal from its previous position, 
---    we have a line segment from previous position to goal, AND
---    a horizontal segment to the start of the new egde.
--- If it had not time to reach the goal, 
---    we draw a line segment from its previous position as far as it went
--- In either case, we update the beam position and set the new goal from the new edge.
-
+-- Should be MUCH easier now the skyline is represented by horizontal roof segments
+-- instead of vertical wall segments!
+-- Note that the roof segments are horizontal but not vertically contiguous- the height transitions are abrupt/
+-- Note the Float here is where the beam ended, not necessarily on the last edge, if that 
+-- edge was too short.
 
 beamSmoothingFunction : EdgeSegment -> 
-    (LineData,  EdgeSegment) -> 
-    (LineData,  EdgeSegment) 
-beamSmoothingFunction newEdge (lines, prevEdge) =
+    (LineData,  Float) -> 
+    (LineData,  Float) 
+beamSmoothingFunction newRoof (lines, beamY) =
     let
-        ((newX1, newY1),(newX2, newY2)) = newEdge
-        ((prevX1, prevY1),(prevX2, prevY2)) = prevEdge
+        ((roofLeft, roofHeight),(roofRight, _)) = newRoof
+        beamVelocity = if roofHeight > beamY then beamSweepIncreasingAmplitude else beamSweepDecreasingAmplitude
+        beamSweepTime = abs <| (roofHeight - beamY) / beamVelocity
+        beamYForShortRoof = beamY + (roofRight - roofLeft) * beamVelocity
     in
-        ( (newX2, newY2)
-        :: (newX1, newY1)    
-        :: (prevX2, prevY2) 
-        :: (prevX1, prevY1) 
-        :: lines
-        , newEdge
-        )
+        if beamSweepTime <= roofRight - roofLeft then
+            -- We have time to get the beam on the roof.
+            ( (roofRight, roofHeight)
+              :: (roofLeft + beamSweepTime, roofHeight)
+              :: (roofLeft, beamY)
+              :: lines
+              , roofHeight
+            )
+        else
+            -- Won't reach the roof but see how far we go.
+            ( (roofRight, beamYForShortRoof)
+              :: (roofLeft, beamY)
+              :: lines
+              , beamYForShortRoof
+            )
 
 
 -- We are now taking a list of horizontal segments and we have to join them.
--- Let's try straight lines first.
 beamPath : List EdgeSegment -> LineData
 beamPath edges =
     let
         (lines, _) = List.foldr beamSmoothingFunction 
-                     ( [], dummyLeadingEdge ) 
+                     ( [], 0.0 ) 
                      edges
     in
         lines
@@ -377,12 +374,12 @@ init _ =
   let
     targetsBaseline = [ bomber1
                       , bomber2
-                      --, bomber2A
-                      --, bomber3
-                      --, bomber4
-                      --, fighter1 
+                      , bomber2A
+                      , bomber3
+                      , bomber4
+                      , fighter1 
                       ]
-                      --++ (stationClutter bawdsey)
+                      ++ (stationClutter bawdsey)
   in
     ( { zone = Time.utc 
       , startTime = 0
@@ -444,7 +441,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 1000 Tick
+  Time.every 50 Tick
 
 -- VIEW
 
@@ -554,11 +551,11 @@ view m =
           lineInfo = List.concatMap viewLineSegment m.lineData
       in
         (div []) <| List.concat [  [crt m]
-                              , [Html.hr [] []]
-                              , polarInfo 
-                              , echoInfo 
-                              , edgeInfo
-                              , lineInfo
+                              --, [Html.hr [] []]
+                              --, polarInfo 
+                              --, echoInfo 
+                              --, edgeInfo
+                              --, lineInfo
                             ]
 
     --AsImage ->  
