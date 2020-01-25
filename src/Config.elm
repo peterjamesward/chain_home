@@ -39,7 +39,7 @@ bomber3 = { longitude = bawdsey.longitude + (degrees 0.8)
           , iff       = False 
           }
  
-bomber4 = { longitude = bawdsey.longitude + (degrees 0.8)
+bomber4 = { longitude = bawdsey.longitude + (degrees 0.8) 
           , latitude  = bawdsey.latitude - (degrees 0.5)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
@@ -55,12 +55,37 @@ fighter1 = { longitude = degrees 1.8
            , iff       = False 
            }
 
-targetsBaseline = [ bomber1
-                  , bomber2
-                  , bomber2A
-                  , bomber3
-                  , bomber4
-                  , fighter1 
-                  ]
+tenAbreast = List.map (\i ->
+                { longitude = bawdsey.longitude + (degrees 0.7)
+                , latitude  = bawdsey.latitude + (degrees (toFloat i-5) * 0.001)
+                , height    = 25
+                , bearing   = 270
+                , speed     = 300
+                , iff       = False
+                }
+            )
+            <| List.range 1 10
+
+tenAligned = List.map (\i ->
+                { longitude = bawdsey.longitude + (degrees 0.9) + (degrees (toFloat i-5) * 0.004)
+                , latitude  = bawdsey.latitude
+                , height    = 25
+                , bearing   = 270
+                , speed     = 300
+                , iff       = False
+                }
+            )
+            <| List.range 1 10
+
+
+targetsBaseline =   [ bomber1
+                    , bomber2
+                    --, bomber2A
+                    --, bomber3
+                    --, bomber4
+                    --, fighter1 
+                    ]
+                    ++ tenAligned
+                    ++ tenAbreast
 
 

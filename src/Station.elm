@@ -11,7 +11,7 @@ type alias Station = { latitude    : Float
 --stationClutter : Station -> List Target
 stationClutter station = 
   List.map (\i -> { latitude = station.latitude + 0.01 * (sin (toFloat i))
-                  , longitude = station.longitude + 0.01 * (sin (toFloat i))
+                  , longitude = station.longitude + 0.015 * (sin (toFloat i))
                   , height = 0.1 * sqrt (toFloat i) 
                   , bearing = toFloat i
                   , speed = toFloat i * 0.001
