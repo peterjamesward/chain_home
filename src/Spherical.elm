@@ -1,4 +1,4 @@
-module Spherical exposing (..)
+module Spherical exposing (range, bearing, newPosition)
 
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html

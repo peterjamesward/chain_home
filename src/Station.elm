@@ -20,10 +20,4 @@ stationClutter station =
                   })
     (List.range 1 100)
 
--- Let's make ourselves a station and a target
--- Bawdsey, assuming LOS due East.
-bawdsey = { longitude   = degrees 1.408614
-          , latitude    = degrees 51.993661 
-          , lineOfShoot = degrees 90.0 
-          }  
 
