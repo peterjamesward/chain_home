@@ -15,7 +15,6 @@ import Set exposing (..)
 
 import Station exposing (..)
 import Target exposing (..)
-import Spherical exposing (..)
 import Echo exposing (..)
 import Constants exposing (..)
 import Config exposing (..)
@@ -132,7 +131,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 50 Tick
+  Time.every 100 Tick
 
 -- VIEW
 
