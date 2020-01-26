@@ -1,4 +1,4 @@
-module Echo exposing (..)
+module Echo exposing (Echo, deriveEchoes, viewEcho)
 
 import Constants exposing (scaleWidthKilometers, pulseDuration, wavelength)
 import Target exposing (PolarTarget)
@@ -28,7 +28,7 @@ dummyInitialEcho = { dummyFinalEcho | r = 0 }
 deriveEchoes : List PolarTarget -> Int -> List Echo
 deriveEchoes targets time = 
   let 
-      ph rng = asin <| sin <| (toFloat time)/wavelength * rng --/wavelength / 1000)  -- clearer not cheaper
+      ph rng = asin <| sin <| rng * (toFloat time)/wavelength  --/wavelength / 1000)  -- clearer not cheaper
       --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
       echoFromTarget target = { r         = target.r
                               , theta     = target.theta
@@ -58,23 +58,24 @@ combineEchoes activeEchoes =
       mag
 
 -- Handy function fo debuggery.
-viewEcho e = [ Html.text "r "
-                , Html.text <| String.fromFloat <| e.r
-                , Html.br [] []
-                , Html.text "theta "
-                , Html.text <| String.fromFloat <| e.theta
-                , Html.br [] []
-                , Html.text "alpha "
-                , Html.text <| String.fromFloat <| e.alpha
-                , Html.br [] []
-                , Html.text "phase "
-                , Html.text <| String.fromFloat <| e.phase
-                , Html.br [] []
-                , Html.text "duration "
-                , Html.text <| String.fromFloat <| e.duration
-                , Html.br [] []
-                , Html.text "amplitude "
-                , Html.text <| String.fromFloat <| e.amplitude
-                , Html.br [] []
-               , Html.hr [] []
-               ]
+viewEcho e = 
+    [ Html.text "r "
+    , Html.text <| String.fromFloat <| e.r
+    , Html.br [] []
+    , Html.text "theta "
+    , Html.text <| String.fromFloat <| e.theta
+    , Html.br [] []
+    , Html.text "alpha "
+    , Html.text <| String.fromFloat <| e.alpha
+    , Html.br [] []
+    , Html.text "phase "
+    , Html.text <| String.fromFloat <| e.phase
+    , Html.br [] []
+    , Html.text "duration "
+    , Html.text <| String.fromFloat <| e.duration
+    , Html.br [] []
+    , Html.text "amplitude "
+    , Html.text <| String.fromFloat <| e.amplitude
+    , Html.br [] []
+    , Html.hr [] []
+    ]

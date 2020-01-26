@@ -21,6 +21,8 @@ import Config exposing (..)
 import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 import BeamSmoother exposing (beamPath)
 import Utils exposing (..)
+import Receiver exposing (dipoleXreceiving, dipoleYreceiving, goniometerMix)
+
 
 -- This is dummy line for me to practise with floats and trig.
 myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
@@ -57,15 +59,16 @@ type alias Model =
   , startTime : Int -- millseconds from t-zero
   , time : Int
   , lineData : List (Float, Float)
-  , prevLine : List (Float, Float)
-  , olderLine : List (Float, Float)
-  , oldestLine : List (Float, Float)
   , station : Station
   , targets : List Target
   , movedTargets : List Target
   , polarTargets : List PolarTarget
   , echoes : List Echo
   , skyline : List ((Float, Float),(Float, Float))
+  , xSignal : List Echo
+  , ySignal : List Echo
+  , goniometer : Float
+  , gonioOutput : List Echo
   }
 
 
@@ -75,15 +78,16 @@ init _ =
       , startTime = 0
       , time = 0
       , lineData = beamPath []
-      , prevLine = beamPath []
-      , olderLine = beamPath []
-      , oldestLine = beamPath []
       , station = bawdsey
       , targets = targetsBaseline ++ (stationClutter bawdsey)
       , movedTargets = []
       , polarTargets = []
-      , echoes = [ dummyFinalEcho ]
+      , echoes = []
       , skyline = []
+      , xSignal = []
+      , ySignal = []
+      , goniometer = degrees -45.0 -- relative to Line Of Shoot.
+      , gonioOutput = []
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -100,7 +104,10 @@ deriveModelAtTime model t =
     targetsNow = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
     echoSignals = deriveEchoes convertedTargets t
-    skyline = deriveSkyline (scaleWidthKilometers * 1000) echoSignals
+    xSignal = dipoleXreceiving echoSignals
+    ySignal = dipoleYreceiving echoSignals
+    gonioOutput  = goniometerMix model.goniometer xSignal ySignal
+    skyline = deriveSkyline (scaleWidthKilometers * 1000) gonioOutput
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
@@ -108,9 +115,9 @@ deriveModelAtTime model t =
               , polarTargets = convertedTargets
               , echoes       = echoSignals
               , skyline      = skyline
-              , oldestLine   = model.olderLine
-              , olderLine    = model.prevLine
-              , prevLine     = model.lineData
+              , xSignal      = xSignal
+              , ySignal      = ySignal
+              , gonioOutput  = gonioOutput
               , lineData     = scalePathToDisplay <| beamPath skyline
       }
 

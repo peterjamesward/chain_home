@@ -12,6 +12,6 @@ beamSweepDecreasingAmplitude = -0.001
 scaleWidthKilometers = 150
 viewWidth = 1000
 viewHeight = 400
-strengthToHeightFactor = 100.0
+strengthToHeightFactor = 80.0
 rangeToXFactor = viewWidth / (scaleWidthKilometers * 1000.0)
 rangeDeltaPerMicrosecond = scaleWidthKilometers * 2
