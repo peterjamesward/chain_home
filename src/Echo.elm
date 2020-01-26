@@ -28,7 +28,7 @@ dummyInitialEcho = { dummyFinalEcho | r = 0 }
 deriveEchoes : List PolarTarget -> Int -> List Echo
 deriveEchoes targets time = 
   let 
-      ph rng = asin <| sin <| rng * (toFloat time)/wavelength  --/wavelength / 1000)  -- clearer not cheaper
+      ph rng = asin <| sin <| rng --* (toFloat time)/wavelength  --/wavelength / 1000)  -- clearer not cheaper
       --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
       echoFromTarget target = { r         = target.r
                               , theta     = target.theta
@@ -63,10 +63,10 @@ viewEcho e =
     , Html.text <| String.fromFloat <| e.r
     , Html.br [] []
     , Html.text "theta "
-    , Html.text <| String.fromFloat <| e.theta
+    , Html.text <| String.fromFloat <| e.theta * 180 / pi
     , Html.br [] []
     , Html.text "alpha "
-    , Html.text <| String.fromFloat <| e.alpha
+    , Html.text <| String.fromFloat <| e.alpha * 180 / pi
     , Html.br [] []
     , Html.text "phase "
     , Html.text <| String.fromFloat <| e.phase

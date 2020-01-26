@@ -50,10 +50,10 @@ viewPolarTarget p1 =   [ Html.text "r "
                         , Html.text <| String.fromFloat <| p1.r
                        , Html.br [] []
                        , Html.text "theta "
-                       , Html.text <| String.fromFloat <| p1.theta
+                       , Html.text <| String.fromFloat <| (108/pi) * p1.theta
                        , Html.br [] []
                        , Html.text "alpha "
-                       , Html.text <| String.fromFloat <| p1.alpha
+                       , Html.text <| String.fromFloat <| (108/pi) * p1.alpha
                        , Html.br [] []
                        , Html.hr [] []
                        ]

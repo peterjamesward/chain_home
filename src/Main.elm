@@ -79,14 +79,14 @@ init _ =
       , time = 0
       , lineData = beamPath []
       , station = bawdsey
-      , targets = targetsBaseline ++ (stationClutter bawdsey)
+      , targets = targetsBaseline --++ (stationClutter bawdsey)
       , movedTargets = []
       , polarTargets = []
       , echoes = []
       , skyline = []
       , xSignal = []
       , ySignal = []
-      , goniometer = degrees -45.0 -- relative to Line Of Shoot.
+      , goniometer = degrees 0 -- relative to Line Of Shoot.
       , gonioOutput = []
       }
     , Task.perform AdjustTimeZone Time.here
@@ -108,6 +108,7 @@ deriveModelAtTime model t =
     ySignal = dipoleYreceiving echoSignals
     gonioOutput  = goniometerMix model.goniometer xSignal ySignal
     skyline = deriveSkyline (scaleWidthKilometers * 1000) gonioOutput
+    --skyline = deriveSkyline (scaleWidthKilometers * 1000) xSignal
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
@@ -188,13 +189,19 @@ view m =
   --  AsText ->
       let polarInfo = List.concatMap viewPolarTarget m.polarTargets
           echoInfo = List.concatMap viewEcho m.echoes
+          xInfo = List.concatMap viewEcho m.xSignal
+          yInfo = List.concatMap viewEcho m.ySignal
+          gonioInfo = List.concatMap viewEcho m.gonioOutput
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
       in
         (div []) <| List.concat [  [crt m]
-                              --, [Html.hr [] []]
+                              , [Html.hr [] []]
                               --, polarInfo 
-                              --, echoInfo 
+                              , echoInfo 
+                              --, xInfo 
+                              --, yInfo 
+                              , gonioInfo
                               --, edgeInfo
                               --, lineInfo
                             ]

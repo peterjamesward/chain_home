@@ -7,11 +7,11 @@ bawdsey = { longitude   = degrees 1.408614
           , lineOfShoot = degrees 90.0 
           }  
 
-bomber1 = { longitude = degrees 2.0
-          , latitude  = degrees 52.0
-          , height    = 30 -- ,000 ft
-          , bearing   = degrees 280
-          , speed     = 200.0 -- mph
+bomber1 = { longitude = bawdsey.longitude + (degrees 0.9)
+          , latitude  = bawdsey.latitude + (degrees 0.0)
+          , height    = 20 -- ,000 ft
+          , bearing   = degrees 270
+          , speed     = 0.0 -- mph
           , iff       = False 
           }
  
@@ -32,18 +32,18 @@ bomber2A = { longitude = degrees 2.000
           }
  
 bomber3 = { longitude = bawdsey.longitude + (degrees 0.8)
-          , latitude  = bawdsey.latitude + (degrees 0.5)
+          , latitude  = bawdsey.latitude + (degrees 0.55)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 220 -- mph
+          , speed     = 0 -- mph
           , iff       = False 
           }
  
 bomber4 = { longitude = bawdsey.longitude + (degrees 0.8) 
-          , latitude  = bawdsey.latitude - (degrees 0.5)
+          , latitude  = bawdsey.latitude + (degrees -0.5)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 220 -- mph
+          , speed     = 0 -- mph
           , iff       = False 
           }
  
@@ -66,7 +66,7 @@ massRaid =
     let base =  { longitude = bawdsey.longitude + (degrees 0.9)
                 , latitude  = bawdsey.latitude
                 , height    = 25
-                , bearing   = 270
+                , bearing   = degrees 270
                 , speed     = 200
                 , iff       = False
                 }
@@ -79,7 +79,7 @@ tenAbreast = List.map (\i ->
                 { longitude = bawdsey.longitude + (degrees 0.8)
                 , latitude  = bawdsey.latitude + (degrees (toFloat i-5) * 0.001)
                 , height    = 25
-                , bearing   = 270
+                , bearing   = degrees 270
                 , speed     = 300
                 , iff       = False
                 }
@@ -90,7 +90,7 @@ tenAligned = List.map (\i ->
                 { longitude = bawdsey.longitude + (degrees 1.0) + (degrees (toFloat i-5) * 0.004)
                 , latitude  = bawdsey.latitude
                 , height    = 25
-                , bearing   = 270
+                , bearing   = degrees 270
                 , speed     = 300
                 , iff       = False
                 }
@@ -98,15 +98,16 @@ tenAligned = List.map (\i ->
             <| List.range 1 10
 
 
-targetsBaseline =   [ bomber1
-                    , bomber2
+targetsBaseline =   [ 
+                     bomber3
+                    --, bomber2
                     --, bomber2A
                     --, bomber3
                     --, bomber4
                     --, fighter1 
                     ]
-                    ++ tenAligned
-                    ++ tenAbreast
+                    --++ tenAligned
+                    --++ tenAbreast
                     --++ massRaid
 
 

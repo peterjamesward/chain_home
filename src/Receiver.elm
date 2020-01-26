@@ -24,7 +24,7 @@ dipoleXreceiving : List Echo -> List Echo
 dipoleXreceiving echoes = 
     List.map (\echo ->  { echo  | amplitude = abs <| echo.amplitude 
                                     * (rxHorizLobe echo.theta) 
-                                    * (rxHiVertLobe echo.alpha)
+                                    --* (rxHiVertLobe echo.alpha)
                                 , phase = if (abs echo.theta) > pi/2 
                                     then 2*pi - echo.phase 
                                     else echo.phase
@@ -35,8 +35,8 @@ dipoleYreceiving : List Echo -> List Echo
 
 dipoleYreceiving echoes = 
     List.map (\echo ->  { echo  | amplitude = abs <| echo.amplitude 
-                                                     * (rxHorizLobe (echo.theta + pi/2))
-                                                     * (rxHiVertLobe echo.alpha)
+                                                     * (rxHorizLobe (pi/2 - echo.theta))
+                                                     --* (rxHiVertLobe echo.alpha)
                                 , phase = if echo.theta < 0
                                           then 2*pi - echo.phase 
                                           else echo.phase
@@ -46,10 +46,16 @@ dipoleYreceiving echoes =
 -- I am tempted here to NOT combine the echoes but simply to make a single
 -- list in which each echo has, if you like, an X version and a Y version, 
 -- and we let the skyline rotine do its thing. That's not a bad first idea.
+-- BUT NO. I think we should pair-wise deal with each signal's X and Y components.
+-- If only because it may be easier to debug...
 goniometerMix : Float -> List Echo -> List Echo -> List Echo
 goniometerMix angle xEchoes yEchoes =
     let    
-        adjustedXechoes = List.map (\e -> {e | amplitude = e.amplitude * cos angle}) xEchoes
-        adjustedYechoes = List.map (\e -> {e | amplitude = e.amplitude * cos angle}) yEchoes
+        adjustedXechoes = List.map (\e -> {e | amplitude = abs <| e.amplitude * sin angle
+                                          }
+                                   ) xEchoes
+        adjustedYechoes = List.map (\e -> {e | amplitude = abs <| e.amplitude * cos angle
+                                          }
+                                   ) yEchoes
     in 
         adjustedXechoes ++ adjustedYechoes
