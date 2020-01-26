@@ -1,4 +1,4 @@
-module Receiver exposing (dipoleXreceiving, dipoleYreceiving, goniometerMix)
+module Receiver exposing (goniometerMix)
 
 import Echo exposing (Echo)
 
@@ -11,51 +11,39 @@ import Echo exposing (Echo)
 
 import LobeFunctions exposing (..)
 
-{- Should be straightforward. We receive the echoes at each 
-   dipole. The strength is diminished by the lobe functions.
-   Also, the phase depending on which side of the dipole the
-   signal hits (applies mostly to the transverse 'Y' dipole).
-   In data structure terms, we're probably still dealing with Echoes.
+{- 
+    When goniometer is aligned with the signal, the combined signal disappears.
+    Simplistically, echo at theta = 0, x signal = cos 0 = 1, y signal = sin 0 = 0
+    We want output for gonio 0 to be zero so x sin theta + y cos theta would be a good start.
+    Echo at 90 deg, x = 0, y = 1. We want output 0 at 09 deg. Same equation works.
+    But to be clever we'll mix the signals with phase, like we do in skyline.
 -}
 
--- Dipole X is oriented along line of shoot.
-dipoleXreceiving : List Echo -> List Echo
-
-dipoleXreceiving echoes = 
-    List.map (\echo ->  { echo  | amplitude = abs <| echo.amplitude 
-                                    * (rxHorizLobe echo.theta) 
-                                    --* (rxHiVertLobe echo.alpha)
-                                , phase = if (abs echo.theta) > pi/2 
-                                    then 2*pi - echo.phase 
-                                    else echo.phase
-                        }
-    ) echoes
-
-dipoleYreceiving : List Echo -> List Echo
-
-dipoleYreceiving echoes = 
-    List.map (\echo ->  { echo  | amplitude = abs <| echo.amplitude 
-                                                     * (rxHorizLobe (pi/2 - echo.theta))
-                                                     --* (rxHiVertLobe echo.alpha)
-                                , phase = if echo.theta < 0
-                                          then 2*pi - echo.phase 
-                                          else echo.phase
-                        }
-    ) echoes
-
--- I am tempted here to NOT combine the echoes but simply to make a single
--- list in which each echo has, if you like, an X version and a Y version, 
--- and we let the skyline rotine do its thing. That's not a bad first idea.
--- BUT NO. I think we should pair-wise deal with each signal's X and Y components.
--- If only because it may be easier to debug...
-goniometerMix : Float -> List Echo -> List Echo -> List Echo
-goniometerMix angle xEchoes yEchoes =
-    let    
-        adjustedXechoes = List.map (\e -> {e | amplitude = abs <| e.amplitude * sin angle
-                                          }
-                                   ) xEchoes
-        adjustedYechoes = List.map (\e -> {e | amplitude = abs <| e.amplitude * cos angle
-                                          }
-                                   ) yEchoes
+gonioMixEcho : Float -> Echo -> Echo
+gonioMixEcho angle echo =
+    let
+        xDipoleAmp = abs <| echo.amplitude 
+                        * (rxHorizLobe echo.theta) 
+                        --* (rxHiVertLobe echo.alpha)
+                        * sin angle
+        yDipoleAmp = abs <| echo.amplitude 
+                         * (rxHorizLobe (pi/2 - echo.theta))
+                         --* (rxHiVertLobe echo.alpha)
+                         * cos angle
+        xDipolePhase = if (abs echo.theta) > pi/2 
+                        then 2*pi - echo.phase 
+                        else echo.phase
+        yDipolePhase = if (abs echo.theta) > pi/2 
+                        then 2*pi - echo.phase 
+                        else echo.phase
+        (xx,xy) = fromPolar (xDipoleAmp, xDipolePhase)
+        (yx,yy) = fromPolar (yDipoleAmp, yDipolePhase)
+        (amp, ph) = toPolar (xx - yx, xy - yy)
     in 
-        adjustedXechoes ++ adjustedYechoes
+        { echo | amplitude = amp, phase = ph }
+
+
+goniometerMix : Float -> List Echo -> List Echo
+goniometerMix angle echoes =
+    List.map (gonioMixEcho angle) echoes  
+

@@ -1,6 +1,6 @@
 module Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 
-import Echo exposing (..)
+import Echo exposing (Echo)
 import Constants exposing (..)
 import Html exposing (..)    
 import Utils exposing (stringifyPoint)
@@ -52,15 +52,15 @@ processEdge (p, echo, isLeading)
             (roofline, activeEchoes, (lastX,lastY)) = 
   let   ((x1,y),(x2,_)) = Maybe.withDefault dummyLeadingEdge <| List.head roofline -- the last output.
         newActiveEchoes = case isLeading of
-                              True  -> echo :: activeEchoes
-                              False -> List.filter ((/=) echo) activeEchoes
+                          True  -> echo :: activeEchoes
+                          False -> List.filter (\e -> e.r /= echo.r) activeEchoes
         newX = p
         newY = combineEchoes newActiveEchoes
   in
         if  newX <= x2 then
             -- We're not moving horizontally but we need to track the roof height.
             (roofline, newActiveEchoes, (newX, newY))
-        else if newY == y then
+        else if newY == lastY then
             -- We have moved horizontally, but the height is the same so
             -- there's nothing to say or do. Move along.
             (roofline, newActiveEchoes, (x1,y))

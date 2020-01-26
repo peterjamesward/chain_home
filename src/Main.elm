@@ -21,7 +21,7 @@ import Config exposing (..)
 import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 import BeamSmoother exposing (beamPath)
 import Utils exposing (..)
-import Receiver exposing (dipoleXreceiving, dipoleYreceiving, goniometerMix)
+import Receiver exposing (goniometerMix)
 
 
 -- This is dummy line for me to practise with floats and trig.
@@ -65,8 +65,6 @@ type alias Model =
   , polarTargets : List PolarTarget
   , echoes : List Echo
   , skyline : List ((Float, Float),(Float, Float))
-  , xSignal : List Echo
-  , ySignal : List Echo
   , goniometer : Float
   , gonioOutput : List Echo
   }
@@ -84,9 +82,7 @@ init _ =
       , polarTargets = []
       , echoes = []
       , skyline = []
-      , xSignal = []
-      , ySignal = []
-      , goniometer = degrees 0 -- relative to Line Of Shoot.
+      , goniometer = degrees 0.0 -- relative to Line Of Shoot.
       , gonioOutput = []
       }
     , Task.perform AdjustTimeZone Time.here
@@ -101,25 +97,20 @@ type Msg
 deriveModelAtTime : Model -> Int -> Model
 deriveModelAtTime model t =
   let
-    targetsNow = List.map (targetAtTime t model.startTime) model.targets
+    targetsNow       = List.map (targetAtTime t model.startTime) model.targets
     convertedTargets = List.map (mapToPolar bawdsey) targetsNow
-    echoSignals = deriveEchoes convertedTargets t
-    xSignal = dipoleXreceiving echoSignals
-    ySignal = dipoleYreceiving echoSignals
-    gonioOutput  = goniometerMix model.goniometer xSignal ySignal
-    skyline = deriveSkyline (scaleWidthKilometers * 1000) gonioOutput
-    --skyline = deriveSkyline (scaleWidthKilometers * 1000) xSignal
+    echoSignals      = deriveEchoes convertedTargets t
+    gonioOut         = goniometerMix model.goniometer echoSignals 
+    newSkyline       = deriveSkyline (scaleWidthKilometers * 1000) gonioOut
   in
       { model | startTime = if model.startTime == 0 then t else model.startTime 
               , time = t
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes       = echoSignals
-              , skyline      = skyline
-              , xSignal      = xSignal
-              , ySignal      = ySignal
-              , gonioOutput  = gonioOutput
-              , lineData     = scalePathToDisplay <| beamPath skyline
+              , skyline      = newSkyline
+              , gonioOutput  = gonioOut
+              , lineData     = scalePathToDisplay <| beamPath newSkyline
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -189,20 +180,16 @@ view m =
   --  AsText ->
       let polarInfo = List.concatMap viewPolarTarget m.polarTargets
           echoInfo = List.concatMap viewEcho m.echoes
-          xInfo = List.concatMap viewEcho m.xSignal
-          yInfo = List.concatMap viewEcho m.ySignal
           gonioInfo = List.concatMap viewEcho m.gonioOutput
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
       in
         (div []) <| List.concat [  [crt m]
                               , [Html.hr [] []]
-                              --, polarInfo 
+                              , polarInfo 
                               , echoInfo 
-                              --, xInfo 
-                              --, yInfo 
                               , gonioInfo
-                              --, edgeInfo
-                              --, lineInfo
+                              , edgeInfo
+                              , lineInfo
                             ]
 
