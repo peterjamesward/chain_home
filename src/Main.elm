@@ -6,6 +6,8 @@ import List
 import Tuple exposing (..)
 import String
 import Browser
+import Browser.Events as E
+import Json.Decode as D
 import Html exposing (..)
 import Task
 import Time
@@ -40,9 +42,35 @@ scalePathToDisplay unscaled =
     let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, ( y) * strengthToHeightFactor)
     in  List.map scalePoint unscaled
 
--- Deriving echoes is just applying the transmitter lobe function so
--- amplitude is function of ltheta and range. Later, IFF figures.
--- Including time here is just experimental for visual effects.
+-- INTERACTIVITY - starting with a linear goniometer.
+
+type alias Keys =
+  { gonioClock : Bool -- W
+  , gonioAnti  : Bool -- Q
+  }
+
+noKeys : Keys
+noKeys =
+  Keys False False
+
+updateKeys : Bool -> String -> Keys -> Keys
+updateKeys isDown key keys =
+  case key of
+    "q"  -> { keys | gonioAnti   = isDown }
+    "w"  -> { keys | gonioClock  = isDown }
+    _    -> keys
+
+
+swingGoniometer : Float -> Keys -> Float
+swingGoniometer angle keys = 
+  if keys.gonioClock && keys.gonioAnti then
+    angle
+  else if keys.gonioClock then
+    degrees <| Basics.min  90.0 (angle * 180/pi + 1.0)
+  else if keys.gonioAnti then
+    degrees <| Basics.max -90.0 (angle * 180/pi - 1.0)
+  else
+    angle
 
 -- MAIN
 main =
@@ -67,6 +95,7 @@ type alias Model =
   , skyline      : List ((Float, Float),(Float, Float))
   , goniometer   : Float
   , gonioOutput  : List Echo
+  , keys         : Keys
   }
 
 
@@ -84,6 +113,7 @@ init _ =
       , skyline      = []
       , goniometer   = degrees 10 -- relative to Line Of Shoot.
       , gonioOutput  = []
+      , keys         = noKeys
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -92,6 +122,7 @@ init _ =
 type Msg
   = Tick Time.Posix
   | AdjustTimeZone Time.Zone
+  | KeyChanged Bool String
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -111,6 +142,7 @@ deriveModelAtTime model t =
               , skyline      = newSkyline
               , gonioOutput  = gonioOut
               , lineData     = scalePathToDisplay <| beamPath newSkyline
+              , goniometer   = swingGoniometer model.goniometer model.keys
       }
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -126,11 +158,23 @@ update msg model =
       , Cmd.none
       )
 
+    KeyChanged isDown key ->
+      ( { model | keys = updateKeys isDown key model.keys }
+      , Cmd.none
+      )
+
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 100 Tick
+
+  Sub.batch
+    [ E.onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
+    , E.onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
+    , Time.every 100 Tick
+    ]
+
 
 -- VIEW
 
@@ -183,13 +227,15 @@ view m =
           gonioInfo = List.concatMap viewEcho m.gonioOutput
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
+          gonio = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
       in
-        (div []) <| List.concat [  [crt m]
+        (div []) <| List.concat [ [gonio] 
+                              , [crt m]
                               , [Html.hr [] []]
-                              , polarInfo 
-                              , echoInfo 
-                              , gonioInfo
-                              , edgeInfo
-                              , lineInfo
+                              --, polarInfo 
+                              --, echoInfo 
+                              --, gonioInfo
+                              --, edgeInfo
+                              --, lineInfo
                             ]
 
