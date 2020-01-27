@@ -57,7 +57,7 @@ updateKeys : Bool -> String -> Keys -> Keys
 updateKeys isDown key keys =
   case key of
     "q"  -> { keys | gonioAnti   = isDown }
-    "w"  -> { keys | gonioClock  = isDown }
+    "a"  -> { keys | gonioClock  = isDown }
     _    -> keys
 
 
@@ -229,7 +229,7 @@ view m =
           lineInfo = List.concatMap viewLineSegment m.lineData
           gonio = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
       in
-        (div []) <| List.concat [ [gonio] 
+        (div []) <| List.concat [ [gonio, Html.br [] [] ]
                               , [crt m]
                               , [Html.hr [] []]
                               --, polarInfo 
