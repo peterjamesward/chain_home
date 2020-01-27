@@ -82,7 +82,7 @@ deriveSkyline maxX allEchoes =
       (roofline, remainingEchoes, ((lastX, lastY))) = List.foldl processEdge ([], activeEchoes, (0.0,0.0)) allEdges
       finalY = combineEchoes remainingEchoes
   in
-      ((lastX, finalY), (maxX, finalY)) :: roofline
+      ((lastX, 0), (maxX, 0)) :: roofline
 
 viewEdge ((x1,y1),(x2,y2)) = 
   [ Html.text "( "

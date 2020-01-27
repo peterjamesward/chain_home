@@ -7,6 +7,14 @@ bawdsey = { longitude   = degrees 1.408614
           , lineOfShoot = degrees 90.0 
           }  
 
+notThere  = { longitude = bawdsey.longitude + (degrees 10)
+          , latitude  = bawdsey.latitude + (degrees 10)
+          , height    = 0 -- ,000 ft
+          , bearing   = degrees 0
+          , speed     = 0.0 -- mph
+          , iff       = False 
+          }
+ 
 bomber1 = { longitude = bawdsey.longitude + (degrees 0.9)
           , latitude  = bawdsey.latitude + (degrees 0.0)
           , height    = 20 -- ,000 ft
@@ -104,7 +112,7 @@ targetsBaseline =   [
                     --, bomber2A
                     --, bomber3
                     --, bomber4
-                     fighter1 
+                    --, fighter1 
                     ]
                     ++ tenAligned
                     ++ tenAbreast

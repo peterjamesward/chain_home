@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Svg exposing (..)
-import Svg.Attributes exposing (..)
+import Svg.Attributes as S exposing (..)
 import List
 import Tuple exposing (..)
 import String
@@ -9,6 +9,7 @@ import Browser
 import Browser.Events as E
 import Json.Decode as D
 import Html exposing (..)
+import Html.Attributes as H exposing (..)
 import Task
 import Time
 import Array exposing (..)
@@ -33,7 +34,11 @@ myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
 
 type alias LineData = List (Float, Float)
 
-rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50)), y "-10", fill "lightgreen", textAnchor "right" ] 
+rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50))
+                                       , y "-10"
+                                       , fill "lightgreen"
+                                       , textAnchor "right" 
+                                       ] 
                                        [ Svg.text (String.fromInt (i*5)) ])
   (List.range 0 19)
 
@@ -185,15 +190,15 @@ crt m =
   let svgPointList = (polyLineFromCoords m.lineData) 
   in 
     svg [ viewBox "-10 -40 1020 450"
-        , width "1020"
-        , height "420"
+        , S.width "1020"
+        , S.height "420"
         ]
         (List.append 
           [ rect
             [ x "-10"
             , y "-40"
-            , width "1020"
-            , height "450"
+            , S.width "1020"
+            , S.height "450"
             , fill "black"
             , stroke "black"
             , strokeWidth "3"
@@ -217,20 +222,27 @@ crt m =
             []
         ] rangeScale)
 
+showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
+
+showGonioImage m = 
+    let imageFile = "http://localhosT:8000/dial.jpeg"
+    in
+      img [ H.src imageFile, H.width 200, H.height 200] []
 
 view : Model -> Svg Msg
 view m = 
   --case viewMode of
   --  AsText ->
-      let polarInfo = List.concatMap viewPolarTarget m.polarTargets
+      let 
+          -- Mostly debugging info ...
+          polarInfo = List.concatMap viewPolarTarget m.polarTargets
           echoInfo = List.concatMap viewEcho m.echoes
           gonioInfo = List.concatMap viewEcho m.gonioOutput
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
-          gonio = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
+          gonio = showGonio m
       in
-        (div []) <| List.concat [ [gonio, Html.br [] [] ]
-                              , [crt m]
+        (div []) <| List.concat [ [gonio, Html.br [] [], showGonioImage m, crt m ]
                               , [Html.hr [] []]
                               --, polarInfo 
                               --, echoInfo 

@@ -5222,7 +5222,7 @@ var $elm$core$Basics$negate = function (n) {
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $author$project$Constants$beamSweepDecreasingAmplitude = -0.001;
+var $author$project$Constants$beamSweepDecreasingAmplitude = -0.0005;
 var $author$project$Constants$beamSweepIncreasingAmplitude = 0.003;
 var $author$project$BeamSmoother$beamSmoothingFunction = F2(
 	function (newRoof, _v0) {
@@ -5267,8 +5267,6 @@ var $author$project$BeamSmoother$beamPath = function (edges) {
 	var lines = _v0.a;
 	return lines;
 };
-var $author$project$Constants$scaleWidthKilometers = 150;
-var $author$project$Echo$dummyFinalEcho = {alpha: 0, amplitude: 0, duration: 0, phase: 0, r: $author$project$Constants$scaleWidthKilometers * 1000, theta: 0};
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
@@ -5281,44 +5279,24 @@ var $elm$time$Time$Zone = F2(
 	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
 var $elm$time$Time$here = _Time_here(_Utils_Tuple0);
-var $elm$core$Basics$sin = _Basics_sin;
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Station$stationClutter = function (station) {
-	return A2(
-		$elm$core$List$map,
-		function (i) {
-			return {
-				bearing: i,
-				height: 0.1 * $elm$core$Basics$sqrt(i),
-				iff: false,
-				latitude: station.latitude + (0.01 * $elm$core$Basics$sin(i)),
-				longitude: station.longitude + (0.015 * $elm$core$Basics$sin(i)),
-				speed: i * 0.001
-			};
-		},
-		A2($elm$core$List$range, 1, 100));
-};
-var $author$project$Config$bomber1 = {
-	bearing: $elm$core$Basics$degrees(280),
-	height: 30,
+var $author$project$Main$Keys = F2(
+	function (gonioClock, gonioAnti) {
+		return {gonioAnti: gonioAnti, gonioClock: gonioClock};
+	});
+var $author$project$Main$noKeys = A2($author$project$Main$Keys, false, false);
+var $author$project$Config$fighter1 = {
+	bearing: $elm$core$Basics$degrees(90),
+	height: 10,
 	iff: false,
-	latitude: $elm$core$Basics$degrees(52.0),
-	longitude: $elm$core$Basics$degrees(2.0),
-	speed: 200.0
-};
-var $author$project$Config$bomber2 = {
-	bearing: $elm$core$Basics$degrees(280),
-	height: 30.1,
-	iff: false,
-	latitude: $elm$core$Basics$degrees(52.05),
-	longitude: $elm$core$Basics$degrees(2.000),
-	speed: 200.0
+	latitude: $author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.1),
+	longitude: $elm$core$Basics$degrees(1.8),
+	speed: 400
 };
 var $author$project$Config$tenAbreast = A2(
 	$elm$core$List$map,
 	function (i) {
 		return {
-			bearing: 270,
+			bearing: $elm$core$Basics$degrees(270),
 			height: 25,
 			iff: false,
 			latitude: $author$project$Config$bawdsey.latitude + ($elm$core$Basics$degrees(i - 5) * 0.001),
@@ -5331,7 +5309,7 @@ var $author$project$Config$tenAligned = A2(
 	$elm$core$List$map,
 	function (i) {
 		return {
-			bearing: 270,
+			bearing: $elm$core$Basics$degrees(270),
 			height: 25,
 			iff: false,
 			latitude: $author$project$Config$bawdsey.latitude,
@@ -5342,34 +5320,36 @@ var $author$project$Config$tenAligned = A2(
 	A2($elm$core$List$range, 1, 10));
 var $author$project$Config$targetsBaseline = _Utils_ap(
 	_List_fromArray(
-		[$author$project$Config$bomber1, $author$project$Config$bomber2]),
+		[$author$project$Config$fighter1]),
 	_Utils_ap($author$project$Config$tenAligned, $author$project$Config$tenAbreast));
 var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
-			echoes: _List_fromArray(
-				[$author$project$Echo$dummyFinalEcho]),
+			echoes: _List_Nil,
+			gonioOutput: _List_Nil,
+			goniometer: $elm$core$Basics$degrees(10),
+			keys: $author$project$Main$noKeys,
 			lineData: $author$project$BeamSmoother$beamPath(_List_Nil),
 			movedTargets: _List_Nil,
-			olderLine: $author$project$BeamSmoother$beamPath(_List_Nil),
-			oldestLine: $author$project$BeamSmoother$beamPath(_List_Nil),
 			polarTargets: _List_Nil,
-			prevLine: $author$project$BeamSmoother$beamPath(_List_Nil),
 			skyline: _List_Nil,
 			startTime: 0,
 			station: $author$project$Config$bawdsey,
-			targets: _Utils_ap(
-				$author$project$Config$targetsBaseline,
-				$author$project$Station$stationClutter($author$project$Config$bawdsey)),
+			targets: $author$project$Config$targetsBaseline,
 			time: 0,
 			zone: $elm$time$Time$utc
 		},
 		A2($elm$core$Task$perform, $author$project$Main$AdjustTimeZone, $elm$time$Time$here));
 };
+var $author$project$Main$KeyChanged = F2(
+	function (a, b) {
+		return {$: 'KeyChanged', a: a, b: b};
+	});
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5774,11 +5754,231 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $elm$browser$Browser$Events$onKeyUp = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keyup');
+var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$subscriptions = function (model) {
-	return A2($elm$time$Time$every, 50, $author$project$Main$Tick);
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$elm$browser$Browser$Events$onKeyUp(
+				A2(
+					$elm$json$Json$Decode$map,
+					$author$project$Main$KeyChanged(false),
+					A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string))),
+				$elm$browser$Browser$Events$onKeyDown(
+				A2(
+					$elm$json$Json$Decode$map,
+					$author$project$Main$KeyChanged(true),
+					A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string))),
+				A2($elm$time$Time$every, 100, $author$project$Main$Tick)
+			]));
 };
 var $elm$core$Basics$asin = _Basics_asin;
 var $author$project$Constants$pulseDuration = 40.0;
+var $elm$core$Basics$sin = _Basics_sin;
 var $author$project$LobeFunctions$txHiVertOmniLobe = function (alpha) {
 	return $elm$core$Basics$sin(7 * alpha);
 };
@@ -5790,11 +5990,14 @@ var $author$project$LobeFunctions$txHorizReflectedLobe = function (θ) {
 		$elm$core$Basics$cos(θ),
 		2);
 };
+var $author$project$Constants$frequency = 20000000.0;
+var $author$project$Constants$lightSpeed = 300000000.0;
+var $author$project$Constants$wavelength = $author$project$Constants$lightSpeed / $author$project$Constants$frequency;
 var $author$project$Echo$deriveEchoes = F2(
 	function (targets, time) {
 		var ph = function (rng) {
 			return $elm$core$Basics$asin(
-				$elm$core$Basics$sin((2 * time) * rng));
+				$elm$core$Basics$sin((rng * time) / $author$project$Constants$wavelength));
 		};
 		var echoFromTarget = function (target) {
 			return {
@@ -5817,6 +6020,7 @@ var $elm$core$Basics$fromPolar = function (_v0) {
 		radius * $elm$core$Basics$sin(theta));
 };
 var $elm$core$Basics$atan2 = _Basics_atan2;
+var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $elm$core$Basics$toPolar = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
@@ -5899,7 +6103,9 @@ var $author$project$Skyline$processEdge = F2(
 			} else {
 				return A2(
 					$elm$core$List$filter,
-					$elm$core$Basics$neq(echo),
+					function (e) {
+						return !_Utils_eq(e.r, echo.r);
+					},
 					activeEchoes);
 			}
 		}();
@@ -5916,7 +6122,7 @@ var $author$project$Skyline$processEdge = F2(
 		return (_Utils_cmp(newX, x2) < 1) ? _Utils_Tuple3(
 			roofline,
 			newActiveEchoes,
-			_Utils_Tuple2(newX, newY)) : (_Utils_eq(newY, y) ? _Utils_Tuple3(
+			_Utils_Tuple2(newX, newY)) : (_Utils_eq(newY, lastY) ? _Utils_Tuple3(
 			roofline,
 			newActiveEchoes,
 			_Utils_Tuple2(x1, y)) : _Utils_Tuple3(
@@ -5929,7 +6135,6 @@ var $author$project$Skyline$processEdge = F2(
 			newActiveEchoes,
 			_Utils_Tuple2(newX, newY)));
 	});
-var $author$project$Constants$lightSpeed = 300000000.0;
 var $author$project$Constants$pulseWidth = ($author$project$Constants$lightSpeed * $author$project$Constants$pulseDuration) / 10000000.0;
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Skyline$deriveSkyline = F2(
@@ -5975,6 +6180,22 @@ var $author$project$Skyline$deriveSkyline = F2(
 				_Utils_Tuple2(maxX, finalY)),
 			roofline);
 	});
+var $author$project$Receiver$gonioMixEcho = F2(
+	function (angle, echo) {
+		return _Utils_update(
+			echo,
+			{
+				amplitude: $elm$core$Basics$abs(
+					echo.amplitude * $elm$core$Basics$sin(echo.theta - angle))
+			});
+	});
+var $author$project$Receiver$goniometerMix = F2(
+	function (angle, echoes) {
+		return A2(
+			$elm$core$List$map,
+			$author$project$Receiver$gonioMixEcho(angle),
+			echoes);
+	});
 var $author$project$Spherical$bearing = F2(
 	function (_v0, _v1) {
 		var φ1 = _v0.a;
@@ -6008,7 +6229,8 @@ var $author$project$Target$mapToPolar = F2(
 			theta: A2($author$project$Spherical$bearing, stationPos, targetPos) - station.lineOfShoot
 		};
 	});
-var $author$project$Constants$strengthToHeightFactor = 100.0;
+var $author$project$Constants$scaleWidthKilometers = 150;
+var $author$project$Constants$strengthToHeightFactor = 200.0;
 var $author$project$Constants$viewWidth = 1000;
 var $author$project$Main$scalePathToDisplay = function (unscaled) {
 	var scalePoint = function (_v0) {
@@ -6018,6 +6240,16 @@ var $author$project$Main$scalePathToDisplay = function (unscaled) {
 	};
 	return A2($elm$core$List$map, scalePoint, unscaled);
 };
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$Main$swingGoniometer = F2(
+	function (angle, keys) {
+		return (keys.gonioClock && keys.gonioAnti) ? angle : (keys.gonioClock ? $elm$core$Basics$degrees(
+			A2($elm$core$Basics$min, 90.0, ((angle * 180) / $elm$core$Basics$pi) + 1.0)) : (keys.gonioAnti ? $elm$core$Basics$degrees(
+			A2($elm$core$Basics$max, -90.0, ((angle * 180) / $elm$core$Basics$pi) - 1.0)) : angle));
+	});
 var $author$project$Spherical$newPosition = F3(
 	function (_v0, d, θ) {
 		var φ1 = _v0.a;
@@ -6057,19 +6289,19 @@ var $author$project$Main$deriveModelAtTime = F2(
 			$author$project$Target$mapToPolar($author$project$Config$bawdsey),
 			targetsNow);
 		var echoSignals = A2($author$project$Echo$deriveEchoes, convertedTargets, t);
-		var skyline = A2($author$project$Skyline$deriveSkyline, $author$project$Constants$scaleWidthKilometers * 1000, echoSignals);
+		var gonioOut = A2($author$project$Receiver$goniometerMix, model.goniometer, echoSignals);
+		var newSkyline = A2($author$project$Skyline$deriveSkyline, $author$project$Constants$scaleWidthKilometers * 1000, gonioOut);
 		return _Utils_update(
 			model,
 			{
 				echoes: echoSignals,
+				gonioOutput: gonioOut,
+				goniometer: A2($author$project$Main$swingGoniometer, model.goniometer, model.keys),
 				lineData: $author$project$Main$scalePathToDisplay(
-					$author$project$BeamSmoother$beamPath(skyline)),
+					$author$project$BeamSmoother$beamPath(newSkyline)),
 				movedTargets: targetsNow,
-				olderLine: model.prevLine,
-				oldestLine: model.olderLine,
 				polarTargets: convertedTargets,
-				prevLine: model.lineData,
-				skyline: skyline,
+				skyline: newSkyline,
 				startTime: (!model.startTime) ? t : model.startTime,
 				time: t
 			});
@@ -6080,25 +6312,52 @@ var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
 };
-var $author$project$Main$update = F2(
-	function (msg, model) {
-		if (msg.$ === 'Tick') {
-			var newTime = msg.a;
-			return _Utils_Tuple2(
-				A2(
-					$author$project$Main$deriveModelAtTime,
-					model,
-					$elm$time$Time$posixToMillis(newTime)),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var newZone = msg.a;
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{zone: newZone}),
-				$elm$core$Platform$Cmd$none);
+var $author$project$Main$updateKeys = F3(
+	function (isDown, key, keys) {
+		switch (key) {
+			case 'q':
+				return _Utils_update(
+					keys,
+					{gonioAnti: isDown});
+			case 'a':
+				return _Utils_update(
+					keys,
+					{gonioClock: isDown});
+			default:
+				return keys;
 		}
 	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Tick':
+				var newTime = msg.a;
+				return _Utils_Tuple2(
+					A2(
+						$author$project$Main$deriveModelAtTime,
+						model,
+						$elm$time$Time$posixToMillis(newTime)),
+					$elm$core$Platform$Cmd$none);
+			case 'AdjustTimeZone':
+				var newZone = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{zone: newZone}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var isDown = msg.a;
+				var key = msg.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							keys: A3($author$project$Main$updateKeys, isDown, key, model.keys)
+						}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -6220,9 +6479,9 @@ var $author$project$Main$crt = function (m) {
 			$author$project$Main$rangeScale));
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$hr = _VirtualDom_node('hr');
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Basics$truncate = _Basics_truncate;
 var $author$project$Echo$viewEcho = function (e) {
 	return _List_fromArray(
 		[
@@ -6232,11 +6491,11 @@ var $author$project$Echo$viewEcho = function (e) {
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			$elm$html$Html$text('theta '),
 			$elm$html$Html$text(
-			$elm$core$String$fromFloat(e.theta)),
+			$elm$core$String$fromFloat((e.theta * 180) / $elm$core$Basics$pi)),
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			$elm$html$Html$text('alpha '),
 			$elm$html$Html$text(
-			$elm$core$String$fromFloat(e.alpha)),
+			$elm$core$String$fromFloat((e.alpha * 180) / $elm$core$Basics$pi)),
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			$elm$html$Html$text('phase '),
 			$elm$html$Html$text(
@@ -6302,11 +6561,11 @@ var $author$project$Target$viewPolarTarget = function (p1) {
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			$elm$html$Html$text('theta '),
 			$elm$html$Html$text(
-			$elm$core$String$fromFloat(p1.theta)),
+			$elm$core$String$fromFloat((180 / $elm$core$Basics$pi) * p1.theta)),
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			$elm$html$Html$text('alpha '),
 			$elm$html$Html$text(
-			$elm$core$String$fromFloat(p1.alpha)),
+			$elm$core$String$fromFloat((180 / $elm$core$Basics$pi) * p1.alpha)),
 			A2($elm$html$Html$br, _List_Nil, _List_Nil),
 			A2($elm$html$Html$hr, _List_Nil, _List_Nil)
 		]);
@@ -6314,6 +6573,9 @@ var $author$project$Target$viewPolarTarget = function (p1) {
 var $author$project$Main$view = function (m) {
 	var polarInfo = A2($elm$core$List$concatMap, $author$project$Target$viewPolarTarget, m.polarTargets);
 	var lineInfo = A2($elm$core$List$concatMap, $author$project$Skyline$viewLineSegment, m.lineData);
+	var gonioInfo = A2($elm$core$List$concatMap, $author$project$Echo$viewEcho, m.gonioOutput);
+	var gonio = $elm$html$Html$text(
+		$elm$core$String$fromInt(((m.goniometer * 180.0) / $elm$core$Basics$pi) | 0));
 	var edgeInfo = A2($elm$core$List$concatMap, $author$project$Skyline$viewEdge, m.skyline);
 	var echoInfo = A2($elm$core$List$concatMap, $author$project$Echo$viewEcho, m.echoes);
 	return A2(
@@ -6324,7 +6586,16 @@ var $author$project$Main$view = function (m) {
 				[
 					_List_fromArray(
 					[
+						gonio,
+						A2($elm$html$Html$br, _List_Nil, _List_Nil)
+					]),
+					_List_fromArray(
+					[
 						$author$project$Main$crt(m)
+					]),
+					_List_fromArray(
+					[
+						A2($elm$html$Html$hr, _List_Nil, _List_Nil)
 					])
 				])));
 };
