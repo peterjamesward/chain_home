@@ -55,35 +55,35 @@ main =
 
 -- MODEL
 type alias Model =
-  { zone : Time.Zone
-  , startTime : Int -- millseconds from t-zero
-  , time : Int
-  , lineData : List (Float, Float)
-  , station : Station
-  , targets : List Target
+  { zone         : Time.Zone
+  , startTime    : Int -- millseconds from t-zero
+  , time         : Int
+  , lineData     : List (Float, Float)
+  , station      : Station
+  , targets      : List Target
   , movedTargets : List Target
   , polarTargets : List PolarTarget
-  , echoes : List Echo
-  , skyline : List ((Float, Float),(Float, Float))
-  , goniometer : Float
-  , gonioOutput : List Echo
+  , echoes       : List Echo
+  , skyline      : List ((Float, Float),(Float, Float))
+  , goniometer   : Float
+  , gonioOutput  : List Echo
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    ( { zone = Time.utc 
-      , startTime = 0
-      , time = 0
-      , lineData = beamPath []
-      , station = bawdsey
-      , targets = targetsBaseline --++ (stationClutter bawdsey)
+    ( { zone         = Time.utc 
+      , startTime    = 0
+      , time         = 0
+      , lineData     = beamPath []
+      , station      = bawdsey
+      , targets      = targetsBaseline --++ (stationClutter bawdsey)
       , movedTargets = []
       , polarTargets = []
-      , echoes = []
-      , skyline = []
-      , goniometer = degrees 0.0 -- relative to Line Of Shoot.
-      , gonioOutput = []
+      , echoes       = []
+      , skyline      = []
+      , goniometer   = degrees 10 -- relative to Line Of Shoot.
+      , gonioOutput  = []
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -103,8 +103,8 @@ deriveModelAtTime model t =
     gonioOut         = goniometerMix model.goniometer echoSignals 
     newSkyline       = deriveSkyline (scaleWidthKilometers * 1000) gonioOut
   in
-      { model | startTime = if model.startTime == 0 then t else model.startTime 
-              , time = t
+      { model | startTime    = if model.startTime == 0 then t else model.startTime 
+              , time         = t
               , movedTargets = targetsNow
               , polarTargets = convertedTargets
               , echoes       = echoSignals

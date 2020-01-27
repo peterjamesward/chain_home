@@ -28,8 +28,7 @@ dummyInitialEcho = { dummyFinalEcho | r = 0 }
 deriveEchoes : List PolarTarget -> Int -> List Echo
 deriveEchoes targets time = 
   let 
-      ph rng = asin <| sin <| rng --* (toFloat time)/wavelength  --/wavelength / 1000)  -- clearer not cheaper
-      --ph rng = 2.0 * pi * (rng - wavelength * (toFloat << truncate) (rng / wavelength))/wavelength
+      ph rng = asin <| sin <| rng * (toFloat time)/wavelength  
       echoFromTarget target = { r         = target.r
                               , theta     = target.theta
                               , alpha     = target.alpha

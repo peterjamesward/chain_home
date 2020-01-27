@@ -19,28 +19,10 @@ import LobeFunctions exposing (..)
     But to be clever we'll mix the signals with phase, like we do in skyline.
 -}
 
+-- Let's cheat, since we know theta.
 gonioMixEcho : Float -> Echo -> Echo
 gonioMixEcho angle echo =
-    let
-        xDipoleAmp = abs <| echo.amplitude 
-                        * (rxHorizLobe echo.theta) 
-                        --* (rxHiVertLobe echo.alpha)
-                        * sin angle
-        yDipoleAmp = abs <| echo.amplitude 
-                         * (rxHorizLobe (pi/2 - echo.theta))
-                         --* (rxHiVertLobe echo.alpha)
-                         * cos angle
-        xDipolePhase = if (abs echo.theta) > pi/2 
-                        then 2*pi - echo.phase 
-                        else echo.phase
-        yDipolePhase = if (abs echo.theta) > pi/2 
-                        then 2*pi - echo.phase 
-                        else echo.phase
-        (xx,xy) = fromPolar (xDipoleAmp, xDipolePhase)
-        (yx,yy) = fromPolar (yDipoleAmp, yDipolePhase)
-        (amp, ph) = toPolar (xx - yx, xy - yy)
-    in 
-        { echo | amplitude = amp, phase = ph }
+        { echo  | amplitude = abs <| echo.amplitude * sin (echo.theta - angle) }
 
 
 goniometerMix : Float -> List Echo -> List Echo

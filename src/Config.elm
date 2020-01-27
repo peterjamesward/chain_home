@@ -24,7 +24,7 @@ bomber2 = { longitude = degrees 2.000
           }
  
 bomber2A = { longitude = degrees 2.000
-          , latitude  = degrees 52.05
+          , latitude  = degrees 52.06
           , height    = 30.1 -- ,000 ft
           , bearing   = degrees 280
           , speed     = 200.0 -- mph
@@ -99,15 +99,15 @@ tenAligned = List.map (\i ->
 
 
 targetsBaseline =   [ 
-                     bomber3
+                    --  bomber1
                     --, bomber2
                     --, bomber2A
                     --, bomber3
                     --, bomber4
-                    --, fighter1 
+                     fighter1 
                     ]
-                    --++ tenAligned
-                    --++ tenAbreast
+                    ++ tenAligned
+                    ++ tenAbreast
                     --++ massRaid
 
 
