@@ -1,4 +1,13 @@
-module Config exposing (..)
+module Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline)
+
+import Target exposing (Target)
+
+type alias TargetSelector =
+  { id          : Int
+  , description : String    -- e.g. "mass raid"
+  , targets     : List Target   -- The planes to be active when this group selected
+  , active      : Bool      -- Whether this group is active (dynamic)
+  }
 
 -- Let's make ourselves a station and a target
 -- Bawdsey, assuming LOS due East.
@@ -7,14 +16,6 @@ bawdsey = { longitude   = degrees 1.408614
           , lineOfShoot = degrees 90.0 
           }  
 
-notThere  = { longitude = bawdsey.longitude + (degrees 10)
-          , latitude  = bawdsey.latitude + (degrees 10)
-          , height    = 0 -- ,000 ft
-          , bearing   = degrees 0
-          , speed     = 0.0 -- mph
-          , iff       = False 
-          }
- 
 bomber1 = { longitude = bawdsey.longitude + (degrees 0.9)
           , latitude  = bawdsey.latitude + (degrees 0.0)
           , height    = 20 -- ,000 ft
@@ -96,7 +97,7 @@ tenAbreast = List.map (\i ->
 
 tenAligned = List.map (\i ->
                 { longitude = bawdsey.longitude + (degrees 1.0) + (degrees (toFloat i-5) * 0.004)
-                , latitude  = bawdsey.latitude
+                , latitude  = bawdsey.latitude + (degrees <| 0.05 * sin (toFloat i))
                 , height    = 25
                 , bearing   = degrees 270
                 , speed     = 300
@@ -117,5 +118,16 @@ targetsBaseline =   [
                     ++ tenAligned
                     ++ tenAbreast
                     --++ massRaid
+
+-- Some useful configurations for training.
+
+outboundFriendly  = TargetSelector 1 "One outbound friendly fighter"  [fighter1] False 
+twoCloseTargets   = TargetSelector 2 "Two targets very close"        [bomber2, bomber2A] False 
+twoDistantTargets = TargetSelector 3 "Two targets, differnt bearings" [bomber3, bomber4] False 
+tenWide           = TargetSelector 4 "Ten targets, line abreast"     tenAbreast False 
+tenDeep           = TargetSelector 5 "Ten targets, line astern"     tenAligned False 
+massiveRaid       = TargetSelector 6 "Formation of 100"       massRaid False 
+
+targetConfigurations = [ outboundFriendly, twoCloseTargets, twoDistantTargets, tenWide, tenDeep, massiveRaid ]
 
 
