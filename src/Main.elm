@@ -25,6 +25,7 @@ import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 import BeamSmoother exposing (beamPath)
 import Utils exposing (..)
 import Receiver exposing (goniometerMix)
+import Goniometer exposing (showGonio, showGonioImage)
 
 
 -- This is dummy line for me to practise with floats and trig.
@@ -222,16 +223,6 @@ crt m =
             []
         ] rangeScale)
 
-showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
-
-showGonioImage m = 
-    let imageFile = "http://localhosT:8000/dial.jpeg"
-    in
-      img [ H.src imageFile
-          , H.width 300
-          , H.height 300 
-          , H.style "transform" ("rotate(" ++ (String.fromInt <| truncate <| m.goniometer * 180/pi) ++ "deg)") 
-          ] []
 
 view : Model -> Svg Msg
 view m = 
