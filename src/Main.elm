@@ -227,7 +227,11 @@ showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / 
 showGonioImage m = 
     let imageFile = "http://localhosT:8000/dial.jpeg"
     in
-      img [ H.src imageFile, H.width 200, H.height 200] []
+      img [ H.src imageFile
+          , H.width 300
+          , H.height 300 
+          , H.style "transform" ("rotate(" ++ (String.fromInt <| truncate <| m.goniometer * 180/pi) ++ "deg)") 
+          ] []
 
 view : Model -> Svg Msg
 view m = 
