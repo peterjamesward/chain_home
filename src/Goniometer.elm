@@ -38,7 +38,7 @@ drawGoniometerScale theta =
         xFromIndex i = String.fromFloat <| ((+) originX) 
                                         <| ((*) radius) <| sin <| degrees 
                                         <| toFloat <| i * 10 
-        yFromIndex i = String.fromFloat <| ((-) originY)
+        yFromIndex i = String.fromFloat <| ((-) (originY + 4)) 
                                         <| ((*) radius) <| cos <| degrees 
                                         <| toFloat <| i * 10 
         labelPoint i = Svg.text_  [  x <| xFromIndex i

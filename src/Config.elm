@@ -111,12 +111,12 @@ targetsBaseline =   [
                     --  bomber1
                     --, bomber2
                     --, bomber2A
-                    --, bomber3
-                    --, bomber4
+                     bomber3
+                    , bomber4
                     --, fighter1 
                     ]
-                    ++ tenAligned
-                    ++ tenAbreast
+                    --++ tenAligned
+                    --++ tenAbreast
                     --++ massRaid
 
 -- Some useful configurations for training.

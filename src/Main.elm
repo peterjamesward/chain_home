@@ -243,7 +243,7 @@ view m =
       in
         (div []) <| List.concat [ [gonio, Html.br [] [], showGonioImage theta, crt m ]
                               , [Html.hr [] []]
-                              --, polarInfo 
+                              , polarInfo 
                               --, echoInfo 
                               --, gonioInfo
                               --, edgeInfo
