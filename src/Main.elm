@@ -67,14 +67,17 @@ updateKeys isDown key keys =
     _    -> keys
 
 
+-- When we have mouse tracking we can have non-integer movements.
 swingGoniometer : Float -> Keys -> Float
 swingGoniometer angle keys = 
   if keys.gonioClock && keys.gonioAnti then
     angle
   else if keys.gonioClock then
-    degrees <| Basics.min  90.0 (angle * 180/pi + 1.0)
+    angle + (degrees 1.0)
+    --degrees <| toFloat <| (modBy 360) <| truncate <| (angle * 180/pi + 1.0)
   else if keys.gonioAnti then
-    degrees <| Basics.max -90.0 (angle * 180/pi - 1.0)
+    --degrees <| toFloat <| (modBy 360) <| truncate <| (angle * 180/pi - 1.0)
+    angle - (degrees 1.0)
   else
     angle
 
@@ -178,7 +181,7 @@ subscriptions model =
   Sub.batch
     [ E.onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
     , E.onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
-    , Time.every 100 Tick
+    , Time.every 50 Tick
     ]
 
 
@@ -235,9 +238,10 @@ view m =
           gonioInfo = List.concatMap viewEcho m.gonioOutput
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
+          theta = m.goniometer + m.station.lineOfShoot
           gonio = showGonio m
       in
-        (div []) <| List.concat [ [gonio, Html.br [] [], showGonioImage m, crt m ]
+        (div []) <| List.concat [ [gonio, Html.br [] [], showGonioImage theta, crt m ]
                               , [Html.hr [] []]
                               --, polarInfo 
                               --, echoInfo 

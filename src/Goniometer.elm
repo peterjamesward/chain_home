@@ -8,20 +8,13 @@ import Svg.Attributes as S exposing (..)
 
 showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
 
-showGonioImage m = 
-    drawGoniometerScale
-    --let imageFile = "http://localhost:8000/dial.jpeg"
-    --in
-    --  img [ H.src imageFile
-    --      , H.width 300
-    --      , H.height 300 
-    --      , H.style "transform" ("rotate(" ++ (String.fromInt <| truncate <| m.goniometer * 180/pi) ++ "deg)") 
-    --      ] []
+showGonioImage theta = 
+        drawGoniometerScale theta
 
 drawGoniometerPointer theta = 
     let originX = 0
         originY = 0
-        radius = 150
+        radius = 140
         xPoint = String.fromFloat <| ((+) originX) 
                                   <| ((*) radius) <| sin theta
         yPoint = String.fromFloat <| ((-) originY)
@@ -38,7 +31,7 @@ drawGoniometerPointer theta =
             ]
             []
 
-drawGoniometerScale = 
+drawGoniometerScale theta = 
     let originX = 0
         originY = 0
         radius = 160
@@ -60,4 +53,4 @@ drawGoniometerScale =
         , S.width "300"
         , S.height "300"
         ]
-        ((drawGoniometerPointer 0.0) :: (List.map labelPoint (List.range 0 35)))
+        ((drawGoniometerPointer theta) :: (List.map labelPoint (List.range 0 35)))
