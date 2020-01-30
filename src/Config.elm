@@ -44,7 +44,7 @@ bomber3 = { longitude = bawdsey.longitude + (degrees 0.8)
           , latitude  = bawdsey.latitude + (degrees 0.55)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 0 -- mph
+          , speed     = 200 -- mph
           , iff       = False 
           }
  
@@ -52,7 +52,7 @@ bomber4 = { longitude = bawdsey.longitude + (degrees 0.8)
           , latitude  = bawdsey.latitude + (degrees -0.5)
           , height    = 20 -- ,000 ft
           , bearing   = degrees 270
-          , speed     = 0 -- mph
+          , speed     = 200 -- mph
           , iff       = False 
           }
  
@@ -89,7 +89,7 @@ tenAbreast = List.map (\i ->
                 , latitude  = bawdsey.latitude + (degrees (toFloat i-5) * 0.001)
                 , height    = 25
                 , bearing   = degrees 270
-                , speed     = 300
+                , speed     = 200
                 , iff       = False
                 }
             )
@@ -100,7 +100,7 @@ tenAligned = List.map (\i ->
                 , latitude  = bawdsey.latitude + (degrees <| 0.05 * sin (toFloat i))
                 , height    = 25
                 , bearing   = degrees 270
-                , speed     = 300
+                , speed     = 200
                 , iff       = False
                 }
             )
@@ -111,12 +111,12 @@ targetsBaseline =   [
                     --  bomber1
                     --, bomber2
                     --, bomber2A
-                     bomber3
-                    , bomber4
+                    -- bomber3
+                    --, bomber4
                     --, fighter1 
                     ]
-                    --++ tenAligned
-                    --++ tenAbreast
+                    ++ tenAligned
+                    ++ tenAbreast
                     --++ massRaid
 
 -- Some useful configurations for training.
