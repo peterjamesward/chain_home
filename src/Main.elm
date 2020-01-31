@@ -76,9 +76,7 @@ swingGoniometer angle keys =
     angle
   else if keys.gonioClock then
     angle + (degrees 1.0)
-    --degrees <| toFloat <| (modBy 360) <| truncate <| (angle * 180/pi + 1.0)
   else if keys.gonioAnti then
-    --degrees <| toFloat <| (modBy 360) <| truncate <| (angle * 180/pi - 1.0)
     angle - (degrees 1.0)
   else
     angle
@@ -108,6 +106,7 @@ type alias Model =
   , gonioOutput  : List Echo
   , keys         : Keys
   , mousePos  : (Float,Float)
+  , gonioDrag : Maybe (Float, (Float, Float))  -- angle and mouse position when mouse down
   }
 
 
@@ -127,6 +126,7 @@ init _ =
       , gonioOutput  = []
       , keys         = noKeys
       , mousePos = (0.0,0.0)
+      , gonioDrag = Nothing
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -137,6 +137,8 @@ type Msg
   | AdjustTimeZone Time.Zone
   | KeyChanged Bool String
   | MouseDownAt ( Float, Float )
+  | MouseMove ( Float, Float )
+  | MouseUp ( Float, Float )
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -178,10 +180,35 @@ update msg model =
       )
 
     MouseDownAt offset ->
-      ( { model | mousePos = offset }
+      ( { model | mousePos = offset
+                , gonioDrag = Just (model.goniometer, offset)
+        }
       , Cmd.none
       )
 
+    MouseMove offset ->
+      ( { model | mousePos = offset
+                , goniometer = case model.gonioDrag of
+                                  Nothing -> 
+                                    model.goniometer
+
+                                  Just (startAngle, startXY) ->
+                                    goniometerTurnAngle startAngle startXY offset
+        }
+      , Cmd.none
+      )
+    MouseUp offset ->
+      ( { model | gonioDrag = Nothing 
+        }
+      , Cmd.none
+      )
+
+goniometerTurnAngle startAngle (startX, startY) (newX, newY) =
+  let
+    dragStartAngle = atan2 (startX - 150) (startY - 150) -- where on control was clicked
+    dragNowAngle = atan2 (newX - 150) (newY - 150) -- where that point is now
+  in 
+    startAngle - dragNowAngle + dragStartAngle
 
 -- SUBSCRIPTIONS
 
@@ -198,20 +225,25 @@ subscriptions model =
   DRAGGABLE Goniometer
   I am very confused about which packages work, versioning, coordinates and all sorts of shot.
   Will next try https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
+
+  THIS IS WHAT I WANTED. Can now try to make it draggable - using a circular motion...
 -}
--- ... example usage
+
 clickableGonioImage m = 
   div 
-    [Mouse.onDown (\event -> MouseDownAt event.offsetPos)] 
+    [ H.width 300
+    , Mouse.onDown (\event -> MouseDownAt event.offsetPos)
+    , Mouse.onMove (\event -> MouseMove event.offsetPos) 
+    , Mouse.onUp (\event -> MouseUp event.offsetPos) 
+    ] 
     [ (showGonioImage <| m.goniometer + m.station.lineOfShoot)
-    , (revealMouse m.mousePos) ]
+    , (revealMouse m.mousePos) 
+    ]
 
 revealMouse pos = Html.text <| stringifyPoint pos
 
 -- VIEW
 
-type ViewMode = AsText | AsImage
-viewMode = AsText
 
 crt m =
   let svgPointList = (polyLineFromCoords m.lineData) 
