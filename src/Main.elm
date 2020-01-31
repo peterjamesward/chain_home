@@ -237,9 +237,11 @@ clickableGonioImageStyles m =
             , Touch.onStart (GonioGrab << touchCoordinates)
             , Touch.onMove (GonioMove << touchCoordinates)
             , Touch.onEnd (GonioRelease << touchCoordinates)    
-            ] 
+            ]
     in
-        clickableGonioImage styles (m.goniometer + m.station.lineOfShoot)
+        div 
+            styles
+            (clickableGonioImage (m.goniometer + m.station.lineOfShoot))
 
 revealMouse pos = Html.text <| stringifyPoint pos
 

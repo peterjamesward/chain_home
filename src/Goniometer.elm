@@ -8,10 +8,8 @@ import Svg.Attributes as S exposing (..)
 -- DEBUG
 showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
 
-
-clickableGonioImage styles theta = 
-  div 
-    styles
+-- Assumes a suitably styled DIV is in effect ...
+clickableGonioImage  theta = 
     [ svg [ viewBox "-200 -200 400 400"
           , S.width "300"
           , S.height "300"
