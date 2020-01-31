@@ -1,15 +1,24 @@
-module Goniometer exposing (showGonio, showGonioImage)
+module Goniometer exposing (showGonio, clickableGonioImage)
 
 import Html exposing (..)
 import Html.Attributes as H exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as S exposing (..)
 
-
+-- DEBUG
 showGonio m = Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
 
-showGonioImage theta = 
-        drawGoniometerScale theta
+
+clickableGonioImage styles theta = 
+  div 
+    styles
+    [ svg [ viewBox "-200 -200 400 400"
+          , S.width "300"
+          , S.height "300"
+          ]
+       (drawGoniometerScale ++ (drawGoniometerPointer theta))
+    ]
+
 
 drawGoniometerPointer theta = 
     let originX = 0
@@ -41,7 +50,7 @@ drawGoniometerPointer theta =
                 []
         ]
 
-drawGoniometerScale theta = 
+drawGoniometerScale  = 
     let originX = 0
         originY = 0
         radius = 160
@@ -59,9 +68,5 @@ drawGoniometerScale theta =
                                    [ Svg.text (String.fromInt (i*10)) 
                                    ]
     in
-        svg [ viewBox "-200 -200 400 400"
-        , S.width "300"
-        , S.height "300"
-        ]
-        ((drawGoniometerPointer theta) ++ (List.map labelPoint (List.range 0 35)))
+       (List.map labelPoint (List.range 0 35))
 

@@ -28,7 +28,7 @@ import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 import BeamSmoother exposing (beamPath)
 import Utils exposing (..)
 import Receiver exposing (goniometerMix)
-import Goniometer exposing (showGonio, showGonioImage)
+import Goniometer exposing (showGonio, clickableGonioImage)
 
 
 -- This is dummy line for me to practise with floats and trig.
@@ -226,18 +226,20 @@ subscriptions model =
   https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
 -}
 
-clickableGonioImage m = 
-  div 
-    [ H.width 300
-    , H.max "300px"
-    , Mouse.onDown (\event -> GonioGrab event.offsetPos)
-    , Mouse.onMove (\event -> GonioMove event.offsetPos) 
-    , Mouse.onUp (\event -> GonioRelease event.offsetPos) 
-    , Touch.onStart (GonioGrab << touchCoordinates)
-    , Touch.onMove (GonioMove << touchCoordinates)
-    , Touch.onEnd (GonioRelease << touchCoordinates)    ] 
-    [ showGonioImage <| m.goniometer + m.station.lineOfShoot
-    ]
+clickableGonioImageStyles m = 
+    let 
+        styles = 
+            [ H.width 300
+            , H.max "300px"
+            , Mouse.onDown (\event -> GonioGrab event.offsetPos)
+            , Mouse.onMove (\event -> GonioMove event.offsetPos) 
+            , Mouse.onUp (\event -> GonioRelease event.offsetPos) 
+            , Touch.onStart (GonioGrab << touchCoordinates)
+            , Touch.onMove (GonioMove << touchCoordinates)
+            , Touch.onEnd (GonioRelease << touchCoordinates)    
+            ] 
+    in
+        clickableGonioImage styles (m.goniometer + m.station.lineOfShoot)
 
 revealMouse pos = Html.text <| stringifyPoint pos
 
@@ -295,7 +297,7 @@ debugInfo m =
     lineInfo = List.concatMap viewLineSegment m.lineData
     theta = m.goniometer + m.station.lineOfShoot
   in
-    []
+    [ Html.hr [] [] ]
     --++ polarInfo 
     --++ echoInfo 
     --++ edgeInfo
@@ -306,11 +308,13 @@ view : Model -> Svg Msg
 view m = 
   div [
   ] 
-  [ showGonio m
-  , Html.br [] []
-  , clickableGonioImage m
+  [ 
+  --  showGonio m
+  --, Html.br [] []
+    Html.text "Emulation of Chain Home RDF receiver by Pete Ward"
+  --, targetConfigurationPanel m
+  , clickableGonioImageStyles m
   , crt m 
-  , Html.hr [] []
   , div [] (debugInfo m)
   ]
                       
