@@ -201,12 +201,13 @@ update msg model =
       , Cmd.none
       )
 
+goniometerTurnAngle : Float -> (Float, Float) -> (Float, Float) -> Float
 goniometerTurnAngle startAngle (startX, startY) (newX, newY) =
   let
-    dragStartAngle = atan2 (startX - 150) (startY - 150) -- where on control was clicked
-    dragNowAngle = atan2 (newX - 150) (newY - 150) -- where that point is now
+    (_, dragStartAngle) = toPolar (startX - 150, startY - 150) -- where on control was clicked
+    (_, dragNowAngle) = toPolar (newX - 150,  newY - 150) -- where that point is now
   in 
-    startAngle - dragNowAngle + dragStartAngle
+    startAngle + dragNowAngle - dragStartAngle
 
 -- SUBSCRIPTIONS
 
@@ -228,6 +229,7 @@ subscriptions model =
 clickableGonioImage m = 
   div 
     [ H.width 300
+    , H.max "300px"
     , Mouse.onDown (\event -> GonioGrab event.offsetPos)
     , Mouse.onMove (\event -> GonioMove event.offsetPos) 
     , Mouse.onUp (\event -> GonioRelease event.offsetPos) 
@@ -302,22 +304,13 @@ debugInfo m =
 
 view : Model -> Svg Msg
 view m = 
-      let 
-          -- Mostly debugging info ...
-          polarInfo = List.concatMap viewPolarTarget m.polarTargets
-          echoInfo = List.concatMap viewEcho m.echoes
-          gonioInfo = List.concatMap viewEcho m.gonioOutput
-          edgeInfo = List.concatMap viewEdge m.skyline
-          lineInfo = List.concatMap viewLineSegment m.lineData
-          theta = m.goniometer + m.station.lineOfShoot
-      in
-        div [
-        ] 
-        [ showGonio m
-        , Html.br [] []
-        , clickableGonioImage m
-        , crt m 
-        , Html.hr [] []
-        , div [] (debugInfo m)
-        ]
+  div [
+  ] 
+  [ showGonio m
+  , Html.br [] []
+  , clickableGonioImage m
+  , crt m 
+  , Html.hr [] []
+  , div [] (debugInfo m)
+  ]
                       
