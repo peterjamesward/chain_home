@@ -15,6 +15,8 @@ import Time
 import Array exposing (..)
 import Dict exposing (..)
 import Set exposing (..)
+--import Html.Events.Extra.Pointer as Pointer
+import Html.Events.Extra.Mouse as Mouse
 
 import Station exposing (..)
 import Target exposing (..)
@@ -105,6 +107,7 @@ type alias Model =
   , goniometer   : Float
   , gonioOutput  : List Echo
   , keys         : Keys
+  , mousePos  : (Float,Float)
   }
 
 
@@ -123,6 +126,7 @@ init _ =
       , goniometer   = degrees 10 -- relative to Line Of Shoot.
       , gonioOutput  = []
       , keys         = noKeys
+      , mousePos = (0.0,0.0)
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -132,6 +136,7 @@ type Msg
   = Tick Time.Posix
   | AdjustTimeZone Time.Zone
   | KeyChanged Bool String
+  | MouseDownAt ( Float, Float )
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -172,6 +177,11 @@ update msg model =
       , Cmd.none
       )
 
+    MouseDownAt offset ->
+      ( { model | mousePos = offset }
+      , Cmd.none
+      )
+
 
 -- SUBSCRIPTIONS
 
@@ -184,6 +194,18 @@ subscriptions model =
     , Time.every 50 Tick
     ]
 
+{-
+  DRAGGABLE Goniometer
+  I am very confused about which packages work, versioning, coordinates and all sorts of shot.
+  Will next try https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
+-}
+-- ... example usage
+clickableGonioImage m = 
+  div 
+    [Mouse.onDown (\event -> MouseDownAt event.offsetPos)] 
+    [(showGonioImage m.goniometer),(revealMouse m.mousePos) ]
+
+revealMouse pos = Html.text <| stringifyPoint pos
 
 -- VIEW
 
@@ -239,11 +261,14 @@ view m =
           edgeInfo = List.concatMap viewEdge m.skyline
           lineInfo = List.concatMap viewLineSegment m.lineData
           theta = m.goniometer + m.station.lineOfShoot
-          gonio = showGonio m
       in
-        (div []) <| List.concat [ [gonio, Html.br [] [], showGonioImage theta, crt m ]
-                              , [Html.hr [] []]
-                              , polarInfo 
+        (div []) <| List.concat [ [showGonio m
+                                  , Html.br [] []
+                                  , clickableGonioImage m
+                                  , crt m 
+                                  , Html.hr [] []
+                                ]
+                              --, polarInfo 
                               --, echoInfo 
                               --, gonioInfo
                               --, edgeInfo
