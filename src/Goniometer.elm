@@ -39,11 +39,6 @@ drawGoniometerPointer theta =
                 , strokeLinecap "round"
                 ]
                 []
-            --, Html.button
-            --    [ H.height 30
-            --    , H.width 100
-            --    ] --, onMouseDown <| DragStart idx ]
-            --    [ Html.text "this needs to overlay the control knob" ]
         ]
 
 drawGoniometerScale theta = 

@@ -106,7 +106,6 @@ type alias Model =
   , goniometer   : Float
   , gonioOutput  : List Echo
   , keys         : Keys
-  , mousePos  : (Float,Float)
   , gonioDrag : Maybe (Float, (Float, Float))  -- angle and mouse position when mouse down
   }
 
@@ -126,7 +125,6 @@ init _ =
       , goniometer   = degrees 10 -- relative to Line Of Shoot.
       , gonioOutput  = []
       , keys         = noKeys
-      , mousePos = (0.0,0.0)
       , gonioDrag = Nothing
       }
     , Task.perform AdjustTimeZone Time.here
@@ -181,15 +179,13 @@ update msg model =
       )
 
     GonioGrab offset ->
-      ( { model | mousePos = offset
-                , gonioDrag = Just (model.goniometer, offset)
+      ( { model | gonioDrag = Just (model.goniometer, offset)
         }
       , Cmd.none
       )
 
     GonioMove offset ->
-      ( { model | mousePos = offset
-                , goniometer = case model.gonioDrag of
+      ( { model | goniometer = case model.gonioDrag of
                                   Nothing -> 
                                     model.goniometer
 
@@ -198,7 +194,7 @@ update msg model =
         }
       , Cmd.none
       )
-      
+
     GonioRelease offset ->
       ( { model | gonioDrag = Nothing 
         }
@@ -238,8 +234,7 @@ clickableGonioImage m =
     , Touch.onStart (GonioGrab << touchCoordinates)
     , Touch.onMove (GonioMove << touchCoordinates)
     , Touch.onEnd (GonioRelease << touchCoordinates)    ] 
-    [ (showGonioImage <| m.goniometer + m.station.lineOfShoot)
-    , (revealMouse m.mousePos) 
+    [ showGonioImage <| m.goniometer + m.station.lineOfShoot
     ]
 
 revealMouse pos = Html.text <| stringifyPoint pos
@@ -289,6 +284,21 @@ crt m =
             []
         ] rangeScale)
 
+debugInfo : Model -> List (Html Msg)
+debugInfo m = 
+  let 
+    polarInfo = List.concatMap viewPolarTarget m.polarTargets
+    echoInfo = List.concatMap viewEcho m.echoes
+    edgeInfo = List.concatMap viewEdge m.skyline
+    lineInfo = List.concatMap viewLineSegment m.lineData
+    theta = m.goniometer + m.station.lineOfShoot
+  in
+    []
+    --++ polarInfo 
+    --++ echoInfo 
+    --++ edgeInfo
+    --++ lineInfo
+
 
 view : Model -> Svg Msg
 view m = 
@@ -301,15 +311,13 @@ view m =
           lineInfo = List.concatMap viewLineSegment m.lineData
           theta = m.goniometer + m.station.lineOfShoot
       in
-        div []  [ showGonio m
-                , Html.br [] []
-                , clickableGonioImage m
-                , crt m 
-                , Html.hr [] []
-                ]
-                --++ polarInfo 
-                --++ echoInfo 
-                --++ gonioInfo
-                --++ edgeInfo
-                --++ lineInfo
+        div [
+        ] 
+        [ showGonio m
+        , Html.br [] []
+        , clickableGonioImage m
+        , crt m 
+        , Html.hr [] []
+        , div [] (debugInfo m)
+        ]
                       
