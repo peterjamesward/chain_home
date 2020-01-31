@@ -137,12 +137,9 @@ type Msg
   = Tick Time.Posix
   | AdjustTimeZone Time.Zone
   | KeyChanged Bool String
-  | MouseDownAt ( Float, Float )
-  | MouseMove ( Float, Float )
-  | MouseUp ( Float, Float )
-  | StartAt ( Float, Float )
-  | MoveAt ( Float, Float )
-  | EndAt ( Float, Float )
+  | GonioGrab ( Float, Float )
+  | GonioMove ( Float, Float )
+  | GonioRelease ( Float, Float )
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -183,14 +180,14 @@ update msg model =
       , Cmd.none
       )
 
-    MouseDownAt offset ->
+    GonioGrab offset ->
       ( { model | mousePos = offset
                 , gonioDrag = Just (model.goniometer, offset)
         }
       , Cmd.none
       )
 
-    MouseMove offset ->
+    GonioMove offset ->
       ( { model | mousePos = offset
                 , goniometer = case model.gonioDrag of
                                   Nothing -> 
@@ -201,31 +198,8 @@ update msg model =
         }
       , Cmd.none
       )
-    MouseUp offset ->
-      ( { model | gonioDrag = Nothing 
-        }
-      , Cmd.none
-      )
-
-    StartAt offset ->
-      ( { model | mousePos = offset
-                , gonioDrag = Just (model.goniometer, offset)
-        }
-      , Cmd.none
-      )
-
-    MoveAt offset ->
-      ( { model | mousePos = offset
-                , goniometer = case model.gonioDrag of
-                                  Nothing -> 
-                                    model.goniometer
-
-                                  Just (startAngle, startXY) ->
-                                    goniometerTurnAngle startAngle startXY offset
-        }
-      , Cmd.none
-      )
-    EndAt offset ->
+      
+    GonioRelease offset ->
       ( { model | gonioDrag = Nothing 
         }
       , Cmd.none
@@ -258,12 +232,12 @@ subscriptions model =
 clickableGonioImage m = 
   div 
     [ H.width 300
-    , Mouse.onDown (\event -> MouseDownAt event.offsetPos)
-    , Mouse.onMove (\event -> MouseMove event.offsetPos) 
-    , Mouse.onUp (\event -> MouseUp event.offsetPos) 
-    ,Touch.onStart (StartAt << touchCoordinates)
-    , Touch.onMove (MoveAt << touchCoordinates)
-    , Touch.onEnd (EndAt << touchCoordinates)    ] 
+    , Mouse.onDown (\event -> GonioGrab event.offsetPos)
+    , Mouse.onMove (\event -> GonioMove event.offsetPos) 
+    , Mouse.onUp (\event -> GonioRelease event.offsetPos) 
+    , Touch.onStart (GonioGrab << touchCoordinates)
+    , Touch.onMove (GonioMove << touchCoordinates)
+    , Touch.onEnd (GonioRelease << touchCoordinates)    ] 
     [ (showGonioImage <| m.goniometer + m.station.lineOfShoot)
     , (revealMouse m.mousePos) 
     ]
