@@ -251,10 +251,8 @@ subscriptions model =
 
 {-
   DRAGGABLE Goniometer
-  I am very confused about which packages work, versioning, coordinates and all sorts of shot.
-  Will next try https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
-
-  THIS IS WHAT I WANTED. Can now try to make it draggable - using a circular motion...
+  I have found this packages to be the solution to dragging for mouse and touch.
+  https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
 -}
 
 clickableGonioImage m = 
@@ -320,8 +318,6 @@ crt m =
 
 view : Model -> Svg Msg
 view m = 
-  --case viewMode of
-  --  AsText ->
       let 
           -- Mostly debugging info ...
           polarInfo = List.concatMap viewPolarTarget m.polarTargets
@@ -331,16 +327,15 @@ view m =
           lineInfo = List.concatMap viewLineSegment m.lineData
           theta = m.goniometer + m.station.lineOfShoot
       in
-        (div []) <| List.concat [ [showGonio m
-                                  , Html.br [] []
-                                  , clickableGonioImage m
-                                  , crt m 
-                                  , Html.hr [] []
-                                ]
-                              --, polarInfo 
-                              --, echoInfo 
-                              --, gonioInfo
-                              --, edgeInfo
-                              --, lineInfo
-                            ]
-
+        div []  [ showGonio m
+                , Html.br [] []
+                , clickableGonioImage m
+                , crt m 
+                , Html.hr [] []
+                ]
+                --++ polarInfo 
+                --++ echoInfo 
+                --++ gonioInfo
+                --++ edgeInfo
+                --++ lineInfo
+                      
