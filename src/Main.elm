@@ -203,7 +203,8 @@ subscriptions model =
 clickableGonioImage m = 
   div 
     [Mouse.onDown (\event -> MouseDownAt event.offsetPos)] 
-    [(showGonioImage m.goniometer),(revealMouse m.mousePos) ]
+    [ (showGonioImage <| m.goniometer + m.station.lineOfShoot)
+    , (revealMouse m.mousePos) ]
 
 revealMouse pos = Html.text <| stringifyPoint pos
 
