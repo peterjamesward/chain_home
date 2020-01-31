@@ -17,6 +17,7 @@ import Dict exposing (..)
 import Set exposing (..)
 --import Html.Events.Extra.Pointer as Pointer
 import Html.Events.Extra.Mouse as Mouse
+import Html.Events.Extra.Touch as Touch
 
 import Station exposing (..)
 import Target exposing (..)
@@ -139,6 +140,9 @@ type Msg
   | MouseDownAt ( Float, Float )
   | MouseMove ( Float, Float )
   | MouseUp ( Float, Float )
+  | StartAt ( Float, Float )
+  | MoveAt ( Float, Float )
+  | EndAt ( Float, Float )
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -203,6 +207,30 @@ update msg model =
       , Cmd.none
       )
 
+    StartAt offset ->
+      ( { model | mousePos = offset
+                , gonioDrag = Just (model.goniometer, offset)
+        }
+      , Cmd.none
+      )
+
+    MoveAt offset ->
+      ( { model | mousePos = offset
+                , goniometer = case model.gonioDrag of
+                                  Nothing -> 
+                                    model.goniometer
+
+                                  Just (startAngle, startXY) ->
+                                    goniometerTurnAngle startAngle startXY offset
+        }
+      , Cmd.none
+      )
+    EndAt offset ->
+      ( { model | gonioDrag = Nothing 
+        }
+      , Cmd.none
+      )
+
 goniometerTurnAngle startAngle (startX, startY) (newX, newY) =
   let
     dragStartAngle = atan2 (startX - 150) (startY - 150) -- where on control was clicked
@@ -235,12 +263,20 @@ clickableGonioImage m =
     , Mouse.onDown (\event -> MouseDownAt event.offsetPos)
     , Mouse.onMove (\event -> MouseMove event.offsetPos) 
     , Mouse.onUp (\event -> MouseUp event.offsetPos) 
-    ] 
+    ,Touch.onStart (StartAt << touchCoordinates)
+    , Touch.onMove (MoveAt << touchCoordinates)
+    , Touch.onEnd (EndAt << touchCoordinates)    ] 
     [ (showGonioImage <| m.goniometer + m.station.lineOfShoot)
     , (revealMouse m.mousePos) 
     ]
 
 revealMouse pos = Html.text <| stringifyPoint pos
+
+touchCoordinates : Touch.Event -> ( Float, Float )
+touchCoordinates touchEvent =
+    List.head touchEvent.changedTouches
+        |> Maybe.map .clientPos
+        |> Maybe.withDefault ( 0, 0 )
 
 -- VIEW
 
