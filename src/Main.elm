@@ -42,6 +42,7 @@ rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50))
                                        , y "-10"
                                        , fill "lightgreen"
                                        , textAnchor "right" 
+                                       , fontFamily "monospace"
                                        ] 
                                        [ Svg.text (String.fromInt (i*5)) ])
   (List.range 0 19)
@@ -322,7 +323,8 @@ targetSelector active =
     let
         display g = div 
             [
-                Mouse.onClick (\_ -> ToggleConfig g.id)
+              Mouse.onClick (\_ -> ToggleConfig g.id)
+            , Touch.onEnd (\_ -> ToggleConfig g.id)  
             ]
             [
                 input [H.type_ "checkbox", checked g.active] []
