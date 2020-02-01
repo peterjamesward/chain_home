@@ -33,7 +33,7 @@ drawGoniometerPointer theta =
                 , r "140"
                 , stroke "grey"
                 , strokeWidth "1"
-                , fill "grey"
+                , fill "darkslategrey"
                 ]
                 []
            , Svg.line
@@ -41,7 +41,7 @@ drawGoniometerPointer theta =
                 , y1 "0"
                 , x2 xPoint
                 , y2 yPoint
-                , stroke "white"
+                , stroke "antiquewhite"
                 , strokeWidth "10"
                 , strokeLinecap "round"
                 ]
@@ -60,11 +60,22 @@ drawGoniometerScale  =
                                         <| toFloat <| i * 10 
         labelPoint i = Svg.text_  [  x <| xFromIndex i
                                    , y <| yFromIndex i
-                                   , fill "black"
+                                   , fill "antiquewhite"
                                    , textAnchor "middle" 
+                                   , fontFamily "monospace"
                                    ] 
                                    [ Svg.text (String.fromInt (i*10)) 
                                    ]
     in
-       (List.map labelPoint (List.range 0 35))
+        (Svg.circle
+                [ cx "0"
+                , cy "0"
+                , r "180"
+                , stroke "grey"
+                , strokeWidth "1"
+                , fill "dimgrey"
+                ]
+                []
+        ) ::
+        (List.map labelPoint (List.range 0 35))
 
