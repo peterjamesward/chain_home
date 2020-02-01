@@ -1,6 +1,7 @@
 module Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline, toggleConfig, getAllTargets)
 
 import Target exposing (Target)
+import Station exposing (Station, stationClutter)
 
 type alias TargetSelector =
   { id          : Int
@@ -17,10 +18,10 @@ bawdsey = { longitude   = degrees 1.408614
           }  
 
 bomber1 = { longitude = bawdsey.longitude + (degrees 0.9)
-          , latitude  = bawdsey.latitude + (degrees 0.0)
+          , latitude  = bawdsey.latitude + (degrees 1.0)
           , height    = 20 -- ,000 ft
-          , bearing   = degrees 270
-          , speed     = 0.0 -- mph
+          , bearing   = degrees 250
+          , speed     = 200.0 -- mph
           , iff       = False 
           }
  
@@ -73,9 +74,9 @@ bomberInFormation baseLocation latIndex longIndex =
 
 massRaid = 
     let base =  { longitude = bawdsey.longitude + (degrees 0.9)
-                , latitude  = bawdsey.latitude
+                , latitude  = bawdsey.latitude - (degrees 1.0)
                 , height    = 25
-                , bearing   = degrees 270
+                , bearing   = degrees 290
                 , speed     = 200
                 , iff       = False
                 }
@@ -122,13 +123,24 @@ targetsBaseline =   [
 -- Some useful configurations for training.
 
 outboundFriendly  = TargetSelector 1 "One outbound friendly fighter"  [fighter1] False 
-twoCloseTargets   = TargetSelector 2 "Two targets very close"        [bomber2, bomber2A] False 
-twoDistantTargets = TargetSelector 3 "Two targets, differnt bearings" [bomber3, bomber4] False 
-tenWide           = TargetSelector 4 "Ten targets, line abreast"     tenAbreast False 
-tenDeep           = TargetSelector 5 "Ten targets, line astern"     tenAligned False 
-massiveRaid       = TargetSelector 6 "Formation of 100"       massRaid False 
+loneBomber = TargetSelector 2 "One bomber all alone" [bomber1] False
+twoCloseTargets   = TargetSelector 3 "Two targets very close"        [bomber2, bomber2A] False 
+twoDistantTargets = TargetSelector 4 "Two targets, different bearings" [bomber3, bomber4] False 
+tenWide           = TargetSelector 5 "Ten targets, line abreast"     tenAbreast False 
+tenDeep           = TargetSelector 6 "Ten targets, line astern"     tenAligned False 
+massiveRaid       = TargetSelector 7 "Formation of 100"       massRaid False 
+nearbynoise = TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 20) False
 
-targetConfigurations = [ outboundFriendly, twoCloseTargets, twoDistantTargets, tenWide, tenDeep, massiveRaid ]
+targetConfigurations = 
+  [ outboundFriendly
+  , loneBomber
+  , twoCloseTargets
+  , twoDistantTargets
+  , tenWide
+  , tenDeep
+  , massiveRaid
+  , nearbynoise
+  ]
 
 toggleConfig : List TargetSelector -> Int -> List TargetSelector
 toggleConfig activeConfigurations idx =
