@@ -1,4 +1,4 @@
-module Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline)
+module Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline, toggleConfig, getAllTargets)
 
 import Target exposing (Target)
 
@@ -129,5 +129,20 @@ tenDeep           = TargetSelector 5 "Ten targets, line astern"     tenAligned F
 massiveRaid       = TargetSelector 6 "Formation of 100"       massRaid False 
 
 targetConfigurations = [ outboundFriendly, twoCloseTargets, twoDistantTargets, tenWide, tenDeep, massiveRaid ]
+
+toggleConfig : List TargetSelector -> Int -> List TargetSelector
+toggleConfig activeConfigurations idx =
+  let
+    toggleMatchingIdx i ts =
+      if ts.id == i then
+        { ts | active = not ts.active }
+      else
+        ts
+  in
+    List.map (toggleMatchingIdx idx) activeConfigurations
+
+getAllTargets : List TargetSelector -> List Target
+getAllTargets config =
+  List.concatMap (.targets) <| List.filter (.active) config
 
 

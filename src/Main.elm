@@ -23,7 +23,7 @@ import Station exposing (..)
 import Target exposing (..)
 import Echo exposing (..)
 import Constants exposing (..)
-import Config exposing (..)
+import Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline, toggleConfig, getAllTargets)
 import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
 import BeamSmoother exposing (beamPath)
 import Utils exposing (..)
@@ -107,6 +107,7 @@ type alias Model =
   , gonioOutput  : List Echo
   , keys         : Keys
   , gonioDrag : Maybe (Float, (Float, Float))  -- angle and mouse position when mouse down
+  , activeConfigurations : List TargetSelector
   }
 
 
@@ -117,7 +118,7 @@ init _ =
       , time         = 0
       , lineData     = beamPath []
       , station      = bawdsey
-      , targets      = targetsBaseline --++ (stationClutter bawdsey)
+      , targets      = getAllTargets targetConfigurations
       , movedTargets = []
       , polarTargets = []
       , echoes       = []
@@ -126,6 +127,7 @@ init _ =
       , gonioOutput  = []
       , keys         = noKeys
       , gonioDrag = Nothing
+      , activeConfigurations = targetConfigurations
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -138,6 +140,7 @@ type Msg
   | GonioGrab ( Float, Float )
   | GonioMove ( Float, Float )
   | GonioRelease ( Float, Float )
+  | ToggleConfig Int
 
 -- THIS IS IT. This is the place where it all comes together.
 deriveModelAtTime : Model -> Int -> Model
@@ -200,6 +203,15 @@ update msg model =
         }
       , Cmd.none
       )
+
+    ToggleConfig idx ->
+        let newConfig = toggleConfig model.activeConfigurations idx 
+        in
+          ( { model | activeConfigurations = newConfig
+                    , targets = getAllTargets newConfig
+            }
+          , Cmd.none
+          )
 
 goniometerTurnAngle : Float -> (Float, Float) -> (Float, Float) -> Float
 goniometerTurnAngle startAngle (startX, startY) (newX, newY) =
@@ -305,8 +317,22 @@ debugInfo m =
     --++ edgeInfo
     --++ lineInfo
 
-
-view : Model -> Svg Msg
+-- Show list of configurations with Checkboxes.
+targetSelector active =
+    let
+        display g = div 
+            [
+                Mouse.onClick (\_ -> ToggleConfig g.id)
+            ]
+            [
+                input [H.type_ "checkbox", checked g.active] []
+            ,   Html.text g.description
+            ]
+    in
+        ul []
+        (List.map display active)
+        
+view : Model -> Html Msg
 view m = 
   div [
   ] 
@@ -314,7 +340,7 @@ view m =
   --  showGonio m
   --, Html.br [] []
     Html.text "Emulation of Chain Home RDF receiver by Pete Ward"
-  --, targetConfigurationPanel m
+  , targetSelector m.activeConfigurations
   , clickableGonioImageStyles m
   , crt m 
   , div [] (debugInfo m)
