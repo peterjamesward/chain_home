@@ -81,7 +81,7 @@ massRaid =
                 }
     in 
         List.map 
-        (\i -> bomberInFormation base (i // 10) (modBy i 10))
+        (\i -> bomberInFormation base (i // 10) (modBy 10 i))
         <| List.range 1 100
 
 tenAbreast = List.map (\i ->
