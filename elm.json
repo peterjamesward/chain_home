@@ -13,6 +13,7 @@
             "elm/random": "1.0.0",
             "elm/svg": "1.0.0",
             "elm/time": "1.0.0",
+            "mdgriffith/elm-ui": "1.1.5",
             "mpizenberg/elm-pointer-events": "4.0.1"
         },
         "indirect": {
