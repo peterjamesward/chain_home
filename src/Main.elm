@@ -1,350 +1,200 @@
-module Main exposing (..)
+module Main exposing (main)
 
-import Svg exposing (..)
-import Svg.Attributes as S exposing (..)
-import List
-import Tuple exposing (..)
-import String
+{-
+   This Main module now based on the elm-ui example by Alex Korban
+   in his book "Practical Elm"".
+-}
+-- Project imports
+
 import Browser
-import Browser.Events as E
-import Json.Decode as D
-import Html exposing (..)
-import Html.Attributes as H exposing (..)
-import Task
-import Time
-import Array exposing (..)
-import Dict exposing (..)
-import Set exposing (..)
---import Html.Events.Extra.Pointer as Pointer
-import Html.Events.Extra.Mouse as Mouse
-import Html.Events.Extra.Touch as Touch
-
-import Station exposing (..)
-import Target exposing (..)
-import Echo exposing (..)
-import Constants exposing (..)
-import Config exposing (TargetSelector, targetConfigurations, bawdsey, targetsBaseline, toggleConfig, getAllTargets)
-import Skyline exposing (deriveSkyline, EdgeSegment, viewEdge, viewLineSegment)
-import BeamSmoother exposing (beamPath)
-import Utils exposing (..)
-import Receiver exposing (goniometerMix)
-import Goniometer exposing (showGonio, clickableGonioImage)
+import Config exposing (..)
+import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import Element.Input as Input
+import Html
 
 
--- This is dummy line for me to practise with floats and trig.
-myLineData t = [ (0.0, 0.0), (1000.0, 0.0)]
-
--- SOME DATA STRUCTURES - ALSO DON'T BELONG HERE
-
-type alias LineData = List (Float, Float)
-
-rangeScale = List.map (\i -> Svg.text_ [ x (String.fromInt (i*50))
-                                       , y "-10"
-                                       , fill "lightgreen"
-                                       , textAnchor "right" 
-                                       , fontFamily "monospace"
-                                       ] 
-                                       [ Svg.text (String.fromInt (i*5)) ])
-  (List.range 0 19)
-
-scalePathToDisplay : LineData -> LineData
-scalePathToDisplay unscaled =
-    let scalePoint (x,y) = (viewWidth * x / scaleWidthKilometers / 1000, ( y) * strengthToHeightFactor)
-    in  List.map scalePoint unscaled
-
--- INTERACTIVITY - starting with a linear goniometer.
-
-type alias Keys =
-  { gonioClock : Bool -- W
-  , gonioAnti  : Bool -- Q
-  }
-
-noKeys : Keys
-noKeys =
-  Keys False False
-
-updateKeys : Bool -> String -> Keys -> Keys
-updateKeys isDown key keys =
-  case key of
-    "q"  -> { keys | gonioAnti   = isDown }
-    "a"  -> { keys | gonioClock  = isDown }
-    _    -> keys
+type Page
+    = InputPage
 
 
--- When we have mouse tracking we can have non-integer movements.
-swingGoniometer : Float -> Keys -> Float
-swingGoniometer angle keys = 
-  if keys.gonioClock && keys.gonioAnti then
-    angle
-  else if keys.gonioClock then
-    angle + (degrees 1.0)
-  else if keys.gonioAnti then
-    angle - (degrees 1.0)
-  else
-    angle
+type Msg
+    = NoOp
+    | ChangePlanText String
+    | SubmitPlan
+    | SetConfigStateMsg Int Bool
 
--- MAIN
-main =
-  Browser.element
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = subscriptions
+
+type alias Model =
+    { currPage : Page
+    , currPlanText : String
+    , activeConfigurations : List TargetSelector
     }
 
--- MODEL
-type alias Model =
-  { zone         : Time.Zone
-  , startTime    : Int -- millseconds from t-zero
-  , time         : Int
-  , lineData     : List (Float, Float)
-  , station      : Station
-  , targets      : List Target
-  , movedTargets : List Target
-  , polarTargets : List PolarTarget
-  , echoes       : List Echo
-  , skyline      : List ((Float, Float),(Float, Float))
-  , goniometer   : Float
-  , gonioOutput  : List Echo
-  , keys         : Keys
-  , gonioDrag : Maybe (Float, (Float, Float))  -- angle and mouse position when mouse down
-  , activeConfigurations : List TargetSelector
-  }
+
+type alias Flags =
+    ()
 
 
-init : () -> (Model, Cmd Msg)
+init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { zone         = Time.utc 
-      , startTime    = 0
-      , time         = 0
-      , lineData     = beamPath []
-      , station      = bawdsey
-      , targets      = getAllTargets targetConfigurations
-      , movedTargets = []
-      , polarTargets = []
-      , echoes       = []
-      , skyline      = []
-      , goniometer   = degrees 10 -- relative to Line Of Shoot.
-      , gonioOutput  = []
-      , keys         = noKeys
-      , gonioDrag = Nothing
+    ( { currPage = InputPage
+      , currPlanText = "hello world"
       , activeConfigurations = targetConfigurations
       }
-    , Task.perform AdjustTimeZone Time.here
+    , Cmd.none
     )
 
--- UPDATE
-type Msg
-  = Tick Time.Posix
-  | AdjustTimeZone Time.Zone
-  | KeyChanged Bool String
-  | GonioGrab ( Float, Float )
-  | GonioMove ( Float, Float )
-  | GonioRelease ( Float, Float )
-  | ToggleConfig Int
 
--- THIS IS IT. This is the place where it all comes together.
-deriveModelAtTime : Model -> Int -> Model
-deriveModelAtTime model t =
-  let
-    targetsNow       = List.map (targetAtTime t model.startTime) model.targets
-    convertedTargets = List.map (mapToPolar bawdsey) targetsNow
-    echoSignals      = deriveEchoes convertedTargets t
-    gonioOut         = goniometerMix model.goniometer echoSignals 
-    newSkyline       = deriveSkyline (scaleWidthKilometers * 1000) gonioOut
-  in
-      { model | startTime    = if model.startTime == 0 then t else model.startTime 
-              , time         = t
-              , movedTargets = targetsNow
-              , polarTargets = convertedTargets
-              , echoes       = echoSignals
-              , skyline      = newSkyline
-              , gonioOutput  = gonioOut
-              , lineData     = scalePathToDisplay <| beamPath newSkyline
-              , goniometer   = swingGoniometer model.goniometer model.keys
-      }
-
-update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
-  case msg of
-    Tick newTime ->
-      ( deriveModelAtTime model (Time.posixToMillis newTime)
-      , Cmd.none
-      )
-
-    AdjustTimeZone newZone ->
-      ( { model | zone = newZone }
-      , Cmd.none
-      )
-
-    KeyChanged isDown key ->
-      ( { model | keys = updateKeys isDown key model.keys }
-      , Cmd.none
-      )
-
-    GonioGrab offset ->
-      ( { model | gonioDrag = Just (model.goniometer, offset)
-        }
-      , Cmd.none
-      )
-
-    GonioMove offset ->
-      ( { model | goniometer = case model.gonioDrag of
-                                  Nothing -> 
-                                    model.goniometer
-
-                                  Just (startAngle, startXY) ->
-                                    goniometerTurnAngle startAngle startXY offset
-        }
-      , Cmd.none
-      )
-
-    GonioRelease offset ->
-      ( { model | gonioDrag = Nothing 
-        }
-      , Cmd.none
-      )
-
-    ToggleConfig idx ->
-        let newConfig = toggleConfig model.activeConfigurations idx 
-        in
-          ( { model | activeConfigurations = newConfig
-                    , targets = getAllTargets newConfig
-            }
-          , Cmd.none
-          )
-
-goniometerTurnAngle : Float -> (Float, Float) -> (Float, Float) -> Float
-goniometerTurnAngle startAngle (startX, startY) (newX, newY) =
-  let
-    (_, dragStartAngle) = toPolar (startX - 150, startY - 150) -- where on control was clicked
-    (_, dragNowAngle) = toPolar (newX - 150,  newY - 150) -- where that point is now
-  in 
-    startAngle + dragNowAngle - dragStartAngle
 
 -- SUBSCRIPTIONS
 
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
+    Sub.none
 
-  Sub.batch
-    [ E.onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
-    , E.onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
-    , Time.every 50 Tick
-    ]
 
-{-
-  DRAGGABLE Goniometer
-  I have found this packages to be the solution to dragging for mouse and touch.
-  https://package.elm-lang.org/packages/mpizenberg/elm-pointer-events/latest/
--}
 
-clickableGonioImageStyles m = 
-    let 
-        styles = 
-            [ H.width 300
-            , H.max "300px"
-            , Mouse.onDown (\event -> GonioGrab event.offsetPos)
-            , Mouse.onMove (\event -> GonioMove event.offsetPos) 
-            , Mouse.onUp (\event -> GonioRelease event.offsetPos) 
-            , Touch.onStart (GonioGrab << touchCoordinates)
-            , Touch.onMove (GonioMove << touchCoordinates)
-            , Touch.onEnd (GonioRelease << touchCoordinates)    
-            ]
-    in
-        div 
-            styles
-            (clickableGonioImage (m.goniometer + m.station.lineOfShoot))
+-- UPDATE
 
-revealMouse pos = Html.text <| stringifyPoint pos
 
-touchCoordinates : Touch.Event -> ( Float, Float )
-touchCoordinates touchEvent =
-    List.head touchEvent.changedTouches
-        |> Maybe.map .clientPos
-        |> Maybe.withDefault ( 0, 0 )
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        SetConfigStateMsg index newState ->
+            ( { model
+                | activeConfigurations =
+                    updateConfig model.activeConfigurations index newState
+              }
+            , Cmd.none
+            )
+
+        _ ->
+            ( model, Cmd.none )
+
+
 
 -- VIEW
 
 
-crt m =
-  let svgPointList = (polyLineFromCoords m.lineData) 
-  in 
-    svg [ viewBox "-10 -40 1020 450"
-        , S.width "1020"
-        , S.height "420"
+view : Model -> Browser.Document Msg
+view model =
+    { title = "VisExp"
+    , body =
+        [ layout [] <|
+            column [ width fill, spacingXY 0 20 ]
+                [ navBar
+                , inputPage model
+                ]
         ]
-        (List.append 
-          [ rect
-            [ x "-10"
-            , y "-40"
-            , S.width "1020"
-            , S.height "450"
-            , fill "black"
-            , stroke "black"
-            , strokeWidth "3"
-            , strokeLinejoin "round"
-            ]
-            []
-        , polyline
-            [ points svgPointList
-            , fill "none"
-            , stroke "forestgreen"
-            , opacity "60%"
-            , strokeWidth "2.5"
-            ]
-            []
-        , polyline
-            [ points svgPointList
-            , fill "none"
-            , stroke "springgreen"
-            , strokeWidth "0.8"
-            ]
-            []
-        ] rangeScale)
+    }
 
-debugInfo : Model -> List (Html Msg)
-debugInfo m = 
-  let 
-    polarInfo = List.concatMap viewPolarTarget m.polarTargets
-    echoInfo = List.concatMap viewEcho m.echoes
-    edgeInfo = List.concatMap viewEdge m.skyline
-    lineInfo = List.concatMap viewLineSegment m.lineData
-    theta = m.goniometer + m.station.lineOfShoot
-  in
-    [ Html.hr [] [] ]
-    --++ polarInfo 
-    --++ echoInfo 
-    --++ edgeInfo
-    --++ lineInfo
+
+blue : Color
+blue =
+    rgb255 52 101 164
+
+
+lightCharcoal : Color
+lightCharcoal =
+    rgb255 136 138 133
+
+
+green : Color
+green =
+    rgb255 52 164 100
+
+
+darkGreen : Color
+darkGreen =
+    rgb255 36 200 33
+
+
+white : Color
+white =
+    rgb255 200 200 200
+
+
+navBar : Element Msg
+navBar =
+    row
+        [ width fill
+        , paddingXY 60 10
+        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+        , Border.color blue
+        ]
+        [ el [ alignLeft ] <| text "Chain Home"
+        , el [ alignRight ] <| text "Menu"
+        ]
+
+
 
 -- Show list of configurations with Checkboxes.
+
+
+setConfig : TargetSelector -> Bool -> Msg
+setConfig selector newState =
+    SetConfigStateMsg selector.id newState
+
+
+targetSelector : List TargetSelector -> List (Element Msg)
 targetSelector active =
     let
-        display g = div 
-            [
-              Mouse.onClick (\_ -> ToggleConfig g.id)
-            , Touch.onEnd (\_ -> ToggleConfig g.id)  
-            ]
-            [
-                input [H.type_ "checkbox", checked g.active] []
-            ,   Html.text g.description
-            ]
+        display : TargetSelector -> Element Msg
+        display g =
+            Input.checkbox
+                [ height (px 40)
+                , Border.width 1
+                , Border.rounded 5
+                , Border.color lightCharcoal
+                , padding 3
+                ]
+                { onChange = setConfig g
+                , checked = g.active
+                , label =
+                    Input.labelRight [] <|
+                        text g.description
+                , icon = Input.defaultCheckbox
+                }
     in
-        ul []
-        (List.map display active)
-        
-view : Model -> Html Msg
-view m = 
-  div [
-  ] 
-  [ 
-  --  showGonio m
-  --, Html.br [] []
-    Html.text "Emulation of Chain Home RDF receiver by Pete Ward"
-  , targetSelector m.activeConfigurations
-  , clickableGonioImageStyles m
-  , crt m 
-  , div [] (debugInfo m)
-  ]
-                      
+    List.map display active
+
+
+inputPage : Model -> Element Msg
+inputPage model =
+    column
+        [ width (px 800)
+        , spacingXY 0 10
+        , centerX
+        ]
+    <|
+        targetSelector model.activeConfigurations
+            ++ [ Input.button
+                    [ Background.color green
+                    , Border.color darkGreen
+                    , Border.rounded 3
+                    , Border.widthEach { bottom = 3, top = 0, right = 0, left = 0 }
+                    , Font.bold
+                    , Font.color white
+                    , paddingXY 20 6
+                    , alignRight
+                    , width (px 200)
+                    , height (px 40)
+                    ]
+                    { onPress = Just SubmitPlan
+                    , label = el [ centerX ] <| text "Go!"
+                    }
+               ]
+
+
+main : Program Flags Model Msg
+main =
+    Browser.document
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = subscriptions
+        }
