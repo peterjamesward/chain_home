@@ -1,4 +1,4 @@
-module Goniometer exposing (clickableGonioImage, showGonio)
+module Goniometer exposing (drawGoniometer, showGonioValue)
 
 import Html exposing (..)
 import Html.Attributes as H exposing (..)
@@ -10,7 +10,7 @@ import Svg.Attributes as S exposing (..)
 -- DEBUG
 
 
-showGonio m =
+showGonioValue m =
     Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
 
 
@@ -18,7 +18,7 @@ showGonio m =
 -- Assumes a suitably styled DIV is in effect ...
 
 
-clickableGonioImage theta =
+drawGoniometer theta =
     svg
         [ viewBox "-200 -200 400 400"
         , S.width "300"

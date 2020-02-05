@@ -16,7 +16,11 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Goniometer exposing (clickableGonioImage, showGonio)
+import Goniometer exposing (drawGoniometer, showGonioValue)
+import Html as H exposing (..)
+import Html.Attributes as HA exposing (..)
+import Html.Events.Extra.Mouse as Mouse
+import Html.Events.Extra.Touch as Touch
 import Json.Decode as D exposing (..)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline, viewEdge, viewLineSegment)
@@ -40,6 +44,9 @@ type Msg
     | DisplayConfiguration
     | Tick Time.Posix
     | KeyChanged Bool String
+    | GonioGrab ( Float, Float )
+    | GonioMove ( Float, Float )
+    | GonioRelease ( Float, Float )
 
 
 type alias Model =
@@ -133,6 +140,21 @@ swingGoniometer angle keys =
             angle
 
 
+goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
+goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
+    let
+        ( _, dragStartAngle ) =
+            toPolar ( startX - 150, startY - 150 )
+
+        -- where on control was clicked
+        ( _, dragNowAngle ) =
+            toPolar ( newX - 150, newY - 150 )
+
+        -- where that point is now
+    in
+    startAngle - dragNowAngle + dragStartAngle
+
+
 
 -- SUBSCRIPTIONS
 
@@ -169,7 +191,10 @@ scalePathToDisplay : LineData -> LineData
 scalePathToDisplay unscaled =
     let
         scalePoint ( x, y ) =
-            ( viewWidth * x / scaleWidthKilometers / 1000, y * strengthToHeightFactor )
+            ( viewWidth * x / scaleWidthKilometers / 1000
+            , y * strengthToHeightFactor / logBase 10 (10 + y)
+              -- This adjustment is empirical.
+            )
 
         -- TODO: constants!
     in
@@ -248,12 +273,58 @@ update msg model =
             , Cmd.none
             )
 
+        GonioGrab offset ->
+            ( { model
+                | gonioDrag = Just ( model.goniometer, offset )
+              }
+            , Cmd.none
+            )
+
+        GonioMove offset ->
+            ( { model
+                | goniometer =
+                    case model.gonioDrag of
+                        Nothing ->
+                            model.goniometer
+
+                        Just ( startAngle, startXY ) ->
+                            goniometerTurnAngle startAngle startXY offset
+              }
+            , Cmd.none
+            )
+
+        GonioRelease offset ->
+            ( { model
+                | gonioDrag = Nothing
+              }
+            , Cmd.none
+            )
+
         _ ->
             ( model, Cmd.none )
 
 
 
 -- VIEW
+
+
+touchCoordinates : Touch.Event -> ( Float, Float )
+touchCoordinates touchEvent =
+    List.head touchEvent.changedTouches
+        |> Maybe.map .clientPos
+        |> Maybe.withDefault ( 0, 0 )
+
+
+clickableGonioImage theta =
+    div
+        [ Mouse.onDown (\event -> GonioGrab event.offsetPos)
+        , Mouse.onMove (\event -> GonioMove event.offsetPos)
+        , Mouse.onUp (\event -> GonioRelease event.offsetPos)
+        , Touch.onStart (GonioGrab << touchCoordinates)
+        , Touch.onMove (GonioMove << touchCoordinates)
+        , Touch.onEnd (GonioRelease << touchCoordinates)
+        ]
+        [ drawGoniometer theta ]
 
 
 operatorPage : Model -> Element Msg
