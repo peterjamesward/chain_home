@@ -38,7 +38,10 @@ beamSweepIncreasingAmplitude =
 
 
 beamSweepDecreasingAmplitude =
-    -0.0002
+    -0.0003
+
+beamResponseTime = -- A proxy for the time taken to the beam to respond to any change in amplitude.
+    1
 
 
 scaleWidthKilometers =
