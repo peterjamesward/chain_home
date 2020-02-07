@@ -1,4 +1,4 @@
-module Config exposing (TargetSelector, bawdsey, getAllTargets, targetConfigurations, targetsBaseline, updateConfig)
+module Config exposing (TargetSelector, bawdsey, getAllTargets, targetConfigurations, updateConfig)
 
 import Station exposing (Station, stationClutter)
 import Target exposing (Target)
@@ -56,7 +56,7 @@ bomber2A =
 
 bomber3 =
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees 0.55
+    , latitude = bawdsey.latitude + degrees 0.35
     , height = 20 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -66,7 +66,7 @@ bomber3 =
 
 bomber4 =
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees -0.55
+    , latitude = bawdsey.latitude + degrees -0.33
     , height = 20 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -86,8 +86,8 @@ fighter1 =
 
 bomberInFormation baseLocation latIndex longIndex =
     { baseLocation
-        | longitude = baseLocation.longitude + (degrees (toFloat longIndex - 5) * 0.003)
-        , latitude = baseLocation.latitude + (degrees (toFloat latIndex - 5) * 0.0011)
+        | longitude = baseLocation.longitude + (degrees (toFloat longIndex - 5) * 0.01)
+        , latitude = baseLocation.latitude + (degrees (toFloat latIndex - 5) * 0.01)
         , height = baseLocation.height + (toFloat (latIndex + longIndex) * 5)
         , speed = baseLocation.speed + toFloat (latIndex + longIndex)
     }
@@ -128,7 +128,7 @@ tenAbreast =
 tenAligned =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.004)
+            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.002)
             , latitude = bawdsey.latitude + (degrees <| 0.05 * sin (toFloat i))
             , height = 25
             , bearing = degrees 270
@@ -140,20 +140,7 @@ tenAligned =
         List.range 1 10
 
 
-targetsBaseline =
-    [--  bomber1
-     --, bomber2
-     --, bomber2A
-     -- bomber3
-     --, bomber4
-     --, fighter1
-    ]
-        ++ tenAligned
-        ++ tenAbreast
 
-
-
---++ massRaid
 -- Some useful configurations for training.
 
 

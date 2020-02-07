@@ -67,11 +67,14 @@ combineEchoes activeEchoes =
         funkyEchoCombiner ( echo, index ) accumulator =
             accumulator
                 + echo.amplitude
-                * sin
-                    (pi
-                        * milliseconds echo.phase
-                        / toFloat index
-                    )
+                * (1
+                    + sin
+                        (pi
+                            * milliseconds (echo.phase + echo.r)
+                            / toFloat index
+                        )
+                  )
+                / 2
 
         descendingEchoes =
             List.reverse <| List.sortBy .amplitude activeEchoes

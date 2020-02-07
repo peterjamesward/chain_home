@@ -147,7 +147,7 @@ swingGoniometer angle keys =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every 50 Tick
+        [ Time.every 100 Tick
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
         ]

@@ -34,11 +34,11 @@ pulseWidth =
 
 
 beamSweepIncreasingAmplitude =
-    0.05
+    0.001
 
 
 beamSweepDecreasingAmplitude =
-    -0.001
+    -0.0002
 
 
 scaleWidthKilometers =
