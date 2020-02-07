@@ -1,48 +1,68 @@
 module Echo exposing (Echo, deriveEchoes, viewEcho)
 
-import Constants exposing (scaleWidthKilometers, pulseDuration, wavelength)
-import Target exposing (PolarTarget)
-import LobeFunctions exposing (..)
+import Constants exposing (pulseDuration, scaleWidthKilometers, wavelength)
 import Html exposing (..)
+import LobeFunctions exposing (..)
+import Target exposing (PolarTarget)
 
-type alias Echo = { r         : Float 
-                  , theta     : Float
-                  , alpha     : Float
-                  , phase     : Float
-                  , duration  : Float
-                  , amplitude : Float
-                  }
 
-defaultEcho = { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
+type alias Echo =
+    { r : Float
+    , theta : Float
+    , alpha : Float
+    , phase : Float
+    , duration : Float
+    , amplitude : Float
+    }
 
-dummyFinalEcho = { r = scaleWidthKilometers * 1000
-                 , theta = 0
-                 , alpha = 0
-                 , phase = 0
-                 , amplitude = 0
-                 , duration = 0
-                 }
 
-dummyInitialEcho = { dummyFinalEcho | r = 0 }
-      
+defaultEcho =
+    { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
+
+
+dummyFinalEcho =
+    { r = scaleWidthKilometers * 1000
+    , theta = 0
+    , alpha = 0
+    , phase = 0
+    , amplitude = 0
+    , duration = 0
+    }
+
+
+dummyInitialEcho =
+    { dummyFinalEcho | r = 0 }
+
+
 deriveEchoes : List PolarTarget -> Int -> List Echo
-deriveEchoes targets time = 
-  let 
-      ph rng = asin <| sin <| rng * (toFloat time)/wavelength  
-      echoFromTarget target = { r         = target.r
-                              , theta     = target.theta
-                              , alpha     = target.alpha
-                              , phase     = ph target.r
-                              , duration  = pulseDuration    -- microseconds
-                              , amplitude = abs <| ( txHorizReflectedLobe target.theta )
-                                                 * ( txHiVertOmniLobe target.alpha )
-                              }
-  in
-      List.map echoFromTarget targets
+deriveEchoes targets time =
+    let
+        ph rng =
+            asin <| sin <| rng * toFloat time / wavelength
+
+        echoFromTarget target =
+            { r = target.r
+            , theta = target.theta
+            , alpha = target.alpha
+
+            -- Using phase attribute to pass time through
+            -- see comments in Skyline re "beating".
+            , phase = toFloat time
+            , duration = pulseDuration -- microseconds
+            , amplitude =
+                abs <|
+                    txHorizReflectedLobe target.theta
+                        * txHiVertOmniLobe target.alpha
+            }
+    in
+    List.map echoFromTarget targets
 
 
--- Handy function fo debuggery.
-viewEcho e = 
+
+-- Handy function for debuggery.
+
+
+viewEcho e =
     [ Html.text "r "
     , Html.text <| String.fromFloat <| e.r
     , Html.br [] []

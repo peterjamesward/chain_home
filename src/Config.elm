@@ -46,7 +46,7 @@ bomber2 =
 
 bomber2A =
     { longitude = degrees 2.0
-    , latitude = degrees 52.06
+    , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
     , bearing = degrees 280
     , speed = 200.0 -- mph
@@ -66,7 +66,7 @@ bomber3 =
 
 bomber4 =
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees -0.5
+    , latitude = bawdsey.latitude + degrees -0.55
     , height = 20 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -162,15 +162,15 @@ outboundFriendly =
 
 
 loneBomber =
-    TargetSelector 2 "One bomber all alone" [ bomber1 ] False
+    TargetSelector 2 "One target" [ bomber1 ] False
 
 
 twoCloseTargets =
-    TargetSelector 3 "Two targets very close" [ bomber2, bomber2A ] False
+    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] False
 
 
 twoDistantTargets =
-    TargetSelector 4 "Two targets, different bearings" [ bomber3, bomber4 ] False
+    TargetSelector 4 "Two targets, same range, different bearings" [ bomber3, bomber4 ] False
 
 
 tenWide =

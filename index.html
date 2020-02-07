@@ -6513,7 +6513,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 				time: t
 			});
 	});
-var $author$project$Main$goniometerTurnAngle = F3(
+var $author$project$Goniometer$goniometerTurnAngle = F3(
 	function (startAngle, _v0, _v1) {
 		var startX = _v0.a;
 		var startY = _v0.b;
@@ -6525,7 +6525,7 @@ var $author$project$Main$goniometerTurnAngle = F3(
 		var _v3 = $elm$core$Basics$toPolar(
 			_Utils_Tuple2(newX - 150, newY - 150));
 		var dragNowAngle = _v3.b;
-		return (startAngle - dragNowAngle) + dragStartAngle;
+		return (startAngle + dragNowAngle) - dragStartAngle;
 	});
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
@@ -6622,7 +6622,7 @@ var $author$project$Main$update = F2(
 									var _v2 = _v1.a;
 									var startAngle = _v2.a;
 									var startXY = _v2.b;
-									return A3($author$project$Main$goniometerTurnAngle, startAngle, startXY, offset);
+									return A3($author$project$Goniometer$goniometerTurnAngle, startAngle, startXY, offset);
 								}
 							}()
 						}),
@@ -13110,6 +13110,7 @@ var $author$project$Goniometer$drawGoniometerPointer = function (theta) {
 		]);
 };
 var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
@@ -13140,7 +13141,8 @@ var $author$project$Goniometer$drawGoniometerScale = function () {
 					yFromIndex(i)),
 					$elm$svg$Svg$Attributes$fill('antiquewhite'),
 					$elm$svg$Svg$Attributes$textAnchor('middle'),
-					$elm$svg$Svg$Attributes$fontFamily('monospace')
+					$elm$svg$Svg$Attributes$fontFamily('monospace'),
+					$elm$svg$Svg$Attributes$fontSize('12pt')
 				]),
 			_List_fromArray(
 				[
@@ -13510,6 +13512,7 @@ var $author$project$Main$operatorPage = function (model) {
 			[
 				$mdgriffith$elm_ui$Element$spacing(10),
 				$mdgriffith$elm_ui$Element$padding(10),
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 				$mdgriffith$elm_ui$Element$centerX
 			]),
 		_List_fromArray(

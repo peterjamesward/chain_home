@@ -1,4 +1,4 @@
-module Goniometer exposing (drawGoniometer, showGonioValue)
+module Goniometer exposing (drawGoniometer, showGonioValue, goniometerTurnAngle)
 
 import Html exposing (..)
 import Html.Attributes as H exposing (..)
@@ -110,6 +110,7 @@ drawGoniometerScale =
                 , fill "antiquewhite"
                 , textAnchor "middle"
                 , fontFamily "monospace"
+                , fontSize "12pt"
                 ]
                 [ Svg.text (String.fromInt (i * 10))
                 ]
@@ -124,3 +125,18 @@ drawGoniometerScale =
         ]
         []
         :: List.map labelPoint (List.range 0 35)
+
+goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
+goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
+    let
+        ( _, dragStartAngle ) =
+            toPolar ( startX - 150, startY - 150 )
+
+        -- where on control was clicked
+        ( _, dragNowAngle ) =
+            toPolar ( newX - 150, newY - 150 )
+
+        -- where that point is now
+    in
+    startAngle + dragNowAngle - dragStartAngle
+

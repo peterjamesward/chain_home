@@ -16,7 +16,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Goniometer exposing (drawGoniometer, showGonioValue)
+import Goniometer exposing (drawGoniometer, goniometerTurnAngle, showGonioValue)
 import Html as H exposing (..)
 import Html.Attributes as HA exposing (..)
 import Html.Events.Extra.Mouse as Mouse
@@ -138,21 +138,6 @@ swingGoniometer angle keys =
 
         _ ->
             angle
-
-
-goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
-goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
-    let
-        ( _, dragStartAngle ) =
-            toPolar ( startX - 150, startY - 150 )
-
-        -- where on control was clicked
-        ( _, dragNowAngle ) =
-            toPolar ( newX - 150, newY - 150 )
-
-        -- where that point is now
-    in
-    startAngle - dragNowAngle + dragStartAngle
 
 
 
@@ -332,6 +317,7 @@ operatorPage model =
     row
         [ E.spacing 10
         , E.padding 10
+        , E.width E.fill
         , E.centerX
         ]
     <|
@@ -401,31 +387,6 @@ view model =
                 ]
         ]
     }
-
-
-blue : Color
-blue =
-    rgb255 52 101 164
-
-
-lightCharcoal : Color
-lightCharcoal =
-    rgb255 136 138 133
-
-
-green : Color
-green =
-    rgb255 52 164 100
-
-
-darkGreen : Color
-darkGreen =
-    rgb255 36 200 33
-
-
-white : Color
-white =
-    rgb255 200 200 200
 
 
 navBar : Element Msg

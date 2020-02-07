@@ -42,6 +42,9 @@ beamSmoothingFunction newRoof (lines, beamY) =
               , beamYForShortRoof
             )
 
+
+-- TODO: Try quadratic splines : https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+
 -- We are now taking a list of horizontal segments and we have to join them.
 beamPath : List EdgeSegment -> List (Float, Float)
 beamPath edges =
