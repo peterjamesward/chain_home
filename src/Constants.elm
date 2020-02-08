@@ -91,3 +91,6 @@ darkGreen =
 white : Color
 white =
     rgb255 200 200 200
+
+midGray : Color
+midGray =  rgb255 80 80 80

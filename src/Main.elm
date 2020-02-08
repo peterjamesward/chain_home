@@ -334,8 +334,7 @@ rangeSlider model =
         ]
         { onChange = AdjustRangeValue
         , label =
-            Input.labelAbove []
-                (E.text "Range (miles)")
+            Input.labelHidden "Range (miles)"
         , min = 0
         , max = 100
         , step = Nothing
@@ -346,8 +345,8 @@ rangeSlider model =
                 , E.height (E.px 50)
                 , Border.rounded 8
                 , Border.width 1
-                , Border.color (E.rgb 0.5 0.5 0.5)
-                , Background.color (E.rgb 0.5 0.5 1)
+                , Border.color <| E.rgb 0 0 0
+                , Background.color <| E.rgb255  51 51 204
                 ]
         }
 
@@ -382,6 +381,8 @@ crt m =
         [ rect
             [ x "-10"
             , y "-40"
+            , rx "20"
+            , ry "20"
             , SA.width "1020"
             , SA.height "450"
             , SA.fill "black"
@@ -422,7 +423,10 @@ view model =
     in
     { title = "Chain Home emulation"
     , body =
-        [ layout [] <|
+        [ layout
+            [ Background.color lightCharcoal
+            ]
+          <|
             column [ E.width E.fill, spacingXY 0 20 ]
                 [ navBar
                 , content
@@ -436,11 +440,21 @@ navBar =
     row
         [ E.width E.fill
         , paddingXY 60 10
-        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color blue
+        , Border.widthEach { bottom = 5, top = 0, left = 0, right = 0 }
+        , Border.color midGray
         ]
-        [ el [ alignLeft ] <| E.text "Chain Home"
-        , el [ alignRight ] <| E.text "Menu"
+        [ el
+            [ alignLeft
+            , Font.color midGray
+            ]
+          <|
+            E.text "Chain Home"
+        , el
+            [ alignRight
+            , Font.color midGray
+            ]
+          <|
+            E.text "Menu"
         ]
 
 
