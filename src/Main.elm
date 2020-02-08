@@ -288,6 +288,13 @@ update msg model =
             , Cmd.none
             )
 
+        AdjustRangeValue newRange ->
+            ( { model
+                | rangeSlider = newRange
+              }
+            , Cmd.none
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -346,7 +353,7 @@ rangeSlider model =
                 , Border.rounded 8
                 , Border.width 1
                 , Border.color <| E.rgb 0 0 0
-                , Background.color <| E.rgb255  51 51 204
+                , Background.color <| E.rgb255 51 51 204
                 ]
         }
 
