@@ -5257,8 +5257,8 @@ var $elm$core$Basics$negate = function (n) {
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $author$project$Constants$beamSweepDecreasingAmplitude = -0.0005;
-var $author$project$Constants$beamSweepIncreasingAmplitude = 0.003;
+var $author$project$Constants$beamSweepDecreasingAmplitude = -0.0003;
+var $author$project$Constants$beamSweepIncreasingAmplitude = 0.001;
 var $author$project$BeamSmoother$beamSmoothingFunction = F2(
 	function (newRoof, _v0) {
 		var lines = _v0.a;
@@ -5364,7 +5364,7 @@ var $author$project$Config$bomber1 = {
 var $author$project$Config$loneBomber = A4(
 	$author$project$Config$TargetSelector,
 	2,
-	'One bomber all alone',
+	'One target',
 	_List_fromArray(
 		[$author$project$Config$bomber1]),
 	false);
@@ -5374,8 +5374,8 @@ var $author$project$Config$bomberInFormation = F3(
 			baseLocation,
 			{
 				height: baseLocation.height + ((latIndex + longIndex) * 5),
-				latitude: baseLocation.latitude + ($elm$core$Basics$degrees(latIndex - 5) * 0.0011),
-				longitude: baseLocation.longitude + ($elm$core$Basics$degrees(longIndex - 5) * 0.003),
+				latitude: baseLocation.latitude + ($elm$core$Basics$degrees(latIndex - 5) * 0.01),
+				longitude: baseLocation.longitude + ($elm$core$Basics$degrees(longIndex - 5) * 0.01),
 				speed: baseLocation.speed + (latIndex + longIndex)
 			});
 	});
@@ -5447,9 +5447,9 @@ var $author$project$Config$tenAligned = A2(
 			bearing: $elm$core$Basics$degrees(270),
 			height: 25,
 			iff: false,
-			latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(
+			latitude: ($author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.2)) + $elm$core$Basics$degrees(
 				0.05 * $elm$core$Basics$sin(i)),
-			longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.0)) + ($elm$core$Basics$degrees(i - 5) * 0.004),
+			longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.0)) + ($elm$core$Basics$degrees(i - 5) * 0.002),
 			speed: 200
 		};
 	},
@@ -5462,7 +5462,7 @@ var $author$project$Config$tenAbreast = A2(
 			bearing: $elm$core$Basics$degrees(270),
 			height: 25,
 			iff: false,
-			latitude: $author$project$Config$bawdsey.latitude + ($elm$core$Basics$degrees(i - 5) * 0.001),
+			latitude: ($author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
 			longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8),
 			speed: 200
 		};
@@ -5481,14 +5481,14 @@ var $author$project$Config$bomber2A = {
 	bearing: $elm$core$Basics$degrees(280),
 	height: 30.1,
 	iff: false,
-	latitude: $elm$core$Basics$degrees(52.06),
+	latitude: $elm$core$Basics$degrees(52.05),
 	longitude: $elm$core$Basics$degrees(2.0),
 	speed: 200.0
 };
 var $author$project$Config$twoCloseTargets = A4(
 	$author$project$Config$TargetSelector,
 	3,
-	'Two targets very close',
+	'Two targets in close formation',
 	_List_fromArray(
 		[$author$project$Config$bomber2, $author$project$Config$bomber2A]),
 	false);
@@ -5496,7 +5496,7 @@ var $author$project$Config$bomber3 = {
 	bearing: $elm$core$Basics$degrees(270),
 	height: 20,
 	iff: false,
-	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.55),
+	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.35),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8),
 	speed: 200
 };
@@ -5504,14 +5504,14 @@ var $author$project$Config$bomber4 = {
 	bearing: $elm$core$Basics$degrees(270),
 	height: 20,
 	iff: false,
-	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(-0.5),
+	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(-0.33),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8),
 	speed: 200
 };
 var $author$project$Config$twoDistantTargets = A4(
 	$author$project$Config$TargetSelector,
 	4,
-	'Two targets, different bearings',
+	'Two targets, same range, different bearings',
 	_List_fromArray(
 		[$author$project$Config$bomber3, $author$project$Config$bomber4]),
 	false);
@@ -6172,7 +6172,7 @@ var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($elm$time$Time$every, 50, $author$project$Main$Tick),
+				A2($elm$time$Time$every, 100, $author$project$Main$Tick),
 				$elm$browser$Browser$Events$onKeyUp(
 				A2(
 					$elm$json$Json$Decode$map,
@@ -6214,52 +6214,53 @@ var $author$project$Echo$deriveEchoes = F2(
 				amplitude: $elm$core$Basics$abs(
 					$author$project$LobeFunctions$txHorizReflectedLobe(target.theta) * $author$project$LobeFunctions$txHiVertOmniLobe(target.alpha)),
 				duration: $author$project$Constants$pulseDuration,
-				phase: ph(target.r),
+				phase: time,
 				r: target.r,
 				theta: target.theta
 			};
 		};
 		return A2($elm$core$List$map, echoFromTarget, targets);
 	});
-var $elm$core$Basics$fromPolar = function (_v0) {
-	var radius = _v0.a;
-	var theta = _v0.b;
-	return _Utils_Tuple2(
-		radius * $elm$core$Basics$cos(theta),
-		radius * $elm$core$Basics$sin(theta));
-};
-var $elm$core$Basics$atan2 = _Basics_atan2;
-var $elm$core$Basics$toPolar = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return _Utils_Tuple2(
-		$elm$core$Basics$sqrt((x * x) + (y * y)),
-		A2($elm$core$Basics$atan2, y, x));
-};
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$Basics$truncate = _Basics_truncate;
 var $author$project$Skyline$combineEchoes = function (activeEchoes) {
-	var asRect = A2(
-		$elm$core$List$map,
-		function (e) {
-			return $elm$core$Basics$fromPolar(
-				_Utils_Tuple2(e.amplitude, e.phase));
-		},
-		activeEchoes);
-	var combinedAsRect = A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v1, _v2) {
-				var x = _v1.a;
-				var y = _v1.b;
-				var xAcc = _v2.a;
-				var yAcc = _v2.b;
-				return _Utils_Tuple2(x + xAcc, y + yAcc);
-			}),
-		_Utils_Tuple2(0.0, 0.0),
-		asRect);
-	var _v0 = $elm$core$Basics$toPolar(combinedAsRect);
-	var mag = _v0.a;
-	var phase = _v0.b;
-	return mag;
+	var milliseconds = function (t) {
+		return 4000 / A2($elm$core$Basics$modBy, 4000, t | 0);
+	};
+	var funkyEchoCombiner = F2(
+		function (_v1, accumulator) {
+			var echo = _v1.a;
+			var index = _v1.b;
+			return accumulator + (echo.amplitude * $elm$core$Basics$sin(
+				((2.0 * $elm$core$Basics$pi) * milliseconds(echo.phase + echo.r)) / index));
+		});
+	var descendingEchoes = $elm$core$List$reverse(
+		A2(
+			$elm$core$List$sortBy,
+			function ($) {
+				return $.amplitude;
+			},
+			activeEchoes));
+	var beatIndex = A2(
+		$elm$core$List$range,
+		1,
+		$elm$core$List$length(activeEchoes));
+	if (!descendingEchoes.b) {
+		return 0.0;
+	} else {
+		var e = descendingEchoes.a;
+		var rest = descendingEchoes.b;
+		return $elm$core$Basics$abs(
+			e.amplitude + A3(
+				$elm$core$List$foldl,
+				funkyEchoCombiner,
+				0.0,
+				A3($elm$core$List$map2, $elm$core$Tuple$pair, rest, beatIndex)));
+	}
 };
 var $author$project$Skyline$dummyLeadingEdge = _Utils_Tuple2(
 	_Utils_Tuple2(0.0, 0.0),
@@ -6333,7 +6334,6 @@ var $author$project$Skyline$processEdge = F2(
 			_Utils_Tuple2(newX, newY)));
 	});
 var $author$project$Constants$pulseWidth = ($author$project$Constants$lightSpeed * $author$project$Constants$pulseDuration) / 10000000.0;
-var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Skyline$deriveSkyline = F2(
 	function (maxX, allEchoes) {
 		var trailingEdges = A2(
@@ -6393,6 +6393,7 @@ var $author$project$Receiver$goniometerMix = F2(
 			$author$project$Receiver$gonioMixEcho(angle),
 			echoes);
 	});
+var $elm$core$Basics$atan2 = _Basics_atan2;
 var $author$project$Spherical$bearing = F2(
 	function (_v0, _v1) {
 		var φ1 = _v0.a;
@@ -6513,6 +6514,13 @@ var $author$project$Main$deriveModelAtTime = F2(
 				time: t
 			});
 	});
+var $elm$core$Basics$toPolar = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return _Utils_Tuple2(
+		$elm$core$Basics$sqrt((x * x) + (y * y)),
+		A2($elm$core$Basics$atan2, y, x));
+};
 var $author$project$Goniometer$goniometerTurnAngle = F3(
 	function (startAngle, _v0, _v1) {
 		var startX = _v0.a;
@@ -12230,7 +12238,7 @@ var $mdgriffith$elm_ui$Element$rgb255 = F3(
 	function (red, green, blue) {
 		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
 	});
-var $author$project$Main$darkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
+var $author$project$Constants$darkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
 var $mdgriffith$elm_ui$Element$el = F2(
 	function (attrs, child) {
 		return A4(
@@ -12248,7 +12256,7 @@ var $mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
-var $author$project$Main$green = A3($mdgriffith$elm_ui$Element$rgb255, 52, 164, 100);
+var $author$project$Constants$green = A3($mdgriffith$elm_ui$Element$rgb255, 52, 164, 100);
 var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
 	function (a, b, c, d, e) {
 		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
@@ -12660,7 +12668,7 @@ var $mdgriffith$elm_ui$Element$Input$Label = F3(
 	});
 var $mdgriffith$elm_ui$Element$Input$OnRight = {$: 'OnRight'};
 var $mdgriffith$elm_ui$Element$Input$labelRight = $mdgriffith$elm_ui$Element$Input$Label($mdgriffith$elm_ui$Element$Input$OnRight);
-var $author$project$Main$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
+var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
 var $mdgriffith$elm_ui$Element$padding = function (x) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -12697,7 +12705,7 @@ var $author$project$Main$targetSelector = function (active) {
 					$mdgriffith$elm_ui$Element$px(40)),
 					$mdgriffith$elm_ui$Element$Border$width(1),
 					$mdgriffith$elm_ui$Element$Border$rounded(5),
-					$mdgriffith$elm_ui$Element$Border$color($author$project$Main$lightCharcoal),
+					$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
 					$mdgriffith$elm_ui$Element$padding(10)
 				]),
 			{
@@ -12712,7 +12720,7 @@ var $author$project$Main$targetSelector = function (active) {
 	};
 	return A2($elm$core$List$map, display, active);
 };
-var $author$project$Main$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
+var $author$project$Constants$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
 var $author$project$Main$inputPage = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
@@ -12731,13 +12739,13 @@ var $author$project$Main$inputPage = function (model) {
 					$mdgriffith$elm_ui$Element$Input$button,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$Background$color($author$project$Main$green),
-							$mdgriffith$elm_ui$Element$Border$color($author$project$Main$darkGreen),
+							$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$green),
+							$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$darkGreen),
 							$mdgriffith$elm_ui$Element$Border$rounded(3),
 							$mdgriffith$elm_ui$Element$Border$widthEach(
 							{bottom: 3, left: 0, right: 0, top: 0}),
 							$mdgriffith$elm_ui$Element$Font$bold,
-							$mdgriffith$elm_ui$Element$Font$color($author$project$Main$white),
+							$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
 							A2($mdgriffith$elm_ui$Element$paddingXY, 20, 6),
 							$mdgriffith$elm_ui$Element$alignRight,
 							$mdgriffith$elm_ui$Element$width(
@@ -13007,7 +13015,7 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
-var $author$project$Main$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
+var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
 var $mdgriffith$elm_ui$Element$row = F2(
 	function (attrs, children) {
 		return A4(
@@ -13034,7 +13042,7 @@ var $author$project$Main$navBar = A2(
 			A2($mdgriffith$elm_ui$Element$paddingXY, 60, 10),
 			$mdgriffith$elm_ui$Element$Border$widthEach(
 			{bottom: 1, left: 0, right: 0, top: 0}),
-			$mdgriffith$elm_ui$Element$Border$color($author$project$Main$blue)
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$blue)
 		]),
 	_List_fromArray(
 		[

@@ -47,6 +47,7 @@ type Msg
     | GonioGrab ( Float, Float )
     | GonioMove ( Float, Float )
     | GonioRelease ( Float, Float )
+    | AdjustRangeValue Float
 
 
 type alias Model =
@@ -66,6 +67,7 @@ type alias Model =
     , keys : Keys
     , gonioDrag : Maybe ( Float, ( Float, Float ) ) -- angle and mouse position when mouse down
     , activeConfigurations : List TargetSelector
+    , rangeSlider : Float
     }
 
 
@@ -91,6 +93,7 @@ init _ =
       , keys = noKeys
       , gonioDrag = Nothing
       , activeConfigurations = targetConfigurations
+      , rangeSlider = 50.0
       }
     , Cmd.none
     )
@@ -312,6 +315,43 @@ clickableGonioImage theta =
         [ drawGoniometer theta ]
 
 
+rangeSlider model =
+    Input.slider
+        [ E.height (E.px 30)
+
+        -- Here is where we're creating/styling the "track"
+        , E.behindContent
+            (E.el
+                [ E.width (px 940)
+                , E.height (E.px 2)
+                , E.centerY
+                , E.centerX
+                , Background.color lightCharcoal
+                , Border.rounded 2
+                ]
+                E.none
+            )
+        ]
+        { onChange = AdjustRangeValue
+        , label =
+            Input.labelAbove []
+                (E.text "Range (miles)")
+        , min = 0
+        , max = 100
+        , step = Nothing
+        , value = model.rangeSlider
+        , thumb =
+            Input.thumb
+                [ E.width (E.px 16)
+                , E.height (E.px 50)
+                , Border.rounded 8
+                , Border.width 1
+                , Border.color (E.rgb 0.5 0.5 0.5)
+                , Background.color (E.rgb 0.5 0.5 1)
+                ]
+        }
+
+
 operatorPage : Model -> Element Msg
 operatorPage model =
     row
@@ -320,9 +360,11 @@ operatorPage model =
         , E.width E.fill
         , E.centerX
         ]
-    <|
         [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
-        , E.html (crt model)
+        , column []
+            [ rangeSlider model
+            , E.html (crt model)
+            ]
         ]
 
 
@@ -378,7 +420,7 @@ view model =
                 InputPage ->
                     inputPage model
     in
-    { title = "VisExp"
+    { title = "Chain Home emulation"
     , body =
         [ layout [] <|
             column [ E.width E.fill, spacingXY 0 20 ]
