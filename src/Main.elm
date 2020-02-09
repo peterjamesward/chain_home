@@ -269,17 +269,21 @@ update msg model =
             )
 
         GonioMove offset ->
-            ( { model
-                | goniometer =
-                    case model.gonioDrag of
-                        Nothing ->
-                            model.goniometer
+            case model.gonioDrag of
+                Nothing ->
+                    ( model, Cmd.none )
 
-                        Just ( startAngle, startXY ) ->
+                Just ( startAngle, startXY ) ->
+                    let
+                        newAngle =
                             goniometerTurnAngle startAngle startXY offset
-              }
-            , Cmd.none
-            )
+                    in
+                    ( { model
+                        | goniometer = newAngle
+                        , gonioDrag = Just ( newAngle, offset )
+                      }
+                    , Cmd.none
+                    )
 
         GonioRelease offset ->
             ( { model
