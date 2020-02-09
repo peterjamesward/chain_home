@@ -408,8 +408,59 @@ operatorPage model =
             ]
             [ rangeSlider model
             , E.html (crt model)
+            , row
+                [ E.height (E.px 100)
+                , E.width E.fill
+                , E.centerX
+                , E.centerY
+                ]
+                [ E.text "Range"
+                , nixieTest 3 (truncate model.rangeSlider)
+                , E.text "Bearing"
+                , nixieTest 3
+                    (modBy 360 <|
+                        truncate
+                            ((model.goniometer + model.station.lineOfShoot)
+                                * 180
+                                / pi
+                            )
+                    )
+                ]
             ]
         ]
+
+
+nixieDigit d =
+    E.image
+        [ E.width (E.px 30)
+        , E.height (E.px 45)
+        ]
+        { src = "../resources/nixie" ++ String.fromInt d ++ ".png"
+        , description = ""
+        }
+
+
+toDigits x =
+    case x of
+        0 ->
+            [ 0 ]
+
+        _ ->
+            let
+                lastDigit =
+                    modBy 10 x
+
+                precedingDigits =
+                    x // 10
+            in
+            toDigits precedingDigits ++ [ lastDigit ]
+
+
+nixieTest digits value =
+    row [] <|
+        List.map
+            nixieDigit
+            (toDigits value)
 
 
 crt m =
