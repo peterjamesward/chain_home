@@ -107,6 +107,10 @@ type alias Keys =
     }
 
 
+
+-- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
+
+
 noKeys : Keys
 noKeys =
     Keys False False False False
@@ -132,7 +136,7 @@ updateKeys isDown key keys =
 
 
 
--- When we have mouse tracking we can have non-integer movements.
+-- Mouse tracking permits non-integer movements.
 
 
 swingGoniometer : Float -> Keys -> Float
@@ -352,39 +356,42 @@ clickableGonioImage theta =
 
 
 rangeSlider model =
-    Input.slider
-        [ E.height (E.px 30)
+    E.el [ E.centerX ] <|
+        Input.slider
+            [ E.height (E.px 30)
+            , E.width (E.px 950)
+            , E.centerX
 
-        -- Here is where we're creating/styling the "track"
-        , E.behindContent
-            (E.el
-                [ E.width (px 900)
-                , E.height (E.px 2)
-                , E.centerY
-                , E.centerX
-                , Background.color midGray
-                , Border.rounded 2
-                ]
-                E.none
-            )
-        ]
-        { onChange = AdjustRangeValue
-        , label =
-            Input.labelHidden "Range (miles)"
-        , min = 0
-        , max = 100
-        , step = Nothing
-        , value = model.rangeSlider
-        , thumb =
-            Input.thumb
-                [ E.width (E.px 16)
-                , E.height (E.px 50)
-                , Border.rounded 8
-                , Border.width 1
-                , Border.color <| E.rgb 0 0 0
-                , Background.color <| E.rgb255 180 20 20
-                ]
-        }
+            -- Here is where we're creating/styling the "track"
+            , E.behindContent
+                (E.el
+                    [ E.width E.fill
+                    , E.height (E.px 2)
+                    , E.centerY
+                    , E.centerX
+                    , Background.color midGray
+                    , Border.rounded 2
+                    ]
+                    E.none
+                )
+            ]
+            { onChange = AdjustRangeValue
+            , label =
+                Input.labelHidden "Range (miles)"
+            , min = 0
+            , max = 100
+            , step = Nothing
+            , value = model.rangeSlider
+            , thumb =
+                Input.thumb
+                    [ E.width (E.px 16)
+                    , E.height (E.px 50)
+                    , Border.rounded 8
+                    , Border.width 1
+                    , Border.color <| E.rgb 0 0 0
+                    , Background.color <| E.rgb255 180 20 20
+                    ]
+            }
 
 
 operatorPage : Model -> Element Msg
@@ -396,7 +403,9 @@ operatorPage model =
         , E.centerX
         ]
         [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
-        , column []
+        , column
+            [ E.width E.shrink
+            ]
             [ rangeSlider model
             , E.html (crt model)
             ]
