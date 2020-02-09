@@ -102,12 +102,14 @@ init _ =
 type alias Keys =
     { gonioClock : Bool -- A
     , gonioAnti : Bool -- Q
+    , rangeLeft : Bool -- left arrow
+    , rangeRight : Bool -- right arrow
     }
 
 
 noKeys : Keys
 noKeys =
-    Keys False False
+    Keys False False False False
 
 
 updateKeys : Bool -> String -> Keys -> Keys
@@ -118,6 +120,12 @@ updateKeys isDown key keys =
 
         "a" ->
             { keys | gonioClock = isDown }
+
+        "," ->
+            { keys | rangeLeft = isDown }
+
+        "." ->
+            { keys | rangeRight = isDown }
 
         _ ->
             keys
@@ -141,6 +149,22 @@ swingGoniometer angle keys =
 
         _ ->
             angle
+
+
+slideRangeSlider : Float -> Keys -> Float
+slideRangeSlider range keys =
+    case ( keys.rangeLeft, keys.rangeRight ) of
+        ( True, True ) ->
+            range
+
+        ( True, False ) ->
+            Basics.max 0.0 (range - 0.5)
+
+        ( False, True ) ->
+            Basics.min 100.0 (range + 0.5)
+
+        _ ->
+            range
 
 
 
@@ -227,6 +251,7 @@ deriveModelAtTime model t =
         , gonioOutput = gonioOut
         , lineData = scalePathToDisplay <| beamPath newSkyline
         , goniometer = swingGoniometer model.goniometer model.keys
+        , rangeSlider = slideRangeSlider model.rangeSlider model.keys
     }
 
 
@@ -333,11 +358,11 @@ rangeSlider model =
         -- Here is where we're creating/styling the "track"
         , E.behindContent
             (E.el
-                [ E.width (px 940)
+                [ E.width (px 900)
                 , E.height (E.px 2)
                 , E.centerY
                 , E.centerX
-                , Background.color lightCharcoal
+                , Background.color midGray
                 , Border.rounded 2
                 ]
                 E.none
@@ -357,7 +382,7 @@ rangeSlider model =
                 , Border.rounded 8
                 , Border.width 1
                 , Border.color <| E.rgb 0 0 0
-                , Background.color <| E.rgb255 51 51 204
+                , Background.color <| E.rgb255 180 20 20
                 ]
         }
 
