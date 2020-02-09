@@ -410,17 +410,20 @@ operatorPage model =
             , E.html (crt model)
             , row
                 [ E.height (E.px 100)
-                , E.width E.fill
                 , E.centerX
-                , E.centerY
                 , E.spacing 50
                 , Font.color white
-                ]
-                [ column []
-                    [ nixieTest 3 (truncate model.rangeSlider)
-                    , E.text "Range"
+                , Font.size 14
+                , Font.family
+                    [ Font.typeface "monospace"
+                    , Font.sansSerif
                     ]
-                , column []
+                ]
+                [ column [ E.centerX ]
+                    [ nixieTest 3 (truncate model.rangeSlider)
+                    , el [ E.centerX ] (E.text "RANGE")
+                    ]
+                , column [ E.centerX ]
                     [ nixieTest 3
                         (modBy 360 <|
                             truncate
@@ -429,7 +432,7 @@ operatorPage model =
                                     / pi
                                 )
                         )
-                    , E.text "Bearing"
+                    , el [ E.centerX ] (E.text "BEARING")
                     ]
                 ]
             ]
@@ -526,7 +529,7 @@ view model =
     { title = "Chain Home emulation"
     , body =
         [ layout
-            [ Background.color lightCharcoal
+            [ Background.color darkGrey
             ]
           <|
             column [ E.width E.fill, spacingXY 0 20 ]
@@ -544,16 +547,15 @@ navBar =
         , paddingXY 60 10
         , Border.widthEach { bottom = 5, top = 0, left = 0, right = 0 }
         , Border.color midGray
+        , Font.color white
         ]
         [ el
             [ alignLeft
-            , Font.color midGray
             ]
           <|
             E.text "Chain Home"
         , el
             [ alignRight
-            , Font.color midGray
             ]
           <|
             E.text "Menu"
@@ -596,9 +598,10 @@ targetSelector active =
 inputPage : Model -> Element Msg
 inputPage model =
     column
-        [ E.width (px 800)
+        [ E.width (px 500)
         , spacingXY 0 10
         , centerX
+        , Font.color lightCharcoal
         ]
     <|
         targetSelector model.activeConfigurations

@@ -73,6 +73,8 @@ blue =
     rgb255 52 101 164
 
 
+darkGrey = rgb255 51 51 51
+
 lightCharcoal : Color
 lightCharcoal =
     rgb255 136 138 133
