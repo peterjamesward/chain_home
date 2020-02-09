@@ -413,18 +413,24 @@ operatorPage model =
                 , E.width E.fill
                 , E.centerX
                 , E.centerY
+                , E.spacing 50
+                , Font.color white
                 ]
-                [ E.text "Range"
-                , nixieTest 3 (truncate model.rangeSlider)
-                , E.text "Bearing"
-                , nixieTest 3
-                    (modBy 360 <|
-                        truncate
-                            ((model.goniometer + model.station.lineOfShoot)
-                                * 180
-                                / pi
-                            )
-                    )
+                [ column []
+                    [ nixieTest 3 (truncate model.rangeSlider)
+                    , E.text "Range"
+                    ]
+                , column []
+                    [ nixieTest 3
+                        (modBy 360 <|
+                            truncate
+                                ((model.goniometer + model.station.lineOfShoot)
+                                    * 180
+                                    / pi
+                                )
+                        )
+                    , E.text "Bearing"
+                    ]
                 ]
             ]
         ]
@@ -440,10 +446,10 @@ nixieDigit d =
         }
 
 
-toDigits x =
-    case x of
+toDigits digits x =
+    case digits of
         0 ->
-            [ 0 ]
+            []
 
         _ ->
             let
@@ -453,14 +459,14 @@ toDigits x =
                 precedingDigits =
                     x // 10
             in
-            toDigits precedingDigits ++ [ lastDigit ]
+            toDigits (digits - 1) precedingDigits ++ [ lastDigit ]
 
 
 nixieTest digits value =
     row [] <|
         List.map
             nixieDigit
-            (toDigits value)
+            (toDigits digits value)
 
 
 crt m =
