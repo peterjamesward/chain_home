@@ -29,6 +29,7 @@ import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
 import Target exposing (..)
 import Time
+import ToggleSwitch exposing (toggleSwitch)
 
 
 type Page
@@ -351,46 +352,6 @@ rangeSlider model =
             }
 
 
-toggleSwitch : String -> Bool -> (Float -> Msg) -> E.Element Msg
-toggleSwitch switchLabel switchState switchMessage =
-    E.el [ E.centerX ] <|
-        Input.slider
-            [ E.height (E.px 40)
-            , E.width (E.px 20)
-            , E.centerX
-
-            -- Here is where we're creating/styling the "track"
-            , E.behindContent
-                (E.el
-                    [ E.height E.fill
-                    , E.width (E.px 10)
-                    , E.centerY
-                    , E.centerX
-                    , Background.color black
-                    , Border.rounded 5
-                    ]
-                    E.none
-                )
-            ]
-            { onChange = switchMessage
-            , label =
-                Input.labelBelow [ E.centerX ] (E.text switchLabel)
-            , min = 0
-            , max = 1
-            , step = Just 1
-            , value = if switchState then 1 else 0
-            , thumb =
-                Input.thumb
-                    [ E.width (E.px 20)
-                    , E.height (E.px 20)
-                    , E.centerY
-                    , Border.rounded 10
-                    , Border.width 1
-                    , Border.color flatSunflower
-                    , Background.color flatSunflower
-                    ]
-            }
-
 
 operatorPage : Model -> Element Msg
 operatorPage model =
@@ -432,6 +393,9 @@ operatorPage model =
                         )
                     , el [ E.centerX ] (E.text "BEARING")
                     ]
+                , toggleSwitch "TEST" True AdjustRangeValue
+                , toggleSwitch "TEST" True AdjustRangeValue
+                , toggleSwitch "TEST" True AdjustRangeValue
                 , toggleSwitch "TEST" True AdjustRangeValue
                 ]
             ]
