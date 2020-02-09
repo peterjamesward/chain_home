@@ -5,9 +5,10 @@ module Main exposing (main)
    in his book "Practical Elm"".
 -}
 
-import BeamSmoother exposing (beamPath)
+import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
 import Browser.Events exposing (..)
+import CRT exposing (crt)
 import Config exposing (..)
 import Constants exposing (..)
 import Echo exposing (..)
@@ -16,20 +17,17 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Goniometer exposing (drawGoniometer, goniometerTurnAngle, showGonioValue)
+import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 import Html as H exposing (..)
-import Html.Attributes as HA exposing (..)
 import Html.Events.Extra.Mouse as Mouse
 import Html.Events.Extra.Touch as Touch
 import Json.Decode as D exposing (..)
+import Nixie exposing (nixieDisplay)
 import Receiver exposing (goniometerMix)
-import Skyline exposing (EdgeSegment, deriveSkyline, viewEdge, viewLineSegment)
+import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
-import Svg as S exposing (..)
-import Svg.Attributes as SA exposing (..)
 import Target exposing (..)
 import Time
-import Utils exposing (..)
 
 
 type Page
@@ -186,35 +184,6 @@ subscriptions model =
 
 type alias LineData =
     List ( Float, Float )
-
-
-rangeScale =
-    List.map
-        (\i ->
-            S.text_
-                [ x (String.fromInt (i * 50))
-                , y "-10"
-                , SA.fill "lightgreen"
-                , textAnchor "right"
-                , fontFamily "monospace"
-                ]
-                [ S.text (String.fromInt (i * 5)) ]
-        )
-        (List.range 0 19)
-
-
-scalePathToDisplay : LineData -> LineData
-scalePathToDisplay unscaled =
-    let
-        scalePoint ( x, y ) =
-            ( viewWidth * x / scaleWidthKilometers / 1000
-            , y * strengthToHeightFactor / logBase 10 (10 + y)
-              -- This adjustment is empirical.
-            )
-
-        -- TODO: constants!
-    in
-    List.map scalePoint unscaled
 
 
 
@@ -420,11 +389,11 @@ operatorPage model =
                     ]
                 ]
                 [ column [ E.centerX ]
-                    [ nixieTest 3 (truncate model.rangeSlider)
+                    [ nixieDisplay 3 (truncate model.rangeSlider)
                     , el [ E.centerX ] (E.text "RANGE")
                     ]
                 , column [ E.centerX ]
-                    [ nixieTest 3
+                    [ nixieDisplay 3
                         (modBy 360 <|
                             truncate
                                 ((model.goniometer + model.station.lineOfShoot)
@@ -437,82 +406,6 @@ operatorPage model =
                 ]
             ]
         ]
-
-
-nixieDigit d =
-    E.image
-        [ E.width (E.px 30)
-        , E.height (E.px 45)
-        ]
-        { src = "../resources/nixie" ++ String.fromInt d ++ ".png"
-        , description = ""
-        }
-
-
-toDigits digits x =
-    case digits of
-        0 ->
-            []
-
-        _ ->
-            let
-                lastDigit =
-                    modBy 10 x
-
-                precedingDigits =
-                    x // 10
-            in
-            toDigits (digits - 1) precedingDigits ++ [ lastDigit ]
-
-
-nixieTest digits value =
-    row [] <|
-        List.map
-            nixieDigit
-            (toDigits digits value)
-
-
-crt m =
-    let
-        svgPointList =
-            polyLineFromCoords m.lineData
-    in
-    svg
-        [ viewBox "-10 -40 1020 450"
-        , SA.width "1020"
-        , SA.height "420"
-        ]
-    <|
-        [ rect
-            [ x "-10"
-            , y "-40"
-            , rx "20"
-            , ry "20"
-            , SA.width "1020"
-            , SA.height "450"
-            , SA.fill "black"
-            , stroke "black"
-            , strokeWidth "3"
-            , strokeLinejoin "round"
-            ]
-            []
-        , polyline
-            [ points svgPointList
-            , SA.fill "none"
-            , stroke "forestgreen"
-            , opacity "60%"
-            , strokeWidth "2.5"
-            ]
-            []
-        , polyline
-            [ points svgPointList
-            , SA.fill "none"
-            , stroke "springgreen"
-            , strokeWidth "0.8"
-            ]
-            []
-        ]
-            ++ rangeScale
 
 
 view : Model -> Browser.Document Msg
@@ -529,7 +422,7 @@ view model =
     { title = "Chain Home emulation"
     , body =
         [ layout
-            [ Background.color darkGrey
+            [ Background.color flatMidnightBlue
             ]
           <|
             column [ E.width E.fill, spacingXY 0 20 ]

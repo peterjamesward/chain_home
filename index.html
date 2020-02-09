@@ -5342,11 +5342,11 @@ var $author$project$Config$getAllTargets = function (config) {
 			},
 			config));
 };
-var $author$project$Main$Keys = F2(
-	function (gonioClock, gonioAnti) {
-		return {gonioAnti: gonioAnti, gonioClock: gonioClock};
+var $author$project$Main$Keys = F4(
+	function (gonioClock, gonioAnti, rangeLeft, rangeRight) {
+		return {gonioAnti: gonioAnti, gonioClock: gonioClock, rangeLeft: rangeLeft, rangeRight: rangeRight};
 	});
-var $author$project$Main$noKeys = A2($author$project$Main$Keys, false, false);
+var $author$project$Main$noKeys = A4($author$project$Main$Keys, false, false, false, false);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Config$TargetSelector = F4(
@@ -6187,7 +6187,6 @@ var $author$project$Main$subscriptions = function (model) {
 			]));
 };
 var $author$project$Main$OperatorPage = {$: 'OperatorPage'};
-var $elm$core$Basics$asin = _Basics_asin;
 var $author$project$Constants$pulseDuration = 40.0;
 var $author$project$LobeFunctions$txHiVertOmniLobe = function (alpha) {
 	return $elm$core$Basics$sin(7 * alpha);
@@ -6205,9 +6204,8 @@ var $author$project$Constants$lightSpeed = 300000000.0;
 var $author$project$Constants$wavelength = $author$project$Constants$lightSpeed / $author$project$Constants$frequency;
 var $author$project$Echo$deriveEchoes = F2(
 	function (targets, time) {
-		var ph = function (rng) {
-			return $elm$core$Basics$asin(
-				$elm$core$Basics$sin((rng * time) / $author$project$Constants$wavelength));
+		var reflectedSignalAdjustment = function (rng) {
+			return $elm$core$Basics$sin(rng / $author$project$Constants$wavelength);
 		};
 		var echoFromTarget = function (target) {
 			return {
@@ -6441,6 +6439,27 @@ var $author$project$Main$scalePathToDisplay = function (unscaled) {
 	};
 	return A2($elm$core$List$map, scalePoint, unscaled);
 };
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$Main$slideRangeSlider = F2(
+	function (range, keys) {
+		var _v0 = _Utils_Tuple2(keys.rangeLeft, keys.rangeRight);
+		if (_v0.a) {
+			if (_v0.b) {
+				return range;
+			} else {
+				return A2($elm$core$Basics$max, 0.0, range - 0.5);
+			}
+		} else {
+			if (_v0.b) {
+				return A2($elm$core$Basics$min, 100.0, range + 0.5);
+			} else {
+				return range;
+			}
+		}
+	});
 var $author$project$Main$swingGoniometer = F2(
 	function (angle, keys) {
 		var _v0 = _Utils_Tuple2(keys.gonioClock, keys.gonioAnti);
@@ -6458,6 +6477,7 @@ var $author$project$Main$swingGoniometer = F2(
 			}
 		}
 	});
+var $elm$core$Basics$asin = _Basics_asin;
 var $author$project$Spherical$newPosition = F3(
 	function (_v0, d, θ) {
 		var φ1 = _v0.a;
@@ -6509,6 +6529,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 					$author$project$BeamSmoother$beamPath(newSkyline)),
 				movedTargets: targetsNow,
 				polarTargets: convertedTargets,
+				rangeSlider: A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys),
 				skyline: newSkyline,
 				startTime: (!model.startTime) ? t : model.startTime,
 				targets: $author$project$Config$getAllTargets(model.activeConfigurations),
@@ -6560,6 +6581,14 @@ var $author$project$Main$updateKeys = F3(
 				return _Utils_update(
 					keys,
 					{gonioClock: isDown});
+			case ',':
+				return _Utils_update(
+					keys,
+					{rangeLeft: isDown});
+			case '.':
+				return _Utils_update(
+					keys,
+					{rangeRight: isDown});
 			default:
 				return keys;
 		}
@@ -6619,23 +6648,24 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'GonioMove':
 				var offset = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							goniometer: function () {
-								var _v1 = model.gonioDrag;
-								if (_v1.$ === 'Nothing') {
-									return model.goniometer;
-								} else {
-									var _v2 = _v1.a;
-									var startAngle = _v2.a;
-									var startXY = _v2.b;
-									return A3($author$project$Goniometer$goniometerTurnAngle, startAngle, startXY, offset);
-								}
-							}()
-						}),
-					$elm$core$Platform$Cmd$none);
+				var _v1 = model.gonioDrag;
+				if (_v1.$ === 'Nothing') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var _v2 = _v1.a;
+					var startAngle = _v2.a;
+					var startXY = _v2.b;
+					var newAngle = A3($author$project$Goniometer$goniometerTurnAngle, startAngle, startXY, offset);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								gonioDrag: $elm$core$Maybe$Just(
+									_Utils_Tuple2(newAngle, offset)),
+								goniometer: newAngle
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
 			case 'GonioRelease':
 				var offset = msg.a;
 				return _Utils_Tuple2(
@@ -9252,10 +9282,6 @@ var $mdgriffith$elm_ui$Internal$Model$hasSmallCaps = function (typeface) {
 		return false;
 	}
 };
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
 var $mdgriffith$elm_ui$Internal$Model$renderProps = F3(
 	function (force, _v0, existing) {
 		var key = _v0.a;
@@ -12062,6 +12088,15 @@ var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
 var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
+var $mdgriffith$elm_ui$Internal$Model$Rgba = F4(
+	function (a, b, c, d) {
+		return {$: 'Rgba', a: a, b: b, c: c, d: d};
+	});
+var $mdgriffith$elm_ui$Element$rgb255 = F3(
+	function (red, green, blue) {
+		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
+	});
+var $author$project$Constants$flatMidnightBlue = A3($mdgriffith$elm_ui$Element$rgb255, 44, 62, 80);
 var $author$project$Main$DisplayReceiver = {$: 'DisplayReceiver'};
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
@@ -12238,14 +12273,6 @@ var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 			'color',
 			fontColor));
 };
-var $mdgriffith$elm_ui$Internal$Model$Rgba = F4(
-	function (a, b, c, d) {
-		return {$: 'Rgba', a: a, b: b, c: c, d: d};
-	});
-var $mdgriffith$elm_ui$Element$rgb255 = F3(
-	function (red, green, blue) {
-		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
-	});
 var $author$project$Constants$darkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
 var $mdgriffith$elm_ui$Element$el = F2(
 	function (attrs, child) {
@@ -12265,6 +12292,7 @@ var $mdgriffith$elm_ui$Element$el = F2(
 					[child])));
 	});
 var $author$project$Constants$green = A3($mdgriffith$elm_ui$Element$rgb255, 52, 164, 100);
+var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
 var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
 	function (a, b, c, d, e) {
 		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
@@ -12676,7 +12704,6 @@ var $mdgriffith$elm_ui$Element$Input$Label = F3(
 	});
 var $mdgriffith$elm_ui$Element$Input$OnRight = {$: 'OnRight'};
 var $mdgriffith$elm_ui$Element$Input$labelRight = $mdgriffith$elm_ui$Element$Input$Label($mdgriffith$elm_ui$Element$Input$OnRight);
-var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
 var $mdgriffith$elm_ui$Element$padding = function (x) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -12735,9 +12762,10 @@ var $author$project$Main$inputPage = function (model) {
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$width(
-				$mdgriffith$elm_ui$Element$px(800)),
+				$mdgriffith$elm_ui$Element$px(500)),
 				A2($mdgriffith$elm_ui$Element$spacingXY, 0, 10),
-				$mdgriffith$elm_ui$Element$centerX
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$lightCharcoal)
 			]),
 		_Utils_ap(
 			$author$project$Main$targetSelector(model.activeConfigurations),
@@ -13050,25 +13078,20 @@ var $author$project$Main$navBar = A2(
 			A2($mdgriffith$elm_ui$Element$paddingXY, 60, 10),
 			$mdgriffith$elm_ui$Element$Border$widthEach(
 			{bottom: 5, left: 0, right: 0, top: 0}),
-			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$midGray)
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$midGray),
+			$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white)
 		]),
 	_List_fromArray(
 		[
 			A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$alignLeft,
-					$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$midGray)
-				]),
+				[$mdgriffith$elm_ui$Element$alignLeft]),
 			$mdgriffith$elm_ui$Element$text('Chain Home')),
 			A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$alignRight,
-					$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$midGray)
-				]),
+				[$mdgriffith$elm_ui$Element$alignRight]),
 			$mdgriffith$elm_ui$Element$text('Menu'))
 		]));
 var $author$project$Main$GonioGrab = function (a) {
@@ -13525,12 +13548,110 @@ var $author$project$Main$crt = function (m) {
 				]),
 			$author$project$Main$rangeScale));
 };
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
 var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
 var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $mdgriffith$elm_ui$Element$image = F2(
+	function (attrs, _v0) {
+		var src = _v0.src;
+		var description = _v0.description;
+		var imageAttributes = A2(
+			$elm$core$List$filter,
+			function (a) {
+				switch (a.$) {
+					case 'Width':
+						return true;
+					case 'Height':
+						return true;
+					default:
+						return false;
+				}
+			},
+			attrs);
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.imageContainer),
+				attrs),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[
+						A4(
+						$mdgriffith$elm_ui$Internal$Model$element,
+						$mdgriffith$elm_ui$Internal$Model$asEl,
+						$mdgriffith$elm_ui$Internal$Model$NodeName('img'),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Internal$Model$Attr(
+									$elm$html$Html$Attributes$src(src)),
+									$mdgriffith$elm_ui$Internal$Model$Attr(
+									$elm$html$Html$Attributes$alt(description))
+								]),
+							imageAttributes),
+						$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
+					])));
+	});
+var $author$project$Main$nixieDigit = function (d) {
+	return A2(
+		$mdgriffith$elm_ui$Element$image,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width(
+				$mdgriffith$elm_ui$Element$px(30)),
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(45))
+			]),
+		{
+			description: '',
+			src: '../resources/nixie' + ($elm$core$String$fromInt(d) + '.png')
+		});
+};
+var $author$project$Main$toDigits = F2(
+	function (digits, x) {
+		if (!digits) {
+			return _List_Nil;
+		} else {
+			var precedingDigits = (x / 10) | 0;
+			var lastDigit = A2($elm$core$Basics$modBy, 10, x);
+			return _Utils_ap(
+				A2($author$project$Main$toDigits, digits - 1, precedingDigits),
+				_List_fromArray(
+					[lastDigit]));
+		}
+	});
+var $author$project$Main$nixieTest = F2(
+	function (digits, value) {
+		return A2(
+			$mdgriffith$elm_ui$Element$row,
+			_List_Nil,
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$nixieDigit,
+				A2($author$project$Main$toDigits, digits, value)));
+	});
 var $author$project$Main$AdjustRangeValue = function (a) {
 	return {$: 'AdjustRangeValue', a: a};
 };
@@ -14050,50 +14171,58 @@ var $mdgriffith$elm_ui$Element$Input$Thumb = function (a) {
 var $mdgriffith$elm_ui$Element$Input$thumb = $mdgriffith$elm_ui$Element$Input$Thumb;
 var $author$project$Main$rangeSlider = function (model) {
 	return A2(
-		$mdgriffith$elm_ui$Element$Input$slider,
+		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$height(
-				$mdgriffith$elm_ui$Element$px(30)),
-				$mdgriffith$elm_ui$Element$behindContent(
-				A2(
-					$mdgriffith$elm_ui$Element$el,
+			[$mdgriffith$elm_ui$Element$centerX]),
+		A2(
+			$mdgriffith$elm_ui$Element$Input$slider,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$height(
+					$mdgriffith$elm_ui$Element$px(30)),
+					$mdgriffith$elm_ui$Element$width(
+					$mdgriffith$elm_ui$Element$px(950)),
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$behindContent(
+					A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$height(
+								$mdgriffith$elm_ui$Element$px(2)),
+								$mdgriffith$elm_ui$Element$centerY,
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$midGray),
+								$mdgriffith$elm_ui$Element$Border$rounded(2)
+							]),
+						$mdgriffith$elm_ui$Element$none))
+				]),
+			{
+				label: $mdgriffith$elm_ui$Element$Input$labelHidden('Range (miles)'),
+				max: 100,
+				min: 0,
+				onChange: $author$project$Main$AdjustRangeValue,
+				step: $elm$core$Maybe$Nothing,
+				thumb: $mdgriffith$elm_ui$Element$Input$thumb(
 					_List_fromArray(
 						[
 							$mdgriffith$elm_ui$Element$width(
-							$mdgriffith$elm_ui$Element$px(940)),
+							$mdgriffith$elm_ui$Element$px(16)),
 							$mdgriffith$elm_ui$Element$height(
-							$mdgriffith$elm_ui$Element$px(2)),
-							$mdgriffith$elm_ui$Element$centerY,
-							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$lightCharcoal),
-							$mdgriffith$elm_ui$Element$Border$rounded(2)
-						]),
-					$mdgriffith$elm_ui$Element$none))
-			]),
-		{
-			label: $mdgriffith$elm_ui$Element$Input$labelHidden('Range (miles)'),
-			max: 100,
-			min: 0,
-			onChange: $author$project$Main$AdjustRangeValue,
-			step: $elm$core$Maybe$Nothing,
-			thumb: $mdgriffith$elm_ui$Element$Input$thumb(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$px(16)),
-						$mdgriffith$elm_ui$Element$height(
-						$mdgriffith$elm_ui$Element$px(50)),
-						$mdgriffith$elm_ui$Element$Border$rounded(8),
-						$mdgriffith$elm_ui$Element$Border$width(1),
-						$mdgriffith$elm_ui$Element$Border$color(
-						A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0)),
-						$mdgriffith$elm_ui$Element$Background$color(
-						A3($mdgriffith$elm_ui$Element$rgb255, 51, 51, 204))
-					])),
-			value: model.rangeSlider
-		});
+							$mdgriffith$elm_ui$Element$px(50)),
+							$mdgriffith$elm_ui$Element$Border$rounded(8),
+							$mdgriffith$elm_ui$Element$Border$width(1),
+							$mdgriffith$elm_ui$Element$Border$color(
+							A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0)),
+							$mdgriffith$elm_ui$Element$Background$color(
+							A3($mdgriffith$elm_ui$Element$rgb255, 180, 20, 20))
+						])),
+				value: model.rangeSlider
+			}));
 };
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
 var $author$project$Main$operatorPage = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$row,
@@ -14110,12 +14239,64 @@ var $author$project$Main$operatorPage = function (model) {
 				$author$project$Main$clickableGonioImage(model.goniometer + model.station.lineOfShoot)),
 				A2(
 				$mdgriffith$elm_ui$Element$column,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink)
+					]),
 				_List_fromArray(
 					[
 						$author$project$Main$rangeSlider(model),
 						$mdgriffith$elm_ui$Element$html(
-						$author$project$Main$crt(model))
+						$author$project$Main$crt(model)),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$height(
+								$mdgriffith$elm_ui$Element$px(100)),
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$spacing(50),
+								$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+								$mdgriffith$elm_ui$Element$Font$size(14),
+								$mdgriffith$elm_ui$Element$Font$family(
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$Font$typeface('monospace'),
+										$mdgriffith$elm_ui$Element$Font$sansSerif
+									]))
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$mdgriffith$elm_ui$Element$column,
+								_List_fromArray(
+									[$mdgriffith$elm_ui$Element$centerX]),
+								_List_fromArray(
+									[
+										A2($author$project$Main$nixieTest, 3, model.rangeSlider | 0),
+										A2(
+										$mdgriffith$elm_ui$Element$el,
+										_List_fromArray(
+											[$mdgriffith$elm_ui$Element$centerX]),
+										$mdgriffith$elm_ui$Element$text('RANGE'))
+									])),
+								A2(
+								$mdgriffith$elm_ui$Element$column,
+								_List_fromArray(
+									[$mdgriffith$elm_ui$Element$centerX]),
+								_List_fromArray(
+									[
+										A2(
+										$author$project$Main$nixieTest,
+										3,
+										A2($elm$core$Basics$modBy, 360, (((model.goniometer + model.station.lineOfShoot) * 180) / $elm$core$Basics$pi) | 0)),
+										A2(
+										$mdgriffith$elm_ui$Element$el,
+										_List_fromArray(
+											[$mdgriffith$elm_ui$Element$centerX]),
+										$mdgriffith$elm_ui$Element$text('BEARING'))
+									]))
+							]))
 					]))
 			]));
 };
@@ -14135,7 +14316,7 @@ var $author$project$Main$view = function (model) {
 				$mdgriffith$elm_ui$Element$layout,
 				_List_fromArray(
 					[
-						$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$lightCharcoal)
+						$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$flatMidnightBlue)
 					]),
 				A2(
 					$mdgriffith$elm_ui$Element$column,

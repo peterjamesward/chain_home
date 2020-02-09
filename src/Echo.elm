@@ -37,8 +37,10 @@ dummyInitialEcho =
 deriveEchoes : List PolarTarget -> Int -> List Echo
 deriveEchoes targets time =
     let
-        ph rng =
-            asin <| sin <| rng * toFloat time / wavelength
+        -- Ground reflection combines depending on difference in path length,
+        -- and could combine positively or destructively.
+        reflectedSignalAdjustment rng =
+            sin <| rng / wavelength
 
         echoFromTarget target =
             { r = target.r
@@ -53,6 +55,7 @@ deriveEchoes targets time =
                 abs <|
                     txHorizReflectedLobe target.theta
                         * txHiVertOmniLobe target.alpha
+                        --* (1 + 0.2 * (reflectedSignalAdjustment target.r))
             }
     in
     List.map echoFromTarget targets
