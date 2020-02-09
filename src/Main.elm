@@ -22,6 +22,7 @@ import Html as H exposing (..)
 import Html.Events.Extra.Mouse as Mouse
 import Html.Events.Extra.Touch as Touch
 import Json.Decode as D exposing (..)
+import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline)
@@ -33,19 +34,6 @@ import Time
 type Page
     = InputPage
     | OperatorPage
-
-
-type Msg
-    = NoOp
-    | SetConfigStateMsg Int Bool
-    | DisplayReceiver
-    | DisplayConfiguration
-    | Tick Time.Posix
-    | KeyChanged Bool String
-    | GonioGrab ( Float, Float )
-    | GonioMove ( Float, Float )
-    | GonioRelease ( Float, Float )
-    | AdjustRangeValue Float
 
 
 type alias Model =
@@ -363,6 +351,47 @@ rangeSlider model =
             }
 
 
+toggleSwitch : String -> Bool -> (Float -> Msg) -> E.Element Msg
+toggleSwitch switchLabel switchState switchMessage =
+    E.el [ E.centerX ] <|
+        Input.slider
+            [ E.height (E.px 40)
+            , E.width (E.px 20)
+            , E.centerX
+
+            -- Here is where we're creating/styling the "track"
+            , E.behindContent
+                (E.el
+                    [ E.height E.fill
+                    , E.width (E.px 10)
+                    , E.centerY
+                    , E.centerX
+                    , Background.color black
+                    , Border.rounded 5
+                    ]
+                    E.none
+                )
+            ]
+            { onChange = switchMessage
+            , label =
+                Input.labelBelow [ E.centerX ] (E.text switchLabel)
+            , min = 0
+            , max = 1
+            , step = Just 1
+            , value = if switchState then 1 else 0
+            , thumb =
+                Input.thumb
+                    [ E.width (E.px 20)
+                    , E.height (E.px 20)
+                    , E.centerY
+                    , Border.rounded 10
+                    , Border.width 1
+                    , Border.color flatSunflower
+                    , Background.color flatSunflower
+                    ]
+            }
+
+
 operatorPage : Model -> Element Msg
 operatorPage model =
     row
@@ -403,6 +432,7 @@ operatorPage model =
                         )
                     , el [ E.centerX ] (E.text "BEARING")
                     ]
+                , toggleSwitch "TEST" True AdjustRangeValue
                 ]
             ]
         ]
@@ -500,7 +530,7 @@ inputPage model =
         targetSelector model.activeConfigurations
             ++ [ Input.button
                     [ Background.color green
-                    , Border.color darkGreen
+                    , Border.color vividGreen
                     , Border.rounded 3
                     , Border.widthEach { bottom = 3, top = 0, right = 0, left = 0 }
                     , Font.bold
