@@ -13317,70 +13317,31 @@ var $author$project$Goniometer$drawGoniometerPointer = function (theta) {
 			_List_Nil)
 		]);
 };
-var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
-var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Goniometer$drawGoniometerScale = function () {
-	var radius = 160;
-	var originY = 0;
-	var yFromIndex = function (i) {
-		return $elm$core$String$fromFloat(
-			(originY + 4) - (radius * $elm$core$Basics$cos(
-				$elm$core$Basics$degrees(i * 10))));
-	};
-	var originX = 0;
-	var xFromIndex = function (i) {
-		return $elm$core$String$fromFloat(
-			originX + (radius * $elm$core$Basics$sin(
-				$elm$core$Basics$degrees(i * 10))));
-	};
-	var labelPoint = function (i) {
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					xFromIndex(i)),
-					$elm$svg$Svg$Attributes$y(
-					yFromIndex(i)),
-					$elm$svg$Svg$Attributes$fill('antiquewhite'),
-					$elm$svg$Svg$Attributes$textAnchor('middle'),
-					$elm$svg$Svg$Attributes$fontFamily('monospace'),
-					$elm$svg$Svg$Attributes$fontSize('12pt')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromInt(i * 10))
-				]));
-	};
-	return A2(
-		$elm$core$List$cons,
-		A2(
-			$elm$svg$Svg$circle,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$cx('0'),
-					$elm$svg$Svg$Attributes$cy('0'),
-					$elm$svg$Svg$Attributes$r('180'),
-					$elm$svg$Svg$Attributes$stroke('grey'),
-					$elm$svg$Svg$Attributes$strokeWidth('1'),
-					$elm$svg$Svg$Attributes$fill('dimgrey')
-				]),
-			_List_Nil),
-		A2(
-			$elm$core$List$map,
-			labelPoint,
-			A2($elm$core$List$range, 0, 35)));
-}();
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
+	return A3(
+		_VirtualDom_attributeNS,
+		'http://www.w3.org/1999/xlink',
+		'xlink:href',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Goniometer$drawGoniometerScale = A2(
+	$elm$svg$Svg$image,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$x('-190'),
+			$elm$svg$Svg$Attributes$y('-190'),
+			$elm$svg$Svg$Attributes$width('380'),
+			$elm$svg$Svg$Attributes$height('380'),
+			$elm$svg$Svg$Attributes$xlinkHref('../resources/goniometer.png')
+		]),
+	_List_Nil);
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Goniometer$drawGoniometer = function (theta) {
 	return A2(
 		$elm$svg$Svg$svg,
@@ -13390,7 +13351,8 @@ var $author$project$Goniometer$drawGoniometer = function (theta) {
 				$elm$svg$Svg$Attributes$width('100%'),
 				$elm$svg$Svg$Attributes$height('100%')
 			]),
-		_Utils_ap(
+		A2(
+			$elm$core$List$cons,
 			$author$project$Goniometer$drawGoniometerScale,
 			$author$project$Goniometer$drawGoniometerPointer(theta)));
 };
@@ -13608,6 +13570,10 @@ var $author$project$Utils$polyLineFromCoords = function (coords) {
 		A2($elm$core$List$map, $author$project$Utils$stringifyPoint, coords));
 };
 var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
+var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$CRT$rangeScale = A2(
 	$elm$core$List$map,
 	function (i) {
@@ -14268,36 +14234,6 @@ var $author$project$Main$rangeSlider = function (model) {
 			value: model.rangeSlider
 		});
 };
-var $author$project$Main$showMouseCoordinates = function (model) {
-	var _v0 = A2(
-		$elm$core$Maybe$withDefault,
-		_Utils_Tuple2(
-			0,
-			_Utils_Tuple2(0, 0)),
-		model.gonioDrag);
-	var _v1 = _v0.b;
-	var x = _v1.a;
-	var y = _v1.b;
-	return A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[$mdgriffith$elm_ui$Element$centerX]),
-		_List_fromArray(
-			[
-				A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$centerX]),
-				$mdgriffith$elm_ui$Element$text('X')),
-				A2($author$project$Nixie$nixieDisplay, 4, x | 0),
-				A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$centerX]),
-				$mdgriffith$elm_ui$Element$text('Y')),
-				A2($author$project$Nixie$nixieDisplay, 4, y | 0)
-			]));
-};
 var $mdgriffith$elm_ui$Element$spaceEvenly = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$spacing, $mdgriffith$elm_ui$Internal$Style$classes.spaceEvenly);
 var $author$project$Constants$black = A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 0);
 var $mdgriffith$elm_ui$Element$Input$Below = {$: 'Below'};
@@ -14427,7 +14363,6 @@ var $author$project$Main$operatorPageLandscape = function (model) {
 							]),
 						$mdgriffith$elm_ui$Element$html(
 							$author$project$Main$clickableGonioImage(model.goniometer + model.station.lineOfShoot))),
-						$author$project$Main$showMouseCoordinates(model),
 						A2(
 						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
