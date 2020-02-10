@@ -352,52 +352,63 @@ rangeSlider model =
             }
 
 
-
 operatorPage : Model -> Element Msg
 operatorPage model =
-    row
+    let
+        rangeDisplay =
+            column [ E.centerX ]
+                [ nixieDisplay 3 (truncate model.rangeSlider)
+                , el [ E.centerX ] (E.text "RANGE")
+                ]
+
+        bearingDisplay =
+            column [ E.centerX ]
+                [ nixieDisplay 3
+                    (modBy 360 <|
+                        truncate
+                            ((model.goniometer + model.station.lineOfShoot)
+                                * 180
+                                / pi
+                            )
+                    )
+                , el [ E.centerX ] (E.text "BEARING")
+                ]
+    in
+    column
         [ E.spacing 10
         , E.padding 10
         , E.width E.fill
         , E.centerX
-        ]
-        [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
-        , column
-            [ E.width E.shrink
+        , Font.color paletteSand
+        , Font.size 14
+        , Font.family
+            [ Font.typeface "monospace"
+            , Font.sansSerif
             ]
-            [ rangeSlider model
-            , E.html (crt model)
-            , row
-                [ E.height (E.px 100)
-                , E.centerX
-                , E.spacing 50
-                , Font.color white
-                , Font.size 14
-                , Font.family
-                    [ Font.typeface "monospace"
-                    , Font.sansSerif
-                    ]
+        ]
+        [ row
+            []
+            [ column
+                []
+                [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
+                , toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
                 ]
-                [ column [ E.centerX ]
-                    [ nixieDisplay 3 (truncate model.rangeSlider)
-                    , el [ E.centerX ] (E.text "RANGE")
-                    ]
-                , column [ E.centerX ]
-                    [ nixieDisplay 3
-                        (modBy 360 <|
-                            truncate
-                                ((model.goniometer + model.station.lineOfShoot)
-                                    * 180
-                                    / pi
-                                )
-                        )
-                    , el [ E.centerX ] (E.text "BEARING")
-                    ]
-                , toggleSwitch "TEST" True AdjustRangeValue
-                , toggleSwitch "TEST" True AdjustRangeValue
-                , toggleSwitch "TEST" True AdjustRangeValue
-                , toggleSwitch "TEST" True AdjustRangeValue
+            , column
+                []
+                [ rangeSlider model
+                , E.html (crt model)
                 ]
+            ]
+        , row
+            [ E.height (E.px 100)
+            , E.centerX
+            , E.spacing 50
+            ]
+            [ toggleSwitch "OFF" "TEST" True AdjustRangeValue
+            , toggleSwitch "A" "B" True AdjustRangeValue
+            , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
+            , rangeDisplay
+            , bearingDisplay
             ]
         ]
 
@@ -493,12 +504,12 @@ inputPage model =
     <|
         targetSelector model.activeConfigurations
             ++ [ Input.button
-                    [ Background.color green
-                    , Border.color vividGreen
+                    [ Background.color paletteDarkGreen
+                    , Border.color paletteLightGreen
                     , Border.rounded 3
-                    , Border.widthEach { bottom = 3, top = 0, right = 0, left = 0 }
+                    , Border.widthEach { bottom = 3, top = 2, right = 3, left = 2 }
                     , Font.bold
-                    , Font.color white
+                    , Font.color paletteLightGreen
                     , paddingXY 20 6
                     , alignRight
                     , E.width (px 200)

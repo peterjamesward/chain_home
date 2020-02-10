@@ -50,3 +50,15 @@ vividGreen = rgb255 36 200 33
 white = rgb255 200 200 200
 
 midGray =  rgb255 80 80 80
+
+flatWetAsphalt = rgb255 52 73 94
+
+-- These four colours from W3C 2018 palettes.
+
+paletteGrey = rgb255 62 62 68
+
+paletteLightGreen = rgb255 130 183 75
+
+paletteDarkGreen = rgb255 64 93 39
+
+paletteSand = rgb255 193 148 106

@@ -1,17 +1,7 @@
-module Goniometer exposing (drawGoniometer, showGonioValue, goniometerTurnAngle)
+module Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 
-import Html exposing (..)
-import Html.Attributes as H exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as S exposing (..)
-
-
-
--- DEBUG
-
-
-showGonioValue m =
-    Html.text <| String.fromInt <| truncate <| m.goniometer * 180.0 / pi
 
 
 
@@ -126,6 +116,7 @@ drawGoniometerScale =
         []
         :: List.map labelPoint (List.range 0 35)
 
+
 goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
 goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
     let
@@ -139,4 +130,3 @@ goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
         -- where that point is now
     in
     startAngle + dragNowAngle - dragStartAngle
-
