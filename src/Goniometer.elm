@@ -14,7 +14,9 @@ drawGoniometer theta =
         , S.width "100%"
         , S.height "100%"
         ]
-        (drawGoniometerScale ++ drawGoniometerPointer theta)
+    <|
+        drawGoniometerScale
+            :: drawGoniometerPointer theta
 
 
 drawGoniometerPointer theta =
@@ -46,7 +48,7 @@ drawGoniometerPointer theta =
         , r "140"
         , stroke "grey"
         , strokeWidth "1"
-        , fill "darkslategrey"
+        , S.fill "darkslategrey"
         ]
         []
     , Svg.line
@@ -62,59 +64,19 @@ drawGoniometerPointer theta =
     ]
 
 
+
+-- Image inside SVG.
+
+
 drawGoniometerScale =
-    let
-        originX =
-            0
-
-        originY =
-            0
-
-        radius =
-            160
-
-        xFromIndex i =
-            String.fromFloat <|
-                (+) originX <|
-                    (*) radius <|
-                        sin <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        yFromIndex i =
-            String.fromFloat <|
-                (-) (originY + 4) <|
-                    (*) radius <|
-                        cos <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        labelPoint i =
-            Svg.text_
-                [ x <| xFromIndex i
-                , y <| yFromIndex i
-                , fill "antiquewhite"
-                , textAnchor "middle"
-                , fontFamily "monospace"
-                , fontSize "12pt"
-                ]
-                [ Svg.text (String.fromInt (i * 10))
-                ]
-    in
-    Svg.circle
-        [ cx "0"
-        , cy "0"
-        , r "180"
-        , stroke "grey"
-        , strokeWidth "1"
-        , fill "dimgrey"
+    Svg.image
+        [ x "-190"
+        , y "-190"
+        , S.width "380"
+        , S.height "380"
+        , xlinkHref "../resources/goniometer.png"
         ]
         []
-        :: List.map labelPoint (List.range 0 35)
 
 
 goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
