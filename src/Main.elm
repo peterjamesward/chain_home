@@ -322,42 +322,42 @@ clickableGonioImage theta =
 
 
 rangeSlider model =
-    E.el [ E.centerX ] <|
-        Input.slider
-            [ E.height (E.px 30)
-            , E.width (E.px 950)
-            , E.centerX
+    --E.el [ E.centerX, E.width fill ] <|
+    Input.slider
+        [ E.height (E.px 30)
+        , E.width E.fill --(E.px 950)
+        , E.centerX
 
-            -- Here is where we're creating/styling the "track"
-            , E.behindContent
-                (E.el
-                    [ E.width E.fill
-                    , E.height (E.px 2)
-                    , E.centerY
-                    , E.centerX
-                    , Background.color midGray
-                    , Border.rounded 2
-                    ]
-                    E.none
-                )
-            ]
-            { onChange = AdjustRangeValue
-            , label =
-                Input.labelHidden "Range (miles)"
-            , min = 0
-            , max = 100
-            , step = Nothing
-            , value = model.rangeSlider
-            , thumb =
-                Input.thumb
-                    [ E.width (E.px 16)
-                    , E.height (E.px 50)
-                    , Border.rounded 8
-                    , Border.width 1
-                    , Border.color <| E.rgb 0 0 0
-                    , Background.color <| E.rgb255 180 20 20
-                    ]
-            }
+        -- Here is where we're creating/styling the "track"
+        , E.behindContent
+            (E.el
+                [ E.width E.fill
+                , E.height (E.px 2)
+                , E.centerY
+                , E.centerX
+                , Background.color midGray
+                , Border.rounded 2
+                ]
+                E.none
+            )
+        ]
+        { onChange = AdjustRangeValue
+        , label =
+            Input.labelHidden "Range (miles)"
+        , min = 0
+        , max = 100
+        , step = Nothing
+        , value = model.rangeSlider
+        , thumb =
+            Input.thumb
+                [ E.width (E.px 16)
+                , E.height (E.px 50)
+                , Border.rounded 8
+                , Border.width 1
+                , Border.color <| E.rgb 0 0 0
+                , Background.color <| E.rgb255 180 20 20
+                ]
+        }
 
 
 rangeDisplay model =
@@ -400,10 +400,15 @@ operatorPageLandscape model =
     column
         commonStyles
         [ row
-            []
-            [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
+            [ E.width E.fill
+            ]
+            [ E.el [ E.width <| fillPortion 1 ] <|
+                E.html <|
+                    clickableGonioImage <|
+                        model.goniometer
+                            + model.station.lineOfShoot
             , column
-                []
+                [ E.width <| E.fillPortion 3 ]
                 [ rangeSlider model
                 , E.html (crt model)
                 ]
@@ -432,7 +437,8 @@ operatorPagePortrait model =
         , E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
         , row
             [ E.height (E.px 100)
-            , E.centerX
+
+            --, E.centerX
             , E.spacing 50
             ]
             [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue

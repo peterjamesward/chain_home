@@ -11,8 +11,8 @@ import Svg.Attributes as S exposing (..)
 drawGoniometer theta =
     svg
         [ viewBox "-200 -200 400 400"
-        , S.width "300"
-        , S.height "300"
+        , S.width "100%"
+        , S.height "100%"
         ]
         (drawGoniometerScale ++ drawGoniometerPointer theta)
 
