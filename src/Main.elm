@@ -4,6 +4,8 @@ module Main exposing (main)
    This Main module now based on the elm-ui example by Alex Korban
    in his book "Practical Elm"".
 -}
+-- TODO: Add another knob to move the range slider.
+--import Html.Events.Extra.Touch as Touch
 
 import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
@@ -20,7 +22,7 @@ import Element.Input as Input
 import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 import Html as H exposing (..)
 import Html.Events.Extra.Mouse as Mouse
-import Html.Events.Extra.Touch as Touch
+import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D exposing (..)
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
@@ -300,23 +302,20 @@ update msg model =
 
 
 -- VIEW
-
-
-touchCoordinates : Touch.Event -> ( Float, Float )
-touchCoordinates touchEvent =
-    List.head touchEvent.changedTouches
-        |> Maybe.map .clientPos
-        |> Maybe.withDefault ( 0, 0 )
+{- type alias Touch =
+   { identifier : Int
+   , clientPos : ( Float, Float )
+   , pagePos : ( Float, Float )
+   , screenPos : ( Float, Float )
+   }
+-}
 
 
 clickableGonioImage theta =
     div
-        [ Mouse.onDown (\event -> GonioGrab event.offsetPos)
-        , Mouse.onMove (\event -> GonioMove event.offsetPos)
-        , Mouse.onUp (\event -> GonioRelease event.offsetPos)
-        , Touch.onStart (GonioGrab << touchCoordinates)
-        , Touch.onMove (GonioMove << touchCoordinates)
-        , Touch.onEnd (GonioRelease << touchCoordinates)
+        [ Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
+        , Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
+        , Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
         ]
         [ drawGoniometer theta ]
 
@@ -325,7 +324,7 @@ rangeSlider model =
     --E.el [ E.centerX, E.width fill ] <|
     Input.slider
         [ E.height (E.px 30)
-        , E.width E.fill --(E.px 950)
+        , E.width E.fill
         , E.centerX
 
         -- Here is where we're creating/styling the "track"
@@ -367,6 +366,19 @@ rangeDisplay model =
         ]
 
 
+showMouseCoordinates model =
+    let
+        ( _, ( x, y ) ) =
+            Maybe.withDefault ( 0, ( 0, 0 ) ) model.gonioDrag
+    in
+    column [ E.centerX ]
+        [ el [ E.centerX ] (E.text "X")
+        , nixieDisplay 4 (truncate x)
+        , el [ E.centerX ] (E.text "Y")
+        , nixieDisplay 4 (truncate y)
+        ]
+
+
 bearingDisplay model =
     column [ E.centerX ]
         [ nixieDisplay 3
@@ -382,8 +394,8 @@ bearingDisplay model =
 
 
 commonStyles =
-    [ E.spacing 10
-    , E.padding 10
+    [ E.spacing 20
+    , E.padding 30
     , E.width E.fill
     , E.centerX
     , Font.color paletteSand
@@ -400,30 +412,35 @@ operatorPageLandscape model =
     column
         commonStyles
         [ row
-            [ E.width E.fill
+            [ E.width E.fill ]
+            [ el [ E.width <| E.fillPortion 1 ] none
+            , column
+                [ E.width <| E.fillPortion 5 ]
+                [ rangeSlider model
+                , E.html (crt model)
+                ]
+            , el [ E.width <| E.fillPortion 1 ] none
             ]
-            [ E.el [ E.width <| fillPortion 1 ] <|
+        , row
+            [ E.centerX
+            , E.spacing 50
+            ]
+            [ E.el [ E.width <| fillPortion 3 ] <|
                 E.html <|
                     clickableGonioImage <|
                         model.goniometer
                             + model.station.lineOfShoot
-            , column
-                [ E.width <| E.fillPortion 3 ]
-                [ rangeSlider model
-                , E.html (crt model)
+            , showMouseCoordinates model
+            , row [ E.width <| fillPortion <| 3, E.spaceEvenly ]
+                [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
+                , toggleSwitch "OFF" "TEST" True AdjustRangeValue
+                , toggleSwitch "A" "B" True AdjustRangeValue
+                , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
                 ]
-            ]
-        , row
-            [ E.height (E.px 100)
-            , E.centerX
-            , E.spacing 50
-            ]
-            [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
-            , toggleSwitch "OFF" "TEST" True AdjustRangeValue
-            , toggleSwitch "A" "B" True AdjustRangeValue
-            , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
-            , rangeDisplay model
-            , bearingDisplay model
+            , column [ E.width <| fillPortion <| 1 ]
+                [ rangeDisplay model
+                , bearingDisplay model
+                ]
             ]
         ]
 

@@ -121,11 +121,11 @@ goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
 goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
     let
         ( _, dragStartAngle ) =
-            toPolar ( startX - 150, startY - 150 )
+            toPolar ( startX - 130, startY - 130 )
 
         -- where on control was clicked
         ( _, dragNowAngle ) =
-            toPolar ( newX - 150, newY - 150 )
+            toPolar ( newX - 130, newY - 130 )
 
         -- where that point is now
     in

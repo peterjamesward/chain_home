@@ -6592,10 +6592,10 @@ var $author$project$Goniometer$goniometerTurnAngle = F3(
 		var newX = _v1.a;
 		var newY = _v1.b;
 		var _v2 = $elm$core$Basics$toPolar(
-			_Utils_Tuple2(startX - 150, startY - 150));
+			_Utils_Tuple2(startX - 130, startY - 130));
 		var dragStartAngle = _v2.b;
 		var _v3 = $elm$core$Basics$toPolar(
-			_Utils_Tuple2(newX - 150, newY - 150));
+			_Utils_Tuple2(newX - 130, newY - 130));
 		var dragNowAngle = _v3.b;
 		return (startAngle + dragNowAngle) - dragStartAngle;
 	});
@@ -13150,6 +13150,113 @@ var $author$project$Main$navBar = A2(
 var $author$project$Messages$AdjustRangeValue = function (a) {
 	return {$: 'AdjustRangeValue', a: a};
 };
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $mdgriffith$elm_ui$Element$image = F2(
+	function (attrs, _v0) {
+		var src = _v0.src;
+		var description = _v0.description;
+		var imageAttributes = A2(
+			$elm$core$List$filter,
+			function (a) {
+				switch (a.$) {
+					case 'Width':
+						return true;
+					case 'Height':
+						return true;
+					default:
+						return false;
+				}
+			},
+			attrs);
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.imageContainer),
+				attrs),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[
+						A4(
+						$mdgriffith$elm_ui$Internal$Model$element,
+						$mdgriffith$elm_ui$Internal$Model$asEl,
+						$mdgriffith$elm_ui$Internal$Model$NodeName('img'),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Internal$Model$Attr(
+									$elm$html$Html$Attributes$src(src)),
+									$mdgriffith$elm_ui$Internal$Model$Attr(
+									$elm$html$Html$Attributes$alt(description))
+								]),
+							imageAttributes),
+						$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
+					])));
+	});
+var $author$project$Nixie$nixieDigit = function (d) {
+	return A2(
+		$mdgriffith$elm_ui$Element$image,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width(
+				$mdgriffith$elm_ui$Element$px(30)),
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(45))
+			]),
+		{
+			description: '',
+			src: '../resources/nixie' + ($elm$core$String$fromInt(d) + '.png')
+		});
+};
+var $author$project$Nixie$toDigits = F2(
+	function (digits, x) {
+		if (!digits) {
+			return _List_Nil;
+		} else {
+			var precedingDigits = (x / 10) | 0;
+			var lastDigit = A2($elm$core$Basics$modBy, 10, x);
+			return _Utils_ap(
+				A2($author$project$Nixie$toDigits, digits - 1, precedingDigits),
+				_List_fromArray(
+					[lastDigit]));
+		}
+	});
+var $author$project$Nixie$nixieDisplay = F2(
+	function (digits, value) {
+		return A2(
+			$mdgriffith$elm_ui$Element$row,
+			_List_Nil,
+			A2(
+				$elm$core$List$map,
+				$author$project$Nixie$nixieDigit,
+				A2($author$project$Nixie$toDigits, digits, value)));
+	});
+var $author$project$Main$bearingDisplay = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[$mdgriffith$elm_ui$Element$centerX]),
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Nixie$nixieDisplay,
+				3,
+				A2($elm$core$Basics$modBy, 360, (((model.goniometer + model.station.lineOfShoot) * 180) / $elm$core$Basics$pi) | 0)),
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('BEARING'))
+			]));
+};
 var $author$project$Messages$GonioGrab = function (a) {
 	return {$: 'GonioGrab', a: a};
 };
@@ -13280,14 +13387,14 @@ var $author$project$Goniometer$drawGoniometer = function (theta) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$viewBox('-200 -200 400 400'),
-				$elm$svg$Svg$Attributes$width('300'),
-				$elm$svg$Svg$Attributes$height('300')
+				$elm$svg$Svg$Attributes$width('100%'),
+				$elm$svg$Svg$Attributes$height('100%')
 			]),
 		_Utils_ap(
 			$author$project$Goniometer$drawGoniometerScale,
 			$author$project$Goniometer$drawGoniometerPointer(theta)));
 };
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
 };
@@ -13298,6 +13405,25 @@ var $elm$html$Html$Events$custom = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Custom(decoder));
 	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event = F5(
+	function (pointerType, pointer, pointerId, isPrimary, contactDetails) {
+		return {contactDetails: contactDetails, isPrimary: isPrimary, pointer: pointer, pointerId: pointerId, pointerType: pointerType};
+	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails = F5(
+	function (width, height, pressure, tiltX, tiltY) {
+		return {height: height, pressure: pressure, tiltX: tiltX, tiltY: tiltY, width: width};
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$json$Json$Decode$map5 = _Json_map5;
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder = A6(
+	$elm$json$Json$Decode$map5,
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails,
+	A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float));
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event = F6(
 	function (keys, button, clientPos, offsetPos, pagePos, screenPos) {
 		return {button: button, clientPos: clientPos, keys: keys, offsetPos: offsetPos, pagePos: pagePos, screenPos: screenPos};
@@ -13328,7 +13454,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder = A2(
 	$elm$json$Json$Decode$map,
 	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId,
 	A2($elm$json$Json$Decode$field, 'button', $elm$json$Json$Decode$int));
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $mpizenberg$elm_pointer_events$Internal$Decode$clientPos = A3(
 	$elm$json$Json$Decode$map2,
 	F2(
@@ -13341,7 +13466,6 @@ var $mpizenberg$elm_pointer_events$Internal$Decode$Keys = F3(
 	function (alt, ctrl, shift) {
 		return {alt: alt, ctrl: ctrl, shift: shift};
 	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$map3 = _Json_map3;
 var $mpizenberg$elm_pointer_events$Internal$Decode$keys = A4(
 	$elm$json$Json$Decode$map3,
@@ -13375,7 +13499,29 @@ var $mpizenberg$elm_pointer_events$Internal$Decode$screenPos = A3(
 	A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
 	A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float));
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder = A7($elm$json$Json$Decode$map6, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event, $mpizenberg$elm_pointer_events$Internal$Decode$keys, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder, $mpizenberg$elm_pointer_events$Internal$Decode$clientPos, $mpizenberg$elm_pointer_events$Internal$Decode$offsetPos, $mpizenberg$elm_pointer_events$Internal$Decode$pagePos, $mpizenberg$elm_pointer_events$Internal$Decode$screenPos);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType = {$: 'MouseType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType = {$: 'PenType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType = {$: 'TouchType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType = function (str) {
+	switch (str) {
+		case 'pen':
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType;
+		case 'touch':
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType;
+		default:
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType;
+	}
+};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder = A2($elm$json$Json$Decode$map, $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType, $elm$json$Json$Decode$string);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder = A6(
+	$elm$json$Json$Decode$map5,
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event,
+	A2($elm$json$Json$Decode$field, 'pointerType', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder),
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder,
+	A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions = F3(
 	function (event, options, tag) {
 		return A2(
 			$elm$html$Html$Events$custom,
@@ -13389,127 +13535,61 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 						stopPropagation: options.stopPropagation
 					};
 				},
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder));
 	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions = {preventDefault: true, stopPropagation: false};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$Event = F4(
-	function (keys, changedTouches, targetTouches, touches) {
-		return {changedTouches: changedTouches, keys: keys, targetTouches: targetTouches, touches: touches};
-	});
-var $elm$json$Json$Decode$map4 = _Json_map4;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$Touch = F4(
-	function (identifier, clientPos, pagePos, screenPos) {
-		return {clientPos: clientPos, identifier: identifier, pagePos: pagePos, screenPos: screenPos};
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchDecoder = A5(
-	$elm$json$Json$Decode$map4,
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$Touch,
-	A2($elm$json$Json$Decode$field, 'identifier', $elm$json$Json$Decode$int),
-	$mpizenberg$elm_pointer_events$Internal$Decode$clientPos,
-	$mpizenberg$elm_pointer_events$Internal$Decode$pagePos,
-	$mpizenberg$elm_pointer_events$Internal$Decode$screenPos);
-var $mpizenberg$elm_pointer_events$Internal$Decode$all = A2(
-	$elm$core$List$foldr,
-	$elm$json$Json$Decode$map2($elm$core$List$cons),
-	$elm$json$Json$Decode$succeed(_List_Nil));
-var $mpizenberg$elm_pointer_events$Internal$Decode$dynamicListOf = function (itemDecoder) {
-	var decodeOne = function (n) {
-		return A2(
-			$elm$json$Json$Decode$field,
-			$elm$core$String$fromInt(n),
-			itemDecoder);
-	};
-	var decodeN = function (n) {
-		return $mpizenberg$elm_pointer_events$Internal$Decode$all(
-			A2(
-				$elm$core$List$map,
-				decodeOne,
-				A2($elm$core$List$range, 0, n - 1)));
-	};
-	return A2(
-		$elm$json$Json$Decode$andThen,
-		decodeN,
-		A2($elm$json$Json$Decode$field, 'length', $elm$json$Json$Decode$int));
-};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchListDecoder = $mpizenberg$elm_pointer_events$Internal$Decode$dynamicListOf;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$eventDecoder = A5(
-	$elm$json$Json$Decode$map4,
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$Event,
-	$mpizenberg$elm_pointer_events$Internal$Decode$keys,
-	A2(
-		$elm$json$Json$Decode$field,
-		'changedTouches',
-		$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchListDecoder($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchDecoder)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'targetTouches',
-		$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchListDecoder($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchDecoder)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'touches',
-		$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchListDecoder($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$touchDecoder)));
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions = F3(
-	function (event, options, tag) {
-		return A2(
-			$elm$html$Html$Events$custom,
-			event,
-			A2(
-				$elm$json$Json$Decode$map,
-				function (ev) {
-					return {
-						message: tag(ev),
-						preventDefault: options.preventDefault,
-						stopPropagation: options.stopPropagation
-					};
-				},
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$eventDecoder));
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchend', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchmove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchstart', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Main$touchCoordinates = function (touchEvent) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		_Utils_Tuple2(0, 0),
-		A2(
-			$elm$core$Maybe$map,
-			function ($) {
-				return $.clientPos;
-			},
-			$elm$core$List$head(touchEvent.changedTouches)));
-};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerdown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointermove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $author$project$Main$clickableGonioImage = function (theta) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown(
 				function (event) {
-					return $author$project$Messages$GonioGrab(event.offsetPos);
+					return $author$project$Messages$GonioGrab(event.pointer.offsetPos);
 				}),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove(
 				function (event) {
-					return $author$project$Messages$GonioMove(event.offsetPos);
+					return $author$project$Messages$GonioMove(event.pointer.offsetPos);
 				}),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp(
 				function (event) {
-					return $author$project$Messages$GonioRelease(event.offsetPos);
-				}),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
-				A2($elm$core$Basics$composeL, $author$project$Messages$GonioGrab, $author$project$Main$touchCoordinates)),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
-				A2($elm$core$Basics$composeL, $author$project$Messages$GonioMove, $author$project$Main$touchCoordinates)),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
-				A2($elm$core$Basics$composeL, $author$project$Messages$GonioRelease, $author$project$Main$touchCoordinates))
+					return $author$project$Messages$GonioRelease(event.pointer.offsetPos);
+				})
 			]),
 		_List_fromArray(
 			[
 				$author$project$Goniometer$drawGoniometer(theta)
 			]));
 };
+var $mdgriffith$elm_ui$Element$Font$family = function (families) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
+		A2(
+			$mdgriffith$elm_ui$Internal$Model$FontFamily,
+			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
+			families));
+};
+var $author$project$Constants$paletteSand = A3($mdgriffith$elm_ui$Element$rgb255, 193, 148, 106);
+var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
+var $author$project$Main$commonStyles = _List_fromArray(
+	[
+		$mdgriffith$elm_ui$Element$spacing(20),
+		$mdgriffith$elm_ui$Element$padding(30),
+		$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+		$mdgriffith$elm_ui$Element$centerX,
+		$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteSand),
+		$mdgriffith$elm_ui$Element$Font$size(14),
+		$mdgriffith$elm_ui$Element$Font$family(
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Font$typeface('monospace'),
+				$mdgriffith$elm_ui$Element$Font$sansSerif
+			]))
+	]);
 var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var $author$project$Utils$stringifyPoint = function (_v0) {
@@ -13557,8 +13637,8 @@ var $author$project$CRT$crt = function (m) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$viewBox('-10 -40 1020 450'),
-				$elm$svg$Svg$Attributes$width('1020'),
-				$elm$svg$Svg$Attributes$height('420')
+				$elm$svg$Svg$Attributes$width('100%'),
+				$elm$svg$Svg$Attributes$height('100%')
 			]),
 		_Utils_ap(
 			_List_fromArray(
@@ -13603,111 +13683,28 @@ var $author$project$CRT$crt = function (m) {
 				]),
 			$author$project$CRT$rangeScale));
 };
-var $mdgriffith$elm_ui$Element$Font$family = function (families) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$fontFamily,
-		A2(
-			$mdgriffith$elm_ui$Internal$Model$FontFamily,
-			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
-			families));
-};
+var $mdgriffith$elm_ui$Element$fillPortion = $mdgriffith$elm_ui$Internal$Model$Fill;
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
 var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
 var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
-var $elm$html$Html$Attributes$src = function (url) {
+var $author$project$Main$rangeDisplay = function (model) {
 	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $mdgriffith$elm_ui$Element$image = F2(
-	function (attrs, _v0) {
-		var src = _v0.src;
-		var description = _v0.description;
-		var imageAttributes = A2(
-			$elm$core$List$filter,
-			function (a) {
-				switch (a.$) {
-					case 'Width':
-						return true;
-					case 'Height':
-						return true;
-					default:
-						return false;
-				}
-			},
-			attrs);
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asEl,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.imageContainer),
-				attrs),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[
-						A4(
-						$mdgriffith$elm_ui$Internal$Model$element,
-						$mdgriffith$elm_ui$Internal$Model$asEl,
-						$mdgriffith$elm_ui$Internal$Model$NodeName('img'),
-						_Utils_ap(
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Internal$Model$Attr(
-									$elm$html$Html$Attributes$src(src)),
-									$mdgriffith$elm_ui$Internal$Model$Attr(
-									$elm$html$Html$Attributes$alt(description))
-								]),
-							imageAttributes),
-						$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil))
-					])));
-	});
-var $author$project$Nixie$nixieDigit = function (d) {
-	return A2(
-		$mdgriffith$elm_ui$Element$image,
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[$mdgriffith$elm_ui$Element$centerX]),
 		_List_fromArray(
 			[
-				$mdgriffith$elm_ui$Element$width(
-				$mdgriffith$elm_ui$Element$px(30)),
-				$mdgriffith$elm_ui$Element$height(
-				$mdgriffith$elm_ui$Element$px(45))
-			]),
-		{
-			description: '',
-			src: '../resources/nixie' + ($elm$core$String$fromInt(d) + '.png')
-		});
-};
-var $author$project$Nixie$toDigits = F2(
-	function (digits, x) {
-		if (!digits) {
-			return _List_Nil;
-		} else {
-			var precedingDigits = (x / 10) | 0;
-			var lastDigit = A2($elm$core$Basics$modBy, 10, x);
-			return _Utils_ap(
-				A2($author$project$Nixie$toDigits, digits - 1, precedingDigits),
+				A2($author$project$Nixie$nixieDisplay, 3, model.rangeSlider | 0),
+				A2(
+				$mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
-					[lastDigit]));
-		}
-	});
-var $author$project$Nixie$nixieDisplay = F2(
-	function (digits, value) {
-		return A2(
-			$mdgriffith$elm_ui$Element$row,
-			_List_Nil,
-			A2(
-				$elm$core$List$map,
-				$author$project$Nixie$nixieDigit,
-				A2($author$project$Nixie$toDigits, digits, value)));
-	});
-var $author$project$Constants$paletteSand = A3($mdgriffith$elm_ui$Element$rgb255, 193, 148, 106);
+					[$mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('RANGE'))
+			]));
+};
 var $mdgriffith$elm_ui$Internal$Model$Behind = {$: 'Behind'};
 var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
 	function (a, b) {
@@ -13837,7 +13834,6 @@ var $elm$html$Html$Attributes$step = function (n) {
 var $elm$core$String$toFloat = _String_toFloat;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $mdgriffith$elm_ui$Element$fillPortion = $mdgriffith$elm_ui$Internal$Model$Fill;
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $mdgriffith$elm_ui$Internal$Model$map = F2(
 	function (fn, el) {
@@ -14224,57 +14220,82 @@ var $mdgriffith$elm_ui$Element$Input$Thumb = function (a) {
 var $mdgriffith$elm_ui$Element$Input$thumb = $mdgriffith$elm_ui$Element$Input$Thumb;
 var $author$project$Main$rangeSlider = function (model) {
 	return A2(
-		$mdgriffith$elm_ui$Element$el,
+		$mdgriffith$elm_ui$Element$Input$slider,
 		_List_fromArray(
-			[$mdgriffith$elm_ui$Element$centerX]),
-		A2(
-			$mdgriffith$elm_ui$Element$Input$slider,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$height(
-					$mdgriffith$elm_ui$Element$px(30)),
-					$mdgriffith$elm_ui$Element$width(
-					$mdgriffith$elm_ui$Element$px(950)),
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$behindContent(
-					A2(
-						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-								$mdgriffith$elm_ui$Element$height(
-								$mdgriffith$elm_ui$Element$px(2)),
-								$mdgriffith$elm_ui$Element$centerY,
-								$mdgriffith$elm_ui$Element$centerX,
-								$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$midGray),
-								$mdgriffith$elm_ui$Element$Border$rounded(2)
-							]),
-						$mdgriffith$elm_ui$Element$none))
-				]),
-			{
-				label: $mdgriffith$elm_ui$Element$Input$labelHidden('Range (miles)'),
-				max: 100,
-				min: 0,
-				onChange: $author$project$Messages$AdjustRangeValue,
-				step: $elm$core$Maybe$Nothing,
-				thumb: $mdgriffith$elm_ui$Element$Input$thumb(
+			[
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(30)),
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$behindContent(
+				A2(
+					$mdgriffith$elm_ui$Element$el,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$width(
-							$mdgriffith$elm_ui$Element$px(16)),
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 							$mdgriffith$elm_ui$Element$height(
-							$mdgriffith$elm_ui$Element$px(50)),
-							$mdgriffith$elm_ui$Element$Border$rounded(8),
-							$mdgriffith$elm_ui$Element$Border$width(1),
-							$mdgriffith$elm_ui$Element$Border$color(
-							A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0)),
-							$mdgriffith$elm_ui$Element$Background$color(
-							A3($mdgriffith$elm_ui$Element$rgb255, 180, 20, 20))
-						])),
-				value: model.rangeSlider
-			}));
+							$mdgriffith$elm_ui$Element$px(2)),
+							$mdgriffith$elm_ui$Element$centerY,
+							$mdgriffith$elm_ui$Element$centerX,
+							$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$midGray),
+							$mdgriffith$elm_ui$Element$Border$rounded(2)
+						]),
+					$mdgriffith$elm_ui$Element$none))
+			]),
+		{
+			label: $mdgriffith$elm_ui$Element$Input$labelHidden('Range (miles)'),
+			max: 100,
+			min: 0,
+			onChange: $author$project$Messages$AdjustRangeValue,
+			step: $elm$core$Maybe$Nothing,
+			thumb: $mdgriffith$elm_ui$Element$Input$thumb(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$px(16)),
+						$mdgriffith$elm_ui$Element$height(
+						$mdgriffith$elm_ui$Element$px(50)),
+						$mdgriffith$elm_ui$Element$Border$rounded(8),
+						$mdgriffith$elm_ui$Element$Border$width(1),
+						$mdgriffith$elm_ui$Element$Border$color(
+						A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0)),
+						$mdgriffith$elm_ui$Element$Background$color(
+						A3($mdgriffith$elm_ui$Element$rgb255, 180, 20, 20))
+					])),
+			value: model.rangeSlider
+		});
 };
-var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
+var $author$project$Main$showMouseCoordinates = function (model) {
+	var _v0 = A2(
+		$elm$core$Maybe$withDefault,
+		_Utils_Tuple2(
+			0,
+			_Utils_Tuple2(0, 0)),
+		model.gonioDrag);
+	var _v1 = _v0.b;
+	var x = _v1.a;
+	var y = _v1.b;
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[$mdgriffith$elm_ui$Element$centerX]),
+		_List_fromArray(
+			[
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('X')),
+				A2($author$project$Nixie$nixieDisplay, 4, x | 0),
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerX]),
+				$mdgriffith$elm_ui$Element$text('Y')),
+				A2($author$project$Nixie$nixieDisplay, 4, y | 0)
+			]));
+};
+var $mdgriffith$elm_ui$Element$spaceEvenly = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$spacing, $mdgriffith$elm_ui$Internal$Style$classes.spaceEvenly);
 var $author$project$Constants$black = A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 0);
 var $mdgriffith$elm_ui$Element$Input$Below = {$: 'Below'};
 var $mdgriffith$elm_ui$Element$Input$labelBelow = $mdgriffith$elm_ui$Element$Input$Label($mdgriffith$elm_ui$Element$Input$Below);
@@ -14341,98 +14362,136 @@ var $author$project$ToggleSwitch$toggleSwitch = F4(
 					})
 				]));
 	});
-var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
-var $author$project$Main$operatorPage = function (model) {
-	var rangeDisplay = A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[$mdgriffith$elm_ui$Element$centerX]),
-		_List_fromArray(
-			[
-				A2($author$project$Nixie$nixieDisplay, 3, model.rangeSlider | 0),
-				A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$centerX]),
-				$mdgriffith$elm_ui$Element$text('RANGE'))
-			]));
-	var bearingDisplay = A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[$mdgriffith$elm_ui$Element$centerX]),
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Nixie$nixieDisplay,
-				3,
-				A2($elm$core$Basics$modBy, 360, (((model.goniometer + model.station.lineOfShoot) * 180) / $elm$core$Basics$pi) | 0)),
-				A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$centerX]),
-				$mdgriffith$elm_ui$Element$text('BEARING'))
-			]));
+var $author$project$Main$operatorPageLandscape = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$spacing(10),
-				$mdgriffith$elm_ui$Element$padding(10),
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$centerX,
-				$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteSand),
-				$mdgriffith$elm_ui$Element$Font$size(14),
-				$mdgriffith$elm_ui$Element$Font$family(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$Font$typeface('monospace'),
-						$mdgriffith$elm_ui$Element$Font$sansSerif
-					]))
-			]),
+		$author$project$Main$commonStyles,
 		_List_fromArray(
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+					]),
 				_List_fromArray(
 					[
 						A2(
-						$mdgriffith$elm_ui$Element$column,
-						_List_Nil,
+						$mdgriffith$elm_ui$Element$el,
 						_List_fromArray(
 							[
-								$mdgriffith$elm_ui$Element$html(
-								$author$project$Main$clickableGonioImage(model.goniometer + model.station.lineOfShoot)),
-								A4($author$project$ToggleSwitch$toggleSwitch, 'BEARING', 'ELEVATION', true, $author$project$Messages$AdjustRangeValue)
-							])),
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(1))
+							]),
+						$mdgriffith$elm_ui$Element$none),
 						A2(
 						$mdgriffith$elm_ui$Element$column,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(5))
+							]),
 						_List_fromArray(
 							[
 								$author$project$Main$rangeSlider(model),
 								$mdgriffith$elm_ui$Element$html(
 								$author$project$CRT$crt(model))
-							]))
+							])),
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(1))
+							]),
+						$mdgriffith$elm_ui$Element$none)
 					])),
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$spacing(50)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(3))
+							]),
+						$mdgriffith$elm_ui$Element$html(
+							$author$project$Main$clickableGonioImage(model.goniometer + model.station.lineOfShoot))),
+						$author$project$Main$showMouseCoordinates(model),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(3)),
+								$mdgriffith$elm_ui$Element$spaceEvenly
+							]),
+						_List_fromArray(
+							[
+								A4($author$project$ToggleSwitch$toggleSwitch, 'BEARING', 'ELEVATION', true, $author$project$Messages$AdjustRangeValue),
+								A4($author$project$ToggleSwitch$toggleSwitch, 'OFF', 'TEST', true, $author$project$Messages$AdjustRangeValue),
+								A4($author$project$ToggleSwitch$toggleSwitch, 'A', 'B', true, $author$project$Messages$AdjustRangeValue),
+								A4($author$project$ToggleSwitch$toggleSwitch, 'OFF', 'REFLECTOR', true, $author$project$Messages$AdjustRangeValue)
+							])),
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$fillPortion(1))
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$rangeDisplay(model),
+								$author$project$Main$bearingDisplay(model)
+							]))
+					]))
+			]));
+};
+var $author$project$Main$operatorPagePortrait = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		$author$project$Main$commonStyles,
+		_List_fromArray(
+			[
+				$author$project$Main$rangeSlider(model),
+				$mdgriffith$elm_ui$Element$html(
+				$author$project$CRT$crt(model)),
+				$mdgriffith$elm_ui$Element$html(
+				$author$project$Main$clickableGonioImage(model.goniometer + model.station.lineOfShoot)),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$height(
 						$mdgriffith$elm_ui$Element$px(100)),
-						$mdgriffith$elm_ui$Element$centerX,
 						$mdgriffith$elm_ui$Element$spacing(50)
 					]),
 				_List_fromArray(
 					[
+						A4($author$project$ToggleSwitch$toggleSwitch, 'BEARING', 'ELEVATION', true, $author$project$Messages$AdjustRangeValue),
 						A4($author$project$ToggleSwitch$toggleSwitch, 'OFF', 'TEST', true, $author$project$Messages$AdjustRangeValue),
 						A4($author$project$ToggleSwitch$toggleSwitch, 'A', 'B', true, $author$project$Messages$AdjustRangeValue),
 						A4($author$project$ToggleSwitch$toggleSwitch, 'OFF', 'REFLECTOR', true, $author$project$Messages$AdjustRangeValue),
-						rangeDisplay,
-						bearingDisplay
+						$author$project$Main$rangeDisplay(model),
+						$author$project$Main$bearingDisplay(model)
 					]))
 			]));
+};
+var $author$project$Main$operatorPage = function (model) {
+	var _v0 = model.outputDevice.orientation;
+	if (_v0.$ === 'Landscape') {
+		return $author$project$Main$operatorPageLandscape(model);
+	} else {
+		return $author$project$Main$operatorPagePortrait(model);
+	}
 };
 var $author$project$Main$view = function (model) {
 	var content = function () {
