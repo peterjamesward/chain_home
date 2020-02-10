@@ -25,6 +25,7 @@ import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D exposing (..)
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
+import Range exposing (drawRangeKnob)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
@@ -57,6 +58,8 @@ type alias Model =
     , activeConfigurations : List TargetSelector
     , rangeSlider : Float
     , outputDevice : Device
+    , rangeDrag : Maybe ( Float, ( Float, Float ) )
+    , rangeKnobAngle : Float
     }
 
 
@@ -84,6 +87,8 @@ init _ =
       , activeConfigurations = targetConfigurations
       , rangeSlider = 50.0
       , outputDevice = { class = Desktop, orientation = Landscape }
+      , rangeDrag = Nothing
+      , rangeKnobAngle = 0.0
       }
     , Cmd.none
     )
@@ -283,6 +288,67 @@ update msg model =
             , Cmd.none
             )
 
+        RangeGrab offset ->
+            ( { model
+                | rangeDrag = Just ( model.rangeKnobAngle, offset )
+              }
+            , Cmd.none
+            )
+
+        RangeMove offset ->
+            case model.rangeDrag of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just ( startAngle, startXY ) ->
+                    let
+                        newAngle =
+                            goniometerTurnAngle startAngle startXY offset
+
+                        angleChange =
+                            (newAngle - startAngle) |> sin |> asin |> (*) (180 / pi)
+
+                        newRange =
+                            max 0 <| min 100 <| (model.rangeSlider + angleChange)
+                    in
+                    ( if angleChange > 0 then
+                        -- Turn clockwise, increase range
+                        { model
+                            | rangeSlider = newRange
+                            , rangeDrag =
+                                if newRange <= 100 then
+                                    Just ( newAngle, offset )
+
+                                else
+                                    Nothing
+                            , rangeKnobAngle = newAngle
+                        }
+
+                      else if angleChange < 0 then
+                        -- Turn anticlockwise, decrease range
+                        { model
+                            | rangeSlider = newRange
+                            , rangeDrag =
+                                if newRange >= 0 then
+                                    Just ( newAngle, offset )
+
+                                else
+                                    Nothing
+                            , rangeKnobAngle = newAngle
+                        }
+
+                      else
+                        model
+                    , Cmd.none
+                    )
+
+        RangeRelease offset ->
+            ( { model
+                | rangeDrag = Nothing
+              }
+            , Cmd.none
+            )
+
         AdjustRangeValue newRange ->
             ( { model
                 | rangeSlider = newRange
@@ -303,6 +369,15 @@ update msg model =
 -- VIEW
 
 
+clickableRangeKnob =
+    div
+        [ Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
+        , Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
+        , Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
+        , style "touch-action" "none"
+        ]
+
+
 clickableGonioImage theta =
     div
         [ Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
@@ -318,6 +393,7 @@ rangeSlider model =
         [ E.height (E.px 30)
         , E.width E.fill
         , E.centerX
+        , pointer
 
         -- Here is where we're creating/styling the "track"
         , E.behindContent
@@ -358,11 +434,10 @@ rangeDisplay model =
         ]
 
 
-{-
 showMouseCoordinates model =
     let
         ( _, ( x, y ) ) =
-            Maybe.withDefault ( 0, ( 0, 0 ) ) model.gonioDrag
+            Maybe.withDefault ( 0, ( 0, 0 ) ) model.rangeDrag
     in
     column [ E.centerX ]
         [ el [ E.centerX ] (E.text "X")
@@ -371,7 +446,6 @@ showMouseCoordinates model =
         , nixieDisplay 4 (truncate y)
         ]
 
--}
 
 bearingDisplay model =
     column [ E.centerX ]
@@ -398,6 +472,7 @@ commonStyles =
         [ Font.typeface "monospace"
         , Font.sansSerif
         ]
+    , htmlAttribute <| style "touch-action" "none"
     ]
 
 
@@ -419,11 +494,12 @@ operatorPageLandscape model =
             [ E.centerX
             , E.spacing 50
             ]
-            [ E.el [ E.width <| fillPortion 3 ] <|
+            [ E.el [ E.width <| fillPortion 3, pointer ] <|
                 E.html <|
                     clickableGonioImage <|
                         model.goniometer
                             + model.station.lineOfShoot
+
             --, showMouseCoordinates model
             , row [ E.width <| fillPortion <| 3, E.spaceEvenly ]
                 [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
@@ -435,6 +511,10 @@ operatorPageLandscape model =
                 [ rangeDisplay model
                 , bearingDisplay model
                 ]
+            , E.el [ E.width <| fillPortion 3, pointer ] <|
+                E.html <|
+                    clickableRangeKnob <|
+                        [ drawRangeKnob model.rangeKnobAngle ]
             ]
         ]
 
@@ -445,7 +525,17 @@ operatorPagePortrait model =
         commonStyles
         [ rangeSlider model
         , E.html (crt model)
-        , E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
+        , row [ E.width E.fill ]
+            [ E.el [ pointer ] <|
+                E.html <|
+                    clickableGonioImage <|
+                        model.goniometer
+                            + model.station.lineOfShoot
+            , E.el [ pointer ] <|
+                E.html <|
+                    clickableRangeKnob <|
+                        [ drawRangeKnob model.rangeKnobAngle ]
+            ]
         , row
             [ E.height (E.px 100)
 
