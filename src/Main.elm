@@ -5,7 +5,6 @@ module Main exposing (main)
    in his book "Practical Elm"".
 -}
 -- TODO: Add another knob to move the range slider.
---import Html.Events.Extra.Touch as Touch
 
 import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
@@ -20,8 +19,8 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
-import Html as H exposing (..)
-import Html.Events.Extra.Mouse as Mouse
+import Html exposing (div)
+import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D exposing (..)
 import Messages exposing (..)
@@ -302,13 +301,6 @@ update msg model =
 
 
 -- VIEW
-{- type alias Touch =
-   { identifier : Int
-   , clientPos : ( Float, Float )
-   , pagePos : ( Float, Float )
-   , screenPos : ( Float, Float )
-   }
--}
 
 
 clickableGonioImage theta =
@@ -316,12 +308,12 @@ clickableGonioImage theta =
         [ Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
         , Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
         , Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
+        , style "touch-action" "none"
         ]
         [ drawGoniometer theta ]
 
 
 rangeSlider model =
-    --E.el [ E.centerX, E.width fill ] <|
     Input.slider
         [ E.height (E.px 30)
         , E.width E.fill
@@ -366,6 +358,7 @@ rangeDisplay model =
         ]
 
 
+{-
 showMouseCoordinates model =
     let
         ( _, ( x, y ) ) =
@@ -378,6 +371,7 @@ showMouseCoordinates model =
         , nixieDisplay 4 (truncate y)
         ]
 
+-}
 
 bearingDisplay model =
     column [ E.centerX ]
@@ -430,7 +424,7 @@ operatorPageLandscape model =
                     clickableGonioImage <|
                         model.goniometer
                             + model.station.lineOfShoot
-            , showMouseCoordinates model
+            --, showMouseCoordinates model
             , row [ E.width <| fillPortion <| 3, E.spaceEvenly ]
                 [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
                 , toggleSwitch "OFF" "TEST" True AdjustRangeValue

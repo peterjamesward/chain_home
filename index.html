@@ -13540,6 +13540,8 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerdown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointermove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$clickableGonioImage = function (theta) {
 	return A2(
 		$elm$html$Html$div,
@@ -13556,7 +13558,8 @@ var $author$project$Main$clickableGonioImage = function (theta) {
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp(
 				function (event) {
 					return $author$project$Messages$GonioRelease(event.pointer.offsetPos);
-				})
+				}),
+				A2($elm$html$Html$Attributes$style, 'touch-action', 'none')
 			]),
 		_List_fromArray(
 			[
