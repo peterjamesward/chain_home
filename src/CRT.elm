@@ -11,7 +11,7 @@ crt m =
             polyLineFromCoords m.lineData
     in
     svg
-        [ viewBox "-10 -40 1020 450"
+        [ viewBox "-10 -40 1020 450" -- Establishes the CRT coordinate system, not its rendered size.
         , SA.width "1020"
         , SA.height "420"
         ]

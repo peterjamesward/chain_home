@@ -13,4 +13,5 @@ type Msg
     | GonioMove ( Float, Float )
     | GonioRelease ( Float, Float )
     | AdjustRangeValue Float
+    | DeviceResize Int Int
 

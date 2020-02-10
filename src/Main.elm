@@ -55,6 +55,7 @@ type alias Model =
     , gonioDrag : Maybe ( Float, ( Float, Float ) ) -- angle and mouse position when mouse down
     , activeConfigurations : List TargetSelector
     , rangeSlider : Float
+    , outputDevice : Device
     }
 
 
@@ -81,6 +82,7 @@ init _ =
       , gonioDrag = Nothing
       , activeConfigurations = targetConfigurations
       , rangeSlider = 50.0
+      , outputDevice = { class = Desktop, orientation = Landscape }
       }
     , Cmd.none
     )
@@ -168,6 +170,7 @@ subscriptions model =
         [ Time.every 100 Tick
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
+        , onResize (\w h -> DeviceResize w h)
         ]
 
 
@@ -286,6 +289,11 @@ update msg model =
             , Cmd.none
             )
 
+        DeviceResize w h ->
+            ( { model | outputDevice = classifyDevice { width = w, height = h } }
+            , Cmd.none
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -352,47 +360,48 @@ rangeSlider model =
             }
 
 
-operatorPage : Model -> Element Msg
-operatorPage model =
-    let
-        rangeDisplay =
-            column [ E.centerX ]
-                [ nixieDisplay 3 (truncate model.rangeSlider)
-                , el [ E.centerX ] (E.text "RANGE")
-                ]
-
-        bearingDisplay =
-            column [ E.centerX ]
-                [ nixieDisplay 3
-                    (modBy 360 <|
-                        truncate
-                            ((model.goniometer + model.station.lineOfShoot)
-                                * 180
-                                / pi
-                            )
-                    )
-                , el [ E.centerX ] (E.text "BEARING")
-                ]
-    in
-    column
-        [ E.spacing 10
-        , E.padding 10
-        , E.width E.fill
-        , E.centerX
-        , Font.color paletteSand
-        , Font.size 14
-        , Font.family
-            [ Font.typeface "monospace"
-            , Font.sansSerif
-            ]
+rangeDisplay model =
+    column [ E.centerX ]
+        [ nixieDisplay 3 (truncate model.rangeSlider)
+        , el [ E.centerX ] (E.text "RANGE")
         ]
+
+
+bearingDisplay model =
+    column [ E.centerX ]
+        [ nixieDisplay 3
+            (modBy 360 <|
+                truncate
+                    ((model.goniometer + model.station.lineOfShoot)
+                        * 180
+                        / pi
+                    )
+            )
+        , el [ E.centerX ] (E.text "BEARING")
+        ]
+
+
+commonStyles =
+    [ E.spacing 10
+    , E.padding 10
+    , E.width E.fill
+    , E.centerX
+    , Font.color paletteSand
+    , Font.size 14
+    , Font.family
+        [ Font.typeface "monospace"
+        , Font.sansSerif
+        ]
+    ]
+
+
+operatorPageLandscape : Model -> Element Msg
+operatorPageLandscape model =
+    column
+        commonStyles
         [ row
             []
-            [ column
-                []
-                [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
-                , toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
-                ]
+            [ E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
             , column
                 []
                 [ rangeSlider model
@@ -404,13 +413,46 @@ operatorPage model =
             , E.centerX
             , E.spacing 50
             ]
-            [ toggleSwitch "OFF" "TEST" True AdjustRangeValue
+            [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
+            , toggleSwitch "OFF" "TEST" True AdjustRangeValue
             , toggleSwitch "A" "B" True AdjustRangeValue
             , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
-            , rangeDisplay
-            , bearingDisplay
+            , rangeDisplay model
+            , bearingDisplay model
             ]
         ]
+
+
+operatorPagePortrait : Model -> Element Msg
+operatorPagePortrait model =
+    column
+        commonStyles
+        [ rangeSlider model
+        , E.html (crt model)
+        , E.html <| clickableGonioImage <| model.goniometer + model.station.lineOfShoot
+        , row
+            [ E.height (E.px 100)
+            , E.centerX
+            , E.spacing 50
+            ]
+            [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
+            , toggleSwitch "OFF" "TEST" True AdjustRangeValue
+            , toggleSwitch "A" "B" True AdjustRangeValue
+            , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
+            , rangeDisplay model
+            , bearingDisplay model
+            ]
+        ]
+
+
+operatorPage : Model -> Element Msg
+operatorPage model =
+    case model.outputDevice.orientation of
+        Landscape ->
+            operatorPageLandscape model
+
+        Portrait ->
+            operatorPagePortrait model
 
 
 view : Model -> Browser.Document Msg
