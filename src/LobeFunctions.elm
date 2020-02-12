@@ -7,24 +7,29 @@ import Types exposing (..)
 
 
 txHiVertReflectedLobe α =
---    (1 - 6 * α) * abs (sin (24 * α))
-    (cos α) *  (sin (24 * α))
+    --    (1 - 6 * α) * abs (sin (24 * α))
+    cos (2 * α) * sin (24 * α)
+
+
+
+-- fudge so it falls to zero at pi/2.
 
 
 txHiVertOmniLobe α =
-    sin (7 * α)
+    cos α * sin (7 * α)
 
 
 txLowVertOmniLobe α =
-    sin (3 * α)
+    cos α * sin (3 * α)
 
 
 txLowVertReflectedLobe α =
-    (1 - 6 * α) * abs (sin (5 * α))
+    cos (2 * α) * abs (sin (5 * α))
 
 
 txHorizReflectedLobe θ =
-    cos θ ^ 2
+    cos θ *
+     (pi - abs θ) -- getting desperate?
 
 
 txHorizOmniLobe θ =

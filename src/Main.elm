@@ -100,7 +100,7 @@ init _ =
       , goniometerElevation = degrees 0
       , transmitAntenna = transmitAReflector
       , transmitAB = True
-      , reflector = False
+      , reflector = True
       }
     , Cmd.none
     )

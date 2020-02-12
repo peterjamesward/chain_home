@@ -23,6 +23,14 @@ bawdsey =
     , lineOfShoot = degrees 90.0
     }
 
+behindStation =
+    { longitude = bawdsey.longitude - degrees 0.9
+    , latitude = bawdsey.latitude + degrees 0.01
+    , height = 10 -- ,000 ft
+    , bearing = degrees 180
+    , speed = 200.0 -- mph
+    , iff = False
+    }
 
 bomber1 =
     { longitude = bawdsey.longitude + degrees 0.9
@@ -149,11 +157,11 @@ outboundFriendly =
 
 
 loneBomber =
-    TargetSelector 2 "One target" [ bomber1 ] False
+    TargetSelector 2 "One target" [ bomber1 ] True
 
 
 twoCloseTargets =
-    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] False
+    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] True
 
 
 twoDistantTargets =
@@ -165,7 +173,7 @@ tenWide =
 
 
 tenDeep =
-    TargetSelector 6 "Ten targets, line astern" tenAligned False
+    TargetSelector 6 "Ten targets, line astern" tenAligned True
 
 
 massiveRaid =
@@ -173,7 +181,10 @@ massiveRaid =
 
 
 nearbynoise =
-    TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 100) False
+    TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 100) True
+
+behindYou =
+    TargetSelector 9 "It's behind you!" [behindStation] True
 
 
 targetConfigurations =
@@ -185,6 +196,7 @@ targetConfigurations =
     , tenDeep
     , massiveRaid
     , nearbynoise
+    , behindYou
     ]
 
 
