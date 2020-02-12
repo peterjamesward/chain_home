@@ -7,3 +7,5 @@ stringifyPoint (x, y) = (String.fromFloat x )++
 
 polyLineFromCoords coords = List.foldr (++) "" (List.map stringifyPoint coords)
 
+choose b o1 o2 = if b then o1 else o2
+
