@@ -37,7 +37,7 @@ deriveEchoes targets txAntenna time =
             , amplitude =
                 abs <|
                     txAntenna.horizontalLobeFunction target.theta
-                        * txAntenna.horizontalLobeFunction target.alpha
+                        * txAntenna.verticalLobeFunction target.alpha
             }
     in
     List.map echoFromTarget targets

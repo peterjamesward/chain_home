@@ -29,7 +29,7 @@ pushButtonGroup groupName buttonDetails =
             , Border.rounded 4
             , center
             , Element.focused
-                [ Background.color flatWetAsphalt ]
+                [ Border.color white ]
             ]
 
         activeButtonStyle =
