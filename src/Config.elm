@@ -173,7 +173,7 @@ massiveRaid =
 
 
 nearbynoise =
-    TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 20) False
+    TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 100) False
 
 
 targetConfigurations =

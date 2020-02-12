@@ -7,7 +7,8 @@ import Types exposing (..)
 
 
 txHiVertReflectedLobe α =
-    (1 - 6 * α) * abs (sin (24 * α))
+--    (1 - 6 * α) * abs (sin (24 * α))
+    (cos α) *  (sin (24 * α))
 
 
 txHiVertOmniLobe α =
@@ -15,7 +16,7 @@ txHiVertOmniLobe α =
 
 
 txLowVertOmniLobe α =
-    sin (5 * α)
+    sin (3 * α)
 
 
 txLowVertReflectedLobe α =

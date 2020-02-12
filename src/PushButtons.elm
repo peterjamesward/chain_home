@@ -25,7 +25,7 @@ pushButtonGroup groupName buttonDetails =
             [ Background.color flatWetAsphalt
             , Border.color black
             , Element.height (px 30)
-            , Element.width (px 100)
+            , Element.width fill
             , Border.rounded 4
             , center
             , Element.focused

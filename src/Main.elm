@@ -373,25 +373,36 @@ update msg model =
         SelectTransmitAntenna val ->
             ( { model
                 | transmitAB = val
-                , transmitAntenna =
-                    case ( val, model.reflector ) of
-                        ( True, True ) ->
-                            transmitAReflector
+                , transmitAntenna = selectTransmitAntenna val model.reflector
+              }
+            , Cmd.none
+            )
 
-                        ( True, False ) ->
-                            transmitANoReflect
-
-                        ( False, True ) ->
-                            transmitBReflector
-
-                        ( False, False ) ->
-                            transmitBNoReflect
+        EnableReflector val ->
+            ( { model
+                | reflector = val
+                , transmitAntenna = selectTransmitAntenna model.transmitAB val
               }
             , Cmd.none
             )
 
         _ ->
             ( model, Cmd.none )
+
+
+selectTransmitAntenna ab reflect =
+    case ( ab, reflect ) of
+        ( True, True ) ->
+            transmitAReflector
+
+        ( False, True ) ->
+            transmitBReflector
+
+        ( True, False ) ->
+            transmitANoReflect
+
+        ( False, False ) ->
+            transmitBNoReflect
 
 
 
@@ -521,20 +532,29 @@ operatorPageLandscape model =
     column
         commonStyles
         [ row
-            [ E.width E.fill ]
-            [ el [ E.width <| E.fillPortion 1 ] none
+            [ E.width E.fill
+            ]
+            [ E.el
+                [ E.width <| fillPortion 1 ]
+                none
             , column
-                [ E.width <| E.fillPortion 5 ]
+                [ E.width <| E.fillPortion 6 ]
                 [ rangeSlider model
                 , E.html (crt model)
                 ]
-            , el [ E.width <| E.fillPortion 1 ] none
+            , E.el
+                [ E.width <| fillPortion 1 ]
+                none
             ]
         , row
             [ E.centerX
             , E.spacing 50
             ]
-            [ E.el [ E.width <| fillPortion 3, pointer ] <|
+            [ E.el
+                [ E.width <| minimum 200 <| fillPortion 3
+                , pointer
+                ]
+              <|
                 E.html <|
                     clickableGonioImage <|
                         model.goniometerBearing
@@ -547,12 +567,12 @@ operatorPageLandscape model =
                 , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
                 ]
             , column
-                [ E.width <| fillPortion 3
+                [ E.width <| minimum 100 <| fillPortion 2
                 , pointer
                 , centerX
                 ]
                 [ E.el
-                    [ E.width fill
+                    [ E.width <| maximum 200 <| fill
                     , pointer
                     ]
                   <|
@@ -572,17 +592,23 @@ operatorPagePortrait model =
         [ rangeSlider model
         , E.html (crt model)
         , row [ E.width E.fill ]
-            [ E.el [ pointer ] <|
+            [ E.el [ pointer, E.width <| fillPortion 3 ] <|
                 E.html <|
                     clickableGonioImage <|
                         model.goniometerBearing
                             + model.station.lineOfShoot
-            , E.el [ pointer ] <|
+            , E.el [ pointer, E.width <| fillPortion 2 ] <|
                 E.html <|
                     clickableRangeKnob <|
                         [ drawRangeKnob model.rangeKnobAngle ]
             ]
-        , modeToggles model
+        , row [ E.width E.fill, spacing 10, padding 5 ]
+            [ modeToggles model
+            , column [ E.width <| fillPortion 1 ]
+                [ rangeDisplay model.rangeSlider
+                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
+                ]
+            ]
         ]
 
 
