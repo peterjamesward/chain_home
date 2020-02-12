@@ -4,6 +4,7 @@ import Constants exposing (pulseDuration, scaleWidthKilometers, wavelength)
 import Html exposing (..)
 import LobeFunctions exposing (..)
 import Target exposing (PolarTarget)
+import Types exposing (Antenna)
 
 
 type alias Echo =
@@ -16,26 +17,8 @@ type alias Echo =
     }
 
 
-defaultEcho =
-    { r = 0, theta = 0, alpha = 0, phase = 0, amplitude = 0, duration = 0 }
-
-
-dummyFinalEcho =
-    { r = scaleWidthKilometers * 1000
-    , theta = 0
-    , alpha = 0
-    , phase = 0
-    , amplitude = 0
-    , duration = 0
-    }
-
-
-dummyInitialEcho =
-    { dummyFinalEcho | r = 0 }
-
-
-deriveEchoes : List PolarTarget -> Int -> List Echo
-deriveEchoes targets time =
+deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
+deriveEchoes targets txAntenna time =
     let
         -- Ground reflection combines depending on difference in path length,
         -- and could combine positively or destructively.
@@ -53,9 +36,8 @@ deriveEchoes targets time =
             , duration = pulseDuration -- microseconds
             , amplitude =
                 abs <|
-                    txHorizReflectedLobe target.theta
-                        * txHiVertOmniLobe target.alpha
-                        --* (1 + 0.2 * (reflectedSignalAdjustment target.r))
+                    txAntenna.horizontalLobeFunction target.theta
+                        * txAntenna.horizontalLobeFunction target.alpha
             }
     in
     List.map echoFromTarget targets

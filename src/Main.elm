@@ -23,15 +23,17 @@ import Html exposing (div)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D exposing (..)
+import LobeFunctions exposing (..)
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
+import PushButtons exposing (toggleSwitch)
 import Range exposing (drawRangeKnob)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
 import Target exposing (..)
 import Time
-import ToggleSwitch exposing (toggleSwitch)
+import Types exposing (..)
 
 
 type Page
@@ -42,24 +44,29 @@ type Page
 type alias Model =
     { currPage : Page
     , zone : Time.Zone
-    , startTime : Int -- millseconds from t-zero
-    , time : Int
-    , lineData : List ( Float, Float )
+    , startTime : Int
+    , time : Int -- milliseconds from t-zero
+    , lineData : List Point
     , station : Station
     , targets : List Target
     , movedTargets : List Target
     , polarTargets : List PolarTarget
     , echoes : List Echo
-    , skyline : List ( ( Float, Float ), ( Float, Float ) )
-    , goniometer : Float
+    , skyline : List Line
+    , goniometerBearing : Angle
     , gonioOutput : List Echo
     , keys : Keys
-    , gonioDrag : Maybe ( Float, ( Float, Float ) ) -- angle and mouse position when mouse down
+    , gonioDrag : Maybe ( Angle, Point ) -- angle and mouse position when mouse down
     , activeConfigurations : List TargetSelector
-    , rangeSlider : Float
+    , rangeSlider : Range
     , outputDevice : Device
-    , rangeDrag : Maybe ( Float, ( Float, Float ) )
-    , rangeKnobAngle : Float
+    , rangeDrag : Maybe ( Angle, Point )
+    , rangeKnobAngle : Angle
+    , goniometerMode : GoniometerMode
+    , goniometerElevation : Angle
+    , transmitAntenna : Antenna
+    , transmitAB : Bool
+    , reflector : Bool
     }
 
 
@@ -80,7 +87,7 @@ init _ =
       , polarTargets = []
       , echoes = []
       , skyline = []
-      , goniometer = degrees 10 -- relative to Line Of Shoot.
+      , goniometerBearing = degrees 10 -- relative to Line Of Shoot.
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
@@ -89,9 +96,18 @@ init _ =
       , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
       , rangeKnobAngle = 0.0
+      , goniometerMode = Bearing
+      , goniometerElevation = degrees 0
+      , transmitAntenna = transmitAReflector
+      , transmitAB = True
+      , reflector = False
       }
     , Cmd.none
     )
+
+
+
+-- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
 
 
 type alias Keys =
@@ -100,10 +116,6 @@ type alias Keys =
     , rangeLeft : Bool -- left arrow
     , rangeRight : Bool -- right arrow
     }
-
-
-
--- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
 
 
 noKeys : Keys
@@ -134,7 +146,7 @@ updateKeys isDown key keys =
 -- Mouse tracking permits non-integer movements.
 
 
-swingGoniometer : Float -> Keys -> Float
+swingGoniometer : Angle -> Keys -> Angle
 swingGoniometer angle keys =
     case ( keys.gonioClock, keys.gonioAnti ) of
         ( True, True ) ->
@@ -150,7 +162,7 @@ swingGoniometer angle keys =
             angle
 
 
-slideRangeSlider : Float -> Keys -> Float
+slideRangeSlider : Range -> Keys -> Range
 slideRangeSlider range keys =
     case ( keys.rangeLeft, keys.rangeRight ) of
         ( True, True ) ->
@@ -180,10 +192,6 @@ subscriptions model =
         ]
 
 
-type alias LineData =
-    List ( Float, Float )
-
-
 
 -- UPDATE
 
@@ -198,16 +206,17 @@ deriveModelAtTime model t =
             List.map (mapToPolar bawdsey) targetsNow
 
         echoSignals =
-            deriveEchoes convertedTargets t
+            deriveEchoes convertedTargets model.transmitAntenna t
 
         gonioOut =
-            goniometerMix model.goniometer echoSignals
+            goniometerMix model.goniometerBearing echoSignals
 
         newSkyline =
             deriveSkyline (scaleWidthKilometers * 1000) gonioOut
     in
     { model
         | startTime =
+            --TODO: Get rid of this somehow.
             if model.startTime == 0 then
                 t
 
@@ -221,7 +230,7 @@ deriveModelAtTime model t =
         , skyline = newSkyline
         , gonioOutput = gonioOut
         , lineData = scalePathToDisplay <| beamPath newSkyline
-        , goniometer = swingGoniometer model.goniometer model.keys
+        , goniometerBearing = swingGoniometer model.goniometerBearing model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
     }
 
@@ -259,7 +268,7 @@ update msg model =
 
         GonioGrab offset ->
             ( { model
-                | gonioDrag = Just ( model.goniometer, offset )
+                | gonioDrag = Just ( model.goniometerBearing, offset )
               }
             , Cmd.none
             )
@@ -275,7 +284,7 @@ update msg model =
                             goniometerTurnAngle startAngle startXY offset
                     in
                     ( { model
-                        | goniometer = newAngle
+                        | goniometerBearing = newAngle
                         , gonioDrag = Just ( newAngle, offset )
                       }
                     , Cmd.none
@@ -306,7 +315,7 @@ update msg model =
                             goniometerTurnAngle startAngle startXY offset
 
                         angleChange =
-                            (newAngle - startAngle) |> sin |> asin |> (*) (180 / pi)
+                            (newAngle - startAngle) |> sin |> asin |> (*) (60 / pi)
 
                         newRange =
                             max 0 <| min 100 <| (model.rangeSlider + angleChange)
@@ -361,6 +370,26 @@ update msg model =
             , Cmd.none
             )
 
+        SelectTransmitAntenna val ->
+            ( { model
+                | transmitAB = val
+                , transmitAntenna =
+                    case ( val, model.reflector ) of
+                        ( True, True ) ->
+                            transmitAReflector
+
+                        ( True, False ) ->
+                            transmitANoReflect
+
+                        ( False, True ) ->
+                            transmitBReflector
+
+                        ( False, False ) ->
+                            transmitBNoReflect
+              }
+            , Cmd.none
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -412,7 +441,7 @@ rangeSlider model =
         , label =
             Input.labelHidden "Range (miles)"
         , min = 0
-        , max = 100
+        , max = 100.0
         , step = Nothing
         , value = model.rangeSlider
         , thumb =
@@ -427,9 +456,9 @@ rangeSlider model =
         }
 
 
-rangeDisplay model =
+rangeDisplay rangeValue =
     column [ E.centerX ]
-        [ nixieDisplay 3 (truncate model.rangeSlider)
+        [ nixieDisplay 3 (truncate rangeValue)
         , el [ E.centerX ] (E.text "RANGE")
         ]
 
@@ -447,12 +476,12 @@ showMouseCoordinates model =
         ]
 
 
-bearingDisplay model =
+bearingDisplay bearing =
     column [ E.centerX ]
         [ nixieDisplay 3
             (modBy 360 <|
                 truncate
-                    ((model.goniometer + model.station.lineOfShoot)
+                    (bearing
                         * 180
                         / pi
                     )
@@ -472,8 +501,19 @@ commonStyles =
         [ Font.typeface "monospace"
         , Font.sansSerif
         ]
-    , htmlAttribute <| style "touch-action" "none"
     ]
+
+
+modeToggles model =
+    row
+        [ E.width <| fillPortion <| 3
+        , E.spacing 20
+        ]
+        [ toggleSwitch "MODE" "BEARING" "ELEVATION" (model.goniometerMode == Bearing) SelectGoniometerMode
+        , toggleSwitch "RECEIVER" "HIGH" "LOW" False SelectReceiveAntenna
+        , toggleSwitch "TRANSMITTER" "A" "B" model.transmitAB SelectTransmitAntenna
+        , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
+        ]
 
 
 operatorPageLandscape : Model -> Element Msg
@@ -497,24 +537,30 @@ operatorPageLandscape model =
             [ E.el [ E.width <| fillPortion 3, pointer ] <|
                 E.html <|
                     clickableGonioImage <|
-                        model.goniometer
+                        model.goniometerBearing
                             + model.station.lineOfShoot
 
             --, showMouseCoordinates model
-            , row [ E.width <| fillPortion <| 3, E.spaceEvenly ]
-                [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
-                , toggleSwitch "OFF" "TEST" True AdjustRangeValue
-                , toggleSwitch "A" "B" True AdjustRangeValue
-                , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
+            , modeToggles model
+            , column [ E.width <| fillPortion 1 ]
+                [ rangeDisplay model.rangeSlider
+                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
                 ]
-            , column [ E.width <| fillPortion <| 1 ]
-                [ rangeDisplay model
-                , bearingDisplay model
+            , column
+                [ E.width <| fillPortion 3
+                , pointer
+                , centerX
                 ]
-            , E.el [ E.width <| fillPortion 3, pointer ] <|
-                E.html <|
-                    clickableRangeKnob <|
-                        [ drawRangeKnob model.rangeKnobAngle ]
+                [ E.el
+                    [ E.width fill
+                    , pointer
+                    ]
+                  <|
+                    E.html <|
+                        clickableRangeKnob <|
+                            [ drawRangeKnob model.rangeKnobAngle ]
+                , E.el [ centerX ] (E.text "RANGE")
+                ]
             ]
         ]
 
@@ -529,26 +575,14 @@ operatorPagePortrait model =
             [ E.el [ pointer ] <|
                 E.html <|
                     clickableGonioImage <|
-                        model.goniometer
+                        model.goniometerBearing
                             + model.station.lineOfShoot
             , E.el [ pointer ] <|
                 E.html <|
                     clickableRangeKnob <|
                         [ drawRangeKnob model.rangeKnobAngle ]
             ]
-        , row
-            [ E.height (E.px 100)
-
-            --, E.centerX
-            , E.spacing 50
-            ]
-            [ toggleSwitch "BEARING" "ELEVATION" True AdjustRangeValue
-            , toggleSwitch "OFF" "TEST" True AdjustRangeValue
-            , toggleSwitch "A" "B" True AdjustRangeValue
-            , toggleSwitch "OFF" "REFLECTOR" True AdjustRangeValue
-            , rangeDisplay model
-            , bearingDisplay model
-            ]
+        , modeToggles model
         ]
 
 

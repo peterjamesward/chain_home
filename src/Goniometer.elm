@@ -2,7 +2,7 @@ module Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 
 import Svg exposing (..)
 import Svg.Attributes as S exposing (..)
-
+import Types exposing (..)
 
 
 -- Assumes a suitably styled DIV is in effect ...
@@ -79,7 +79,7 @@ drawGoniometerScale =
         []
 
 
-goniometerTurnAngle : Float -> ( Float, Float ) -> ( Float, Float ) -> Float
+goniometerTurnAngle : Angle -> Point -> Point -> Angle
 goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
     let
         ( _, dragStartAngle ) =

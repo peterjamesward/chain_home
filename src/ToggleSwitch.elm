@@ -38,7 +38,7 @@ toggleSwitch upperLabel lowerLabel switchState switchMessage =
                 Input.labelBelow [ E.centerX ] (E.text lowerLabel)
             , min = 0
             , max = 1
-            , step = Just 1
+            , step = Nothing
             , value =
                 if switchState then
                     1
