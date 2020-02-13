@@ -4,8 +4,10 @@ module Main exposing (main)
    This Main module now based on the elm-ui example by Alex Korban
    in his book "Practical Elm"".
 -}
--- TODO: Add another knob to move the range slider.
+-- TODO: A|B *also* refers to two different height finding curves, not only to Tx dipoles.
+-- A is more accurate at low alpha, B at greater. Both only reliable up to 10 deg.
 
+import Attr exposing (..)
 import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
 import Browser.Events exposing (..)
@@ -16,6 +18,7 @@ import Echo exposing (..)
 import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events as Event exposing (..)
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
@@ -34,6 +37,7 @@ import Station exposing (..)
 import Target exposing (..)
 import Time
 import Types exposing (..)
+import Utils exposing (..)
 
 
 type Page
@@ -67,6 +71,7 @@ type alias Model =
     , transmitAntenna : Antenna
     , transmitAB : Bool
     , reflector : Bool
+    , isMenuOpen : Bool
     }
 
 
@@ -101,6 +106,7 @@ init _ =
       , transmitAntenna = transmitAReflector
       , transmitAB = True
       , reflector = True
+      , isMenuOpen = False
       }
     , Cmd.none
     )
@@ -238,6 +244,13 @@ deriveModelAtTime model t =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ToggleMenu ->
+            ( { model
+                | isMenuOpen = not model.isMenuOpen
+              }
+            , Cmd.none
+            )
+
         SetConfigStateMsg index newState ->
             ( { model
                 | activeConfigurations =
@@ -247,12 +260,18 @@ update msg model =
             )
 
         DisplayReceiver ->
-            ( { model | currPage = OperatorPage }
+            ( { model
+                | currPage = OperatorPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
         DisplayConfiguration ->
-            ( { model | currPage = InputPage }
+            ( { model
+                | currPage = InputPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
@@ -382,6 +401,13 @@ update msg model =
             ( { model
                 | reflector = val
                 , transmitAntenna = selectTransmitAntenna model.transmitAB val
+              }
+            , Cmd.none
+            )
+
+        SelectGoniometerMode mode ->
+            ( { model
+                | goniometerMode = choose mode Bearing Elevation
               }
             , Cmd.none
             )
@@ -521,8 +547,8 @@ modeToggles model =
         , E.spacing 20
         ]
         [ toggleSwitch "MODE" "BEARING" "ELEVATION" (model.goniometerMode == Bearing) SelectGoniometerMode
-        , toggleSwitch "RECEIVER" "HIGH" "LOW" False SelectReceiveAntenna
-        , toggleSwitch "TRANSMITTER" "A" "B" model.transmitAB SelectTransmitAntenna
+        , toggleSwitch "HEIGHT DF" "HIGH (A)" "LOW (B)" False SelectReceiveAntenna
+        , toggleSwitch "TRANSMITTER" "MAIN ARRAY" "GAP FILLER" model.transmitAB SelectTransmitAntenna
         , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
         ]
 
@@ -637,6 +663,7 @@ view model =
     , body =
         [ layout
             [ Background.color flatMidnightBlue
+            , inFront <| menuPanel model
             ]
           <|
             column [ E.width E.fill, spacingXY 0 20 ]
@@ -650,22 +677,24 @@ view model =
 navBar : Element Msg
 navBar =
     row
-        [ E.width E.fill
+        [ width fill
         , paddingXY 60 10
-        , Border.widthEach { bottom = 5, top = 0, left = 0, right = 0 }
-        , Border.color midGray
-        , Font.color white
+        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+        , Border.color blue
         ]
         [ el
             [ alignLeft
+            , Font.color paletteSand
             ]
           <|
-            E.text "Chain Home"
-        , el
-            [ alignRight
-            ]
-          <|
-            E.text "Menu"
+            text "Chain Home"
+        , Input.button
+            (Attr.greenButton
+                ++ [ padding 5, alignRight, width (px 80) ]
+            )
+            { onPress = Just ToggleMenu
+            , label = el [ centerX ] <| text "Menu"
+            }
         ]
 
 
@@ -713,19 +742,9 @@ inputPage model =
     <|
         targetSelector model.activeConfigurations
             ++ [ Input.button
-                    [ Background.color paletteDarkGreen
-                    , Border.color paletteLightGreen
-                    , Border.rounded 3
-                    , Border.widthEach { bottom = 3, top = 2, right = 3, left = 2 }
-                    , Font.bold
-                    , Font.color paletteLightGreen
-                    , paddingXY 20 6
-                    , alignRight
-                    , E.width (px 200)
-                    , E.height (px 40)
-                    ]
+                    (Attr.greenButton ++ [ width (px 200), height (px 40), alignRight ])
                     { onPress = Just DisplayReceiver
-                    , label = el [ centerX ] <| E.text "Go!"
+                    , label = el [ centerX ] <| text "Go!"
                     }
                ]
 
@@ -738,3 +757,42 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+menuPanel : Model -> Element Msg
+menuPanel model =
+    let
+        items =
+            [ E.el [ pointer, Event.onClick DisplayConfiguration ] <| text "Configuration"
+            , E.el [ pointer, Event.onClick DisplayReceiver ] <| text "Operator"
+            ]
+
+        panel =
+            column
+                [ Background.color lightCharcoal
+                , Border.widthEach { left = 1, right = 0, top = 0, bottom = 0 }
+                , Border.color flatMidnightBlue
+                , Border.shadow
+                    { offset = ( 0, 0 )
+                    , size = 1
+                    , blur = 10
+                    , color = flatWetAsphalt
+                    }
+                , Font.bold
+                , Font.color paletteDarkGreen
+                , Font.family [ Font.sansSerif ]
+                , width <| fillPortion 1
+                , height fill
+                , paddingXY 20 20
+                , spacingXY 0 40
+                ]
+                items
+
+        overlay =
+            el [ width <| fillPortion 4, height fill, Event.onClick ToggleMenu ] none
+    in
+    if model.isMenuOpen then
+        row [ width fill, height fill ] [ overlay, panel ]
+
+    else
+        none

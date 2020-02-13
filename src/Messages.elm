@@ -22,4 +22,5 @@ type Msg
     | SelectReceiveAntenna Bool
     | EnableReflector Bool
     | SelectGoniometerMode Bool
+    | ToggleMenu
 
