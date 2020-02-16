@@ -157,11 +157,11 @@ outboundFriendly =
 
 
 loneBomber =
-    TargetSelector 2 "One target" [ bomber1 ] True
+    TargetSelector 2 "One target" [ bomber1 ] False
 
 
 twoCloseTargets =
-    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] True
+    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] False
 
 
 twoDistantTargets =
@@ -173,7 +173,7 @@ tenWide =
 
 
 tenDeep =
-    TargetSelector 6 "Ten targets, line astern" tenAligned True
+    TargetSelector 6 "Ten targets, line astern" tenAligned False
 
 
 massiveRaid =
@@ -181,10 +181,10 @@ massiveRaid =
 
 
 nearbynoise =
-    TargetSelector 8 "Artefacts local to station" (stationClutter bawdsey 100) True
+    TargetSelector 8 "Local ground reflections" (stationClutter bawdsey 100) False
 
 behindYou =
-    TargetSelector 9 "It's behind you!" [behindStation] True
+    TargetSelector 9 "It's behind you!" [behindStation] False
 
 
 targetConfigurations =

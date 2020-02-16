@@ -15,9 +15,9 @@ pulseDuration =40.0 -- microseconds
 pulseWidth = lightSpeed * pulseDuration / 10000000.0
 
 -- higher numbers are steeper slops.
-beamSweepIncreasingAmplitude = 0.001
+beamSweepIncreasingAmplitude = 0.03
 
-beamSweepDecreasingAmplitude = -0.0003
+beamSweepDecreasingAmplitude = -0.01
 
 scaleWidthKilometers = 150
 
@@ -25,7 +25,7 @@ viewWidth = 1000
 
 viewHeight = 400
 
-strengthToHeightFactor = 100.0
+strengthToHeightFactor = 10.0
 
 rangeToXFactor =  viewWidth / (scaleWidthKilometers * 1000.0)
 
