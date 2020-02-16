@@ -7,7 +7,8 @@ import Types exposing (Antenna)
 
 
 type alias Echo =
-    { r : Float
+    { sequence : Int
+    , r : Float
     , theta : Float
     , alpha : Float
     , phase : Float
@@ -21,16 +22,14 @@ combineEchoes time activeEchoes =
     -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
     let
         asRect =
-            List.map2
-                (\e i ->
+            List.map
+                (\e ->
                     fromPolar
                         ( e.amplitude
-                        , toFloat i * pi * (toFloat <| modBy 2000 time) / 2000
+                        , toFloat e.sequence * 2 * pi * (toFloat <| modBy 2000 time) / 2000
                         )
                 )
                 activeEchoes
-                -- Increment frequency to cause deliberate "beating".
-                (List.range 1 (List.length activeEchoes))
 
         combinedAsRect =
             List.foldl (\( x, y ) ( xAcc, yAcc ) -> ( x + xAcc, y + yAcc )) ( 0.0, 0.0 ) asRect
@@ -54,8 +53,9 @@ combineEchoes time activeEchoes =
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
 deriveEchoes targets txAntenna time =
     let
-        echoFromDirectBeam target =
-            { r = target.r
+        echoFromDirectBeam target seq =
+            { sequence = seq
+            , r = target.r
             , theta = target.theta
             , alpha = target.alpha
             , phase = asin <| sin <| target.r / wavelength
@@ -69,7 +69,10 @@ deriveEchoes targets txAntenna time =
                         / logBase 100 (1 + target.r)
             }
     in
-    List.map echoFromDirectBeam targets
+    List.map2 echoFromDirectBeam
+        targets
+    <|
+        List.range 1 (List.length targets)
 
 
 

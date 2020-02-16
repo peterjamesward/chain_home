@@ -136,7 +136,7 @@ tenAbreast =
 tenAligned =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.004)
+            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.002)
             , latitude = bawdsey.latitude - (degrees 0.2) + (degrees <| 0.05 * sin (toFloat i))
             , height = 25
             , bearing = degrees 270
