@@ -57,7 +57,7 @@ txHorizontalReflectedLobe θ =
 txHorizontalUnreflectedLobe θ =
     abs <| cos θ ^ 2
 
-
+-- TODO: The receiver lobe functions need more scrutiny.
 rxHorizLobe θ =
     cos θ
 

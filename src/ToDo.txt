@@ -8,3 +8,5 @@
 -- A is more accurate at low alpha, B at greater. Both only reliable up to 10 deg.
 
 -- TODO: Calibration pips. See page 9 of supervisor's handbook.
+
+-- TODO: IFF

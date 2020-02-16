@@ -1,8 +1,7 @@
 module Echo exposing (Echo, deriveEchoes, viewEcho)
 
-import Constants exposing (pulseDuration, scaleWidthKilometers, wavelength)
+import Constants exposing (pulseDuration, scaleWidthKilometers, transmitterEffectiveHeight, wavelength)
 import Html exposing (..)
-import LobeFunctions exposing (..)
 import Target exposing (PolarTarget)
 import Types exposing (Antenna)
 
@@ -17,31 +16,56 @@ type alias Echo =
     }
 
 
+
+{-
+   Going to create TWO echoes for each target, one for the direct ray
+   and one for the reflected ray from the transmitter ground image. Watch out for phase.
+-}
+
+
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
 deriveEchoes targets txAntenna time =
     let
-        -- Ground reflection combines depending on difference in path length,
-        -- and could combine positively or destructively.
-        reflectedSignalAdjustment rng =
-            sin <| rng / wavelength
+        indirectRange target =
+            sqrt (target.r ^ 2 + (2 * transmitterEffectiveHeight) ^ 2)
 
-        echoFromTarget target =
+        indirectElevation target =
+            (target.r * sin target.alpha + 2 * transmitterEffectiveHeight) / target.r |> asin
+
+        phaseShift target =
+            asin <| sin <| target.r / wavelength
+
+        indirectPhase target =
+            (*) -1.0 <| asin <| sin <| indirectRange target / wavelength
+
+        echoFromDirectBeam target =
             { r = target.r
             , theta = target.theta
             , alpha = target.alpha
-
-            -- Using phase attribute to pass time through
-            -- see comments in Skyline re "beating".
-            , phase = toFloat time
-            , duration = pulseDuration -- microseconds
+            , phase = phaseShift target
+            , duration = pulseDuration
             , amplitude =
                 abs <|
                     txAntenna.horizontalLobeFunction target.theta
                         * txAntenna.verticalLobeFunction target.alpha
-                        / (logBase 100 (1 + target.r))
+                        / logBase 100 (1 + target.r)
+            }
+
+        echoFromReflectedBeam target =
+            { r = indirectRange target
+            , theta = target.theta
+            , alpha = indirectElevation target
+            , phase = indirectPhase target
+            , duration = pulseDuration
+            , amplitude =
+                abs <|
+                    txAntenna.horizontalLobeFunction target.theta
+                        * txAntenna.verticalLobeFunction target.alpha
+                        / logBase 100 (1 + target.r)
             }
     in
-    List.map echoFromTarget targets
+    List.map echoFromDirectBeam targets
+        ++ List.map echoFromReflectedBeam targets
 
 
 

@@ -39,56 +39,20 @@ dummyLeadingEdge =
     ( ( 0.0, 0.0 ), ( 0.0, 0.0 ) )
 
 
-
-{-
-   Having thought more about the "beating" effect on the CRT videos, I suspect
-   there are some unexplained frequencies shifts in the return signals and it
-   genuinely is a moiré effect. We can probably simulate that by applying time-varying
-   phase shifts to each signal, on a fairly arbitrary basis, as we combine them.
-   We do this to deliberately cause the phase to alternate over a 1 to 4 second
-   period (say).
-   To facilitate, the phase attribute of all echoes will contain the model time.
-   We can also use range as a 'seed' to prevent all echoes bouncing in synch!
--}
-
-
 combineEchoes : List Echo -> Float
 combineEchoes activeEchoes =
+    -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
     let
-        -- The beat index will determine for each echo how quickly it's
-        -- phase rotates (let's say how many seconds a rotation takes,
-        -- this is all empirical "art" anyway).
-        beatIndex =
-            List.range 1 (List.length activeEchoes)
+        asRect =
+            List.map (\e -> fromPolar ( e.amplitude, e.phase )) activeEchoes
 
-        milliseconds t =
-            truncate t |> modBy 4000 |> toFloat |> (/) 4000
+        combinedAsRect =
+            List.foldl (\( x, y ) ( xAcc, yAcc ) -> ( x + xAcc, y + yAcc )) ( 0.0, 0.0 ) asRect
 
-        funkyEchoCombiner ( echo, index ) accumulator =
-            accumulator
-                + echo.amplitude
-                * sin
-                    (2.0 * pi
-                        * milliseconds (echo.phase + echo.r)
-                        / toFloat index
-                    )
-
-        descendingEchoes =
-            List.reverse <| List.sortBy .amplitude activeEchoes
+        ( mag, phase ) =
+            toPolar combinedAsRect
     in
-    case descendingEchoes of
-        [] ->
-            0.0
-
-        e :: rest ->
-            abs <|
-                (+) e.amplitude <|
-                    List.foldl funkyEchoCombiner
-                        0.0
-                        (List.map2 Tuple.pair
-                            rest
-                            beatIndex
-                        )
+    mag
 
 
 
