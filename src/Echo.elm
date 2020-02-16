@@ -1,4 +1,4 @@
-module Echo exposing (Echo, deriveEchoes, viewEcho)
+module Echo exposing (Echo, combineEchoes, deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, scaleWidthKilometers, transmitterEffectiveHeight, wavelength)
 import Html exposing (..)
@@ -16,56 +16,60 @@ type alias Echo =
     }
 
 
+combineEchoes : Int -> List Echo -> Float
+combineEchoes time activeEchoes =
+    -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
+    let
+        asRect =
+            List.map2
+                (\e i ->
+                    fromPolar
+                        ( e.amplitude
+                        , toFloat i * pi * (toFloat <| modBy 2000 time) / 2000
+                        )
+                )
+                activeEchoes
+                -- Increment frequency to cause deliberate "beating".
+                (List.range 1 (List.length activeEchoes))
+
+        combinedAsRect =
+            List.foldl (\( x, y ) ( xAcc, yAcc ) -> ( x + xAcc, y + yAcc )) ( 0.0, 0.0 ) asRect
+
+        ( mag, phase ) =
+            toPolar combinedAsRect
+    in
+    mag
+
+
 
 {-
    Going to create TWO echoes for each target, one for the direct ray
    and one for the reflected ray from the transmitter ground image. Watch out for phase.
+   Did that but either everything beats or nothing beats.
+   I see no way to make only two or more targets beat without frequency beats.
+   So that's what we'll do. Again.
 -}
 
 
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
 deriveEchoes targets txAntenna time =
     let
-        indirectRange target =
-            sqrt (target.r ^ 2 + (2 * transmitterEffectiveHeight) ^ 2)
-
-        indirectElevation target =
-            (target.r * sin target.alpha + 2 * transmitterEffectiveHeight) / target.r |> asin
-
-        phaseShift target =
-            asin <| sin <| target.r / wavelength
-
-        indirectPhase target =
-            (*) -1.0 <| asin <| sin <| indirectRange target / wavelength
-
         echoFromDirectBeam target =
             { r = target.r
             , theta = target.theta
             , alpha = target.alpha
-            , phase = phaseShift target
+            , phase = asin <| sin <| target.r / wavelength
             , duration = pulseDuration
             , amplitude =
                 abs <|
+                    -- Combine the lobe functions
                     txAntenna.horizontalLobeFunction target.theta
                         * txAntenna.verticalLobeFunction target.alpha
-                        / logBase 100 (1 + target.r)
-            }
-
-        echoFromReflectedBeam target =
-            { r = indirectRange target
-            , theta = target.theta
-            , alpha = indirectElevation target
-            , phase = indirectPhase target
-            , duration = pulseDuration
-            , amplitude =
-                abs <|
-                    txAntenna.horizontalLobeFunction target.theta
-                        * txAntenna.verticalLobeFunction target.alpha
+                        -- and ad-hoc adjustment for range
                         / logBase 100 (1 + target.r)
             }
     in
     List.map echoFromDirectBeam targets
-        ++ List.map echoFromReflectedBeam targets
 
 
 

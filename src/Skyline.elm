@@ -1,7 +1,7 @@
 module Skyline exposing (EdgeSegment, deriveSkyline, viewEdge, viewLineSegment)
 
 import Constants exposing (..)
-import Echo exposing (Echo)
+import Echo exposing (Echo, combineEchoes)
 import Html exposing (..)
 import Utils exposing (stringifyPoint)
 
@@ -39,31 +39,16 @@ dummyLeadingEdge =
     ( ( 0.0, 0.0 ), ( 0.0, 0.0 ) )
 
 
-combineEchoes : List Echo -> Float
-combineEchoes activeEchoes =
-    -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
-    let
-        asRect =
-            List.map (\e -> fromPolar ( e.amplitude, e.phase )) activeEchoes
-
-        combinedAsRect =
-            List.foldl (\( x, y ) ( xAcc, yAcc ) -> ( x + xAcc, y + yAcc )) ( 0.0, 0.0 ) asRect
-
-        ( mag, phase ) =
-            toPolar combinedAsRect
-    in
-    mag
-
-
 
 -- We do not output for each edge. We output only when X and Y change.
 
 
 processEdge :
-    EdgeInfo
+    Int
+    -> EdgeInfo
     -> ( List EdgeSegment, List Echo, ( Float, Float ) )
     -> ( List EdgeSegment, List Echo, ( Float, Float ) )
-processEdge ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY ) ) =
+processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY ) ) =
     let
         ( ( x1, y ), ( x2, _ ) ) =
             Maybe.withDefault dummyLeadingEdge <| List.head roofline
@@ -81,7 +66,7 @@ processEdge ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY ) ) 
             p
 
         newY =
-            combineEchoes newActiveEchoes
+            combineEchoes time newActiveEchoes
     in
     if newX <= x2 then
         -- We're not moving horizontally but we need to track the roof height.
@@ -105,8 +90,8 @@ processEdge ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY ) ) 
 -- Derive skyline as series of flat roof segments.
 
 
-deriveSkyline : Float -> List Echo -> List EdgeSegment
-deriveSkyline maxX allEchoes =
+deriveSkyline : Int -> Float -> List Echo -> List EdgeSegment
+deriveSkyline time maxX allEchoes =
     -- Let's put the echoes in a dictionary, indexed by range (probably unique!).
     -- Then we need a sorted list of edges (front and back).
     -- Sorted list will index into the dictionary, for easy access to each target.
@@ -125,10 +110,10 @@ deriveSkyline maxX allEchoes =
 
         -- We have one in hand so we need to flush it out
         ( roofline, remainingEchoes, ( lastX, lastY ) ) =
-            List.foldl processEdge ( [], activeEchoes, ( 0.0, 0.0 ) ) allEdges
+            List.foldl (processEdge time) ( [], activeEchoes, ( 0.0, 0.0 ) ) allEdges
 
         finalY =
-            combineEchoes remainingEchoes
+            combineEchoes time remainingEchoes
     in
     ( ( lastX, 0 ), ( maxX, 0 ) ) :: roofline
 

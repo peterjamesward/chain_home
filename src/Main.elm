@@ -216,7 +216,7 @@ deriveModelAtTime model t =
             goniometerMix model.goniometerBearing echoSignals
 
         newSkyline =
-            deriveSkyline (scaleWidthKilometers * 1000) gonioOut
+            deriveSkyline model.time (scaleWidthKilometers * 1000) gonioOut
     in
     { model
         | startTime =

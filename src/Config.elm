@@ -54,8 +54,8 @@ bomber2 =
 
 bomber2A =
     { longitude = degrees 2.0
-    , latitude = degrees 52.05
-    , height = 30.1 -- ,000 ft
+    , latitude = degrees 52.04
+    , height = 30.2 -- ,000 ft
     , bearing = degrees 280
     , speed = 200.0 -- mph
     , iff = False
@@ -136,7 +136,7 @@ tenAbreast =
 tenAligned =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.002)
+            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.004)
             , latitude = bawdsey.latitude - (degrees 0.2) + (degrees <| 0.05 * sin (toFloat i))
             , height = 25
             , bearing = degrees 270
