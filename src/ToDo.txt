@@ -1,0 +1,10 @@
+-- TODO: Ground reflection. Supervisor's Handbook chapter 8.
+-- I don't think this can or should be buried in the tx lobe function.
+-- May be easier to think of two echoes - one from the real mast, one from its reflection.
+-- These signals will move in and out of phase as path length varies, and this may mean
+-- that we can lose the 'fudge' for the beating signals.
+
+-- TODO: A|B *also* refers to two different height finding curves, not only to Tx dipoles.
+-- A is more accurate at low alpha, B at greater. Both only reliable up to 10 deg.
+
+-- TODO: Calibration pips. See page 9 of supervisor's handbook.

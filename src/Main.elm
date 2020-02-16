@@ -4,8 +4,6 @@ module Main exposing (main)
    This Main module now based on the elm-ui example by Alex Korban
    in his book "Practical Elm"".
 -}
--- TODO: A|B *also* refers to two different height finding curves, not only to Tx dipoles.
--- A is more accurate at low alpha, B at greater. Both only reliable up to 10 deg.
 
 import Attr exposing (..)
 import BeamSmoother exposing (beamPath, scalePathToDisplay)

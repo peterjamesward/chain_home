@@ -6,6 +6,46 @@ module LobeFunctions exposing (..)
 import Types exposing (..)
 
 
+
+-- This use of simple series is a pretty good approximation, based on curves from Wolfram Alphs
+
+
+txFourStack =
+    dipoleStackVerticalUnreflectedLobes 4
+
+
+
+--abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ))
+
+
+txSixStack =
+    dipoleStackVerticalUnreflectedLobes 6
+
+
+
+--abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ) + cos (5 * θ) + cos (6 * θ))
+
+
+txEightStack =
+    dipoleStackVerticalUnreflectedLobes 8
+
+
+
+--abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ) + cos (5 * θ) + cos (6 * θ) + cos (7 * θ) + cos (8 * θ))
+-- More generally, FWIW:
+
+
+dipoleStackVerticalUnreflectedLobes : Int -> Float -> Float
+dipoleStackVerticalUnreflectedLobes n θ =
+    List.range 1 n
+        |> List.map
+            (\i ->
+                cos (θ * toFloat i)
+            )
+        |> List.sum
+        |> abs
+
+
 txHiVertReflectedLobe α =
     --    (1 - 6 * α) * abs (sin (24 * α))
     cos (2 * α) * sin (24 * α)
@@ -28,8 +68,12 @@ txLowVertReflectedLobe α =
 
 
 txHorizReflectedLobe θ =
-    cos θ *
-     (pi - abs θ) -- getting desperate?
+    cos θ
+        * (pi - abs θ)
+
+
+
+-- getting desperate?
 
 
 txHorizOmniLobe θ =
@@ -49,7 +93,7 @@ rxHiVertLobe α =
 
 
 transmitANoReflect =
-    Antenna txHiVertOmniLobe txHorizOmniLobe
+    Antenna txEightStack txHorizOmniLobe
 
 
 transmitAReflector =
@@ -57,7 +101,7 @@ transmitAReflector =
 
 
 transmitBNoReflect =
-    Antenna txLowVertOmniLobe txHorizOmniLobe
+    Antenna txSixStack txHorizOmniLobe
 
 
 transmitBReflector =
