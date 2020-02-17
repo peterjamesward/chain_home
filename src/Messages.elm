@@ -3,6 +3,7 @@ module Messages exposing (..)
 import Time exposing (..)
 import Types exposing (..)
 
+
 type Msg
     = NoOp
     | SetConfigStateMsg Int Bool
@@ -23,4 +24,4 @@ type Msg
     | EnableReflector Bool
     | SelectGoniometerMode Bool
     | ToggleMenu
-
+    | AdjustTimeZone Time.Zone

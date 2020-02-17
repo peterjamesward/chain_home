@@ -26,7 +26,8 @@ combineEchoes time activeEchoes =
                 (\e ->
                     fromPolar
                         ( e.amplitude
-                        , toFloat e.sequence * 2 * pi * (toFloat <| modBy 2000 time) / 2000
+                          -- Largely artistic here, trying for convincing "beats".
+                        , toFloat e.sequence * 2 * pi * toFloat time / 2000
                         )
                 )
                 activeEchoes
@@ -38,16 +39,6 @@ combineEchoes time activeEchoes =
             toPolar combinedAsRect
     in
     mag
-
-
-
-{-
-   Going to create TWO echoes for each target, one for the direct ray
-   and one for the reflected ray from the transmitter ground image. Watch out for phase.
-   Did that but either everything beats or nothing beats.
-   I see no way to make only two or more targets beat without frequency beats.
-   So that's what we'll do. Again.
--}
 
 
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo

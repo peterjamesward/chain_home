@@ -27,13 +27,15 @@ import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
+import OperatorPage exposing (operatorPage)
 import PushButtons exposing (toggleSwitch)
 import Range exposing (drawRangeKnob)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
 import Target exposing (..)
-import Time
+import Task
+import Time exposing (..)
 import Types exposing (..)
 import Utils exposing (..)
 
@@ -46,8 +48,8 @@ type Page
 type alias Model =
     { currPage : Page
     , zone : Time.Zone
-    , startTime : Int
-    , time : Int -- milliseconds from t-zero
+    , startTime : Maybe Time.Posix
+    , time : Time.Posix -- milliseconds from t-zero
     , lineData : List Point
     , station : Station
     , targets : List Target
@@ -81,8 +83,8 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { currPage = InputPage
       , zone = Time.utc
-      , startTime = 0
-      , time = 0
+      , startTime = Nothing
+      , time = Time.millisToPosix 0
       , lineData = beamPath []
       , station = bawdsey
       , targets = getAllTargets targetConfigurations
@@ -106,7 +108,7 @@ init _ =
       , reflector = True
       , isMenuOpen = False
       }
-    , Cmd.none
+    , Task.perform AdjustTimeZone Time.here
     )
 
 
@@ -200,32 +202,36 @@ subscriptions model =
 -- UPDATE
 
 
-deriveModelAtTime : Model -> Int -> Model
+deriveModelAtTime : Model -> Time.Posix -> Model
 deriveModelAtTime model t =
     let
+        effectiveStartTime =
+            Maybe.withDefault model.time model.startTime
+
         targetsNow =
-            List.map (targetAtTime t model.startTime) model.targets
+            List.map (targetAtTime t effectiveStartTime) model.targets
 
         convertedTargets =
             List.map (mapToPolar bawdsey) targetsNow
 
         echoSignals =
-            deriveEchoes convertedTargets model.transmitAntenna t
+            deriveEchoes convertedTargets model.transmitAntenna (Time.posixToMillis t)
 
         gonioOut =
             goniometerMix model.goniometerBearing echoSignals
 
         newSkyline =
-            deriveSkyline model.time (scaleWidthKilometers * 1000) gonioOut
+            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioOut
     in
     { model
         | startTime =
-            --TODO: Get rid of this somehow.
-            if model.startTime == 0 then
-                t
+            case model.startTime of
+                --TODO: Get rid of this somehow.
+                Nothing ->
+                    Just t
 
-            else
-                model.startTime
+                _ ->
+                    model.startTime
         , time = t
         , targets = getAllTargets model.activeConfigurations
         , movedTargets = targetsNow
@@ -242,6 +248,11 @@ deriveModelAtTime model t =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        AdjustTimeZone newZone ->
+            ( { model | zone = newZone }
+            , Cmd.none
+            )
+
         ToggleMenu ->
             ( { model
                 | isMenuOpen = not model.isMenuOpen
@@ -274,7 +285,7 @@ update msg model =
             )
 
         Tick newTime ->
-            ( deriveModelAtTime model (Time.posixToMillis newTime)
+            ( deriveModelAtTime model newTime
             , Cmd.none
             )
 
@@ -432,218 +443,6 @@ selectTransmitAntenna ab reflect =
 
 -- VIEW
 
-
-clickableRangeKnob =
-    div
-        [ Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
-        , Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
-        , Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
-        , style "touch-action" "none"
-        ]
-
-
-clickableGonioImage theta =
-    div
-        [ Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
-        , Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
-        , Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
-        , style "touch-action" "none"
-        ]
-        [ drawGoniometer theta ]
-
-
-rangeSlider model =
-    Input.slider
-        [ E.height (E.px 30)
-        , E.width E.fill
-        , E.centerX
-        , pointer
-
-        -- Here is where we're creating/styling the "track"
-        , E.behindContent
-            (E.el
-                [ E.width E.fill
-                , E.height (E.px 2)
-                , E.centerY
-                , E.centerX
-                , Background.color midGray
-                , Border.rounded 2
-                ]
-                E.none
-            )
-        ]
-        { onChange = AdjustRangeValue
-        , label =
-            Input.labelHidden "Range (miles)"
-        , min = 0
-        , max = 100.0
-        , step = Nothing
-        , value = model.rangeSlider
-        , thumb =
-            Input.thumb
-                [ E.width (E.px 16)
-                , E.height (E.px 50)
-                , Border.rounded 8
-                , Border.width 1
-                , Border.color <| E.rgb 0 0 0
-                , Background.color <| E.rgb255 180 20 20
-                ]
-        }
-
-
-rangeDisplay rangeValue =
-    column [ E.centerX ]
-        [ nixieDisplay 3 (truncate rangeValue)
-        , el [ E.centerX ] (E.text "RANGE")
-        ]
-
-
-showMouseCoordinates model =
-    let
-        ( _, ( x, y ) ) =
-            Maybe.withDefault ( 0, ( 0, 0 ) ) model.rangeDrag
-    in
-    column [ E.centerX ]
-        [ el [ E.centerX ] (E.text "X")
-        , nixieDisplay 4 (truncate x)
-        , el [ E.centerX ] (E.text "Y")
-        , nixieDisplay 4 (truncate y)
-        ]
-
-
-bearingDisplay bearing =
-    column [ E.centerX ]
-        [ nixieDisplay 3
-            (modBy 360 <|
-                truncate
-                    (bearing
-                        * 180
-                        / pi
-                    )
-            )
-        , el [ E.centerX ] (E.text "BEARING")
-        ]
-
-
-commonStyles =
-    [ E.spacing 20
-    , E.padding 30
-    , E.width E.fill
-    , E.centerX
-    , Font.color paletteSand
-    , Font.size 14
-    , Font.family
-        [ Font.typeface "monospace"
-        , Font.sansSerif
-        ]
-    ]
-
-
-modeToggles model =
-    row
-        [ E.width <| fillPortion <| 3
-        , E.spacing 20
-        ]
-        [ toggleSwitch "MODE" "BEARING" "ELEVATION" (model.goniometerMode == Bearing) SelectGoniometerMode
-        , toggleSwitch "HEIGHT DF" "HIGH (A)" "LOW (B)" False SelectReceiveAntenna
-        , toggleSwitch "TRANSMITTER" "MAIN ARRAY" "GAP FILLER" model.transmitAB SelectTransmitAntenna
-        , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
-        ]
-
-
-operatorPageLandscape : Model -> Element Msg
-operatorPageLandscape model =
-    column
-        commonStyles
-        [ row
-            [ E.width E.fill
-            ]
-            [ E.el
-                [ E.width <| fillPortion 1 ]
-                none
-            , column
-                [ E.width <| E.fillPortion 6 ]
-                [ rangeSlider model
-                , E.html (crt model)
-                ]
-            , E.el
-                [ E.width <| fillPortion 1 ]
-                none
-            ]
-        , row
-            [ E.centerX
-            , E.spacing 50
-            ]
-            [ E.el
-                [ E.width <| minimum 200 <| fillPortion 3
-                , pointer
-                ]
-              <|
-                E.html <|
-                    clickableGonioImage <|
-                        model.goniometerBearing
-                            + model.station.lineOfShoot
-
-            --, showMouseCoordinates model
-            , modeToggles model
-            , column [ E.width <| fillPortion 1 ]
-                [ rangeDisplay model.rangeSlider
-                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
-                ]
-            , column
-                [ E.width <| minimum 100 <| fillPortion 2
-                , pointer
-                , centerX
-                ]
-                [ E.el
-                    [ E.width <| maximum 200 <| fill
-                    , pointer
-                    ]
-                  <|
-                    E.html <|
-                        clickableRangeKnob <|
-                            [ drawRangeKnob model.rangeKnobAngle ]
-                , E.el [ centerX ] (E.text "RANGE")
-                ]
-            ]
-        ]
-
-
-operatorPagePortrait : Model -> Element Msg
-operatorPagePortrait model =
-    column
-        commonStyles
-        [ rangeSlider model
-        , E.html (crt model)
-        , row [ E.width E.fill ]
-            [ E.el [ pointer, E.width <| fillPortion 3 ] <|
-                E.html <|
-                    clickableGonioImage <|
-                        model.goniometerBearing
-                            + model.station.lineOfShoot
-            , E.el [ pointer, E.width <| fillPortion 2 ] <|
-                E.html <|
-                    clickableRangeKnob <|
-                        [ drawRangeKnob model.rangeKnobAngle ]
-            ]
-        , row [ E.width E.fill, spacing 10, padding 5 ]
-            [ modeToggles model
-            , column [ E.width <| fillPortion 1 ]
-                [ rangeDisplay model.rangeSlider
-                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
-                ]
-            ]
-        ]
-
-
-operatorPage : Model -> Element Msg
-operatorPage model =
-    case model.outputDevice.orientation of
-        Landscape ->
-            operatorPageLandscape model
-
-        Portrait ->
-            operatorPagePortrait model
 
 
 view : Model -> Browser.Document Msg

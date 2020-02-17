@@ -23,6 +23,7 @@ bawdsey =
     , lineOfShoot = degrees 90.0
     }
 
+
 behindStation =
     { longitude = bawdsey.longitude - degrees 0.9
     , latitude = bawdsey.latitude + degrees 0.01
@@ -31,6 +32,7 @@ behindStation =
     , speed = 200.0 -- mph
     , iff = False
     }
+
 
 bomber1 =
     { longitude = bawdsey.longitude + degrees 0.9
@@ -122,7 +124,7 @@ tenAbreast =
     List.map
         (\i ->
             { longitude = bawdsey.longitude + degrees 0.8
-            , latitude = bawdsey.latitude + (degrees 0.3) +  (degrees (toFloat i - 5) * 0.001)
+            , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
             , height = 25
             , bearing = degrees 270
             , speed = 200
@@ -136,9 +138,9 @@ tenAbreast =
 tenAligned =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.002)
-            , latitude = bawdsey.latitude - (degrees 0.2) + (degrees <| 0.05 * sin (toFloat i))
-            , height = 25
+            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.001)
+            , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
+            , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
             , bearing = degrees 270
             , speed = 200
             , iff = False
@@ -183,8 +185,9 @@ massiveRaid =
 nearbynoise =
     TargetSelector 8 "Local ground reflections" (stationClutter bawdsey 100) False
 
+
 behindYou =
-    TargetSelector 9 "It's behind you!" [behindStation] False
+    TargetSelector 9 "It's behind you!" [ behindStation ] False
 
 
 targetConfigurations =

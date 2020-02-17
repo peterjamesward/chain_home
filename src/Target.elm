@@ -3,6 +3,7 @@ module Target exposing (..)
 import Spherical exposing (..)
 import Station exposing (Station)
 import Html exposing (..)
+import Time
 
 type alias Target = { latitude   : Float
                      , longitude : Float
@@ -21,6 +22,7 @@ defaultPolarTarget = { r = 0, theta = 0, alpha = 0, iff = False }
 
 -- Convert from Cartesian (and imperial) map coordinates to 
 -- polar (and metric) relative to station position and line of shoot.
+-- Note that target height are specified in '000 feet.
 
 mapToPolar : Station -> Target -> PolarTarget
 mapToPolar station target = 
@@ -35,9 +37,9 @@ mapToPolar station target =
      }
 
 -- Targets move! t in seconds to at least centisecond resolution please
-targetAtTime : Int -> Int -> Target -> Target
+targetAtTime : Time.Posix -> Time.Posix -> Target -> Target
 targetAtTime t startTime target = 
-  let tempusFugit = t - startTime  -- milliseconds elapsed
+  let tempusFugit = (Time.posixToMillis t) - (Time.posixToMillis startTime)  -- milliseconds elapsed
       distanceTravelled = (toFloat tempusFugit) * target.speed * 1609 / 3600000
       (newLat, newLong) = newPosition (target.latitude, target.longitude) 
                                        distanceTravelled target.bearing

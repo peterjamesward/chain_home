@@ -47,7 +47,7 @@ txHiVerticalReflectedLobe α =
 
 
 txLowVerticalReflectedLobe α =
-    dipoleStackVerticalReflectedLobes 6 α
+    dipoleStackVerticalReflectedLobes 4 α
 
 
 txHorizontalReflectedLobe θ =
