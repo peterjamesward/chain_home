@@ -183,7 +183,7 @@ massiveRaid =
 
 
 nearbynoise =
-    TargetSelector 8 "Local ground reflections" (stationClutter bawdsey 100) False
+    TargetSelector 8 "Local ground reflections" (stationClutter bawdsey 10) False
 
 
 behindYou =

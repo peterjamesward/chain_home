@@ -1,5 +1,7 @@
 module Station exposing (Station, stationClutter)
 
+import Complex exposing (..)
+
 
 type alias Station =
     { latitude : Float

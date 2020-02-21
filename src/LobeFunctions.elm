@@ -2,12 +2,13 @@ module LobeFunctions exposing (..)
 
 -- Some RDF lobe functions.
 -- These are approximations to curves portrayed in the supervisor's handbook.
--- This use of simple series is a pretty good approximation, based on curves from Wolfram Alphs
+-- This use of simple series is a pretty good approximation, based on curves from Wolfram Alpha.
 -- Four stack : abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ))
 -- Six stack : abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ) + cos (5 * θ) + cos (6 * θ))
 -- Eight stack : abs (cos θ + cos (2 * θ) + cos (3 * θ) + cos (4 * θ) + cos (5 * θ) + cos (6 * θ) + cos (7 * θ) + cos (8 * θ))
 
 import Types exposing (..)
+import Utils exposing (choose)
 
 
 txFourStack =
@@ -39,15 +40,21 @@ dipoleStackVerticalUnreflectedLobes n α =
 
 dipoleStackVerticalReflectedLobes : Int -> Float -> Float
 dipoleStackVerticalReflectedLobes n α =
-    -- The factor of 3 here is empirical.
-    dipoleStackVerticalUnreflectedLobes n α * 3 / (1 + α ^ 2)
+    let
+        -- Simply, the energy is reflected forwards; almost nothing behind.
+        coefficient =
+            choose (abs α < pi / 2) 3.0 0.1
+    in
+    dipoleStackVerticalUnreflectedLobes n α * coefficient
 
 
 txHiVerticalReflectedLobe α =
+    -- The main eight dipole array.
     dipoleStackVerticalReflectedLobes 8 α
 
 
 txLowVerticalReflectedLobe α =
+    -- The "gap filler" four dipole array.
     dipoleStackVerticalReflectedLobes 4 α
 
 
