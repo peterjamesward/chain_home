@@ -39,7 +39,8 @@ dipoleStackVerticalUnreflectedLobes n α =
 
 dipoleStackVerticalReflectedLobes : Int -> Float -> Float
 dipoleStackVerticalReflectedLobes n α =
-    dipoleStackVerticalUnreflectedLobes n α / (1 + α ^ 2)
+    -- The factor of 3 here is empirical.
+    dipoleStackVerticalUnreflectedLobes n α * 3 / (1 + α ^ 2)
 
 
 txHiVerticalReflectedLobe α =
@@ -57,7 +58,11 @@ txHorizontalReflectedLobe θ =
 txHorizontalUnreflectedLobe θ =
     abs <| cos θ ^ 2
 
+
+
 -- TODO: The receiver lobe functions need more scrutiny.
+
+
 rxHorizLobe θ =
     cos θ
 

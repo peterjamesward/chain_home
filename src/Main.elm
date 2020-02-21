@@ -9,7 +9,6 @@ import Attr exposing (..)
 import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
 import Browser.Events exposing (..)
-import CRT exposing (crt)
 import Config exposing (..)
 import Constants exposing (..)
 import Echo exposing (..)
@@ -20,16 +19,10 @@ import Element.Events as Event exposing (..)
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
-import Html exposing (div)
-import Html.Attributes exposing (style)
-import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
 import Messages exposing (..)
-import Nixie exposing (nixieDisplay)
 import OperatorPage exposing (operatorPage)
-import PushButtons exposing (toggleSwitch)
-import Range exposing (drawRangeKnob)
 import Receiver exposing (goniometerMix)
 import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
@@ -442,7 +435,6 @@ selectTransmitAntenna ab reflect =
 
 
 -- VIEW
-
 
 
 view : Model -> Browser.Document Msg
