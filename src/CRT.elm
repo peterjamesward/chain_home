@@ -50,15 +50,24 @@ crt m =
 
 
 rangeScale =
-    List.map
+    List.concatMap
         (\i ->
-            text_
-                [ x (String.fromInt (i * 33))
+            [ text_
+                [ x (String.fromInt (i * 33 - 5))
                 , y "-10"
-                , fill "lightgreen"
+                , fill "antiquewhite"
                 , textAnchor "right"
                 , fontFamily "monospace"
                 ]
                 [ text (String.fromInt (i * 5)) ]
+            , Svg.line
+                [ x1 (String.fromInt (i * 33))
+                , y1 "-5"
+                , x2 (String.fromInt (i * 33))
+                , y2 "0"
+                , stroke "antiquewhite"
+                , strokeWidth "1"
+                ] []
+            ]
         )
         (List.range 0 30)

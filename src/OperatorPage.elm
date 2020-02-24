@@ -130,7 +130,7 @@ modeToggles model =
         , E.spacing 20
         ]
         [ toggleSwitch "MODE" "AZIMUTH" "ELEVATION" (model.goniometerMode == Azimuth) SelectGoniometerMode
-        , toggleSwitch "HEIGHT DF" "HIGH (A)" "LOW (B)" model.receiveAB SelectReceiveAntenna
+        , toggleSwitch "ELEVATION" "HIGH (A)" "LOW (B)" model.receiveAB SelectReceiveAntenna
         , toggleSwitch "TRANSMITTER" "MAIN ARRAY" "GAP FILLER" model.transmitAB SelectTransmitAntenna
         , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
         ]
