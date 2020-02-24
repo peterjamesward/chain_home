@@ -15,11 +15,11 @@ txFourStack =
     dipoleStackVerticalUnreflectedLobes 4
 
 
-txSixStack =
+txSixStackUnreflected =
     dipoleStackVerticalUnreflectedLobes 6
 
 
-txEightStack =
+txEightStackUnreflected =
     dipoleStackVerticalUnreflectedLobes 8
 
 
@@ -48,21 +48,21 @@ dipoleStackVerticalReflectedLobes n α =
     dipoleStackVerticalUnreflectedLobes n α * coefficient
 
 
-txHiVerticalReflectedLobe α =
+txEightStackReflected α =
     -- The main eight dipole array.
     dipoleStackVerticalReflectedLobes 8 α
 
 
-txLowVerticalReflectedLobe α =
+txSixStackReflected α =
     -- The "gap filler" four dipole array.
     dipoleStackVerticalReflectedLobes 4 α
 
 
-txHorizontalReflectedLobe θ =
+txHorizontalReflected θ =
     abs <| cos θ ^ 2 / (1 + θ ^ 2)
 
 
-txHorizontalUnreflectedLobe θ =
+txHorizontalUnreflected θ =
     abs <| cos θ ^ 2
 
 
@@ -83,19 +83,19 @@ rxHiVertLobe α =
 
 
 transmitANoReflect =
-    Antenna txEightStack txHorizontalUnreflectedLobe
+    Antenna txEightStackUnreflected txHorizontalUnreflected
 
 
 transmitAReflector =
-    Antenna txHiVerticalReflectedLobe txHorizontalReflectedLobe
+    Antenna txEightStackReflected txHorizontalReflected
 
 
 transmitBNoReflect =
-    Antenna txSixStack txHorizontalUnreflectedLobe
+    Antenna txSixStackUnreflected txHorizontalUnreflected
 
 
 transmitBReflector =
-    Antenna txLowVerticalReflectedLobe txHorizontalReflectedLobe
+    Antenna txSixStackReflected txHorizontalReflected
 
 
 receiveHigh =
