@@ -1,5 +1,6 @@
 module CRT exposing (crt)
 
+import Constants exposing (scaleWidthKilometers, viewWidth)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Utils exposing (..)
@@ -52,7 +53,7 @@ rangeScale =
     List.map
         (\i ->
             text_
-                [ x (String.fromInt (i * 50))
+                [ x (String.fromInt (i * 33))
                 , y "-10"
                 , fill "lightgreen"
                 , textAnchor "right"
@@ -60,4 +61,4 @@ rangeScale =
                 ]
                 [ text (String.fromInt (i * 5)) ]
         )
-        (List.range 0 19)
+        (List.range 0 30)

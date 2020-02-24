@@ -17,7 +17,7 @@ pulseWidth = lightSpeed * pulseDuration / 10000000.0
 beamSweepIncreasingAmplitude = 0.03
 beamSweepDecreasingAmplitude = -0.01
 
-scaleWidthKilometers = 150
+scaleWidthKilometers = 250
 
 viewWidth = 1000
 viewHeight = 400

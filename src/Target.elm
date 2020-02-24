@@ -60,13 +60,15 @@ targetAtTime : Time.Posix -> Time.Posix -> Target -> Target
 targetAtTime t startTime target =
     let
         tempusFugit =
+            -- milliseconds elapsed
             Time.posixToMillis t - Time.posixToMillis startTime
 
-        -- milliseconds elapsed
         distanceTravelled =
+            -- switch from mph to km/s
             toFloat tempusFugit * target.speed * 1609 / 3600000
 
         ( newLat, newLong ) =
+            -- Use the spherical stuff.
             newPosition ( target.latitude, target.longitude )
                 distanceTravelled
                 target.bearing

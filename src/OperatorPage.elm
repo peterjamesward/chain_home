@@ -1,6 +1,5 @@
 module OperatorPage exposing (operatorPage)
 
-
 import CRT exposing (crt)
 import Constants exposing (..)
 import Element as E exposing (Element, Orientation(..), centerX, column, el, fill, fillPortion, maximum, minimum, none, padding, pointer, row, spacing)
@@ -14,9 +13,10 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (toggleSwitch)
+import PushButtons exposing (alert, toggleSwitch)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..))
+
 
 clickableRangeKnob =
     div
@@ -106,7 +106,7 @@ bearingDisplay bearing =
                         / pi
                     )
             )
-        , el [ E.centerX ] (E.text "BEARING")
+        , el [ E.centerX ] (E.text "AZIMUTH")
         ]
 
 
@@ -129,14 +129,13 @@ modeToggles model =
         [ E.width <| fillPortion <| 3
         , E.spacing 20
         ]
-        [ toggleSwitch "MODE" "BEARING" "ELEVATION" (model.goniometerMode == Bearing) SelectGoniometerMode
-        , toggleSwitch "HEIGHT DF" "HIGH (A)" "LOW (B)" False SelectReceiveAntenna
+        [ toggleSwitch "MODE" "AZIMUTH" "ELEVATION" (model.goniometerMode == Azimuth) SelectGoniometerMode
+        , toggleSwitch "HEIGHT DF" "HIGH (A)" "LOW (B)" model.receiveAB SelectReceiveAntenna
         , toggleSwitch "TRANSMITTER" "MAIN ARRAY" "GAP FILLER" model.transmitAB SelectTransmitAntenna
         , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
         ]
 
 
---operatorPageLandscape : Model -> Element Msg
 operatorPageLandscape model =
     column
         commonStyles
@@ -166,15 +165,16 @@ operatorPageLandscape model =
               <|
                 E.html <|
                     clickableGonioImage <|
-                        model.goniometerBearing
+                        model.goniometerAzimuth
                             + model.station.lineOfShoot
 
             --, showMouseCoordinates model
             , modeToggles model
-            , column [ E.width <| fillPortion 1 ]
-                [ rangeDisplay model.rangeSlider
-                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
-                ]
+
+            --, column [ E.width <| fillPortion 1 ]
+            --    [ rangeDisplay model.rangeSlider
+            --    , bearingDisplay (model.goniometerAzimuth + model.station.lineOfShoot)
+            --    ]
             , column
                 [ E.width <| minimum 100 <| fillPortion 2
                 , pointer
@@ -194,7 +194,10 @@ operatorPageLandscape model =
         ]
 
 
+
 --operatorPagePortrait : Model -> Element Msg
+
+
 operatorPagePortrait model =
     column
         commonStyles
@@ -204,7 +207,7 @@ operatorPagePortrait model =
             [ E.el [ pointer, E.width <| fillPortion 3 ] <|
                 E.html <|
                     clickableGonioImage <|
-                        model.goniometerBearing
+                        model.goniometerAzimuth
                             + model.station.lineOfShoot
             , E.el [ pointer, E.width <| fillPortion 2 ] <|
                 E.html <|
@@ -213,15 +216,19 @@ operatorPagePortrait model =
             ]
         , row [ E.width E.fill, spacing 10, padding 5 ]
             [ modeToggles model
-            , column [ E.width <| fillPortion 1 ]
-                [ rangeDisplay model.rangeSlider
-                , bearingDisplay (model.goniometerBearing + model.station.lineOfShoot)
-                ]
+
+            --, column [ E.width <| fillPortion 1 ]
+            --    [ rangeDisplay model.rangeSlider
+            --    , bearingDisplay (model.goniometerAzimuth + model.station.lineOfShoot)
+            --    ]
             ]
         ]
 
 
+
 --operatorPage : Model -> Element Msg
+
+
 operatorPage model =
     case model.outputDevice.orientation of
         Landscape ->

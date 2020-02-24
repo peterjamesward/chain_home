@@ -92,8 +92,7 @@ processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY
 
 deriveSkyline : Int -> Float -> List Echo -> List EdgeSegment
 deriveSkyline time maxX allEchoes =
-    -- Let's put the echoes in a dictionary, indexed by range (probably unique!).
-    -- Then we need a sorted list of edges (front and back).
+    -- We need a sorted list of edges (front and back).
     -- Sorted list will index into the dictionary, for easy access to each target.
     let
         activeEchoes =

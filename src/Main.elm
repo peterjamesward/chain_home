@@ -50,7 +50,7 @@ type alias Model =
     , polarTargets : List PolarTarget
     , echoes : List Echo
     , skyline : List Line
-    , goniometerBearing : Angle
+    , goniometerAzimuth : Angle
     , gonioOutput : List Echo
     , keys : Keys
     , gonioDrag : Maybe ( Angle, Point ) -- angle and mouse position when mouse down
@@ -87,7 +87,7 @@ init _ =
       , polarTargets = []
       , echoes = []
       , skyline = []
-      , goniometerBearing = degrees 10 -- relative to Line Of Shoot.
+      , goniometerAzimuth = degrees 10 -- relative to Line Of Shoot.
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
@@ -96,7 +96,7 @@ init _ =
       , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
       , rangeKnobAngle = 0.0
-      , goniometerMode = Bearing
+      , goniometerMode = Azimuth
       , goniometerElevation = degrees 0
       , transmitAntenna = transmitAReflector
       , transmitAB = True
@@ -236,19 +236,19 @@ deriveModelAtTime model t =
             applyReceiver model.receiveAntenna echoSignals
 
         heightModeAInputs =
-            -- When we are in height mode, we need high and low receiver inputs
+            -- When we are in elevation mode, we need high and low receiver inputs to derive elevation
             applyReceiver receiveHigh echoSignals
 
         heightModeBInputs =
             applyReceiver receiveLow echoSignals
 
-        gonioBearingOut =
-            -- 'Blend' X and Y inputs to find bearing.
-            goniometerMix model.goniometerBearing receiveSignals
+        gonioAzimuthOut =
+            -- 'Blend' X and Y inputs to find target's azimuth.
+            goniometerMix model.goniometerAzimuth receiveSignals
 
         newSkyline =
             -- Work out what to show on the CRT trace.
-            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioBearingOut
+            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioAzimuthOut
     in
     { model
         | startTime =
@@ -265,9 +265,9 @@ deriveModelAtTime model t =
         , polarTargets = convertedTargets
         , echoes = echoSignals
         , skyline = newSkyline
-        , gonioOutput = gonioBearingOut
+        , gonioOutput = gonioAzimuthOut
         , lineData = scalePathToDisplay <| beamPath newSkyline
-        , goniometerBearing = swingGoniometer model.goniometerBearing model.keys
+        , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
     }
 
@@ -323,7 +323,7 @@ update msg model =
 
         GonioGrab offset ->
             ( { model
-                | gonioDrag = Just ( model.goniometerBearing, offset )
+                | gonioDrag = Just ( model.goniometerAzimuth, offset )
               }
             , Cmd.none
             )
@@ -339,7 +339,7 @@ update msg model =
                             goniometerTurnAngle startAngle startXY offset
                     in
                     ( { model
-                        | goniometerBearing = newAngle
+                        | goniometerAzimuth = newAngle
                         , gonioDrag = Just ( newAngle, offset )
                       }
                     , Cmd.none
@@ -380,11 +380,7 @@ update msg model =
                         { model
                             | rangeSlider = newRange
                             , rangeDrag =
-                                if newRange <= 100 then
-                                    Just ( newAngle, offset )
-
-                                else
-                                    Nothing
+                                choose (newRange <= 100) (Just ( newAngle, offset )) Nothing
                             , rangeKnobAngle = newAngle
                         }
 
@@ -393,11 +389,7 @@ update msg model =
                         { model
                             | rangeSlider = newRange
                             , rangeDrag =
-                                if newRange >= 0 then
-                                    Just ( newAngle, offset )
-
-                                else
-                                    Nothing
+                                choose (newRange >= 0) (Just ( newAngle, offset )) Nothing
                             , rangeKnobAngle = newAngle
                         }
 
@@ -451,7 +443,7 @@ update msg model =
 
         SelectGoniometerMode mode ->
             ( { model
-                | goniometerMode = choose mode Bearing Elevation
+                | goniometerMode = choose mode Azimuth Elevation
               }
             , Cmd.none
             )

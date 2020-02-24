@@ -18,32 +18,42 @@ toggleSwitch groupName trueLabel falseLabel state msg =
         ]
 
 
+commonStyles =
+    [ Background.color flatWetAsphalt
+    , Border.color black
+    , Element.height (px 30)
+    , Element.width fill
+    , Border.rounded 4
+    , center
+    , Element.focused
+        [ Border.color white ]
+    ]
+
+
+activeButtonStyle =
+    [ innerGlow flatSunflower 0.5
+    , Font.color vividGreen
+    ]
+        ++ commonStyles
+
+
+inactiveButtonStyle =
+    [ innerGlow flatMidnightBlue 1.0
+    , Font.color lightCharcoal
+    ]
+        ++ commonStyles
+
+
+activeAlertStyle =
+    [ innerGlow flatSunflower 0.5
+    , Font.color flatSunflower
+    ]
+        ++ commonStyles
+
+
 pushButtonGroup : String -> List ( String, Msg, Bool ) -> Element Msg
 pushButtonGroup groupName buttonDetails =
     let
-        commonStyles =
-            [ Background.color flatWetAsphalt
-            , Border.color black
-            , Element.height (px 30)
-            , Element.width fill
-            , Border.rounded 4
-            , center
-            , Element.focused
-                [ Border.color white ]
-            ]
-
-        activeButtonStyle =
-            [ innerGlow flatSunflower 0.5
-            , Font.color flatSunflower
-            ]
-                ++ commonStyles
-
-        inactiveButtonStyle =
-            [ innerGlow flatMidnightBlue 1.0
-            , Font.color lightCharcoal
-            ]
-                ++ commonStyles
-
         makeButton ( label, msg, state ) =
             Input.button
                 (choose state activeButtonStyle inactiveButtonStyle)
@@ -61,3 +71,13 @@ pushButtonGroup groupName buttonDetails =
                     (Element.text groupName)
                ]
         )
+
+
+alert : String -> Bool -> Element Msg
+alert label enabled =
+    -- Abusing a button to give us an illuminating alert indicator.
+    Input.button
+        (choose enabled activeAlertStyle inactiveButtonStyle)
+        { onPress = Nothing
+        , label = Element.text label
+        }

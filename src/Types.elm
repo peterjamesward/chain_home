@@ -16,7 +16,7 @@ type alias Range =
     Float
 
 type GoniometerMode
-    = Bearing
+    = Azimuth
     | Elevation
 
 type alias Antenna =
