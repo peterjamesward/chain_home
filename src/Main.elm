@@ -65,6 +65,8 @@ type alias Model =
     , transmitAB : Bool
     , reflector : Bool
     , isMenuOpen : Bool
+    , receiveAB : Bool
+    , receiveAntenna : Antenna
     }
 
 
@@ -100,6 +102,8 @@ init _ =
       , transmitAB = True
       , reflector = True
       , isMenuOpen = False
+      , receiveAB = True
+      , receiveAntenna = receiveHigh
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -195,26 +199,56 @@ subscriptions model =
 -- UPDATE
 
 
+applyReceiver : Antenna -> List Echo -> List Echo
+applyReceiver antenna rawEchoes =
+    List.map
+        (\e ->
+            { e
+                | amplitude =
+                    e.amplitude
+                        * antenna.verticalLobeFunction e.alpha
+            }
+        )
+        rawEchoes
+
+
 deriveModelAtTime : Model -> Time.Posix -> Model
 deriveModelAtTime model t =
     let
         effectiveStartTime =
+            -- TODO: Embellish this so we can vary the model speed.
             Maybe.withDefault model.time model.startTime
 
         targetsNow =
+            -- Where are they, based on origin, bearing, speed, time.
             List.map (targetAtTime t effectiveStartTime) model.targets
 
         convertedTargets =
+            -- Easier to work in polar coordinates here on.
             List.map (mapToPolar bawdsey) targetsNow
 
         echoSignals =
+            -- Deduce echo based on transmitter characteristics.
             deriveEchoes convertedTargets model.transmitAntenna (Time.posixToMillis t)
 
-        gonioOut =
-            goniometerMix model.goniometerBearing echoSignals
+        receiveSignals =
+            -- Deduce inputs based on receiver characteristics.
+            applyReceiver model.receiveAntenna echoSignals
+
+        heightModeAInputs =
+            -- When we are in height mode, we need high and low receiver inputs
+            applyReceiver receiveHigh echoSignals
+
+        heightModeBInputs =
+            applyReceiver receiveLow echoSignals
+
+        gonioBearingOut =
+            -- 'Blend' X and Y inputs to find bearing.
+            goniometerMix model.goniometerBearing receiveSignals
 
         newSkyline =
-            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioOut
+            -- Work out what to show on the CRT trace.
+            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioBearingOut
     in
     { model
         | startTime =
@@ -231,7 +265,7 @@ deriveModelAtTime model t =
         , polarTargets = convertedTargets
         , echoes = echoSignals
         , skyline = newSkyline
-        , gonioOutput = gonioOut
+        , gonioOutput = gonioBearingOut
         , lineData = scalePathToDisplay <| beamPath newSkyline
         , goniometerBearing = swingGoniometer model.goniometerBearing model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
@@ -395,6 +429,14 @@ update msg model =
             ( { model
                 | transmitAB = val
                 , transmitAntenna = selectTransmitAntenna val model.reflector
+              }
+            , Cmd.none
+            )
+
+        SelectReceiveAntenna val ->
+            ( { model
+                | receiveAB = val
+                , receiveAntenna = choose val receiveHigh receiveLow
               }
             , Cmd.none
             )
