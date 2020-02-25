@@ -18,6 +18,7 @@ import Element.Border as Border
 import Element.Events as Event exposing (..)
 import Element.Font as Font
 import Element.Input as Input
+import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
 import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
@@ -43,7 +44,9 @@ type alias Model =
     , zone : Time.Zone
     , startTime : Maybe Time.Posix
     , time : Time.Posix -- milliseconds from t-zero
-    , lineData : List Point
+    , azimuthModeTrace : List Point
+    , elevation_A_trace : List Point
+    , elevation_B_trace : List Point
     , station : Station
     , targets : List Target
     , movedTargets : List Target
@@ -60,7 +63,6 @@ type alias Model =
     , rangeDrag : Maybe ( Angle, Point )
     , rangeKnobAngle : Angle
     , goniometerMode : GoniometerMode
-    , goniometerElevation : Angle
     , transmitAntenna : Antenna
     , transmitAB : Bool
     , reflector : Bool
@@ -80,7 +82,9 @@ init _ =
       , zone = Time.utc
       , startTime = Nothing
       , time = Time.millisToPosix 0
-      , lineData = beamPath []
+      , azimuthModeTrace = beamPath []
+      , elevation_A_trace = []
+      , elevation_B_trace = []
       , station = bawdsey
       , targets = getAllTargets targetConfigurations
       , movedTargets = []
@@ -97,7 +101,6 @@ init _ =
       , rangeDrag = Nothing
       , rangeKnobAngle = 0.0
       , goniometerMode = Azimuth
-      , goniometerElevation = degrees 0
       , transmitAntenna = transmitAReflector
       , transmitAB = True
       , reflector = True
@@ -235,12 +238,23 @@ deriveModelAtTime model t =
             -- Deduce inputs based on receiver characteristics.
             applyReceiver model.receiveAntenna echoSignals
 
-        heightModeAInputs =
-            -- When we are in elevation mode, we need high and low receiver inputs to derive elevation
-            applyReceiver receiveHigh echoSignals
+        heightMode_A_Outputs =
+            -- When we are in elevation mode, we need high and low receiver inputs to derive elevation.
+            -- But we going to cheat here, since height finding is iffy at best. We know the
+            -- elevation of each target, and we can hard-code the height response curves for A and B
+            -- systems (Supervisor's Handbook chap 12). We then know the goniometer setting that
+            -- will make a target "D/F out" -- we only need a suitable function to make it appear
+            -- that we are actually using a goniometer.
+            aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
+                |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
+                |> beamPath
+                |> scalePathToDisplay
 
-        heightModeBInputs =
-            applyReceiver receiveLow echoSignals
+        heightMode_B_Outputs =
+            bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
+                |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
+                |> beamPath
+                |> scalePathToDisplay
 
         gonioAzimuthOut =
             -- 'Blend' X and Y inputs to find target's azimuth.
@@ -266,9 +280,11 @@ deriveModelAtTime model t =
         , echoes = echoSignals
         , skyline = newSkyline
         , gonioOutput = gonioAzimuthOut
-        , lineData = scalePathToDisplay <| beamPath newSkyline
+        , azimuthModeTrace = scalePathToDisplay <| beamPath newSkyline
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
+        , elevation_A_trace = heightMode_A_Outputs
+        , elevation_B_trace = heightMode_B_Outputs
     }
 
 

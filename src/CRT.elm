@@ -1,15 +1,17 @@
 module CRT exposing (crt)
 
-import Constants exposing (scaleWidthKilometers, viewWidth)
+import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Types exposing (Point)
 import Utils exposing (..)
 
 
-crt m =
+crt : List Point -> Html msg
+crt lineData =
     let
         svgPointList =
-            polyLineFromCoords m.lineData
+            polyLineFromCoords lineData
     in
     svg
         [ viewBox "-10 -40 1020 450" -- Establishes the CRT coordinate system, not its rendered size.

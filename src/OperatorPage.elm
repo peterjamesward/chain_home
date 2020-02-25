@@ -13,7 +13,7 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (alert, toggleSwitch)
+import PushButtons exposing (toggleSwitch)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..))
 
@@ -136,6 +136,18 @@ modeToggles model =
         ]
 
 
+traceDependingOnMode model =
+    case ( model.goniometerMode, model.receiveAB ) of
+        ( Azimuth, _ ) ->
+            model.azimuthModeTrace
+
+        ( Elevation, True ) ->
+            model.elevation_A_trace
+
+        ( Elevation, False ) ->
+            model.elevation_B_trace
+
+
 operatorPageLandscape model =
     column
         commonStyles
@@ -148,7 +160,7 @@ operatorPageLandscape model =
             , column
                 [ E.width <| E.fillPortion 6 ]
                 [ rangeSlider model
-                , E.html (crt model)
+                , E.html <| crt <| traceDependingOnMode model
                 ]
             , E.el
                 [ E.width <| fillPortion 1 ]
@@ -202,7 +214,7 @@ operatorPagePortrait model =
     column
         commonStyles
         [ rangeSlider model
-        , E.html (crt model)
+        , E.html <| crt <| traceDependingOnMode model
         , row [ E.width E.fill ]
             [ E.el [ pointer, E.width <| fillPortion 3 ] <|
                 E.html <|

@@ -93,7 +93,6 @@ processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY
 deriveSkyline : Int -> Float -> List Echo -> List EdgeSegment
 deriveSkyline time maxX allEchoes =
     -- We need a sorted list of edges (front and back).
-    -- Sorted list will index into the dictionary, for easy access to each target.
     let
         activeEchoes =
             []
@@ -110,9 +109,6 @@ deriveSkyline time maxX allEchoes =
         -- We have one in hand so we need to flush it out
         ( roofline, remainingEchoes, ( lastX, lastY ) ) =
             List.foldl (processEdge time) ( [], activeEchoes, ( 0.0, 0.0 ) ) allEdges
-
-        finalY =
-            combineEchoes time remainingEchoes
     in
     ( ( lastX, 0 ), ( maxX, 0 ) ) :: roofline
 

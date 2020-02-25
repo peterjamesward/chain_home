@@ -44,7 +44,7 @@ inactiveButtonStyle =
         ++ commonStyles
 
 
-activeAlertStyle =
+pendingActionStyle =
     [ innerGlow flatSunflower 0.5
     , Font.color flatSunflower
     ]
@@ -73,11 +73,11 @@ pushButtonGroup groupName buttonDetails =
         )
 
 
-alert : String -> Bool -> Element Msg
-alert label enabled =
-    -- Abusing a button to give us an illuminating alert indicator.
+actionButton : String -> Bool -> Msg -> Element Msg
+actionButton label enabled msg =
+    -- Abusing a button for sort-of-modal azimuth and elevation capture.
     Input.button
-        (choose enabled activeAlertStyle inactiveButtonStyle)
-        { onPress = Nothing
+        (choose enabled pendingActionStyle inactiveButtonStyle)
+        { onPress = choose enabled (Just msg) Nothing
         , label = Element.text label
         }
