@@ -12,12 +12,8 @@ type alias TargetSelector =
     }
 
 
-
--- Let's make ourselves a station and a target
--- Bawdsey, assuming LOS due East.
-
-
 bawdsey =
+    -- Bawdsey, assuming LOS due East.
     { longitude = degrees 1.408614
     , latitude = degrees 51.993661
     , lineOfShoot = degrees 90.0
@@ -25,9 +21,10 @@ bawdsey =
 
 
 behindStation =
+    -- This to test reflector function.
     { longitude = bawdsey.longitude - degrees 0.9
     , latitude = bawdsey.latitude + degrees 0.01
-    , height = 10 -- ,000 ft
+    , height = 30 -- ,000 ft
     , bearing = degrees 180
     , speed = 200.0 -- mph
     , iff = False
@@ -45,6 +42,7 @@ bomber1 =
 
 
 bomber2 =
+    -- 2 and 2A very close to look for "beating" effect.
     { longitude = degrees 2.0
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
@@ -65,9 +63,10 @@ bomber2A =
 
 
 bomber3 =
+    -- Try to get 3 and 4 at similar range but differing in azimuth.
     { longitude = bawdsey.longitude + degrees 0.8
     , latitude = bawdsey.latitude + degrees 0.35
-    , height = 20 -- ,000 ft
+    , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
     , iff = False
@@ -76,7 +75,7 @@ bomber3 =
 
 bomber4 =
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees -0.33
+    , latitude = bawdsey.latitude + degrees -0.35
     , height = 20 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -85,16 +84,18 @@ bomber4 =
 
 
 fighter1 =
-    { longitude = degrees 1.8
-    , latitude = bawdsey.latitude - degrees 0.1
+    -- Starts behind and heads out pretty quick.
+    { longitude = bawdsey.longitude - degrees 0.01
+    , latitude = bawdsey.latitude + degrees 0.01
     , height = 10 -- ,000 ft
     , bearing = degrees 90
-    , speed = 400 -- mph
+    , speed = 300 -- mph
     , iff = False
     }
 
 
 bomberInFormation baseLocation latIndex longIndex =
+    -- TODO: Better attempt at spacing these out.
     { baseLocation
         | longitude = baseLocation.longitude + (degrees (toFloat longIndex - 5) * 0.01)
         , latitude = baseLocation.latitude + (degrees (toFloat latIndex - 5) * 0.01)
@@ -197,7 +198,8 @@ targetConfigurations =
     , twoDistantTargets
     , tenWide
     , tenDeep
-    , massiveRaid
+
+    --, massiveRaid
     , nearbynoise
     , behindYou
     ]

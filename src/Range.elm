@@ -15,18 +15,18 @@ drawRangeKnob theta =
             0
 
         radius =
-            90
+            120
 
         xPoint =
             String.fromFloat <|
                 (+) originX <|
-                    (*) radius <|
+                    (*) (radius - 8) <|
                         sin theta
 
         yPoint =
             String.fromFloat <|
                 (-) originY <|
-                    (*) radius <|
+                    (*) (radius - 8) <|
                         cos theta
     in
     svg
@@ -38,7 +38,7 @@ drawRangeKnob theta =
         [ Svg.circle
             [ cx "0"
             , cy "0"
-            , r "100"
+            , r (String.fromInt radius)
             , stroke "grey"
             , strokeWidth "1"
             , S.fill "darkslategrey"

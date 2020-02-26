@@ -21,17 +21,20 @@ toggleSwitch groupName trueLabel falseLabel state msg =
 commonStyles =
     [ Background.color flatWetAsphalt
     , Border.color black
-    , Element.height (px 30)
+
+    --, Element.height (px 30)
     , Element.width fill
     , Border.rounded 4
+    , padding 10
     , center
     , Element.focused
         [ Border.color white ]
+    , Font.variant Font.smallCaps
     ]
 
 
 activeButtonStyle =
-    [ innerGlow flatSunflower 0.5
+    [ innerGlow flatSunflower 1.0
     , Font.color vividGreen
     ]
         ++ commonStyles
@@ -79,5 +82,7 @@ actionButton label enabled msg =
     Input.button
         (choose enabled pendingActionStyle inactiveButtonStyle)
         { onPress = choose enabled (Just msg) Nothing
-        , label = Element.text label
+        , label =
+            paragraph [ spacing 3 ]
+                [ Element.text label ]
         }

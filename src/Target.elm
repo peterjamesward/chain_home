@@ -24,14 +24,11 @@ type alias PolarTarget =
     }
 
 
-
--- Convert from Cartesian (and imperial) map coordinates to
--- polar (and metric) relative to station position and line of shoot.
--- Note that target height are specified in '000 feet.
-
-
 mapToPolar : Station -> Target -> PolarTarget
 mapToPolar station target =
+    -- Convert from Cartesian (and imperial) map coordinates to
+    -- polar (and metric) relative to station position and line of shoot.
+    -- Note that target height are specified in '000 feet.
     let
         stationPos =
             ( station.latitude, station.longitude )
@@ -52,12 +49,9 @@ mapToPolar station target =
     }
 
 
-
--- Targets move! t in seconds to at least centisecond resolution please
-
-
 targetAtTime : Time.Posix -> Time.Posix -> Target -> Target
 targetAtTime t startTime target =
+    -- Targets move! t in seconds to at least centisecond resolution please
     let
         tempusFugit =
             -- milliseconds elapsed

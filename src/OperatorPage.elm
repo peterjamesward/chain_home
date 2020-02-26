@@ -2,7 +2,7 @@ module OperatorPage exposing (operatorPage)
 
 import CRT exposing (crt)
 import Constants exposing (..)
-import Element as E exposing (Element, Orientation(..), centerX, column, el, fill, fillPortion, maximum, minimum, none, padding, pointer, row, spacing)
+import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -13,7 +13,7 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (toggleSwitch)
+import PushButtons exposing (actionButton, toggleSwitch)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..))
 
@@ -135,6 +135,16 @@ modeToggles model =
         , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
         ]
 
+actionButtons model =
+    row
+        [ E.width <| fillPortion <| 3
+        , E.spacing 20
+        , E.padding 40
+        ]
+        [ actionButton "STORE\nAZIMUTH" False StoreAzimuth
+        , actionButton "STORE\nELEVATION" False StoreElevation
+        ]
+
 
 traceDependingOnMode model =
     case ( model.goniometerMode, model.receiveAB ) of
@@ -179,14 +189,10 @@ operatorPageLandscape model =
                     clickableGonioImage <|
                         model.goniometerAzimuth
                             + model.station.lineOfShoot
-
-            --, showMouseCoordinates model
-            , modeToggles model
-
-            --, column [ E.width <| fillPortion 1 ]
-            --    [ rangeDisplay model.rangeSlider
-            --    , bearingDisplay (model.goniometerAzimuth + model.station.lineOfShoot)
-            --    ]
+            , column []
+                [ modeToggles model
+                , actionButtons model
+                ]
             , column
                 [ E.width <| minimum 100 <| fillPortion 2
                 , pointer

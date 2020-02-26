@@ -112,11 +112,8 @@ init _ =
     )
 
 
-
--- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
-
-
 type alias Keys =
+    -- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
     { gonioClock : Bool -- A
     , gonioAnti : Bool -- Q
     , rangeLeft : Bool -- left arrow
@@ -148,12 +145,9 @@ updateKeys isDown key keys =
             keys
 
 
-
--- Mouse tracking permits non-integer movements.
-
-
 swingGoniometer : Angle -> Keys -> Angle
 swingGoniometer angle keys =
+    -- Mouse tracking permits non-integer movements.
     case ( keys.gonioClock, keys.gonioAnti ) of
         ( True, True ) ->
             angle

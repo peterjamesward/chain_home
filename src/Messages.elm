@@ -25,3 +25,5 @@ type Msg
     | SelectGoniometerMode Bool
     | ToggleMenu
     | AdjustTimeZone Time.Zone
+    | StoreAzimuth
+    | StoreElevation
