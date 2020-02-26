@@ -10,19 +10,19 @@ wavelength = lightSpeed / frequency
 
 transmitterEffectiveHeight = 100.0
 
-pulseDuration = 40.0 -- microseconds
+pulseDuration = 20.0 -- microseconds
 pulseWidth = lightSpeed * pulseDuration / 10000000.0
 
 -- higher numbers are steeper slops.
-beamSweepIncreasingAmplitude = 0.03
-beamSweepDecreasingAmplitude = -0.01
+beamSweepIncreasingAmplitude = 0.002
+beamSweepDecreasingAmplitude = -0.001
 
-scaleWidthKilometers = 250
+scaleWidthKilometers = 160
 
 viewWidth = 1000
 viewHeight = 400
 
-strengthToHeightFactor = 10.0
+strengthToHeightFactor = 100.0
 
 rangeToXFactor =  viewWidth / (scaleWidthKilometers * 1000.0)
 

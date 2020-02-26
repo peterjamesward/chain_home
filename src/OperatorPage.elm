@@ -128,21 +128,23 @@ modeToggles model =
     row
         [ E.width <| fillPortion <| 3
         , E.spacing 20
+        , E.padding 40
+        , E.centerX
         ]
-        [ toggleSwitch "MODE" "AZIMUTH" "ELEVATION" (model.goniometerMode == Azimuth) SelectGoniometerMode
-        , toggleSwitch "ELEVATION" "HIGH (A)" "LOW (B)" model.receiveAB SelectReceiveAntenna
-        , toggleSwitch "TRANSMITTER" "MAIN ARRAY" "GAP FILLER" model.transmitAB SelectTransmitAntenna
-        , toggleSwitch "REFLECTOR" "ON" "OFF" model.reflector EnableReflector
+        [ toggleSwitch "MODE" "D/F" "HEIGHT" (model.goniometerMode == Azimuth) SelectGoniometerMode
+        , toggleSwitch "SENSING" "ON" "OFF" model.reflector EnableReflector
         ]
+
 
 actionButtons model =
     row
         [ E.width <| fillPortion <| 3
         , E.spacing 20
         , E.padding 40
+        , E.centerX
         ]
         [ actionButton "STORE\nAZIMUTH" False StoreAzimuth
-        , actionButton "STORE\nELEVATION" False StoreElevation
+        , actionButton "STORE\nHEIGHT" False StoreElevation
         ]
 
 
@@ -181,7 +183,7 @@ operatorPageLandscape model =
             , E.spacing 50
             ]
             [ E.el
-                [ E.width <| minimum 200 <| fillPortion 3
+                [ E.width <| minimum 200 <| fillPortion 2
                 , pointer
                 ]
               <|
@@ -189,7 +191,7 @@ operatorPageLandscape model =
                     clickableGonioImage <|
                         model.goniometerAzimuth
                             + model.station.lineOfShoot
-            , column []
+            , column [ E.width <| minimum 200 <| fillPortion 2 ]
                 [ modeToggles model
                 , actionButtons model
                 ]
