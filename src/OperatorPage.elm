@@ -161,55 +161,50 @@ traceDependingOnMode model =
 
 
 operatorPageLandscape model =
-    column
-        commonStyles
-        [ row
-            [ E.width E.fill
-            ]
-            [ E.el
-                [ E.width <| fillPortion 1 ]
-                none
-            , column
-                [ E.width <| E.fillPortion 6 ]
+    let
+        rangeSliderAndCRT =
+            column
+                [ width fill
+                , paddingEach { bottom = 10, top = 10, left = 100, right = 100 }
+                ]
                 [ rangeSlider model
                 , E.html <| crt <| traceDependingOnMode model
                 ]
-            , E.el
-                [ E.width <| fillPortion 1 ]
-                none
-            ]
-        , row
-            [ E.centerX
-            , E.spacing 50
-            ]
-            [ E.el
+
+        goniometer =
+            E.el
                 [ E.width <| minimum 200 <| fillPortion 2
                 , pointer
                 ]
-              <|
+            <|
                 E.html <|
                     clickableGonioImage <|
                         model.goniometerAzimuth
                             + model.station.lineOfShoot
+
+        rangeKnob =
+            E.el
+                [ E.width <| maximum 200 <| fillPortion 2
+                , pointer
+                ]
+            <|
+                E.html <|
+                    clickableRangeKnob <|
+                        [ drawRangeKnob model.rangeKnobAngle ]
+    in
+    column
+        commonStyles
+        [ rangeSliderAndCRT
+        , row
+            [ E.centerX
+            , E.spacing 50
+            ]
+            [ goniometer
             , column [ E.width <| minimum 200 <| fillPortion 2 ]
                 [ modeToggles model
                 , actionButtons model
                 ]
-            , column
-                [ E.width <| minimum 100 <| fillPortion 2
-                , pointer
-                , centerX
-                ]
-                [ E.el
-                    [ E.width <| maximum 200 <| fill
-                    , pointer
-                    ]
-                  <|
-                    E.html <|
-                        clickableRangeKnob <|
-                            [ drawRangeKnob model.rangeKnobAngle ]
-                , E.el [ centerX ] (E.text "RANGE")
-                ]
+            , rangeKnob
             ]
         ]
 
