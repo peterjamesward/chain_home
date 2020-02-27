@@ -115,6 +115,7 @@ commonStyles =
     [ E.width E.fill
     , E.spacing 20
     , E.centerX
+    , E.centerY
     , Font.color paletteSand
     , Font.size 14
     , Font.family
@@ -156,43 +157,56 @@ goniometer azimuth =
 modeSwitchPanel model =
     column commonStyles
         [ row commonStyles
-            [ el [ width <| fillPortion 1 ] <| text "--"
-            , el [ width <| fillPortion 1 ] <| text "--"
-            , el [ width <| fillPortion 1 ] <| text "CLEAR"
+            [ el [ width <| fillPortion 1 ] <| none
+            , el [ width <| fillPortion 1 ] <| none
+            , el [ width <| fillPortion 1 ] <| actionButton "CLEAR" DummyMessage
             ]
+        , el [ height (px 10) ] none
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <|
                 column commonStyles
                     [ indicator "A" model.receiveAB
+                    , el [ height (px 10) ] none
                     , el [ centerX ] <| text "D/F"
                     , indicator "B" (not model.receiveAB)
                     ]
             , el [ width <| fillPortion 1 ] <|
-                actionButton "A - B" (SelectReceiveAntenna (not model.receiveAB))
+                actionButton "A <> B" (SelectReceiveAntenna (not model.receiveAB))
             , el [ width <| fillPortion 1 ] <|
                 column commonStyles
                     [ indicator "A" model.receiveAB
-                    , el [ centerX ] <| text "Height"
+                    , el [ height (px 10) ] none
+                    , el [ centerX ] <| text "HEIGHT"
                     , indicator "B" (not model.receiveAB)
                     ]
             ]
+        , el [ height (px 30) ] none
         , row commonStyles
-            [ el [ centerX, width <| fillPortion 1 ] <| text "SENSE"
-            , el [ centerX, width <| fillPortion 1 ] <| text "--"
-            , el [ centerX, width <| fillPortion 1 ] <| text "HEIGHT"
+            [ column commonStyles
+                [ indicator "ON" model.reflector
+                , el [ height (px 5) ] none
+                , actionButton "SENSE" (EnableReflector (not model.reflector))
+                ]
+            , el [ centerX, width <| fillPortion 1 ] <| none
+            , column commonStyles
+                [ indicator "ON" (model.goniometerMode == Elevation)
+                , el [ height (px 5) ] none
+                , actionButton "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
+                ]
             ]
+        , el [ height (px 20) ] none
         , row commonStyles
-            [ el [ centerX, width <| fillPortion 1 ] <| text "press gonio"
-            , el [ centerX, width <| fillPortion 1 ] <| text "press range"
+            [ el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nGONIO" False
+            , el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nRANGE" False
             ]
         ]
 
 
 secondarySwitchPanel model =
     column commonStyles
-        [ text "padding"
-        , text "enter rage"
-        , text "padding"
+        [ el [ height (px 30) ] none
+        , actionButton "RANGE" DummyMessage
+        , el [ height (px 30) ] none
         ]
 
 
@@ -207,7 +221,7 @@ operatorPageLandscape model =
             ]
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-            , el [ width <| fillPortion 1 ] <| E.text "padding"
+            , el [ width <| fillPortion 2 ] <| E.text "padding"
             , el [ width <| fillPortion 1 ] <| rangeKnob model.rangeKnobAngle
             , el [ width <| fillPortion 1 ] <| E.text "raid strength"
             ]

@@ -26,3 +26,4 @@ type Msg
     | AdjustTimeZone Time.Zone
     | StoreAzimuth
     | StoreElevation
+    | DummyMessage

@@ -46,7 +46,7 @@ actionButton : String -> Msg -> Element Msg
 actionButton label msg =
     column buttonStyles
         [ Input.button
-            (Background.color flatSunflower :: buttonStyles)
+            (Background.color blue :: buttonStyles)
             { onPress = Just msg
             , label = none
             }
