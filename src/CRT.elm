@@ -60,6 +60,7 @@ rangeScale =
                 , fill "antiquewhite"
                 , textAnchor "right"
                 , fontFamily "monospace"
+                , fontSize "18"
                 ]
                 [ text (String.fromInt (i * 5)) ]
             , Svg.line

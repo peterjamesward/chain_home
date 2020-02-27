@@ -13,28 +13,29 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (actionButton, toggleSwitch)
+import PushButtons exposing (actionButton, indicator)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..))
 
 
-clickableRangeKnob =
-    div
-        [ Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
-        , Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
-        , Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
-        , style "touch-action" "none"
+clickableRangeKnob angle =
+    el
+        [ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
+        , htmlAttribute <| style "touch-action" "none"
         ]
+        (html <| drawRangeKnob angle)
 
 
 clickableGonioImage theta =
-    div
-        [ Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
-        , Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
-        , Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
-        , style "touch-action" "none"
+    el
+        [ htmlAttribute <| Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
+        , htmlAttribute <| style "touch-action" "none"
         ]
-        [ drawGoniometer theta ]
+        (html <| drawGoniometer theta)
 
 
 rangeSlider model =
@@ -111,9 +112,8 @@ bearingDisplay bearing =
 
 
 commonStyles =
-    [ E.spacing 20
-    , E.padding 30
-    , E.width E.fill
+    [ E.width E.fill
+    , E.spacing 20
     , E.centerX
     , Font.color paletteSand
     , Font.size 14
@@ -122,30 +122,6 @@ commonStyles =
         , Font.sansSerif
         ]
     ]
-
-
-modeToggles model =
-    row
-        [ E.width <| fillPortion <| 3
-        , E.spacing 20
-        , E.padding 40
-        , E.centerX
-        ]
-        [ toggleSwitch "MODE" "D/F" "HEIGHT" (model.goniometerMode == Azimuth) SelectGoniometerMode
-        , toggleSwitch "SENSING" "ON" "OFF" model.reflector EnableReflector
-        ]
-
-
-actionButtons model =
-    row
-        [ E.width <| fillPortion <| 3
-        , E.spacing 20
-        , E.padding 40
-        , E.centerX
-        ]
-        [ actionButton "STORE\nAZIMUTH" False StoreAzimuth
-        , actionButton "STORE\nHEIGHT" False StoreElevation
-        ]
 
 
 traceDependingOnMode model =
@@ -160,88 +136,91 @@ traceDependingOnMode model =
             model.elevation_B_trace
 
 
-operatorPageLandscape model =
-    let
-        rangeSliderAndCRT =
-            column
-                [ width fill
-                , paddingEach { bottom = 10, top = 10, left = 100, right = 100 }
-                ]
-                [ rangeSlider model
-                , E.html <| crt <| traceDependingOnMode model
-                ]
+rangeSliderAndCRT model =
+    column commonStyles
+        [ rangeSlider model
+        , E.html <| crt <| traceDependingOnMode model
+        ]
 
-        goniometer =
-            E.el
-                [ E.width <| minimum 200 <| fillPortion 2
-                , pointer
-                ]
-            <|
-                E.html <|
-                    clickableGonioImage <|
-                        model.goniometerAzimuth
-                            + model.station.lineOfShoot
 
-        rangeKnob =
-            E.el
-                [ E.width <| maximum 200 <| fillPortion 2
-                , pointer
-                ]
-            <|
-                E.html <|
-                    clickableRangeKnob <|
-                        [ drawRangeKnob model.rangeKnobAngle ]
-    in
-    column
-        commonStyles
-        [ rangeSliderAndCRT
-        , row
-            [ E.centerX
-            , E.spacing 50
+rangeKnob angle =
+    E.el [ pointer, width (px 200) ]
+        (clickableRangeKnob angle)
+
+
+goniometer azimuth =
+    E.el [ pointer, width (px 300) ]
+        (clickableGonioImage azimuth)
+
+
+modeSwitchPanel model =
+    column commonStyles
+        [ row commonStyles
+            [ el [ width <| fillPortion 1 ] <| text "--"
+            , el [ width <| fillPortion 1 ] <| text "--"
+            , el [ width <| fillPortion 1 ] <| text "CLEAR"
             ]
-            [ goniometer
-            , column [ E.width <| minimum 200 <| fillPortion 2 ]
-                [ modeToggles model
-                , actionButtons model
-                ]
-            , rangeKnob
+        , row commonStyles
+            [ el [ width <| fillPortion 1 ] <|
+                column commonStyles
+                    [ indicator "A" model.receiveAB
+                    , el [ centerX ] <| text "D/F"
+                    , indicator "B" (not model.receiveAB)
+                    ]
+            , el [ width <| fillPortion 1 ] <|
+                actionButton "A - B" (SelectReceiveAntenna (not model.receiveAB))
+            , el [ width <| fillPortion 1 ] <|
+                column commonStyles
+                    [ indicator "A" model.receiveAB
+                    , el [ centerX ] <| text "Height"
+                    , indicator "B" (not model.receiveAB)
+                    ]
+            ]
+        , row commonStyles
+            [ el [ centerX, width <| fillPortion 1 ] <| text "SENSE"
+            , el [ centerX, width <| fillPortion 1 ] <| text "--"
+            , el [ centerX, width <| fillPortion 1 ] <| text "HEIGHT"
+            ]
+        , row commonStyles
+            [ el [ centerX, width <| fillPortion 1 ] <| text "press gonio"
+            , el [ centerX, width <| fillPortion 1 ] <| text "press range"
             ]
         ]
 
 
+secondarySwitchPanel model =
+    column commonStyles
+        [ text "padding"
+        , text "enter rage"
+        , text "padding"
+        ]
 
---operatorPagePortrait : Model -> Element Msg
+
+operatorPageLandscape model =
+    column
+        commonStyles
+        [ row commonStyles
+            [ el [ width <| fillPortion 1 ] <| none
+            , el [ width <| fillPortion 9 ] <| rangeSliderAndCRT model
+            , el [ width <| fillPortion 2 ] <| modeSwitchPanel model
+            , el [ width <| fillPortion 1 ] <| secondarySwitchPanel model
+            ]
+        , row commonStyles
+            [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
+            , el [ width <| fillPortion 1 ] <| E.text "padding"
+            , el [ width <| fillPortion 1 ] <| rangeKnob model.rangeKnobAngle
+            , el [ width <| fillPortion 1 ] <| E.text "raid strength"
+            ]
+        ]
 
 
 operatorPagePortrait model =
     column
         commonStyles
-        [ rangeSlider model
-        , E.html <| crt <| traceDependingOnMode model
-        , row [ E.width E.fill ]
-            [ E.el [ pointer, E.width <| fillPortion 3 ] <|
-                E.html <|
-                    clickableGonioImage <|
-                        model.goniometerAzimuth
-                            + model.station.lineOfShoot
-            , E.el [ pointer, E.width <| fillPortion 2 ] <|
-                E.html <|
-                    clickableRangeKnob <|
-                        [ drawRangeKnob model.rangeKnobAngle ]
-            ]
-        , row [ E.width E.fill, spacing 10, padding 5 ]
-            [ modeToggles model
-
-            --, column [ E.width <| fillPortion 1 ]
-            --    [ rangeDisplay model.rangeSlider
-            --    , bearingDisplay (model.goniometerAzimuth + model.station.lineOfShoot)
-            --    ]
-            ]
+        [ rangeSliderAndCRT model
+        , goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
+        , rangeKnob model.rangeKnobAngle
         ]
-
-
-
---operatorPage : Model -> Element Msg
 
 
 operatorPage model =

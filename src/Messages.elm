@@ -19,7 +19,6 @@ type Msg
     | RangeGrab Point
     | RangeMove Point
     | RangeRelease Point
-    | SelectTransmitAntenna Bool
     | SelectReceiveAntenna Bool
     | EnableReflector Bool
     | SelectGoniometerMode Bool

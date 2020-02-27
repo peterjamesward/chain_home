@@ -38,6 +38,12 @@ type Page
     = InputPage
     | OperatorPage
 
+type InputState
+    -- Inferred sequence of operator actions
+    = BearingInput
+    | BearingRangeInput
+    | HeightInput
+    | HeightRangeInput
 
 type alias Model =
     { currPage : Page
@@ -64,11 +70,11 @@ type alias Model =
     , rangeKnobAngle : Angle
     , goniometerMode : GoniometerMode
     , transmitAntenna : Antenna
-    , transmitAB : Bool
     , reflector : Bool
     , isMenuOpen : Bool
     , receiveAB : Bool
     , receiveAntenna : Antenna
+    , inputState : InputState
     }
 
 
@@ -102,11 +108,11 @@ init _ =
       , rangeKnobAngle = 0.0
       , goniometerMode = Azimuth
       , transmitAntenna = transmitAReflector
-      , transmitAB = True
       , reflector = True
       , isMenuOpen = False
       , receiveAB = True
       , receiveAntenna = receiveHigh
+      , inputState = BearingInput
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -427,14 +433,6 @@ update msg model =
             , Cmd.none
             )
 
-        SelectTransmitAntenna val ->
-            ( { model
-                | transmitAB = val
-                , transmitAntenna = selectTransmitAntenna val model.reflector
-              }
-            , Cmd.none
-            )
-
         SelectReceiveAntenna val ->
             ( { model
                 | receiveAB = val
@@ -446,7 +444,7 @@ update msg model =
         EnableReflector val ->
             ( { model
                 | reflector = val
-                , transmitAntenna = selectTransmitAntenna model.transmitAB val
+                , transmitAntenna = selectTransmitAntenna True val
               }
             , Cmd.none
             )

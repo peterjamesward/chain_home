@@ -4,85 +4,73 @@ import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
-import Element.Font as Font exposing (..)
 import Element.Input as Input exposing (..)
 import Messages exposing (Msg)
 import Utils exposing (choose)
 
 
-toggleSwitch : String -> String -> String -> Bool -> (Bool -> Msg) -> Element Msg
-toggleSwitch groupName trueLabel falseLabel state msg =
-    pushButtonGroup groupName
-        [ ( trueLabel, msg True, state )
-        , ( falseLabel, msg False, not state )
-        ]
+
+-- Buttons to change for historical accuracy. 2020-02-27.
+-- Buttons will be small, circular with label outside (aside or below).
+-- Separate indicator lights may (or not) be used to show state or recommended actions.
+-- It follows that we don't have switch groups or their use as toggles (there were
+-- toggles but not in our scope).
 
 
 commonStyles =
-    [ Background.color flatWetAsphalt
-    , Border.color black
-
-    --, Element.height (px 30)
-    , Element.width fill
-    , Border.rounded 4
-    , padding 10
-    , center
-    , Element.focused
-        [ Border.color white ]
-    , Font.variant Font.smallCaps
+    [ Element.centerX
+    , Element.spacing 5
     ]
 
 
-activeButtonStyle =
-    [ innerGlow flatSunflower 1.0
-    , Font.color vividGreen
+buttonStyles =
+    [ Element.height (px 30)
+    , Element.width (px 30)
+    , Border.rounded 15
+    , Border.widthEach { bottom = 3, top = 2, right = 3, left = 3 }
+    , Element.focused []
     ]
         ++ commonStyles
 
 
-inactiveButtonStyle =
-    [ innerGlow flatMidnightBlue 1.0
-    , Font.color lightCharcoal
+indicatorStyles =
+    [ Element.height (px 20)
+    , Element.width (px 20)
+    , Border.rounded 10
+    , Border.width 2
     ]
         ++ commonStyles
 
 
-pendingActionStyle =
-    [ innerGlow flatSunflower 0.5
-    , Font.color flatSunflower
-    ]
-        ++ commonStyles
-
-
-pushButtonGroup : String -> List ( String, Msg, Bool ) -> Element Msg
-pushButtonGroup groupName buttonDetails =
-    let
-        makeButton ( label, msg, state ) =
-            Input.button
-                (choose state activeButtonStyle inactiveButtonStyle)
-                { onPress = Just msg
-                , label = Element.text label
-                }
-    in
-    column
-        [ center
-        , spacing 5
-        , pointer
+actionButton : String -> Msg -> Element Msg
+actionButton label msg =
+    column buttonStyles
+        [ Input.button
+            (Background.color flatSunflower :: buttonStyles)
+            { onPress = Just msg
+            , label = none
+            }
+        , el [ centerX ] <| Element.text label
         ]
-        (List.map makeButton buttonDetails
-            ++ [ el [ centerX ]
-                    (Element.text groupName)
-               ]
-        )
 
 
-actionButton : String -> Bool -> Msg -> Element Msg
-actionButton label enabled msg =
-    -- Abusing a button for sort-of-modal azimuth and elevation capture.
-    Input.button
-        (choose enabled pendingActionStyle inactiveButtonStyle)
-        { onPress = choose enabled (Just msg) Nothing
-        , label =
-            paragraph [ spacing 3 ]
-                [ Element.text label ]
-        }
+indicator : String -> Bool -> Element Msg
+indicator label state =
+    let
+        colour =
+            choose state vividGreen paletteDarkGreen
+
+        borderColour =
+            choose state paletteSand paletteGrey
+    in
+    column indicatorStyles
+        [ Input.button
+            (Background.color colour
+                :: Border.color borderColour
+                :: indicatorStyles
+            )
+            { onPress = Nothing
+            , label = none
+            }
+        , el [ centerX ] <| Element.text label
+        ]
