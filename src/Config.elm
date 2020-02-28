@@ -65,7 +65,7 @@ bomber2A =
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees 0.35
+    , latitude = bawdsey.latitude + degrees 0.30
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -74,9 +74,9 @@ bomber3 =
 
 
 bomber4 =
-    { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees -0.35
-    , height = 20 -- ,000 ft
+    { longitude = bawdsey.longitude + degrees 0.8001
+    , latitude = bawdsey.latitude + degrees -0.30
+    , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
     , iff = False

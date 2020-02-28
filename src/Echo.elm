@@ -1,4 +1,4 @@
-module Echo exposing (Echo, combineEchoes, deriveEchoes, viewEcho)
+module Echo exposing (Echo, artisticEchoCombiner, combineEchoes, deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, scaleWidthKilometers, transmitterEffectiveHeight, wavelength)
 import Html exposing (..)
@@ -27,7 +27,8 @@ combineEchoes time activeEchoes =
                     fromPolar
                         ( e.amplitude
                           -- Largely artistic here, trying for convincing "beats".
-                        , toFloat e.sequence * 2 * pi * toFloat time / 2000
+                        , e.phase
+                          --toFloat e.sequence * 2 * pi * toFloat time / 2000
                         )
                 )
                 activeEchoes
@@ -39,6 +40,44 @@ combineEchoes time activeEchoes =
             toPolar combinedAsRect
     in
     mag
+
+
+artisticEchoCombiner : Int -> List Echo -> Float
+artisticEchoCombiner time activeEchoes =
+    -- Special cases to make 1, 2, 3 or more echoes to look like the training videos.
+    let
+        triangleWave t =
+            toFloat (abs (modBy 2000 t - 1000) - 1000) / 1000.0
+
+        noise t =
+            fractional (5000 * sin (toFloat t))
+
+        fractional x =
+            x - toFloat (truncate x)
+
+        notNearlyEqual x1 x2 =
+            (10 * abs x1 < abs x2) || (10 * abs x2 < abs x1)
+    in
+    abs <|
+        case activeEchoes of
+            [] ->
+                0.0
+
+            [ e ] ->
+                e.amplitude
+
+            [ e1, e2 ] ->
+                -- This is our primary special case. There should be beating but if
+                -- they are on distinct bearings and one is D/F'd out, no beating.
+                -- So if amplitudes are dissimilar, treat as single echo.
+                if notNearlyEqual e1.amplitude e2.amplitude then
+                    e1.amplitude + e2.amplitude
+
+                else
+                    (e1.amplitude + e2.amplitude) * triangleWave time
+
+            es ->
+                noise time * combineEchoes time es
 
 
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo

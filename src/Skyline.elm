@@ -1,7 +1,7 @@
 module Skyline exposing (EdgeSegment, deriveSkyline, viewEdge, viewLineSegment)
 
 import Constants exposing (..)
-import Echo exposing (Echo, combineEchoes)
+import Echo exposing (Echo, artisticEchoCombiner, combineEchoes)
 import Html exposing (..)
 import Utils exposing (stringifyPoint)
 
@@ -66,7 +66,8 @@ processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY
             p
 
         newY =
-            combineEchoes time newActiveEchoes
+            artisticEchoCombiner time newActiveEchoes
+            --combineEchoes time newActiveEchoes
     in
     if newX <= x2 then
         -- We're not moving horizontally but we need to track the roof height.
