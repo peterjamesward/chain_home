@@ -11,7 +11,6 @@ type alias EdgeSegment =
 
 
 
--- Skyline algorithm works out the trace from combined echoes.
 {- There will be some set of echoes, and shall probably manage these as a set not a list.
    We sort by range of leading edge of echo. Maybe we have one sort of both leading and
    trailing edges.

@@ -4,6 +4,7 @@ import Constants exposing (pulseDuration, scaleWidthKilometers, transmitterEffec
 import Html exposing (..)
 import Target exposing (PolarTarget)
 import Types exposing (Antenna)
+import Utils exposing (noise, notNearlyEqual, triangleWave)
 
 
 type alias Echo =
@@ -40,19 +41,6 @@ combineEchoes time activeEchoes =
 artisticEchoCombiner : Int -> List Echo -> Float
 artisticEchoCombiner time activeEchoes =
     -- Special cases to make 1, 2, 3 or more echoes to look like the training videos.
-    let
-        triangleWave t =
-            toFloat (abs (abs (modBy 2000 t - 1000) - 1000)) / 1000.0
-
-        noise t =
-            fractional (5000 * sin (toFloat t))
-
-        fractional x =
-            x - toFloat (truncate x)
-
-        notNearlyEqual x1 x2 =
-            (10 * abs x1 < abs x2) || (10 * abs x2 < abs x1)
-    in
     abs <|
         case activeEchoes of
             [] ->

@@ -15,7 +15,7 @@ import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
 import PushButtons exposing (actionButton, indicator)
 import Range exposing (drawRangeKnob)
-import Types exposing (GoniometerMode(..))
+import Types exposing (GoniometerMode(..), InputState(..))
 
 
 clickableRangeKnob angle =
@@ -150,7 +150,11 @@ rangeKnob angle =
 
 
 goniometer azimuth =
-    E.el [ pointer, width (px 300) ]
+    E.el
+        [ pointer
+        , width (px 300)
+        , E.onRight <| actionButton "GONIO" StoreGoniometerSetting
+        ]
         (clickableGonioImage azimuth)
 
 
@@ -190,17 +194,23 @@ modeSwitchPanel model =
             ]
         , el [ height (px 10) ] none
         , row commonStyles
-            [ el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nGONIO" False
-            , el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nRANGE" False
+            [ el [ centerX, width <| fillPortion 1 ] <|
+                indicator "PRESS\nGONIO" <|
+                    (model.inputState == BearingInput)
+                        || (model.inputState == HeightInput)
+            , el [ centerX, width <| fillPortion 1 ] <|
+                indicator "PRESS\nRANGE" <|
+                    (model.inputState == BearingRangeInput)
+                        || (model.inputState == HeightRangeInput)
             ]
         ]
 
 
 secondarySwitchPanel model =
     column commonStyles
-        [ actionButton "CLEAR" DummyMessage
+        [ actionButton "CLEAR" ResetInputState
         , el [ height (px 40) ] none
-        , actionButton "RANGE" DummyMessage
+        , actionButton "RANGE" StoreRangeSetting
         ]
 
 
@@ -219,9 +229,9 @@ operatorPageLandscape model =
             ]
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-            , el [ width <| fillPortion 2 ] <| E.text "padding"
+            , el [ width <| fillPortion 2 ] <| none
             , el [ width <| fillPortion 1 ] <| rangeKnob model.rangeKnobAngle
-            , el [ width <| fillPortion 1 ] <| E.text "raid strength"
+            , el [ width <| fillPortion 1 ] <| E.text "(raid strength)"
             ]
         ]
 

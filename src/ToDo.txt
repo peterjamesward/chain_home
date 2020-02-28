@@ -22,3 +22,5 @@ TODO: Electronic calculator output.
 TODO: Narrative and on-screen prompts.
 
 TODO: Physical knobs!!
+
+TODO: Bug when signal exits stage right.

@@ -2,6 +2,8 @@ module BeamSmoother exposing (beamPath, scalePathToDisplay)
 
 import Constants exposing (..)
 import Skyline exposing (EdgeSegment)
+import Time exposing (Posix)
+import Utils exposing (noise)
 
 
 
@@ -15,12 +17,14 @@ dummyTrailingEdge =
 
 
 
--- Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
--- Should be MUCH easier now the skyline is represented by horizontal roof segments
--- instead of vertical wall segments!
--- Note that the roof segments are horizontal but not vertically contiguous- the height transitions are abrupt/
--- Note the Float here is where the beam ended, not necessarily on the last edge, if that
--- edge was too short.
+{-
+   Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
+   Should be MUCH easier now the skyline is represented by horizontal roof segments
+   instead of vertical wall segments!
+   Note that the roof segments are horizontal but not vertically contiguous- the height transitions are abrupt/
+   Note the Float here is where the beam ended, not necessarily on the last edge, if that
+   edge was too short.
+-}
 
 
 beamSmoothingFunction :
@@ -63,12 +67,9 @@ beamSmoothingFunction newRoof ( lines, beamY ) =
         )
 
 
-
--- We are now taking a list of horizontal segments and we have to join them.
-
-
 beamPath : List EdgeSegment -> List ( Float, Float )
 beamPath edges =
+    -- We are now taking a list of horizontal segments and we have to join them.
     let
         ( lines, _ ) =
             List.foldr beamSmoothingFunction
@@ -78,8 +79,8 @@ beamPath edges =
     lines
 
 
-scalePathToDisplay : List ( Float, Float ) -> List ( Float, Float )
-scalePathToDisplay unscaled =
+scalePathToDisplay : Int -> List ( Float, Float ) -> List ( Float, Float )
+scalePathToDisplay time unscaled =
     let
         scalePoint ( x, y ) =
             ( viewWidth * x / scaleWidthKilometers / 1000

@@ -23,3 +23,10 @@ type alias Antenna =
     { verticalLobeFunction : Float -> Float
     , horizontalLobeFunction : Float -> Float
     }
+
+type InputState
+    -- Inferred sequence of operator actions
+    = BearingInput
+    | BearingRangeInput
+    | HeightInput
+    | HeightRangeInput

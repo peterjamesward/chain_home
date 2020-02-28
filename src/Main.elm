@@ -38,12 +38,6 @@ type Page
     = InputPage
     | OperatorPage
 
-type InputState
-    -- Inferred sequence of operator actions
-    = BearingInput
-    | BearingRangeInput
-    | HeightInput
-    | HeightRangeInput
 
 type alias Model =
     { currPage : Page
@@ -75,6 +69,10 @@ type alias Model =
     , receiveAB : Bool
     , receiveAntenna : Antenna
     , inputState : InputState
+    , storedAzimuth : Maybe Float
+    , storedElevation : Maybe Float
+    , storedAzimuthRange : Maybe Float
+    , storedElevationRange : Maybe Float
     }
 
 
@@ -113,6 +111,10 @@ init _ =
       , receiveAB = True
       , receiveAntenna = receiveHigh
       , inputState = BearingInput
+      , storedAzimuth = Nothing
+      , storedElevation = Nothing
+      , storedAzimuthRange = Nothing
+      , storedElevationRange = Nothing
       }
     , Task.perform AdjustTimeZone Time.here
     )
@@ -248,13 +250,13 @@ deriveModelAtTime model t =
             aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
                 |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
                 |> beamPath
-                |> scalePathToDisplay
+                |> scalePathToDisplay (Time.posixToMillis model.time)
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
                 |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
                 |> beamPath
-                |> scalePathToDisplay
+                |> scalePathToDisplay (Time.posixToMillis model.time)
 
         gonioAzimuthOut =
             -- 'Blend' X and Y inputs to find target's azimuth.
@@ -280,7 +282,7 @@ deriveModelAtTime model t =
         , echoes = echoSignals
         , skyline = newSkyline
         , gonioOutput = gonioAzimuthOut
-        , azimuthModeTrace = scalePathToDisplay <| beamPath newSkyline
+        , azimuthModeTrace = scalePathToDisplay (Time.posixToMillis model.time) <| beamPath newSkyline
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
         , elevation_A_trace = heightMode_A_Outputs
@@ -453,6 +455,57 @@ update msg model =
             ( { model
                 | goniometerMode = choose mode Azimuth Elevation
               }
+            , Cmd.none
+            )
+
+        StoreGoniometerSetting ->
+            ( case model.goniometerMode of
+                Azimuth ->
+                    { model
+                        | storedAzimuth = Just model.goniometerAzimuth
+                        , inputState = BearingRangeInput
+                    }
+
+                Elevation ->
+                    { model
+                        | storedElevation = Just model.goniometerAzimuth
+                        , inputState = HeightRangeInput
+                    }
+            , Cmd.none
+            )
+
+        StoreRangeSetting ->
+            ( case model.inputState of
+                BearingRangeInput ->
+                    { model
+                        | storedAzimuthRange = Just model.rangeSlider
+                        , inputState = HeightInput
+                        , goniometerMode = Elevation
+                    }
+
+                HeightRangeInput ->
+                    { model
+                        | storedElevationRange = Just model.rangeSlider
+                        , inputState = BearingInput
+                        , goniometerMode = Azimuth
+                    }
+
+                _ ->
+                    model
+            , Cmd.none
+            )
+
+        ResetInputState ->
+            (
+                    { model
+                        | storedAzimuthRange = Nothing
+                        , storedAzimuth = Nothing
+                        , storedElevation = Nothing
+                        , storedElevationRange = Nothing
+                        , inputState = BearingInput
+                        , goniometerMode = Azimuth
+                    }
+
             , Cmd.none
             )
 
