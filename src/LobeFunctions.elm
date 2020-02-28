@@ -78,8 +78,9 @@ rxLoVertLobe α =
     sin (7 * α)
 
 
-rxHiVertLobe α =
-    (1 - 6 * α) * abs (sin (24 * α))
+rxHiVertLobe  =
+    -- See if this is a decent fit for our receiver A system.
+    dipoleStackVerticalUnreflectedLobes 2
 
 
 transmitANoReflect =

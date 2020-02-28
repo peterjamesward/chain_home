@@ -31,16 +31,8 @@ type alias EdgeInfo =
     ( Float, Echo, Bool )
 
 
-
--- x coord of edge, leading edge,  and whether leading edge.
-
-
 dummyLeadingEdge =
     ( ( 0.0, 0.0 ), ( 0.0, 0.0 ) )
-
-
-
--- We do not output for each edge. We output only when X and Y change.
 
 
 processEdge :
@@ -49,6 +41,7 @@ processEdge :
     -> ( List EdgeSegment, List Echo, ( Float, Float ) )
     -> ( List EdgeSegment, List Echo, ( Float, Float ) )
 processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY ) ) =
+    -- We do not output for each edge. We output only when X and Y change.
     let
         ( ( x1, y ), ( x2, _ ) ) =
             Maybe.withDefault dummyLeadingEdge <| List.head roofline
@@ -67,7 +60,6 @@ processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY
 
         newY =
             artisticEchoCombiner time newActiveEchoes
-            --combineEchoes time newActiveEchoes
     in
     if newX <= x2 then
         -- We're not moving horizontally but we need to track the roof height.
@@ -87,12 +79,9 @@ processEdge time ( p, echo, isLeading ) ( roofline, activeEchoes, ( lastX, lastY
         )
 
 
-
--- Derive skyline as series of flat roof segments.
-
-
 deriveSkyline : Int -> Float -> List Echo -> List EdgeSegment
 deriveSkyline time maxX allEchoes =
+    -- Derive skyline as series of flat roof segments.
     -- We need a sorted list of edges (front and back).
     let
         activeEchoes =

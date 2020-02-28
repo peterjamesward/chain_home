@@ -24,12 +24,7 @@ combineEchoes time activeEchoes =
         asRect =
             List.map
                 (\e ->
-                    fromPolar
-                        ( e.amplitude
-                          -- Largely artistic here, trying for convincing "beats".
-                        , e.phase
-                          --toFloat e.sequence * 2 * pi * toFloat time / 2000
-                        )
+                    fromPolar ( e.amplitude, e.phase )
                 )
                 activeEchoes
 
@@ -47,7 +42,7 @@ artisticEchoCombiner time activeEchoes =
     -- Special cases to make 1, 2, 3 or more echoes to look like the training videos.
     let
         triangleWave t =
-            toFloat (abs (modBy 2000 t - 1000) - 1000) / 1000.0
+            toFloat (abs (abs (modBy 2000 t - 1000) - 1000)) / 1000.0
 
         noise t =
             fractional (5000 * sin (toFloat t))
@@ -71,13 +66,13 @@ artisticEchoCombiner time activeEchoes =
                 -- they are on distinct bearings and one is D/F'd out, no beating.
                 -- So if amplitudes are dissimilar, treat as single echo.
                 if notNearlyEqual e1.amplitude e2.amplitude then
-                    e1.amplitude + e2.amplitude
+                    (0.5 + noise time) * combineEchoes time [ e1, e2 ]
 
                 else
-                    (e1.amplitude + e2.amplitude) * triangleWave time
+                    e1.amplitude * triangleWave time
 
             es ->
-                noise time * combineEchoes time es
+                noise time * combineEchoes time es / (sqrt <| toFloat <| List.length es)
 
 
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
