@@ -251,13 +251,13 @@ deriveModelAtTime model t =
             aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
                 |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
                 |> beamPath
-                |> scalePathToDisplay (Time.posixToMillis model.time)
+                |> scalePathToDisplay
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
                 |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
                 |> beamPath
-                |> scalePathToDisplay (Time.posixToMillis model.time)
+                |> scalePathToDisplay
 
         gonioAzimuthOut =
             -- 'Blend' X and Y inputs to find target's azimuth.
@@ -283,7 +283,7 @@ deriveModelAtTime model t =
         , echoes = echoSignals
         , skyline = newSkyline
         , gonioOutput = gonioAzimuthOut
-        , azimuthModeTrace = scalePathToDisplay (Time.posixToMillis model.time) <| beamPath newSkyline
+        , azimuthModeTrace = scalePathToDisplay <| beamPath newSkyline
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
         , elevation_A_trace = heightMode_A_Outputs
@@ -463,6 +463,7 @@ update msg model =
         SelectGoniometerMode mode ->
             ( { model
                 | goniometerMode = choose mode Azimuth Elevation
+                , inputState = choose mode BearingInput HeightInput
               }
             , Cmd.none
             )
@@ -491,15 +492,13 @@ update msg model =
                 BearingRangeInput ->
                     { model
                         | storedAzimuthRange = Just model.rangeSlider
-                        , inputState = HeightInput
-                        , goniometerMode = Elevation
+                        , inputState = BearingInput
                     }
 
                 HeightRangeInput ->
                     { model
                         | storedElevationRange = Just model.rangeSlider
-                        , inputState = BearingInput
-                        , goniometerMode = Azimuth
+                        , inputState = HeightInput
                     }
 
                 _ ->
@@ -631,9 +630,9 @@ targetSelector active =
 calculatorPage : Model -> Element Msg
 calculatorPage model =
     row (padding 50 :: spacing 50 :: commonStyles)
-        [ numericDisplay "AZIMUTH" model.storedAzimuth
+        [ bearingDisplay "AZIMUTH" model.storedAzimuth
         , numericDisplay "RANGE (Azimuth)" model.storedAzimuthRange
-        , numericDisplay "ELEVATION" model.storedElevation
+        , bearingDisplay "ELEVATION" model.storedElevation
         , numericDisplay "RANGE (Elevation)" model.storedElevationRange
         ]
 

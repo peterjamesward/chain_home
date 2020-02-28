@@ -7,20 +7,11 @@ import Utils exposing (noise)
 
 
 
--- Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
--- on the deflection plated. We shall simulate that here.
--- We shall not bother to limit acceleration, unless we have to.
-
-
-dummyTrailingEdge =
-    ( ( 1000.0, 0.0 ), ( 1000.0, 0.0 ) )
-
-
-
 {-
-   Latest attempt at a simple beam movement smoother, to simulate limitation on beam vertical slope.
-   Should be MUCH easier now the skyline is represented by horizontal roof segments
-   instead of vertical wall segments!
+   Real CH CRTs would not draw vertical lines - it takes time to build up the voltages
+   on the deflection plated. We shall simulate that here.
+   We shall not bother to limit acceleration, unless we have to.
+
    Note that the roof segments are horizontal but not vertically contiguous- the height transitions are abrupt/
    Note the Float here is where the beam ended, not necessarily on the last edge, if that
    edge was too short.
@@ -79,8 +70,8 @@ beamPath edges =
     lines
 
 
-scalePathToDisplay : Int -> List ( Float, Float ) -> List ( Float, Float )
-scalePathToDisplay time unscaled =
+scalePathToDisplay : List ( Float, Float ) -> List ( Float, Float )
+scalePathToDisplay unscaled =
     let
         scalePoint ( x, y ) =
             ( viewWidth * x / scaleWidthKilometers / 1000

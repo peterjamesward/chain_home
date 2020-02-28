@@ -6,6 +6,7 @@ import Constants exposing (paletteSand)
 import Element exposing (..)
 import Element.Font exposing (..)
 import Nixie exposing (nixieDisplay)
+import String exposing (toInt)
 
 
 stringifyPoint ( x, y ) =
@@ -43,22 +44,25 @@ notNearlyEqual x1 x2 =
     (10 * abs x1 < abs x2) || (10 * abs x2 < abs x1)
 
 
-numericDisplay label maybeBearing =
+numericDisplay label maybeValue =
     let
-        bearing =
-            Maybe.withDefault 0.0 maybeBearing
+        value =
+            truncate <| Maybe.withDefault 0.0 maybeValue
     in
     column commonStyles
-        [ nixieDisplay 3
-            (modBy 360 <|
-                truncate
-                    (bearing
-                        * 180
-                        / pi
-                    )
-            )
+        [ nixieDisplay 3 value
         , text label
         ]
+
+
+bearingDisplay label maybeBearing =
+    numericDisplay label <|
+        case maybeBearing of
+            Just m ->
+                Just <| toFloat <| modBy 360 (truncate (m * 180 / pi))
+
+            _ ->
+                Nothing
 
 
 commonStyles =
