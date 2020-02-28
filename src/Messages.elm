@@ -9,6 +9,7 @@ type Msg
     | SetConfigStateMsg Int Bool
     | DisplayReceiver
     | DisplayConfiguration
+    | DisplayCalculator
     | Tick Time.Posix
     | KeyChanged Bool String
     | GonioGrab Point

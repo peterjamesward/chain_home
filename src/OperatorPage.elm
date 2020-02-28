@@ -16,6 +16,7 @@ import Nixie exposing (nixieDisplay)
 import PushButtons exposing (actionButton, indicator)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..), InputState(..))
+import Utils exposing (commonStyles)
 
 
 clickableRangeKnob angle =
@@ -97,32 +98,7 @@ showMouseCoordinates model =
         ]
 
 
-bearingDisplay bearing =
-    column [ E.centerX ]
-        [ nixieDisplay 3
-            (modBy 360 <|
-                truncate
-                    (bearing
-                        * 180
-                        / pi
-                    )
-            )
-        , el [ E.centerX ] (E.text "AZIMUTH")
-        ]
 
-
-commonStyles =
-    [ E.width E.fill
-    , E.spacing 20
-    , E.centerX
-    , E.centerY
-    , Font.color paletteSand
-    , Font.size 14
-    , Font.family
-        [ Font.typeface "monospace"
-        , Font.sansSerif
-        ]
-    ]
 
 
 traceDependingOnMode model =

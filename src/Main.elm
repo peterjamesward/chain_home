@@ -37,6 +37,7 @@ import Utils exposing (..)
 type Page
     = InputPage
     | OperatorPage
+    | OutputPage
 
 
 type alias Model =
@@ -329,6 +330,14 @@ update msg model =
             , Cmd.none
             )
 
+        DisplayCalculator ->
+            ( { model
+                | currPage = OutputPage
+                , isMenuOpen = False
+              }
+            , Cmd.none
+            )
+
         Tick newTime ->
             ( deriveModelAtTime model newTime
             , Cmd.none
@@ -459,18 +468,21 @@ update msg model =
             )
 
         StoreGoniometerSetting ->
-            ( case model.goniometerMode of
-                Azimuth ->
+            ( case model.inputState of
+                BearingInput ->
                     { model
-                        | storedAzimuth = Just model.goniometerAzimuth
+                        | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
                         , inputState = BearingRangeInput
                     }
 
-                Elevation ->
+                HeightInput ->
                     { model
-                        | storedElevation = Just model.goniometerAzimuth
+                        | storedElevation = Just (model.goniometerAzimuth + model.station.lineOfShoot)
                         , inputState = HeightRangeInput
                     }
+
+                _ ->
+                    model
             , Cmd.none
             )
 
@@ -496,16 +508,14 @@ update msg model =
             )
 
         ResetInputState ->
-            (
-                    { model
-                        | storedAzimuthRange = Nothing
-                        , storedAzimuth = Nothing
-                        , storedElevation = Nothing
-                        , storedElevationRange = Nothing
-                        , inputState = BearingInput
-                        , goniometerMode = Azimuth
-                    }
-
+            ( { model
+                | storedAzimuthRange = Nothing
+                , storedAzimuth = Nothing
+                , storedElevation = Nothing
+                , storedElevationRange = Nothing
+                , inputState = BearingInput
+                , goniometerMode = Azimuth
+              }
             , Cmd.none
             )
 
@@ -542,6 +552,9 @@ view model =
 
                 InputPage ->
                     inputPage model
+
+                OutputPage ->
+                    calculatorPage model
     in
     { title = "Chain Home emulation"
     , body =
@@ -615,6 +628,16 @@ targetSelector active =
     List.map display active
 
 
+calculatorPage : Model -> Element Msg
+calculatorPage model =
+    row (padding 50 :: spacing 50 :: commonStyles)
+        [ numericDisplay "AZIMUTH" model.storedAzimuth
+        , numericDisplay "RANGE (Azimuth)" model.storedAzimuthRange
+        , numericDisplay "ELEVATION" model.storedElevation
+        , numericDisplay "RANGE (Elevation)" model.storedElevationRange
+        ]
+
+
 inputPage : Model -> Element Msg
 inputPage model =
     column
@@ -649,6 +672,7 @@ menuPanel model =
         items =
             [ E.el [ pointer, Event.onClick DisplayConfiguration ] <| text "Configuration"
             , E.el [ pointer, Event.onClick DisplayReceiver ] <| text "Operator"
+            , E.el [ pointer, Event.onClick DisplayCalculator ] <| text "Outputs"
             ]
 
         panel =
