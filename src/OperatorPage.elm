@@ -70,9 +70,9 @@ rangeSlider model =
                 [ E.width (E.px 16)
                 , E.height (E.px 50)
                 , Border.rounded 8
-                , Border.width 1
-                , Border.color <| E.rgb 0 0 0
-                , Background.color <| E.rgb255 180 20 20
+                , Border.width 4
+                , Border.color paletteDarkGreen
+                , Background.color white
                 ]
         }
 
@@ -156,31 +156,26 @@ goniometer azimuth =
 
 modeSwitchPanel model =
     column commonStyles
-        [ row commonStyles
-            [ el [ width <| fillPortion 1 ] <| none
-            , el [ width <| fillPortion 1 ] <| none
-            , el [ width <| fillPortion 1 ] <| actionButton "CLEAR" DummyMessage
-            ]
-        , el [ height (px 10) ] none
+        [ el [ height (px 10) ] none
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <|
                 column commonStyles
-                    [ indicator "A" model.receiveAB
+                    [ indicator "A" (model.goniometerMode == Azimuth && model.receiveAB)
                     , el [ height (px 10) ] none
                     , el [ centerX ] <| text "D/F"
-                    , indicator "B" (not model.receiveAB)
+                    , indicator "B" (model.goniometerMode == Azimuth && not model.receiveAB)
                     ]
             , el [ width <| fillPortion 1 ] <|
                 actionButton "A <> B" (SelectReceiveAntenna (not model.receiveAB))
             , el [ width <| fillPortion 1 ] <|
                 column commonStyles
-                    [ indicator "A" model.receiveAB
+                    [ indicator "A" (model.goniometerMode == Elevation && model.receiveAB)
                     , el [ height (px 10) ] none
                     , el [ centerX ] <| text "HEIGHT"
-                    , indicator "B" (not model.receiveAB)
+                    , indicator "B" (model.goniometerMode == Elevation && not model.receiveAB)
                     ]
             ]
-        , el [ height (px 30) ] none
+        , el [ height (px 10) ] none
         , row commonStyles
             [ column commonStyles
                 [ indicator "ON" model.reflector
@@ -189,12 +184,11 @@ modeSwitchPanel model =
                 ]
             , el [ centerX, width <| fillPortion 1 ] <| none
             , column commonStyles
-                [ indicator "ON" (model.goniometerMode == Elevation)
-                , el [ height (px 5) ] none
+                [ el [ height (px 40) ] none
                 , actionButton "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
                 ]
             ]
-        , el [ height (px 20) ] none
+        , el [ height (px 10) ] none
         , row commonStyles
             [ el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nGONIO" False
             , el [ centerX, width <| fillPortion 1 ] <| indicator "PRESS\nRANGE" False
@@ -204,9 +198,9 @@ modeSwitchPanel model =
 
 secondarySwitchPanel model =
     column commonStyles
-        [ el [ height (px 30) ] none
+        [ actionButton "CLEAR" DummyMessage
+        , el [ height (px 40) ] none
         , actionButton "RANGE" DummyMessage
-        , el [ height (px 30) ] none
         ]
 
 
@@ -214,8 +208,12 @@ operatorPageLandscape model =
     column
         commonStyles
         [ row commonStyles
-            [ el [ width <| fillPortion 1 ] <| none
-            , el [ width <| fillPortion 9 ] <| rangeSliderAndCRT model
+            [ el
+                [ paddingEach { left = 10, top = 10, bottom = 0, right = 0 }
+                , width <| fillPortion 6
+                ]
+              <|
+                rangeSliderAndCRT model
             , el [ width <| fillPortion 2 ] <| modeSwitchPanel model
             , el [ width <| fillPortion 1 ] <| secondarySwitchPanel model
             ]

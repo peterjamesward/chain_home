@@ -14,7 +14,7 @@ crt lineData =
             polyLineFromCoords lineData
     in
     svg
-        [ viewBox "-10 -40 1020 450" -- Establishes the CRT coordinate system, not its rendered size.
+        [ viewBox "-10 -40 1020 500" -- Establishes the CRT coordinate system, not its rendered size.
         , width "100%"
         , height "100%"
         ]
@@ -25,7 +25,7 @@ crt lineData =
             , rx "20"
             , ry "20"
             , width "1020"
-            , height "450"
+            , height "500"
             , fill "black"
             , stroke "black"
             , strokeWidth "3"
