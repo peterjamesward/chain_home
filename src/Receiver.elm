@@ -25,7 +25,7 @@ import LobeFunctions exposing (..)
 gonioMixEcho : Float -> Echo -> Echo
 gonioMixEcho angle echo =
     { echo
-        | amplitude = abs <| echo.amplitude * (1 - cos (echo.theta - angle))
+        | amplitude = abs <| echo.amplitude * sin (echo.theta - angle)
     }
 
 

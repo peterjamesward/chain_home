@@ -241,10 +241,10 @@ operatorPageLandscape model =
             , el [ width <| fillPortion 2 ] <| modeSwitchPanel model
             ]
         , row commonStyles
-            [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
+            [ el [ width <| fillPortion 2 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
             , el [ width <| fillPortion 1 ] <| none
-            , el [ width <| fillPortion 1 ] <| rangeKnob model.rangeKnobAngle
-            , el [ width <| fillPortion 1 ] <| raidStrengthPanel
+            , el [ width <| fillPortion 2 ] <| rangeKnob model.rangeKnobAngle
+            , el [ width <| fillPortion 2 ] <| raidStrengthPanel
             ]
         , el [ width fill, height (px 100) ] none
         ]
