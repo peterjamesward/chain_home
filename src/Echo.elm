@@ -25,7 +25,7 @@ combineEchoes time activeEchoes =
         asRect =
             List.map
                 (\e ->
-                    fromPolar ( e.amplitude, e.phase )
+                    fromPolar ( e.amplitude * noise (time + e.sequence), e.phase )
                 )
                 activeEchoes
 
@@ -60,7 +60,7 @@ artisticEchoCombiner time activeEchoes =
                     e1.amplitude * triangleWave time
 
             es ->
-                noise time * combineEchoes time es / (sqrt <| toFloat <| List.length es)
+                combineEchoes time es / (sqrt <| toFloat <| List.length es)
 
 
 deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
