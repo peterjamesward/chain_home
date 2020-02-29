@@ -28,4 +28,7 @@ type Msg
     | StoreGoniometerSetting
     | StoreRangeSetting
     | ResetInputState
+    | RaidStrength Int
+    | RaidStrengthPlus
+    | RaidFriendly
     | DummyMessage

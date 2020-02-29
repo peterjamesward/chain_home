@@ -13,7 +13,7 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (actionButton, indicator)
+import PushButtons exposing (actionButton, actionButtonLabelLeft, actionButtonLabelRight, indicator)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..), InputState(..))
 import Utils exposing (commonStyles)
@@ -98,9 +98,6 @@ showMouseCoordinates model =
         ]
 
 
-
-
-
 traceDependingOnMode model =
     case ( model.goniometerMode, model.receiveAB ) of
         ( Azimuth, _ ) ->
@@ -168,7 +165,8 @@ modeSwitchPanel model =
                 , actionButton "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
                 ]
             ]
-        , el [ height (px 10) ] none
+
+        --, el [ height (px 10) ] none
         , row commonStyles
             [ el [ centerX, width <| fillPortion 1 ] <|
                 indicator "PRESS\nGONIO" <|
@@ -190,6 +188,31 @@ secondarySwitchPanel model =
         ]
 
 
+raidStrengthPanel =
+    column commonStyles
+        [ row []
+            [ column (paddingEach { left = 0, right = 5, top = 0, bottom = 0 } :: commonStyles)
+                [ actionButtonLabelLeft "1" (RaidStrength 1)
+                , actionButtonLabelLeft "2" (RaidStrength 2)
+                , actionButtonLabelLeft "3" (RaidStrength 3)
+                , actionButtonLabelLeft "6" (RaidStrength 6)
+                , actionButtonLabelLeft "9" (RaidStrength 9)
+                , actionButtonLabelLeft "12" (RaidStrength 12)
+                ]
+            , el [ width (px 30) ] none
+            , column (paddingEach { left = 5, right = 0, top = 0, bottom = 0 } :: commonStyles)
+                [ actionButtonLabelRight "18" (RaidStrength 18)
+                , actionButtonLabelRight "2" (RaidStrength 2)
+                , el [ height (px 30) ] <| none
+                , el [ height (px 30) ] <| none
+                , actionButtonLabelRight "+" RaidStrengthPlus
+                , actionButtonLabelRight "F" RaidFriendly
+                ]
+            ]
+        , el [ width fill, centerX ] <| text "RAID STRENGTH"
+        ]
+
+
 operatorPageLandscape model =
     column
         commonStyles
@@ -205,10 +228,11 @@ operatorPageLandscape model =
             ]
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-            , el [ width <| fillPortion 2 ] <| none
+            , el [ width <| fillPortion 1 ] <| none
             , el [ width <| fillPortion 1 ] <| rangeKnob model.rangeKnobAngle
-            , el [ width <| fillPortion 1 ] <| E.text "(raid strength)"
+            , el [ width <| fillPortion 1 ] <| raidStrengthPanel
             ]
+        , el [ width fill, height (px 100) ] none
         ]
 
 

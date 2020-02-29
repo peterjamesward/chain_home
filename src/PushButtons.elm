@@ -44,13 +44,39 @@ indicatorStyles =
 
 actionButton : String -> Msg -> Element Msg
 actionButton label msg =
-    column buttonStyles
+    column commonStyles
         [ Input.button
             (Background.color blue :: buttonStyles)
             { onPress = Just msg
             , label = none
             }
         , el [ centerX ] <| Element.text label
+        ]
+
+
+actionButtonLabelLeft : String -> Msg -> Element Msg
+actionButtonLabelLeft label msg =
+    row [ alignRight ]
+        [ el [] <| Element.text label
+        , el [ Element.width (px 5) ] none
+        , Input.button
+            (alignRight :: Background.color blue :: buttonStyles)
+            { onPress = Just msg
+            , label = none
+            }
+        ]
+
+
+actionButtonLabelRight : String -> Msg -> Element Msg
+actionButtonLabelRight label msg =
+    row [ alignLeft ]
+        [ Input.button
+            (alignLeft :: Background.color blue :: buttonStyles)
+            { onPress = Just msg
+            , label = none
+            }
+        , el [ Element.width (px 5) ] none
+        , el [] <| Element.text label
         ]
 
 
