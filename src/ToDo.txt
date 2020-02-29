@@ -1,4 +1,10 @@
 
+TODO: Smaller buttons, reduce space around switch panel.
+
+TODO: Raid strength buttons in rows, smaller, different colour.
+
+TODO: Behind you signals not reduced when sensing - is this because of recent goniometer change?
+
 TODO: Static background trace with ground reflections.
 
 TODO: More 'randomness' in multiple echo scenarios.

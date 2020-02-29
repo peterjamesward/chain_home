@@ -38,7 +38,7 @@ aSystemElevationCurveBasic x =
 bSystemElevationCurveBasic : ElevationCurve
 bSystemElevationCurveBasic x =
     -- For a given target elevation, returns the goniometer setting that would cause
-    -- that target to be "D/F out" in height mode when using the A system.
+    -- that target to be "D/F out" in height mode when using the B system.
     -- Empirically and strictly within these bounds: 1 - cos (x^2.5 / 400 + 1) for x = 0 to 20
     if (x >= 0) && (x <= 20) then
         1 - cos (x ^ 2.5 / 400 + 1)

@@ -3,8 +3,9 @@ module Utils exposing (..)
 -- SVG requires a line to be expressed as a space separated string of pairs.
 
 import Constants exposing (paletteSand)
-import Element exposing (..)
-import Element.Font exposing (..)
+import Element as E exposing (..)
+import Element.Border as Border exposing (..)
+import Element.Font as Font exposing (..)
 import Nixie exposing (nixieDisplay)
 import String exposing (toInt)
 
@@ -26,6 +27,10 @@ choose b o1 o2 =
 
     else
         o2
+
+
+edges =
+    { top = 0, left = 0, right = 0, bottom = 0 }
 
 
 triangleWave t =
@@ -66,14 +71,15 @@ bearingDisplay label maybeBearing =
 
 
 commonStyles =
-    [ width fill
-    , spacing 20
-    , centerX
-    , centerY
-    , color paletteSand
-    , size 14
-    , family
-        [ typeface "monospace"
-        , sansSerif
+    [ E.width E.fill
+    , E.centerX
+    , E.centerY
+    , E.spacing 5
+    , E.paddingEach { edges | top = 10, bottom = 10, left = 5, right = 5 }
+    , Font.color paletteSand
+    , Font.size 14
+    , Font.family
+        [ Font.typeface "monospace"
+        , Font.sansSerif
         ]
     ]

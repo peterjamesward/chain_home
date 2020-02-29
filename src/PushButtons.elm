@@ -6,7 +6,7 @@ import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
 import Element.Input as Input exposing (..)
 import Messages exposing (Msg)
-import Utils exposing (choose)
+import Utils exposing (choose, commonStyles, edges)
 
 
 
@@ -17,40 +17,79 @@ import Utils exposing (choose)
 -- toggles but not in our scope).
 
 
-commonStyles =
-    [ Element.centerX
-    , Element.spacing 5
-    ]
-
-
 buttonStyles =
-    [ Element.height (px 30)
-    , Element.width (px 30)
-    , Border.rounded 15
-    , Border.widthEach { bottom = 3, top = 2, right = 3, left = 3 }
+    [ Element.height (px 20)
+    , Element.width (px 20)
+    , Element.centerX
+    , Border.rounded 10
+    , Border.widthEach { bottom = 2, top = 1, right = 2, left = 2 }
     , Element.focused []
     ]
-        ++ commonStyles
 
 
 indicatorStyles =
-    [ Element.height (px 20)
-    , Element.width (px 20)
-    , Border.rounded 10
+    [ Element.height (px 10)
+    , Element.width (px 10)
+    , Element.centerX
+    , Element.spacing 5
+    , Border.rounded 5
     , Border.width 2
     ]
-        ++ commonStyles
 
 
-actionButton : String -> Msg -> Element Msg
-actionButton label msg =
+actionButtonNoLabel : String -> Msg -> Element Msg
+actionButtonNoLabel _ msg =
+    Input.button
+        (Background.color blue :: buttonStyles)
+        { onPress = Just msg
+        , label = none
+        }
+
+
+actionButtonLabelAbove : String -> Msg -> Element Msg
+actionButtonLabelAbove label msg =
     column commonStyles
-        [ Input.button
-            (Background.color blue :: buttonStyles)
+        [ el
+            [ centerX
+            , paddingEach { edges | bottom = 5 }
+            ]
+          <|
+            Element.text label
+        , Input.button
+            (Background.color blue
+                :: buttonStyles
+            )
             { onPress = Just msg
             , label = none
             }
-        , el [ centerX ] <| Element.text label
+        ]
+
+
+actionButtonLabelAboveWithIndicator : String -> Bool -> Msg -> Element Msg
+actionButtonLabelAboveWithIndicator label state msg =
+    -- Hell, these buttons are becoming too specialised!
+    column commonStyles
+        [ el
+            [ centerX
+            , paddingEach { edges | bottom = 5 }
+            , above
+                (el
+                    [ centerX
+                    , paddingEach { edges | bottom = 5 }
+                    ]
+                 <|
+                    indicatorNoLabel state
+                )
+            ]
+          <|
+            Element.text label
+        , Input.button
+            (Background.color blue
+                :: buttonStyles
+            )
+            { onPress = Just msg
+            , label = none
+            }
         ]
 
 
@@ -80,8 +119,8 @@ actionButtonLabelRight label msg =
         ]
 
 
-indicator : String -> Bool -> Element Msg
-indicator label state =
+indicatorLabelBelow : String -> Bool -> Element Msg
+indicatorLabelBelow label state =
     let
         colour =
             choose state vividGreen paletteDarkGreen
@@ -89,7 +128,7 @@ indicator label state =
         borderColour =
             choose state paletteSand paletteGrey
     in
-    column indicatorStyles
+    column commonStyles
         [ Input.button
             (Background.color colour
                 :: Border.color borderColour
@@ -98,5 +137,47 @@ indicator label state =
             { onPress = Nothing
             , label = none
             }
-        , el [ centerX ] <| Element.text label
+        , el [ centerX, paddingEach { edges | top = 5 } ] <| Element.text label
         ]
+
+
+indicatorLabelAbove : String -> Bool -> Element Msg
+indicatorLabelAbove label state =
+    let
+        colour =
+            choose state vividGreen paletteDarkGreen
+
+        borderColour =
+            choose state paletteSand paletteGrey
+    in
+    column commonStyles
+        [ el [ centerX, paddingEach { edges | bottom = 5 } ] <| Element.text label
+        , Input.button
+            (Background.color colour
+                :: Border.color borderColour
+                :: indicatorStyles
+            )
+            { onPress = Nothing
+            , label = none
+            }
+        ]
+
+
+indicatorNoLabel : Bool -> Element Msg
+indicatorNoLabel state =
+    let
+        colour =
+            choose state vividGreen paletteDarkGreen
+
+        borderColour =
+            choose state paletteSand paletteGrey
+    in
+    Input.button
+        (Background.color colour
+            :: Border.color borderColour
+            :: focused []
+            :: indicatorStyles
+        )
+        { onPress = Nothing
+        , label = none
+        }

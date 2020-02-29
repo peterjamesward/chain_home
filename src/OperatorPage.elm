@@ -13,10 +13,10 @@ import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import Nixie exposing (nixieDisplay)
-import PushButtons exposing (actionButton, actionButtonLabelLeft, actionButtonLabelRight, indicator)
+import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..), InputState(..))
-import Utils exposing (commonStyles)
+import Utils exposing (commonStyles, edges)
 
 
 clickableRangeKnob angle =
@@ -118,7 +118,11 @@ rangeSliderAndCRT model =
 
 
 rangeKnob angle =
-    E.el [ pointer, width (px 200) ]
+    E.el
+        [ pointer
+        , width (px 200)
+        , E.onRight <| actionButtonLabelAbove "RANGE" StoreRangeSetting
+        ]
         (clickableRangeKnob angle)
 
 
@@ -126,90 +130,101 @@ goniometer azimuth =
     E.el
         [ pointer
         , width (px 300)
-        , E.onRight <| actionButton "GONIO" StoreGoniometerSetting
+        , E.onRight <| actionButtonLabelAbove "GONIO" StoreGoniometerSetting
         ]
         (clickableGonioImage azimuth)
 
 
 modeSwitchPanel model =
-    column commonStyles
+    column [ width fill ]
         [ el [ height (px 10) ] none
         , row commonStyles
-            [ el [ width <| fillPortion 1 ] <|
-                column commonStyles
-                    [ indicator "A" (model.goniometerMode == Azimuth && model.receiveAB)
-                    , el [ height (px 10) ] none
-                    , el [ centerX ] <| text "D/F"
-                    , indicator "B" (model.goniometerMode == Azimuth && not model.receiveAB)
-                    ]
-            , el [ width <| fillPortion 1 ] <|
-                actionButton "A <> B" (SelectReceiveAntenna (not model.receiveAB))
-            , el [ width <| fillPortion 1 ] <|
-                column commonStyles
-                    [ indicator "A" (model.goniometerMode == Elevation && model.receiveAB)
-                    , el [ height (px 10) ] none
-                    , el [ centerX ] <| text "HEIGHT"
-                    , indicator "B" (model.goniometerMode == Elevation && not model.receiveAB)
-                    ]
+            [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
-        , el [ height (px 10) ] none
-        , row commonStyles
+        , row
+            (Border.widthEach { edges | left = 1, right = 1, top = 1 }
+                :: commonStyles
+            )
             [ column commonStyles
-                [ indicator "ON" model.reflector
-                , el [ height (px 5) ] none
-                , actionButton "SENSE" (EnableReflector (not model.reflector))
+                [ indicatorLabelAbove "A" (model.goniometerMode == Azimuth && model.receiveAB)
+                , el [ centerX ] <| text "D/F"
+                , indicatorLabelBelow "B" (model.goniometerMode == Azimuth && not model.receiveAB)
                 ]
-            , el [ centerX, width <| fillPortion 1 ] <| none
             , column commonStyles
-                [ el [ height (px 40) ] none
-                , actionButton "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
+                [ el
+                    [ below (actionButtonNoLabel "A <> B" (SelectReceiveAntenna (not model.receiveAB)))
+                    , centerX
+                    ]
+                  <|
+                    text "A <> B"
+                ]
+            , column commonStyles
+                [ indicatorLabelAbove "A" (model.goniometerMode == Elevation && model.receiveAB)
+                , el [ centerX ] <| text "HEIGHT"
+                , indicatorLabelBelow "B" (model.goniometerMode == Elevation && not model.receiveAB)
                 ]
             ]
-
-        --, el [ height (px 10) ] none
+        , row
+            (Border.widthEach { edges | left = 1, right = 1, bottom = 1 }
+                :: commonStyles
+            )
+            [ el [ centerX, width <| fillPortion 1 ] <|
+                actionButtonLabelAboveWithIndicator "SENSE" model.reflector (EnableReflector (not model.reflector))
+            , el [ centerX, width <| fillPortion 1 ] <|
+                actionButtonLabelAbove "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
+            ]
         , row commonStyles
             [ el [ centerX, width <| fillPortion 1 ] <|
-                indicator "PRESS\nGONIO" <|
+                indicatorLabelBelow "PRESS\nGONIO" <|
                     (model.inputState == BearingInput)
                         || (model.inputState == HeightInput)
             , el [ centerX, width <| fillPortion 1 ] <|
-                indicator "PRESS\nRANGE" <|
+                indicatorLabelBelow "PRESS\nRANGE" <|
                     (model.inputState == BearingRangeInput)
                         || (model.inputState == HeightRangeInput)
             ]
         ]
 
 
-secondarySwitchPanel model =
-    column commonStyles
-        [ actionButton "CLEAR" ResetInputState
-        , el [ height (px 40) ] none
-        , actionButton "RANGE" StoreRangeSetting
-        ]
-
-
 raidStrengthPanel =
-    column commonStyles
-        [ row []
-            [ column (paddingEach { left = 0, right = 5, top = 0, bottom = 0 } :: commonStyles)
-                [ actionButtonLabelLeft "1" (RaidStrength 1)
-                , actionButtonLabelLeft "2" (RaidStrength 2)
-                , actionButtonLabelLeft "3" (RaidStrength 3)
-                , actionButtonLabelLeft "6" (RaidStrength 6)
-                , actionButtonLabelLeft "9" (RaidStrength 9)
-                , actionButtonLabelLeft "12" (RaidStrength 12)
+    column (Border.width 1 :: commonStyles)
+        [ row commonStyles
+            [ column
+                (spacing 30
+                    :: commonStyles
+                )
+                [ el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "1" (RaidStrength 1)
+                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "2" (RaidStrength 2)
+                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "3" (RaidStrength 3)
+                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "6" (RaidStrength 6)
+                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "9" (RaidStrength 9)
+                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelLeft "12" (RaidStrength 12)
                 ]
             , el [ width (px 30) ] none
-            , column (paddingEach { left = 5, right = 0, top = 0, bottom = 0 } :: commonStyles)
-                [ actionButtonLabelRight "18" (RaidStrength 18)
-                , actionButtonLabelRight "2" (RaidStrength 2)
-                , el [ height (px 30) ] <| none
-                , el [ height (px 30) ] <| none
-                , actionButtonLabelRight "+" RaidStrengthPlus
-                , actionButtonLabelRight "F" RaidFriendly
+            , column
+                (spacing 30
+                    :: commonStyles
+                )
+                [ el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelRight "18" (RaidStrength 18)
+                , el [ height <| minimum 30 <| px 30 ] <| none
+                , el [ height <| minimum 30 <| px 30 ] <| none
+                , el [ height <| minimum 30 <| px 30 ] <| none
+                , el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelRight "+" RaidStrengthPlus
+                , el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
+                    actionButtonLabelRight "F" RaidFriendly
                 ]
             ]
-        , el [ width fill, centerX ] <| text "RAID STRENGTH"
+        , row commonStyles
+            [ el [ centerX ] <| text "RAID STRENGTH"
+            ]
         ]
 
 
@@ -224,7 +239,6 @@ operatorPageLandscape model =
               <|
                 rangeSliderAndCRT model
             , el [ width <| fillPortion 2 ] <| modeSwitchPanel model
-            , el [ width <| fillPortion 1 ] <| secondarySwitchPanel model
             ]
         , row commonStyles
             [ el [ width <| fillPortion 1 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
