@@ -73,7 +73,6 @@ bearingDisplay label maybeBearing =
 commonStyles =
     [ E.width E.fill
     , E.centerX
-    , E.centerY
     , E.spacing 5
     , E.paddingEach { edges | top = 10, bottom = 10, left = 5, right = 5 }
     , Font.color paletteSand

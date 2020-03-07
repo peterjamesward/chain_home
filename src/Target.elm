@@ -49,13 +49,13 @@ mapToPolar station target =
     }
 
 
-targetAtTime : Float -> Target -> Target
+targetAtTime : Int -> Target -> Target
 targetAtTime t target =
     -- Targets move! t in seconds to at least centisecond resolution please
     let
         distanceTravelled =
             -- switch from mph to km/s
-            t * target.speed * 1609 / 3600000
+            toFloat t * target.speed * 1609 / 3600000
 
         ( newLat, newLong ) =
             -- Use the spherical stuff.

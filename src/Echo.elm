@@ -1,6 +1,6 @@
 module Echo exposing (Echo, artisticEchoCombiner, combineEchoes, deriveEchoes, viewEcho)
 
-import Constants exposing (pulseDuration, scaleWidthKilometers, transmitterEffectiveHeight, wavelength)
+import Constants exposing (pulseDuration, wavelength)
 import Html exposing (..)
 import Target exposing (PolarTarget)
 import Types exposing (Antenna)

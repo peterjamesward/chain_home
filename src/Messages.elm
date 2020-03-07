@@ -6,7 +6,8 @@ import Types exposing (..)
 
 type Msg
     = NoOp
-    | TimeDelta Float
+    | TimeDelta Float -- WebGL animation time
+    | UpdateModel Time.Posix -- Time for model updates
     | SetConfigStateMsg Int Bool
     | DisplayReceiver
     | DisplayConfiguration

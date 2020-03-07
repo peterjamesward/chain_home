@@ -25,6 +25,7 @@ clickableRangeKnob angle =
         , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
         , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
         , htmlAttribute <| style "touch-action" "none"
+        , width (px 200)
         ]
         (html <| drawRangeKnob angle)
 
@@ -35,6 +36,7 @@ clickableGonioImage theta =
         , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
         , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
         , htmlAttribute <| style "touch-action" "none"
+        , width (px 300)
         ]
         (html <| drawGoniometer theta)
 
@@ -130,33 +132,37 @@ rangeScale =
             (List.range 0 10)
 
 
-rangeSliderAndCRT model =
-    column [ width fill, centerX ]
+rangeSliderAndCRT model trace =
+    column [ width fill, paddingEach {edges | left = 50, top = 10, right = 50} ]
         [ E.el
             [ E.below rangeScale
             , centerX
             ]
             (rangeSlider model)
-        , E.html <| crt model.time
+        , E.html <| crt model.webGLtime trace
         ]
 
 
 rangeKnob angle =
-    E.el
+    E.row
         [ pointer
-        , width (px 200)
-        , E.onRight <| actionButtonLabelAbove "RANGE" StoreRangeSetting
+        , centerY
+        , width fill
         ]
-        (clickableRangeKnob angle)
+        [ clickableRangeKnob angle
+        , actionButtonLabelAbove "RANGE" StoreRangeSetting
+        ]
 
 
 goniometer azimuth =
-    E.el
+    E.row
         [ pointer
-        , width (px 300)
-        , E.onRight <| actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+        , centerY
+        , width fill
         ]
-        (clickableGonioImage azimuth)
+        [ clickableGonioImage azimuth
+        , actionButtonLabelAbove "RANGE" StoreRangeSetting
+        ]
 
 
 modeSwitchPanel model =
@@ -250,7 +256,7 @@ raidStrengthPanel =
 operatorPageLandscape model =
     row commonStyles
         [ column commonStyles
-            [ rangeSliderAndCRT model
+            [ rangeSliderAndCRT model <| traceDependingOnMode model
             , row commonStyles
                 [ goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
                 , el [ width (px 200) ] none
@@ -268,7 +274,7 @@ operatorPageLandscape model =
 operatorPagePortrait model =
     column
         commonStyles
-        [ rangeSliderAndCRT model
+        [ rangeSliderAndCRT model <| traceDependingOnMode model
         , goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
         , rangeKnob model.rangeKnobAngle
         ]

@@ -1,9 +1,8 @@
 module CRT_WebGL exposing (..)
 
--- TODO: This sub-project is done - we have PO approval.
--- TODO: Integrate this display with the main project.
--- TODO: Add "ground rays' - switchable, local, non-D/F-able artefacts. (i.e. static cubic pulses downstream of gonio).
-
+import Array exposing (Array)
+import Constants exposing (rangeToXFactor)
+import Echo exposing (Echo)
 import Html exposing (Html)
 import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
@@ -12,8 +11,8 @@ import Messages exposing (Msg)
 import WebGL exposing (clearColor)
 
 
-crt : Float -> Html Msg
-crt angle =
+crt : Float -> List Echo -> Html Msg
+crt time echoes =
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0
         ]
@@ -21,7 +20,7 @@ crt angle =
         , height 400
         , style "display" "block"
         ]
-        [ WebGL.entity vertexShader fragmentShader lineMesh (uniforms angle)
+        [ WebGL.entity vertexShader fragmentShader lineMesh (uniforms time echoes)
         ]
 
 
@@ -65,47 +64,65 @@ type alias Uniforms =
     }
 
 
-uniforms : Float -> Uniforms
-uniforms angle =
+echoToVec : Array Echo -> Int -> Vec3
+echoToVec echoes i =
+    case Array.get i echoes of
+        Just echo ->
+            vec3
+                (echo.r / (10 ^ 7) - 1.0)
+                (echo.amplitude / 10.0)
+                0.0
+
+        _ ->
+            vec3 0.0 0.0 0.0
+
+
+uniforms : Float -> List Echo -> Uniforms
+uniforms time echoes =
+    let
+        echoArray =
+            Array.fromList echoes
+    in
+    -- Apologies this is fugly but the Elm GLSL parser does not accept array, for now.
     { rotation =
         Mat4.mul
             (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
             (Mat4.makeRotate (2 * 0.0) (vec3 1 0 0))
     , perspective = Mat4.makePerspective 19 1 0.1 10
     , camera = Mat4.makeLookAt (vec3 0 -1 7) (vec3 0 -0.8 0) (vec3 0 1 0)
-    , u_time = angle
-    , raid0 = vec3 -0.9 1.0 0 -- Ground ray
-    , raid1 = vec3 -0.83 0.9 0 -- Ground ray
-    , raid2 = vec3 0.0 0.28 0
-    , raid3 = vec3 0.0 0.27 0
-    , raid4 = vec3 0.502 0.3 0
-    , raid5 = vec3 0.502 0.2 0
-    , raid6 = vec3 0.502 0.3 0
-    , raid7 = vec3 0.504 0.2 0
-    , raid8 = vec3 0.504 0.2 0
-    , raid9 = vec3 0.504 0.2 0
-    , raid10 = vec3 0.506 0.3 0
-    , raid11 = vec3 0.507 0.2 0
-    , raid12 = vec3 0.507 0.3 0
-    , raid13 = vec3 0.507 0.2 0
-    , raid14 = vec3 0.507 0.3 0
-    , raid15 = vec3 0.509 0.2 0
-    , raid16 = vec3 0.509 0.3 0
-    , raid17 = vec3 0.509 0.2 0
-    , raid18 = vec3 0.51 0.2 0
-    , raid19 = vec3 0.0 0.0 0.0
-    , raid20 = vec3 0.0 0.0 0.0
-    , raid21 = vec3 0.0 0.0 0.0
-    , raid22 = vec3 0.0 0.0 0.0
-    , raid23 = vec3 0.0 0.0 0.0
-    , raid24 = vec3 0.0 0.0 0.0
-    , raid25 = vec3 0.0 0.0 0.0
-    , raid26 = vec3 0.0 0.0 0.0
-    , raid27 = vec3 0.0 0.0 0.0
-    , raid28 = vec3 0.0 0.0 0.0
-    , raid29 = vec3 0.0 0.0 0.0
-    , raid30 = vec3 0.0 0.0 0.0
-    , raid31 = vec3 0.0 0.0 0.0
+    , u_time = time
+    , raid0 = vec3 -0.95 1.0 0 -- Ground ray
+    , raid1 = vec3 -0.9 0.9 0 -- Ground ray
+    , raid2 = echoToVec echoArray 0
+    , raid3 = echoToVec echoArray 1
+    , raid4 = echoToVec echoArray 2
+    , raid5 = echoToVec echoArray 3
+    , raid6 = echoToVec echoArray 4
+    , raid7 = echoToVec echoArray 5
+    , raid8 = echoToVec echoArray 6
+    , raid9 = echoToVec echoArray 7
+    , raid10 = echoToVec echoArray 8
+    , raid11 = echoToVec echoArray 9
+    , raid12 = echoToVec echoArray 10
+    , raid13 = echoToVec echoArray 11
+    , raid14 = echoToVec echoArray 12
+    , raid15 = echoToVec echoArray 13
+    , raid16 = echoToVec echoArray 14
+    , raid17 = echoToVec echoArray 15
+    , raid18 = echoToVec echoArray 16
+    , raid19 = echoToVec echoArray 17
+    , raid20 = echoToVec echoArray 18
+    , raid21 = echoToVec echoArray 19
+    , raid22 = echoToVec echoArray 20
+    , raid23 = echoToVec echoArray 21
+    , raid24 = echoToVec echoArray 22
+    , raid25 = echoToVec echoArray 23
+    , raid26 = echoToVec echoArray 24
+    , raid27 = echoToVec echoArray 25
+    , raid28 = echoToVec echoArray 26
+    , raid29 = echoToVec echoArray 27
+    , raid30 = echoToVec echoArray 28
+    , raid31 = echoToVec echoArray 29
     }
 
 

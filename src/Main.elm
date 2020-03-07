@@ -6,7 +6,6 @@ module Main exposing (main)
 -}
 
 import Attr exposing (..)
-import BeamSmoother exposing (beamPath, scalePathToDisplay)
 import Browser
 import Browser.Events exposing (..)
 import Config exposing (..)
@@ -25,10 +24,9 @@ import LobeFunctions exposing (..)
 import Messages exposing (..)
 import OperatorPage exposing (operatorPage)
 import Receiver exposing (goniometerMix)
-import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
 import Target exposing (..)
-import Task
+import Time
 import Types exposing (..)
 import Utils exposing (..)
 
@@ -41,7 +39,8 @@ type Page
 
 type alias Model =
     { currPage : Page
-    , time : Float -- now updated by the WebGL animation control.
+    , webGLtime : Float -- now updated by the WebGL animation control.
+    , modelTime : Int -- millseconds
     , azimuthModeTrace : List Echo
     , elevation_A_trace : List Echo
     , elevation_B_trace : List Echo
@@ -81,7 +80,8 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { currPage = InputPage
-      , time = 0.0
+      , webGLtime = 0.0
+      , modelTime = 0
       , azimuthModeTrace = []
       , elevation_A_trace = []
       , elevation_B_trace = []
@@ -185,7 +185,8 @@ slideRangeSlider range keys =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ onAnimationFrameDelta TimeDelta
+        [ Time.every 100 UpdateModel
+        , onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
         , onResize (\w h -> DeviceResize w h)
@@ -205,7 +206,7 @@ applyReceiver antenna rawEchoes =
         rawEchoes
 
 
-deriveModelAtTime : Model -> Float -> Model
+deriveModelAtTime : Model -> Int -> Model
 deriveModelAtTime model t =
     let
         targetsNow =
@@ -241,7 +242,7 @@ deriveModelAtTime model t =
             goniometerMix model.goniometerAzimuth receiveSignals
     in
     { model
-        | time = t
+        | modelTime = t
         , targets = getAllTargets model.activeConfigurations
         , movedTargets = targetsNow
         , polarTargets = convertedTargets
@@ -259,7 +260,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TimeDelta dt ->
-            ( { model | time = model.time + dt / 100.0 }
+            ( { model | webGLtime = model.webGLtime + dt / 100.0 }
+            , Cmd.none
+            )
+
+        UpdateModel time ->
+            ( deriveModelAtTime model (Time.posixToMillis time)
             , Cmd.none
             )
 

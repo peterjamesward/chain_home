@@ -8,25 +8,12 @@ lightSpeed = 300000000.0
 frequency =  20000000.0
 wavelength = lightSpeed / frequency
 
-transmitterEffectiveHeight = 100.0
-
 pulseDuration = 20.0 -- microseconds
 pulseWidth = lightSpeed * pulseDuration / 10000000.0
 
--- higher numbers are steeper slops.
-beamSweepIncreasingAmplitude = 0.003
-beamSweepDecreasingAmplitude = -0.002
-
 scaleWidthKilometers = 160
 
-viewWidth = 1000
-viewHeight = 400
-
-strengthToHeightFactor = 100.0
-
-rangeToXFactor =  viewWidth / (scaleWidthKilometers * 1000.0)
-
-rangeDeltaPerMicrosecond = scaleWidthKilometers * 2
+rangeToXFactor = (scaleWidthKilometers * 1000.0)
 
 blue = rgb255 52 101 164
 black = rgb255 0 0 0
