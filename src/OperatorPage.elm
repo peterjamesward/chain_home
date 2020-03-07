@@ -42,7 +42,7 @@ clickableGonioImage theta =
 rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
-        , E.width E.fill
+        , E.width (E.px 700)
         , E.centerX
         , pointer
 
@@ -110,9 +110,31 @@ traceDependingOnMode model =
             model.elevation_B_trace
 
 
+rangeScale =
+    row
+        [ width fill
+        , spaceEvenly
+        , Font.color green
+        , Font.size 30
+        , Font.family
+            [ Font.typeface "Courier New"
+            , Font.sansSerif
+            ]
+        ]
+    <|
+        List.map
+            (\i ->
+                text (String.fromInt (10 * i))
+            )
+            (List.range 1 10)
+
+
 rangeSliderAndCRT model =
     column commonStyles
-        [ rangeSlider model
+        [ E.el
+            [ E.below rangeScale
+            ]
+            (rangeSlider model)
         , E.html <| crt model.time
         ]
 
@@ -188,38 +210,39 @@ modeSwitchPanel model =
 
 raidStrengthPanel =
     column (Border.width 1 :: commonStyles)
-        [ row commonStyles
+        [ row (Font.size 60 :: commonStyles)
             [ column
-                (spacing 30
-                    :: commonStyles
-                )
-                [ el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "1" (RaidStrength 1)
-                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "2" (RaidStrength 2)
-                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "3" (RaidStrength 3)
-                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "6" (RaidStrength 6)
-                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "9" (RaidStrength 9)
-                , el [ alignRight, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelLeft "12" (RaidStrength 12)
+                [ E.width E.fill
+                , E.centerX
+                , E.centerY
+                , E.spacing 5
+                , E.paddingEach { edges | top = 10, bottom = 10, left = 5, right = 5 }
+                , Font.color green
+                , Font.size 18
+                , Font.bold
+                , Font.family
+                    [ Font.typeface "Courier New"
+                    , Font.sansSerif
+                    ]
+                ]
+                [ actionButtonLabelLeft "1" (RaidStrength 1)
+                , actionButtonLabelLeft "2" (RaidStrength 2)
+                , actionButtonLabelLeft "3" (RaidStrength 3)
+                , actionButtonLabelLeft "6" (RaidStrength 6)
+                , actionButtonLabelLeft "9" (RaidStrength 9)
+                , actionButtonLabelLeft "12" (RaidStrength 12)
                 ]
             , el [ width (px 30) ] none
             , column
                 (spacing 30
                     :: commonStyles
                 )
-                [ el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelRight "18" (RaidStrength 18)
+                [ actionButtonLabelRight "18" (RaidStrength 18)
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
-                , el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelRight "+" RaidStrengthPlus
-                , el [ alignLeft, height <| minimum 30 <| fillPortion 1 ] <|
-                    actionButtonLabelRight "F" RaidFriendly
+                , actionButtonLabelRight "+" RaidStrengthPlus
+                , actionButtonLabelRight "F" RaidFriendly
                 ]
             ]
         , row commonStyles

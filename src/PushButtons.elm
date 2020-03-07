@@ -4,6 +4,7 @@ import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
+import Element.Font as Font
 import Element.Input as Input exposing (..)
 import Messages exposing (Msg)
 import Utils exposing (choose, commonStyles, edges)
@@ -24,6 +25,7 @@ buttonStyles =
     , Border.rounded 10
     , Border.widthEach { bottom = 2, top = 1, right = 2, left = 2 }
     , Element.focused []
+    , Font.bold
     ]
 
 
@@ -34,6 +36,7 @@ indicatorStyles =
     , Element.spacing 5
     , Border.rounded 5
     , Border.width 2
+    , Font.bold
     ]
 
 
@@ -95,9 +98,8 @@ actionButtonLabelAboveWithIndicator label state msg =
 
 actionButtonLabelLeft : String -> Msg -> Element Msg
 actionButtonLabelLeft label msg =
-    row [ alignRight ]
-        [ el [] <| Element.text label
-        , el [ Element.width (px 5) ] none
+    row [ alignRight, height <| minimum 30 <| fill ]
+        [ el [ paddingEach { edges | right = 10 } ] <| Element.text label
         , Input.button
             (alignRight :: Background.color green :: buttonStyles)
             { onPress = Just msg
@@ -108,14 +110,13 @@ actionButtonLabelLeft label msg =
 
 actionButtonLabelRight : String -> Msg -> Element Msg
 actionButtonLabelRight label msg =
-    row [ alignLeft ]
+    row [ alignLeft, height <| minimum 30 <| fill ]
         [ Input.button
             (alignLeft :: Background.color green :: buttonStyles)
             { onPress = Just msg
             , label = none
             }
-        , el [ Element.width (px 5) ] none
-        , el [] <| Element.text label
+        , el [ paddingEach { edges | left = 10 } ] <| Element.text label
         ]
 
 
