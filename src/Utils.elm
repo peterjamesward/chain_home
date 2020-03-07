@@ -77,7 +77,6 @@ commonStyles =
     , E.spacingXY 20 0
     , E.paddingEach { top = 10, bottom = 10, left = 10, right = 10 }
     , Font.color paletteSand
-    , B.color flatWetAsphalt
     , Font.size 14
     , Font.family
         [ Font.typeface "monospace"

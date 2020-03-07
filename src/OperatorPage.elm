@@ -133,7 +133,7 @@ rangeScale =
 
 
 rangeSliderAndCRT model trace =
-    column [ width fill, paddingEach {edges | left = 50, top = 10, right = 50} ]
+    column [ width fill, paddingEach { edges | left = 50, top = 10, right = 50 } ]
         [ E.el
             [ E.below rangeScale
             , centerX
@@ -262,7 +262,19 @@ operatorPageLandscape model =
                 , rangeKnob model.rangeKnobAngle
                 ]
             ]
-        , column commonStyles
+        , column
+            [ E.width E.fill
+            , E.alignTop
+            , E.spacingXY 20 0
+            , E.paddingEach { top = 10, bottom = 10, left = 10, right = 10 }
+            , Font.color paletteSand
+            , Background.color flatWetAsphalt
+            , Font.size 14
+            , Font.family
+                [ Font.typeface "monospace"
+                , Font.sansSerif
+                ]
+            ]
             [ modeSwitchPanel model
             , raidStrengthPanel
             ]

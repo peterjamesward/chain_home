@@ -532,7 +532,7 @@ view model =
     , body =
         [ layout
             [ Background.color flatMidnightBlue
-            , inFront <| menuPanel model
+            , width fill
             ]
           <|
             column [ E.width E.fill, spacingXY 0 20 ]
@@ -550,20 +550,11 @@ navBar =
         , paddingXY 60 10
         , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
         , Border.color blue
+        , Font.color paletteLightGreen
         ]
-        [ el
-            [ alignLeft
-            , Font.color paletteSand
-            ]
-          <|
-            text "Chain Home"
-        , Input.button
-            (Attr.greenButton
-                ++ [ padding 5, alignRight, width (px 80) ]
-            )
-            { onPress = Just ToggleMenu
-            , label = el [ centerX ] <| text "Menu"
-            }
+        [ E.el [ pointer, alignLeft, Event.onClick DisplayConfiguration ] <| text "Configuration"
+        , E.el [ pointer, centerX, Event.onClick DisplayReceiver ] <| text "Operator"
+        , E.el [ pointer, alignRight, Event.onClick DisplayCalculator ] <| text "Outputs"
         ]
 
 
