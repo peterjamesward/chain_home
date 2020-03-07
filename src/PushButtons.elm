@@ -42,11 +42,18 @@ indicatorStyles =
 
 actionButtonNoLabel : String -> Msg -> Element Msg
 actionButtonNoLabel _ msg =
-    Input.button
-        (Background.color blue :: buttonStyles)
-        { onPress = Just msg
-        , label = none
-        }
+    el
+        [ paddingEach { edges | top = 10 }
+        , centerX
+        ]
+    <|
+        Input.button
+            (Background.color blue
+                :: buttonStyles
+            )
+            { onPress = Just msg
+            , label = none
+            }
 
 
 actionButtonLabelAbove : String -> Msg -> Element Msg

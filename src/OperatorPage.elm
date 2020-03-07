@@ -167,8 +167,7 @@ goniometer azimuth =
 
 modeSwitchPanel model =
     column commonStyles
-        [ el [ height (px 10) ] none
-        , row commonStyles
+        [ row commonStyles
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
         , row
@@ -184,7 +183,6 @@ modeSwitchPanel model =
                 [ el
                     [ below (actionButtonNoLabel "A <> B" (SelectReceiveAntenna (not model.receiveAB)))
                     , centerX
-                    , paddingEach {edges | bottom = 10}
                     ]
                   <|
                     text "A <> B"
