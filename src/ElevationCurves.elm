@@ -68,9 +68,11 @@ aElevationAdjustedEchoes goniometerSetting echoes =
         (\e ->
             { e
                 | amplitude =
-                    sin <|
-                        goniometerSetting
-                            - goniometerPositionForAlpha aSystemElevationCurveBasic e.alpha
+                    4.0
+                        * sin
+                            (goniometerSetting
+                                - goniometerPositionForAlpha aSystemElevationCurveBasic e.alpha
+                            )
             }
         )
         echoes
@@ -85,9 +87,11 @@ bElevationAdjustedEchoes goniometerSetting echoes =
         (\e ->
             { e
                 | amplitude =
-                    sin <|
-                        goniometerSetting
-                            - goniometerPositionForAlpha bSystemElevationCurveBasic e.alpha
+                    4.0
+                        * sin
+                            (goniometerSetting
+                                - goniometerPositionForAlpha bSystemElevationCurveBasic e.alpha
+                            )
             }
         )
         echoes

@@ -184,6 +184,7 @@ modeSwitchPanel model =
                 [ el
                     [ below (actionButtonNoLabel "A <> B" (SelectReceiveAntenna (not model.receiveAB)))
                     , centerX
+                    , paddingEach {edges | bottom = 10}
                     ]
                   <|
                     text "A <> B"

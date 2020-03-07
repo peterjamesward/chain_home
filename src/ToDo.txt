@@ -1,5 +1,4 @@
 
-TODO: Merge WebGL CRT.
 
 TODO: Replace popout nav bar with simple "tabs" at top.
 
