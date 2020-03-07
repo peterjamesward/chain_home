@@ -160,7 +160,7 @@ goniometer azimuth =
 
 
 modeSwitchPanel model =
-    column [ width fill ]
+    column commonStyles
         [ el [ height (px 10) ] none
         , row commonStyles
             [ actionButtonLabelAbove "CLEAR" ResetInputState
@@ -211,7 +211,11 @@ modeSwitchPanel model =
 
 
 raidStrengthPanel =
-    column (Border.width 1 :: commonStyles)
+    column
+        (Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
+            :: paddingEach { edges | left = 20, right = 20 }
+            :: commonStyles
+        )
         [ row [ centerX ]
             [ column
                 [ Font.size 18
@@ -244,17 +248,18 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    column
-        commonStyles
-        [ row commonStyles
+    row commonStyles
+        [ column commonStyles
             [ rangeSliderAndCRT model
-            , modeSwitchPanel model
+            , row commonStyles
+                [ goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
+                , el [ width (px 200) ] none
+                , rangeKnob model.rangeKnobAngle
+                ]
             ]
-        , row commonStyles
-            [ el [ width <| fillPortion 2 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-            , el [ width <| fillPortion 1 ] <| none
-            , el [ width <| fillPortion 2 ] <| rangeKnob model.rangeKnobAngle
-            , el [ width <| fillPortion 2 ] <| raidStrengthPanel
+        , column commonStyles
+            [ modeSwitchPanel model
+            , raidStrengthPanel
             ]
         , el [ width fill, height (px 100) ] none
         ]
