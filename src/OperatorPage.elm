@@ -161,7 +161,7 @@ goniometer azimuth =
         , width fill
         ]
         [ clickableGonioImage azimuth
-        , actionButtonLabelAbove "RANGE" StoreRangeSetting
+        , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
         ]
 
 

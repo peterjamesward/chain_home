@@ -2,8 +2,9 @@ module Utils exposing (..)
 
 -- SVG requires a line to be expressed as a space separated string of pairs.
 
-import Constants exposing (paletteSand)
+import Constants exposing (flatWetAsphalt, paletteSand)
 import Element as E exposing (..)
+import Element.Background as B
 import Element.Border as Border exposing (..)
 import Element.Font as Font exposing (..)
 import Nixie exposing (nixieDisplay)
@@ -76,6 +77,7 @@ commonStyles =
     , E.spacingXY 20 0
     , E.paddingEach { top = 10, bottom = 10, left = 10, right = 10 }
     , Font.color paletteSand
+    , B.color flatWetAsphalt
     , Font.size 14
     , Font.family
         [ Font.typeface "monospace"
