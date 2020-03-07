@@ -76,7 +76,7 @@ echoToVec echoes i =
                 0.0
 
         _ ->
-            vec3 0.0 0.0 0.0
+            vec3 2.0 0.0 0.0
 
 
 uniforms : Float -> List Echo -> Uniforms
@@ -605,7 +605,7 @@ vertexShader =
 
           // Additional "spiky" line noise.
           if (lineSpikes > 0.0) {
-              if ( random( floor( position.x * 100.0) * floor(u_time / 3.0)) < 0.01 )
+              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )
               {
                  vec3 noise = vec3(position.x, 0.1, 0.0);
                  vec3 spike = pulseShape(noise, 0.05);
@@ -619,7 +619,7 @@ vertexShader =
             stretch = abs(slope);
 
             // Lower the resolution of the x line to make the noise less noisy.
-            float newx = floor((position.x + 1.0) * 153.0);
+            float newx = floor((position.x) * 153.0);
             float newtime = floor(u_time / 2.0);
 
             // add time to the noise parameters so it's animated
