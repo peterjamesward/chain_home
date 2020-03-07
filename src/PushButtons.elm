@@ -99,7 +99,7 @@ actionButtonLabelLeft label msg =
         [ el [] <| Element.text label
         , el [ Element.width (px 5) ] none
         , Input.button
-            (alignRight :: Background.color blue :: buttonStyles)
+            (alignRight :: Background.color green :: buttonStyles)
             { onPress = Just msg
             , label = none
             }
@@ -110,7 +110,7 @@ actionButtonLabelRight : String -> Msg -> Element Msg
 actionButtonLabelRight label msg =
     row [ alignLeft ]
         [ Input.button
-            (alignLeft :: Background.color blue :: buttonStyles)
+            (alignLeft :: Background.color green :: buttonStyles)
             { onPress = Just msg
             , label = none
             }
