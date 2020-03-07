@@ -85,7 +85,7 @@ uniforms time echoes =
         echoArray =
             Array.fromList echoes
     in
-    -- Apologies this is fugly but the Elm GLSL parser does not accept array, for now.
+    -- Apologies this is ch'ugly but the Elm GLSL parser does not accept array, for now.
     { rotation =
         Mat4.mul
             (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
@@ -95,38 +95,38 @@ uniforms time echoes =
     , u_time = time
     , lineJiggle = 0.0  -- 0.3 is OK.
     , lineSpikes = 0.0  -- 1.0 is OK.
-    , raid0 = vec3 -0.95 1.0 0 -- Ground ray
-    , raid1 = vec3 -0.9 0.9 0 -- Ground ray
-    , raid2 = echoToVec echoArray 0
-    , raid3 = echoToVec echoArray 1
-    , raid4 = echoToVec echoArray 2
-    , raid5 = echoToVec echoArray 3
-    , raid6 = echoToVec echoArray 4
-    , raid7 = echoToVec echoArray 5
-    , raid8 = echoToVec echoArray 6
-    , raid9 = echoToVec echoArray 7
-    , raid10 = echoToVec echoArray 8
-    , raid11 = echoToVec echoArray 9
-    , raid12 = echoToVec echoArray 10
-    , raid13 = echoToVec echoArray 11
-    , raid14 = echoToVec echoArray 12
-    , raid15 = echoToVec echoArray 13
-    , raid16 = echoToVec echoArray 14
-    , raid17 = echoToVec echoArray 15
-    , raid18 = echoToVec echoArray 16
-    , raid19 = echoToVec echoArray 17
-    , raid20 = echoToVec echoArray 18
-    , raid21 = echoToVec echoArray 19
-    , raid22 = echoToVec echoArray 20
-    , raid23 = echoToVec echoArray 21
-    , raid24 = echoToVec echoArray 22
-    , raid25 = echoToVec echoArray 23
-    , raid26 = echoToVec echoArray 24
-    , raid27 = echoToVec echoArray 25
-    , raid28 = echoToVec echoArray 26
-    , raid29 = echoToVec echoArray 27
-    , raid30 = echoToVec echoArray 28
-    , raid31 = echoToVec echoArray 29
+    , raid0  = echoToVec echoArray 0
+    , raid1  = echoToVec echoArray 1
+    , raid2  = echoToVec echoArray 2
+    , raid3  = echoToVec echoArray 3
+    , raid4  = echoToVec echoArray 4
+    , raid5  = echoToVec echoArray 5
+    , raid6  = echoToVec echoArray 6
+    , raid7  = echoToVec echoArray 7
+    , raid8  = echoToVec echoArray 8
+    , raid9  = echoToVec echoArray 9
+    , raid10 = echoToVec echoArray 10
+    , raid11 = echoToVec echoArray 11
+    , raid12 = echoToVec echoArray 12
+    , raid13 = echoToVec echoArray 13
+    , raid14 = echoToVec echoArray 14
+    , raid15 = echoToVec echoArray 15
+    , raid16 = echoToVec echoArray 16
+    , raid17 = echoToVec echoArray 17
+    , raid18 = echoToVec echoArray 18
+    , raid19 = echoToVec echoArray 19
+    , raid20 = echoToVec echoArray 20
+    , raid21 = echoToVec echoArray 21
+    , raid22 = echoToVec echoArray 22
+    , raid23 = echoToVec echoArray 23
+    , raid24 = echoToVec echoArray 24
+    , raid25 = echoToVec echoArray 25
+    , raid26 = echoToVec echoArray 26
+    , raid27 = echoToVec echoArray 27
+    , raid28 = echoToVec echoArray 28
+    , raid29 = echoToVec echoArray 29
+    , raid30 = echoToVec echoArray 30
+    , raid31 = echoToVec echoArray 31
     }
 
 

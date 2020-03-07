@@ -1,5 +1,6 @@
-module Config exposing (TargetSelector, bawdsey, getAllTargets, targetConfigurations, updateConfig)
+module Config exposing (..)
 
+import Echo exposing (Echo)
 import Station exposing (Station, stationClutter)
 import Target exposing (Target)
 
@@ -10,6 +11,26 @@ type alias TargetSelector =
     , targets : List Target -- The planes to be active when this group selected
     , active : Bool -- Whether this group is active (dynamic)
     }
+
+
+groundRays =
+    [ { sequence = 0
+      , r = 5000
+      , theta = 0 -- ignored as these are injected after D/F
+      , alpha = 0
+      , phase = 0
+      , duration = 0
+      , amplitude = 10.0
+      }
+    , { sequence = 0
+      , r = 8000
+      , theta = 0 -- ignored as these are injected after D/F
+      , alpha = 0
+      , phase = 0
+      , duration = 0
+      , amplitude = 8.0
+      }
+    ]
 
 
 bawdsey =
@@ -65,7 +86,7 @@ bomber2A =
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
     { longitude = bawdsey.longitude + degrees 0.8
-    , latitude = bawdsey.latitude + degrees 0.30
+    , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -75,7 +96,7 @@ bomber3 =
 
 bomber4 =
     { longitude = bawdsey.longitude + degrees 0.8001
-    , latitude = bawdsey.latitude + degrees -0.30
+    , latitude = bawdsey.latitude + degrees -0.3
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -200,7 +221,7 @@ targetConfigurations =
     , tenDeep
 
     --, massiveRaid
-    , nearbynoise
+    --, nearbynoise
     , behindYou
     ]
 
