@@ -6,11 +6,11 @@ import Types exposing (..)
 
 type Msg
     = NoOp
+    | TimeDelta Float
     | SetConfigStateMsg Int Bool
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
-    | Tick Time.Posix
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point
@@ -24,7 +24,6 @@ type Msg
     | EnableReflector Bool
     | SelectGoniometerMode Bool
     | ToggleMenu
-    | AdjustTimeZone Time.Zone
     | StoreGoniometerSetting
     | StoreRangeSetting
     | ResetInputState

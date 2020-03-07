@@ -1,6 +1,6 @@
 module OperatorPage exposing (operatorPage)
 
-import CRT exposing (crt)
+import CRT_WebGL exposing (crt)
 import Constants exposing (..)
 import Element as E exposing (..)
 import Element.Background as Background
@@ -113,7 +113,7 @@ traceDependingOnMode model =
 rangeSliderAndCRT model =
     column commonStyles
         [ rangeSlider model
-        , E.html <| crt <| traceDependingOnMode model
+        , E.html <| crt model.time
         ]
 
 
@@ -234,7 +234,7 @@ operatorPageLandscape model =
         [ row commonStyles
             [ el
                 [ paddingEach { left = 10, top = 10, bottom = 0, right = 0 }
-                , width <| fillPortion 6
+                , width <| fillPortion 4
                 ]
               <|
                 rangeSliderAndCRT model

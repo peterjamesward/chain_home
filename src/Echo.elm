@@ -63,8 +63,8 @@ artisticEchoCombiner time activeEchoes =
                 combineEchoes time es / (sqrt <| toFloat <| List.length es)
 
 
-deriveEchoes : List PolarTarget -> Antenna -> Int -> List Echo
-deriveEchoes targets txAntenna time =
+deriveEchoes : List PolarTarget -> Antenna -> List Echo
+deriveEchoes targets txAntenna =
     let
         echoFromDirectBeam target seq =
             { sequence = seq

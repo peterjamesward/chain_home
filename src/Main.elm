@@ -19,7 +19,7 @@ import Element.Events as Event exposing (..)
 import Element.Font as Font
 import Element.Input as Input
 import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
-import Goniometer exposing (drawGoniometer, goniometerTurnAngle)
+import Goniometer exposing (goniometerTurnAngle)
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
 import Messages exposing (..)
@@ -29,7 +29,6 @@ import Skyline exposing (EdgeSegment, deriveSkyline)
 import Station exposing (..)
 import Target exposing (..)
 import Task
-import Time exposing (..)
 import Types exposing (..)
 import Utils exposing (..)
 
@@ -42,12 +41,10 @@ type Page
 
 type alias Model =
     { currPage : Page
-    , zone : Time.Zone
-    , startTime : Maybe Time.Posix
-    , time : Time.Posix -- milliseconds from t-zero
-    , azimuthModeTrace : List Point
-    , elevation_A_trace : List Point
-    , elevation_B_trace : List Point
+    , time : Float -- now updated by the WebGL animation control.
+    , azimuthModeTrace : List Echo
+    , elevation_A_trace : List Echo
+    , elevation_B_trace : List Echo
     , station : Station
     , targets : List Target
     , movedTargets : List Target
@@ -84,10 +81,8 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { currPage = InputPage
-      , zone = Time.utc
-      , startTime = Nothing
-      , time = Time.millisToPosix 0
-      , azimuthModeTrace = beamPath []
+      , time = 0.0
+      , azimuthModeTrace = []
       , elevation_A_trace = []
       , elevation_B_trace = []
       , station = bawdsey
@@ -117,7 +112,7 @@ init _ =
       , storedAzimuthRange = Nothing
       , storedElevationRange = Nothing
       }
-    , Task.perform AdjustTimeZone Time.here
+    , Cmd.none
     )
 
 
@@ -187,22 +182,14 @@ slideRangeSlider range keys =
             range
 
 
-
--- SUBSCRIPTIONS
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every 100 Tick
+        [ onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
         , onResize (\w h -> DeviceResize w h)
         ]
-
-
-
--- UPDATE
 
 
 applyReceiver : Antenna -> List Echo -> List Echo
@@ -218,16 +205,12 @@ applyReceiver antenna rawEchoes =
         rawEchoes
 
 
-deriveModelAtTime : Model -> Time.Posix -> Model
+deriveModelAtTime : Model -> Float -> Model
 deriveModelAtTime model t =
     let
-        effectiveStartTime =
-            -- TODO: Embellish this so we can vary the model speed.
-            Maybe.withDefault model.time model.startTime
-
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
-            List.map (targetAtTime t effectiveStartTime) model.targets
+            List.map (targetAtTime t) model.targets
 
         convertedTargets =
             -- Easier to work in polar coordinates here on.
@@ -235,7 +218,7 @@ deriveModelAtTime model t =
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
-            deriveEchoes convertedTargets model.transmitAntenna (Time.posixToMillis t)
+            deriveEchoes convertedTargets model.transmitAntenna
 
         receiveSignals =
             -- Deduce inputs based on receiver characteristics.
@@ -249,41 +232,22 @@ deriveModelAtTime model t =
             -- will make a target "D/F out" -- we only need a suitable function to make it appear
             -- that we are actually using a goniometer.
             aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
-                |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
-                |> beamPath
-                |> scalePathToDisplay
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
-                |> deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000)
-                |> beamPath
-                |> scalePathToDisplay
 
         gonioAzimuthOut =
             -- 'Blend' X and Y inputs to find target's azimuth.
             goniometerMix model.goniometerAzimuth receiveSignals
-
-        newSkyline =
-            -- Work out what to show on the CRT trace.
-            deriveSkyline (Time.posixToMillis model.time) (scaleWidthKilometers * 1000) gonioAzimuthOut
     in
     { model
-        | startTime =
-            case model.startTime of
-                --TODO: Get rid of this somehow.
-                Nothing ->
-                    Just t
-
-                _ ->
-                    model.startTime
-        , time = t
+        | time = t
         , targets = getAllTargets model.activeConfigurations
         , movedTargets = targetsNow
         , polarTargets = convertedTargets
         , echoes = echoSignals
-        , skyline = newSkyline
         , gonioOutput = gonioAzimuthOut
-        , azimuthModeTrace = scalePathToDisplay <| beamPath newSkyline
+        , azimuthModeTrace = echoSignals
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
         , elevation_A_trace = heightMode_A_Outputs
@@ -294,8 +258,8 @@ deriveModelAtTime model t =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AdjustTimeZone newZone ->
-            ( { model | zone = newZone }
+        TimeDelta dt ->
+            ( { model | time = model.time + dt / 100.0 }
             , Cmd.none
             )
 
@@ -335,11 +299,6 @@ update msg model =
                 | currPage = OutputPage
                 , isMenuOpen = False
               }
-            , Cmd.none
-            )
-
-        Tick newTime ->
-            ( deriveModelAtTime model newTime
             , Cmd.none
             )
 

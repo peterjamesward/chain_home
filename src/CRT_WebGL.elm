@@ -4,56 +4,21 @@ module CRT_WebGL exposing (..)
 -- TODO: Integrate this display with the main project.
 -- TODO: Add "ground rays' - switchable, local, non-D/F-able artefacts. (i.e. static cubic pulses downstream of gonio).
 
-import Browser
-import Browser.Events as E
 import Html exposing (Html)
 import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
+import Messages exposing (Msg)
 import WebGL exposing (clearColor)
 
 
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-type alias Model =
-    Float
-
-
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( 0, Cmd.none )
-
-
-type Msg
-    = TimeDelta Float
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg angle =
-    case msg of
-        TimeDelta dt ->
-            ( angle + dt / 100.0, Cmd.none )
-
-
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    E.onAnimationFrameDelta TimeDelta
-
-
-view : Model -> Html Msg
-view angle =
+crt : Float -> Html Msg
+crt angle =
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0
         ]
-        [ width 1200
-        , height 700
+        [ width 800
+        , height 400
         , style "display" "block"
         ]
         [ WebGL.entity vertexShader fragmentShader lineMesh (uniforms angle)
@@ -109,30 +74,25 @@ uniforms angle =
     , perspective = Mat4.makePerspective 20 1 0.1 10
     , camera = Mat4.makeLookAt (vec3 0 -1 7) (vec3 0 -0.8 0) (vec3 0 1 0)
     , u_time = angle
-    , raid0 = vec3 -0.9 1.0 0
-    , raid1 = vec3 -0.83 0.9 0
+    , raid0 = vec3 -0.9 1.0 0 -- Ground ray
+    , raid1 = vec3 -0.83 0.9 0 -- Ground ray
     , raid2 = vec3 0.0 0.28 0
     , raid3 = vec3 0.0 0.27 0
-
-    --, raid0  = vec3 -0.500 0.3 0
-    --, raid1  = vec3 -0.500 0.2 0
-    --, raid2  = vec3 -0.500 0.3 0
-    --, raid3  = vec3 -0.502 0.2 0
-    , raid4 = vec3 -0.502 0.3 0
-    , raid5 = vec3 -0.502 0.2 0
-    , raid6 = vec3 -0.502 0.3 0
-    , raid7 = vec3 -0.504 0.2 0
-    , raid8 = vec3 -0.504 0.2 0
-    , raid9 = vec3 -0.504 0.2 0
-    , raid10 = vec3 -0.506 0.3 0
-    , raid11 = vec3 -0.507 0.2 0
-    , raid12 = vec3 -0.507 0.3 0
-    , raid13 = vec3 -0.507 0.2 0
-    , raid14 = vec3 -0.507 0.3 0
-    , raid15 = vec3 -0.509 0.2 0
-    , raid16 = vec3 -0.509 0.3 0
-    , raid17 = vec3 -0.509 0.2 0
-    , raid18 = vec3 -0.51 0.2 0
+    , raid4 = vec3 0.502 0.3 0
+    , raid5 = vec3 0.502 0.2 0
+    , raid6 = vec3 0.502 0.3 0
+    , raid7 = vec3 0.504 0.2 0
+    , raid8 = vec3 0.504 0.2 0
+    , raid9 = vec3 0.504 0.2 0
+    , raid10 = vec3 0.506 0.3 0
+    , raid11 = vec3 0.507 0.2 0
+    , raid12 = vec3 0.507 0.3 0
+    , raid13 = vec3 0.507 0.2 0
+    , raid14 = vec3 0.507 0.3 0
+    , raid15 = vec3 0.509 0.2 0
+    , raid16 = vec3 0.509 0.3 0
+    , raid17 = vec3 0.509 0.2 0
+    , raid18 = vec3 0.51 0.2 0
     , raid19 = vec3 0.0 0.0 0.0
     , raid20 = vec3 0.0 0.0 0.0
     , raid21 = vec3 0.0 0.0 0.0

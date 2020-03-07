@@ -1,27 +1,13 @@
 
-TODO: Smaller buttons, reduce space around switch panel.
-
-TODO: Raid strength buttons in rows, smaller, different colour.
-
-TODO: Behind you signals not reduced when sensing - is this because of recent goniometer change?
-
-TODO: Static background trace with ground reflections.
-
-TODO: More 'randomness' in multiple echo scenarios.
-
-TODO: "Buzzing" background trace.
-
-TODO: Only the echoes are drawn dynamically, atop the ground reflections.
-
-TODO: Treat formations as units, with their intrinsic dancing patterns.
-
-TODO: Reconsider WebGL, bearing in mind all the above.
-
-TODO: IFF.
+TODO: Merge WebGL CRT.
 
 TODO: Replace popout nav bar with simple "tabs" at top.
 
-TODO: "Proper" operator panel layout.
+TODO: Noise parameters to configuration.
+
+X TODO: Treat formations as units, with their intrinsic dancing patterns.
+
+TODO: IFF.
 
 TODO: Electronic calculator output.
 
@@ -29,4 +15,3 @@ TODO: Narrative and on-screen prompts.
 
 TODO: Physical knobs!!
 
-TODO: Bug when signal exits stage right.
