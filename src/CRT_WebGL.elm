@@ -29,6 +29,8 @@ type alias Uniforms =
     , perspective : Mat4
     , camera : Mat4
     , u_time : Float
+    ,    lineJiggle : Float
+    ,    lineSpikes : Float
     , raid0 : Vec3
     , raid1 : Vec3
     , raid2 : Vec3
@@ -69,7 +71,7 @@ echoToVec echoes i =
     case Array.get i echoes of
         Just echo ->
             vec3
-                (echo.r / (10 ^ 7) - 1.0)
+                (echo.r / 80000 - 1.0)
                 (echo.amplitude / 10.0)
                 0.0
 
@@ -91,6 +93,8 @@ uniforms time echoes =
     , perspective = Mat4.makePerspective 19 1 0.1 10
     , camera = Mat4.makeLookAt (vec3 0 -1 7) (vec3 0 -0.8 0) (vec3 0 1 0)
     , u_time = time
+    , lineJiggle = 0.0  -- 0.3 is OK.
+    , lineSpikes = 0.0  -- 1.0 is OK.
     , raid0 = vec3 -0.95 1.0 0 -- Ground ray
     , raid1 = vec3 -0.9 0.9 0 -- Ground ray
     , raid2 = echoToVec echoArray 0
@@ -225,6 +229,8 @@ vertexShader =
         uniform mat4 camera;
         uniform mat4 rotation;
         uniform float u_time;
+        uniform float lineJiggle;
+        uniform float lineSpikes;
         uniform vec3 raid0;
         uniform vec3 raid1;
         uniform vec3 raid2;
@@ -591,19 +597,21 @@ vertexShader =
             float slope = 0.0;
             for (int i = 0; i < 32; i++) {
                 // Note we use cos so that pulse[0] doesn't disappear.
-                height += pulse[i].y * coefficient(i) * cos(u_time * periodicity(i));
-                slope += pulse[i].z * coefficient(i) * cos(u_time * periodicity(i));
+                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));
+                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));
             }
 
             // TODO: Limit slope and use that to limit height changes!
 
           // Additional "spiky" line noise.
-          if ( random( floor( position.x * 100.0) * floor(u_time / 3.0)) < 0.01 )
-          {
-             vec3 noise = vec3(position.x, 0.1, 0.0);
-             vec3 spike = pulseShape(noise, 0.05);
-             height += spike.y;
-             slope += spike.z;
+          if (lineSpikes > 0.0) {
+              if ( random( floor( position.x * 100.0) * floor(u_time / 3.0)) < 0.01 )
+              {
+                 vec3 noise = vec3(position.x, 0.1, 0.0);
+                 vec3 spike = pulseShape(noise, 0.05);
+                 height += lineSpikes * spike.y;
+                 slope += lineSpikes * spike.z;
+              }
           }
 
             newPos.y -= max(0.0, height);
@@ -615,10 +623,12 @@ vertexShader =
             float newtime = floor(u_time / 2.0);
 
             // add time to the noise parameters so it's animated
-            float noise = turbulence( newx * newtime );
-            float b = random( newx * newtime );
-            float displacement = 0.03 * noise + 0.01 * b;
-            newPos.y += displacement;
+            if (lineJiggle > 0.0) {
+                float noise = turbulence( newx * newtime );
+                float b = random( newx * newtime );
+                float displacement = lineJiggle * noise + 0.01 * b;
+                newPos.y += displacement;
+            }
 
             // Where no signal, narrow the line a bit.
             if (height == 0.0) {

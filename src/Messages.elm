@@ -8,6 +8,7 @@ type Msg
     = NoOp
     | TimeDelta Float -- WebGL animation time
     | UpdateModel Time.Posix -- Time for model updates
+    | SetStartTime Time.Posix
     | SetConfigStateMsg Int Bool
     | DisplayReceiver
     | DisplayConfiguration

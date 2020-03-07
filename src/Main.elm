@@ -26,6 +26,7 @@ import OperatorPage exposing (operatorPage)
 import Receiver exposing (goniometerMix)
 import Station exposing (..)
 import Target exposing (..)
+import Task
 import Time
 import Types exposing (..)
 import Utils exposing (..)
@@ -41,6 +42,7 @@ type alias Model =
     { currPage : Page
     , webGLtime : Float -- now updated by the WebGL animation control.
     , modelTime : Int -- millseconds
+    , startTime : Int
     , azimuthModeTrace : List Echo
     , elevation_A_trace : List Echo
     , elevation_B_trace : List Echo
@@ -82,6 +84,7 @@ init _ =
     ( { currPage = InputPage
       , webGLtime = 0.0
       , modelTime = 0
+      , startTime = 0
       , azimuthModeTrace = []
       , elevation_A_trace = []
       , elevation_B_trace = []
@@ -112,7 +115,7 @@ init _ =
       , storedAzimuthRange = Nothing
       , storedElevationRange = Nothing
       }
-    , Cmd.none
+    , Task.perform SetStartTime Time.now
     )
 
 
@@ -264,8 +267,13 @@ update msg model =
             , Cmd.none
             )
 
+        SetStartTime time ->
+            ( { model | startTime = Time.posixToMillis time }
+            , Cmd.none
+            )
+
         UpdateModel time ->
-            ( deriveModelAtTime model (Time.posixToMillis time)
+            ( deriveModelAtTime model (Time.posixToMillis time - model.startTime)
             , Cmd.none
             )
 
