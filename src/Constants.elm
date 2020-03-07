@@ -46,3 +46,4 @@ paletteGrey = rgb255 62 62 68
 paletteLightGreen = rgb255 130 183 75
 paletteDarkGreen = rgb255 64 93 39
 paletteSand = rgb255 193 148 106
+beamGreen = rgb255 0 (truncate (0.7 * 255)) 0

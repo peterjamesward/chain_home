@@ -55,6 +55,7 @@ actionButtonLabelAbove label msg =
         [ el
             [ centerX
             , paddingEach { edges | bottom = 5 }
+            , Font.bold
             ]
           <|
             Element.text label
@@ -138,7 +139,13 @@ indicatorLabelBelow label state =
             { onPress = Nothing
             , label = none
             }
-        , el [ centerX, paddingEach { edges | top = 5 } ] <| Element.text label
+        , el
+            [ centerX
+            , paddingEach { edges | top = 5 }
+            , Font.bold
+            ]
+          <|
+            Element.text label
         ]
 
 

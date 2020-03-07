@@ -71,7 +71,7 @@ uniforms angle =
         Mat4.mul
             (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
             (Mat4.makeRotate (2 * 0.0) (vec3 1 0 0))
-    , perspective = Mat4.makePerspective 20 1 0.1 10
+    , perspective = Mat4.makePerspective 19 1 0.1 10
     , camera = Mat4.makeLookAt (vec3 0 -1 7) (vec3 0 -0.8 0) (vec3 0 1 0)
     , u_time = angle
     , raid0 = vec3 -0.9 1.0 0 -- Ground ray

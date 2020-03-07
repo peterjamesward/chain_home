@@ -114,8 +114,9 @@ rangeScale =
     row
         [ width fill
         , spaceEvenly
-        , Font.color green
-        , Font.size 30
+        , paddingEach { edges | top = 10, left = 5 }
+        , Font.color beamGreen
+        , Font.size 28
         , Font.family
             [ Font.typeface "Courier New"
             , Font.sansSerif
@@ -126,13 +127,14 @@ rangeScale =
             (\i ->
                 text (String.fromInt (10 * i))
             )
-            (List.range 1 10)
+            (List.range 0 10)
 
 
 rangeSliderAndCRT model =
-    column commonStyles
+    column [ width fill, centerX ]
         [ E.el
             [ E.below rangeScale
+            , centerX
             ]
             (rangeSlider model)
         , E.html <| crt model.time
@@ -210,20 +212,10 @@ modeSwitchPanel model =
 
 raidStrengthPanel =
     column (Border.width 1 :: commonStyles)
-        [ row (Font.size 60 :: commonStyles)
+        [ row [ centerX ]
             [ column
-                [ E.width E.fill
-                , E.centerX
-                , E.centerY
-                , E.spacing 5
-                , E.paddingEach { edges | top = 10, bottom = 10, left = 5, right = 5 }
-                , Font.color green
-                , Font.size 18
+                [ Font.size 18
                 , Font.bold
-                , Font.family
-                    [ Font.typeface "Courier New"
-                    , Font.sansSerif
-                    ]
                 ]
                 [ actionButtonLabelLeft "1" (RaidStrength 1)
                 , actionButtonLabelLeft "2" (RaidStrength 2)
@@ -234,9 +226,9 @@ raidStrengthPanel =
                 ]
             , el [ width (px 30) ] none
             , column
-                (spacing 30
-                    :: commonStyles
-                )
+                [ Font.size 18
+                , Font.bold
+                ]
                 [ actionButtonLabelRight "18" (RaidStrength 18)
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
@@ -255,13 +247,8 @@ operatorPageLandscape model =
     column
         commonStyles
         [ row commonStyles
-            [ el
-                [ paddingEach { left = 10, top = 10, bottom = 0, right = 0 }
-                , width <| fillPortion 4
-                ]
-              <|
-                rangeSliderAndCRT model
-            , el [ width <| fillPortion 2 ] <| modeSwitchPanel model
+            [ rangeSliderAndCRT model
+            , modeSwitchPanel model
             ]
         , row commonStyles
             [ el [ width <| fillPortion 2 ] <| goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
