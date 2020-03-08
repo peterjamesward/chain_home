@@ -66,10 +66,6 @@ txHorizontalUnreflected θ =
     abs <| cos θ ^ 2
 
 
-
--- TODO: The receiver lobe functions need more scrutiny.
-
-
 rxHorizLobe θ =
     cos θ
 
@@ -78,7 +74,7 @@ rxLoVertLobe α =
     sin (7 * α)
 
 
-rxHiVertLobe  =
+rxHiVertLobe =
     -- See if this is a decent fit for our receiver A system.
     dipoleStackVerticalUnreflectedLobes 2
 
