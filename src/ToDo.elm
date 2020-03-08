@@ -1,0 +1,10 @@
+--TODO: Noise spike at about +0.35 in clip space (only on iPad).
+--TODO: CRT block does not scale. Is this underlying layout issues on iOS?
+--TODO: Reduce sorting burden - if that what's slowing the iPad. (It seems to have an impact.)
+--TODO: (pass in number of raids, select sort size)
+--TODO: Noise parameters to configuration.
+--DONE: Treat formations as units, with their intrinsic dancing patterns.
+--TODO: IFF.
+--TODO: Electronic calculator output.
+--TODO: Narrative and on-screen prompts.
+--TODO: Physical knobs!!

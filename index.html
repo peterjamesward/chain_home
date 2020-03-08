@@ -14370,6 +14370,9 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			'background-color',
 			clr));
 };
+var $mdgriffith$elm_ui$Element$explain = function (_v0) {
+	return $mdgriffith$elm_ui$Internal$Model$htmlClass('explain');
+};
 var $author$project$Constants$flatMidnightBlue = A3($mdgriffith$elm_ui$Element$rgb255, 44, 62, 80);
 var $author$project$Messages$DisplayReceiver = {$: 'DisplayReceiver'};
 var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
@@ -15196,7 +15199,6 @@ var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
 var $author$project$Messages$DisplayCalculator = {$: 'DisplayCalculator'};
 var $author$project$Messages$DisplayConfiguration = {$: 'DisplayConfiguration'};
-var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
 var $author$project$Main$navBar = A2(
 	$mdgriffith$elm_ui$Element$row,
 	_List_fromArray(
@@ -15205,7 +15207,7 @@ var $author$project$Main$navBar = A2(
 			A2($mdgriffith$elm_ui$Element$paddingXY, 60, 10),
 			$mdgriffith$elm_ui$Element$Border$widthEach(
 			{bottom: 1, left: 0, right: 0, top: 0}),
-			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$blue),
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
 			$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteLightGreen)
 		]),
 	_List_fromArray(
@@ -15238,10 +15240,9 @@ var $author$project$Main$navBar = A2(
 				]),
 			$mdgriffith$elm_ui$Element$text('Outputs'))
 		]));
-var $mdgriffith$elm_ui$Internal$Model$Top = {$: 'Top'};
-var $mdgriffith$elm_ui$Element$alignTop = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$Top);
-var $author$project$Constants$flatWetAsphalt = A3($mdgriffith$elm_ui$Element$rgb255, 52, 73, 94);
+var $mdgriffith$elm_ui$Element$fillPortion = $mdgriffith$elm_ui$Internal$Model$Fill;
 var $author$project$Messages$StoreGoniometerSetting = {$: 'StoreGoniometerSetting'};
+var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
 var $mdgriffith$elm_ui$Internal$Model$Focus = {$: 'Focus'};
 var $mdgriffith$elm_ui$Internal$Model$PseudoSelector = F2(
 	function (a, b) {
@@ -15840,7 +15841,6 @@ var $mdgriffith$elm_ui$Internal$Model$Below = {$: 'Below'};
 var $mdgriffith$elm_ui$Element$below = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Below, element);
 };
-var $mdgriffith$elm_ui$Element$fillPortion = $mdgriffith$elm_ui$Internal$Model$Fill;
 var $author$project$PushButtons$indicatorLabelAbove = F2(
 	function (label, state) {
 		var colour = A3($author$project$Utils$choose, state, $author$project$Constants$vividGreen, $author$project$Constants$paletteDarkGreen);
@@ -16724,7 +16724,9 @@ var $author$project$CRT_WebGL$crt = F2(
 				[
 					$elm$html$Html$Attributes$width(800),
 					$elm$html$Html$Attributes$height(400),
-					A2($elm$html$Html$Attributes$style, 'display', 'block')
+					A2($elm$html$Html$Attributes$style, 'display', 'block'),
+					A2($elm$html$Html$Attributes$style, 'Width', '200px'),
+					A2($elm$html$Html$Attributes$style, 'height', '100px')
 				]),
 			_List_fromArray(
 				[
@@ -17333,7 +17335,11 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$column,
-				$author$project$Utils$commonStyles,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$fillPortion(3))
+					]),
 				_List_fromArray(
 					[
 						A2(
@@ -17361,35 +17367,14 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 				$mdgriffith$elm_ui$Element$column,
 				_List_fromArray(
 					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$alignTop,
-						A2($mdgriffith$elm_ui$Element$spacingXY, 20, 0),
-						$mdgriffith$elm_ui$Element$paddingEach(
-						{bottom: 10, left: 10, right: 10, top: 10}),
-						$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteSand),
-						$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$flatWetAsphalt),
-						$mdgriffith$elm_ui$Element$Font$size(14),
-						$mdgriffith$elm_ui$Element$Font$family(
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Font$typeface('monospace'),
-								$mdgriffith$elm_ui$Element$Font$sansSerif
-							]))
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$fillPortion(1))
 					]),
 				_List_fromArray(
 					[
 						$author$project$OperatorPage$modeSwitchPanel(model),
 						$author$project$OperatorPage$raidStrengthPanel
-					])),
-				A2(
-				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$height(
-						$mdgriffith$elm_ui$Element$px(100))
-					]),
-				$mdgriffith$elm_ui$Element$none)
+					]))
 			]));
 };
 var $author$project$OperatorPage$operatorPagePortrait = function (model) {
@@ -17414,6 +17399,7 @@ var $author$project$OperatorPage$operatorPage = function (model) {
 		return $author$project$OperatorPage$operatorPagePortrait(model);
 	}
 };
+var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Main$view = function (model) {
 	var content = function () {
 		var _v0 = model.currPage;
@@ -17441,7 +17427,14 @@ var $author$project$Main$view = function (model) {
 					_List_fromArray(
 						[
 							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							A2($mdgriffith$elm_ui$Element$spacingXY, 0, 20)
+							A2($mdgriffith$elm_ui$Element$spacingXY, 0, 20),
+							$mdgriffith$elm_ui$Element$explain(
+							_Debug_todo(
+								'Main',
+								{
+									start: {line: 538, column: 62},
+									end: {line: 538, column: 72}
+								}))
 						]),
 					_List_fromArray(
 						[$author$project$Main$navBar, content])))
