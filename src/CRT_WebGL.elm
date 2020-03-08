@@ -19,6 +19,7 @@ crt time echoes =
         [ width 800
         , height 400
         , style "display" "block"
+        , style "width" "640px"
         ]
         [ WebGL.entity vertexShader fragmentShader lineMesh (uniforms time echoes)
         ]
@@ -29,8 +30,8 @@ type alias Uniforms =
     , perspective : Mat4
     , camera : Mat4
     , u_time : Float
-    ,    lineJiggle : Float
-    ,    lineSpikes : Float
+    , lineJiggle : Float
+    , lineSpikes : Float
     , raid0 : Vec3
     , raid1 : Vec3
     , raid2 : Vec3
@@ -93,18 +94,18 @@ uniforms time echoes =
     , perspective = Mat4.makePerspective 19 1 0.1 10
     , camera = Mat4.makeLookAt (vec3 0 -1 7) (vec3 0 -0.8 0) (vec3 0 1 0)
     , u_time = time
-    , lineJiggle = 0.03  -- 0.03 is OK.
-    , lineSpikes = 1.0  -- 1.0 is OK.
-    , raid0  = echoToVec echoArray 0
-    , raid1  = echoToVec echoArray 1
-    , raid2  = echoToVec echoArray 2
-    , raid3  = echoToVec echoArray 3
-    , raid4  = echoToVec echoArray 4
-    , raid5  = echoToVec echoArray 5
-    , raid6  = echoToVec echoArray 6
-    , raid7  = echoToVec echoArray 7
-    , raid8  = echoToVec echoArray 8
-    , raid9  = echoToVec echoArray 9
+    , lineJiggle = 0.03 -- 0.03 is OK.
+    , lineSpikes = 1.0 -- 1.0 is OK.
+    , raid0 = echoToVec echoArray 0
+    , raid1 = echoToVec echoArray 1
+    , raid2 = echoToVec echoArray 2
+    , raid3 = echoToVec echoArray 3
+    , raid4 = echoToVec echoArray 4
+    , raid5 = echoToVec echoArray 5
+    , raid6 = echoToVec echoArray 6
+    , raid7 = echoToVec echoArray 7
+    , raid8 = echoToVec echoArray 8
+    , raid9 = echoToVec echoArray 9
     , raid10 = echoToVec echoArray 10
     , raid11 = echoToVec echoArray 11
     , raid12 = echoToVec echoArray 12

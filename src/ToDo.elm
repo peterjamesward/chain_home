@@ -1,5 +1,5 @@
 --TODO: Noise spike at about +0.35 in clip space (only on iPad).
---TODO: CRT block does not scale. Is this underlying layout issues on iOS?
+--TODO: CRT block does not scale. Is this underlying layout issues on iOS? (No, it's not the WebGL. What it is?
 --TODO: Reduce sorting burden - if that what's slowing the iPad. (It seems to have an impact.)
 --TODO: (pass in number of raids, select sort size)
 --TODO: Noise parameters to configuration.

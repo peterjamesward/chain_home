@@ -44,8 +44,8 @@ clickableGonioImage theta =
 rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
-        , E.width (E.px 700)
-        , E.centerX
+        , E.width (E.px 560)
+        , paddingEach { edges | left = 80 }
         , pointer
 
         -- Here is where we're creating/styling the "track"
@@ -114,11 +114,11 @@ traceDependingOnMode model =
 
 rangeScale =
     row
-        [ width fill
+        [ width (px 600)
         , spaceEvenly
-        , paddingEach { edges | top = 10, left = 5 }
+        , paddingEach { edges | top = 10, left = 40 }
         , Font.color beamGreen
-        , Font.size 28
+        , Font.size 20
         , Font.family
             [ Font.typeface "Courier New"
             , Font.sansSerif
@@ -133,11 +133,11 @@ rangeScale =
 
 
 rangeSliderAndCRT model trace =
-    column [ width fill, paddingEach { edges | left = 50, top = 10, right = 50 } ]
+    column [ paddingEach { edges | left = 40 } ]
         [ E.el
             [ E.below rangeScale
-            , centerX
-            ]
+            , paddingEach { edges | left = 40 }
+          ]
             (rangeSlider model)
         , E.html <| crt model.webGLtime trace
         ]
@@ -253,32 +253,22 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row commonStyles
-        [ column commonStyles
-            [ rangeSliderAndCRT model <| traceDependingOnMode model
-            , row commonStyles
-                [ goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-                , el [ width (px 200) ] none
-                , rangeKnob model.rangeKnobAngle
+    row []
+        [ column []
+            [ row []
+                [ rangeSliderAndCRT model <| traceDependingOnMode model
+                ]
+            , row []
+                [ clickableGonioImage (model.goniometerAzimuth + model.station.lineOfShoot)
+                , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+                , clickableRangeKnob model.rangeKnobAngle
+                , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
-        , column
-            [ E.width E.fill
-            , E.alignTop
-            , E.spacingXY 20 0
-            , E.paddingEach { top = 10, bottom = 10, left = 10, right = 10 }
-            , Font.color paletteSand
-            , Background.color flatWetAsphalt
-            , Font.size 14
-            , Font.family
-                [ Font.typeface "monospace"
-                , Font.sansSerif
-                ]
-            ]
+        , column []
             [ modeSwitchPanel model
             , raidStrengthPanel
             ]
-        , el [ width fill, height (px 100) ] none
         ]
 
 

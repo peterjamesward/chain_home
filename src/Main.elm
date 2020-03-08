@@ -549,7 +549,7 @@ navBar =
         [ width fill
         , paddingXY 60 10
         , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color blue
+        , Border.color paletteSand
         , Font.color paletteLightGreen
         ]
         [ E.el [ pointer, alignLeft, Event.onClick DisplayConfiguration ] <| text "Configuration"
