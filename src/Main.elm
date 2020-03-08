@@ -188,7 +188,7 @@ slideRangeSlider range keys =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Time.every 100 UpdateModel
+        [ Time.every 40 UpdateModel
         , onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
@@ -254,8 +254,8 @@ deriveModelAtTime model t =
         , azimuthModeTrace = groundRays ++ gonioAzimuthOut
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
         , rangeSlider = slideRangeSlider model.rangeSlider model.keys
-        , elevation_A_trace = heightMode_A_Outputs
-        , elevation_B_trace = heightMode_B_Outputs
+        , elevation_A_trace = groundRays ++ heightMode_A_Outputs
+        , elevation_B_trace = groundRays ++ heightMode_B_Outputs
     }
 
 
@@ -528,7 +528,7 @@ view model =
                 OutputPage ->
                     calculatorPage model
     in
-    { title = "Chain Home emulation"
+    { title = "Chain Home receiver emulation"
     , body =
         [ layout
             [ Background.color flatMidnightBlue
