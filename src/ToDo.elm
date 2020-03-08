@@ -4,7 +4,7 @@
 --DONE: (pass in number of raids, select sort size)
 --DONE: Noise parameters to configuration.
 --DONE: Treat formations as units, with their intrinsic dancing patterns.
---TODO: IFF.
+--DONE: IFF.
 --TODO: Electronic calculator output.
 --TODO: Narrative and on-screen prompts.
 --TODO: Physical knobs!!
