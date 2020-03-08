@@ -12,7 +12,8 @@ type alias Target =
     , height : Float -- in thousands of feet
     , bearing : Float -- in degrees from North
     , speed : Float -- miles per hour (!)
-    , iff : Bool
+    , iff : Maybe Int -- the value at which t mod 12 triggers a return
+    , iffActive : Bool -- pulsing now.
     }
 
 
@@ -20,7 +21,8 @@ type alias PolarTarget =
     { r : Float -- metres
     , theta : Float -- radians
     , alpha : Float -- radians, ignoring curvature for now
-    , iff : Bool -- is this a pipsqueak equipped friendly?
+    , iff : Maybe Int -- pulsing; time when pulse started
+    , iffActive : Bool -- pulsing now.
     }
 
 
@@ -46,6 +48,7 @@ mapToPolar station target =
     , theta = bearing stationPos targetPos - station.lineOfShoot
     , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
     , iff = target.iff
+    , iffActive = target.iffActive
     }
 
 
@@ -66,6 +69,13 @@ targetAtTime t target =
     { target
         | latitude = newLat
         , longitude = newLong
+        , iffActive =
+            case target.iff of
+                Nothing ->
+                    False
+
+                Just n ->
+                    modBy 12 (t // 1000) == n && modBy 1000 t > 0 && modBy 1000 t < 500
     }
 
 

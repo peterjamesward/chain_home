@@ -1,10 +1,10 @@
-module Echo exposing (Echo, artisticEchoCombiner, combineEchoes, deriveEchoes, viewEcho)
+module Echo exposing (Echo, deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, wavelength)
 import Html exposing (..)
 import Target exposing (PolarTarget)
 import Types exposing (Antenna)
-import Utils exposing (noise, notNearlyEqual, triangleWave)
+import Utils exposing (choose, noise, notNearlyEqual, triangleWave)
 
 
 type alias Echo =
@@ -18,54 +18,12 @@ type alias Echo =
     }
 
 
-combineEchoes : Int -> List Echo -> Float
-combineEchoes time activeEchoes =
-    -- Treat amplitude and phase as vector, sum components, convert back, use amplitude.
-    let
-        asRect =
-            List.map
-                (\e ->
-                    fromPolar ( e.amplitude * noise (time + e.sequence), e.phase )
-                )
-                activeEchoes
-
-        combinedAsRect =
-            List.foldl (\( x, y ) ( xAcc, yAcc ) -> ( x + xAcc, y + yAcc )) ( 0.0, 0.0 ) asRect
-
-        ( mag, phase ) =
-            toPolar combinedAsRect
-    in
-    mag
-
-
-artisticEchoCombiner : Int -> List Echo -> Float
-artisticEchoCombiner time activeEchoes =
-    -- Special cases to make 1, 2, 3 or more echoes to look like the training videos.
-    abs <|
-        case activeEchoes of
-            [] ->
-                0.0
-
-            [ e ] ->
-                e.amplitude
-
-            [ e1, e2 ] ->
-                -- This is our primary special case. There should be beating but if
-                -- they are on distinct bearings and one is D/F'd out, no beating.
-                -- So if amplitudes are dissimilar, treat as single echo.
-                if notNearlyEqual e1.amplitude e2.amplitude then
-                    (0.5 + noise time) * combineEchoes time [ e1, e2 ]
-
-                else
-                    e1.amplitude * triangleWave time
-
-            es ->
-                combineEchoes time es / (sqrt <| toFloat <| List.length es)
-
-
 deriveEchoes : List PolarTarget -> Antenna -> List Echo
 deriveEchoes targets txAntenna =
     let
+        iffFactor target =
+            choose target.iffActive 4.0 1.0
+
         echoFromDirectBeam target seq =
             { sequence = seq
             , r = target.r
@@ -74,12 +32,17 @@ deriveEchoes targets txAntenna =
             , phase = asin <| sin <| target.r / wavelength
             , duration = pulseDuration
             , amplitude =
-                abs <|
-                    -- Combine the lobe functions
-                    txAntenna.horizontalLobeFunction target.theta
-                        * txAntenna.verticalLobeFunction target.alpha
-                        -- and ad-hoc adjustment for range
-                        / logBase 100 (1 + target.r)
+                if target.iffActive then
+                    -- When IFF cuts in we can ignore the tx lobes!
+                    10
+
+                else
+                    abs <|
+                        -- Combine the lobe functions
+                        txAntenna.horizontalLobeFunction target.theta
+                            * txAntenna.verticalLobeFunction target.alpha
+                            -- and ad-hoc adjustment for range
+                            / logBase 100 (1 + target.r)
             }
     in
     List.map2 echoFromDirectBeam

@@ -1,7 +1,5 @@
 module Config exposing (..)
 
-import Echo exposing (Echo)
-import Station exposing (Station, stationClutter)
 import Target exposing (Target)
 
 
@@ -48,7 +46,8 @@ behindStation =
     , height = 30 -- ,000 ft
     , bearing = degrees 180
     , speed = 200.0 -- mph
-    , iff = False
+    , iff = Nothing
+    , iffActive = False
     }
 
 
@@ -58,7 +57,8 @@ bomber1 =
     , height = 20 -- ,000 ft
     , bearing = degrees 250
     , speed = 200.0 -- mph
-    , iff = False
+    , iff = Just 7
+    , iffActive = False
     }
 
 
@@ -69,7 +69,8 @@ bomber2 =
     , height = 30.1 -- ,000 ft
     , bearing = degrees 280
     , speed = 200.0 -- mph
-    , iff = False
+    , iff = Nothing
+    , iffActive = False
     }
 
 
@@ -79,7 +80,8 @@ bomber2A =
     , height = 30.2 -- ,000 ft
     , bearing = degrees 280
     , speed = 200.0 -- mph
-    , iff = False
+    , iff = Nothing
+    , iffActive = False
     }
 
 
@@ -90,7 +92,8 @@ bomber3 =
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
-    , iff = False
+    , iff = Nothing
+    , iffActive = False
     }
 
 
@@ -100,7 +103,8 @@ bomber4 =
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
-    , iff = False
+    , iff = Nothing
+    , iffActive = False
     }
 
 
@@ -111,35 +115,9 @@ fighter1 =
     , height = 10 -- ,000 ft
     , bearing = degrees 90
     , speed = 300 -- mph
-    , iff = False
+    , iff = Just 1
+    , iffActive = False
     }
-
-
-bomberInFormation baseLocation latIndex longIndex =
-    -- TODO: Better attempt at spacing these out.
-    { baseLocation
-        | longitude = baseLocation.longitude + (degrees (toFloat longIndex - 5) * 0.01)
-        , latitude = baseLocation.latitude + (degrees (toFloat latIndex - 5) * 0.01)
-        , height = baseLocation.height + (toFloat (latIndex + longIndex) * 5)
-        , speed = baseLocation.speed + toFloat (latIndex + longIndex)
-    }
-
-
-massRaid =
-    let
-        base =
-            { longitude = bawdsey.longitude + degrees 0.9
-            , latitude = bawdsey.latitude - degrees 1.0
-            , height = 25
-            , bearing = degrees 290
-            , speed = 200
-            , iff = False
-            }
-    in
-    List.map
-        (\i -> bomberInFormation base (i // 10) (modBy 10 i))
-    <|
-        List.range 1 100
 
 
 tenAbreast =
@@ -150,7 +128,8 @@ tenAbreast =
             , height = 25
             , bearing = degrees 270
             , speed = 200
-            , iff = False
+            , iff = Nothing
+            , iffActive = False
             }
         )
     <|
@@ -165,7 +144,8 @@ tenAligned =
             , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
             , bearing = degrees 270
             , speed = 200
-            , iff = False
+            , iff = Nothing
+            , iffActive = False
             }
         )
     <|
@@ -181,7 +161,7 @@ outboundFriendly =
 
 
 loneBomber =
-    TargetSelector 2 "One target" [ bomber1 ] False
+    TargetSelector 2 "One returning friendly" [ bomber1 ] False
 
 
 twoCloseTargets =
@@ -200,16 +180,8 @@ tenDeep =
     TargetSelector 6 "Ten targets, line astern" tenAligned False
 
 
-massiveRaid =
-    TargetSelector 7 "Formation of 100" massRaid False
-
-
-nearbynoise =
-    TargetSelector 8 "Local ground reflections" (stationClutter bawdsey 10) False
-
-
 behindYou =
-    TargetSelector 9 "It's behind you!" [ behindStation ] False
+    TargetSelector 9 "One behind station (use Sense)" [ behindStation ] False
 
 
 targetConfigurations =
@@ -219,9 +191,6 @@ targetConfigurations =
     , twoDistantTargets
     , tenWide
     , tenDeep
-
-    --, massiveRaid
-    --, nearbynoise
     , behindYou
     ]
 

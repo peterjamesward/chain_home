@@ -137,7 +137,7 @@ rangeSliderAndCRT model trace =
         [ E.el
             [ E.below rangeScale
             , paddingEach { edges | left = 40 }
-          ]
+            ]
             (rangeSlider model)
         , E.html <| crt model.webGLtime trace
         ]
@@ -253,8 +253,8 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row []
-        [ column []
+    row [ centerX ]
+        [ column [ width <| fillPortion 3, centerX ]
             [ row []
                 [ rangeSliderAndCRT model <| traceDependingOnMode model
                 ]
@@ -265,7 +265,7 @@ operatorPageLandscape model =
                 , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
-        , column []
+        , column [ width <| fillPortion 2, centerX ]
             [ modeSwitchPanel model
             , raidStrengthPanel
             ]
