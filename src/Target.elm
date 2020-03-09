@@ -79,6 +79,30 @@ targetAtTime t target =
     }
 
 
+findTargetElevation : List Target -> List PolarTarget -> Float -> Maybe Float
+findTargetElevation targets polarTargets range =
+    -- "Cheat" function to avoid inverse height curves, looks to see
+    -- if your range pointer is on a an echo, and uses that target's elevation.
+
+    -- Any target will do today.
+    Maybe.map .height <| List.head targets
+
+{-
+    List.map2 (\rect pol -> ( pol.r, rect.height ))
+        targets
+        polarTargets
+        |> List.filterMap
+            (\( r, h ) ->
+                if abs (r - range) < 50000 then
+                    Just h
+
+                else
+                    Nothing
+            )
+        |> List.minimum
+-}
+
+
 viewPolarTarget p1 =
     [ Html.text "r "
     , Html.text <| String.fromFloat <| p1.r

@@ -1,4 +1,4 @@
-module Nixie exposing (nixieDisplay)
+module Nixie exposing (nixieDisplay, maybeNixieDisplay)
 
 -- Displays integer using simulation of "Nixie" tubes.
 
@@ -36,3 +36,8 @@ nixieDisplay digits value =
         List.map
             nixieDigit
             (toDigits digits value)
+
+maybeNixieDisplay digits maybeValue =
+    case maybeValue of
+        (Just value ) -> nixieDisplay digits value
+        _ -> none

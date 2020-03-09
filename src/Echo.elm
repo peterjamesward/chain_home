@@ -21,9 +21,6 @@ type alias Echo =
 deriveEchoes : List PolarTarget -> Antenna -> List Echo
 deriveEchoes targets txAntenna =
     let
-        iffFactor target =
-            choose target.iffActive 4.0 1.0
-
         echoFromDirectBeam target seq =
             { sequence = seq
             , r = target.r
@@ -34,7 +31,8 @@ deriveEchoes targets txAntenna =
             , amplitude =
                 if target.iffActive then
                     -- When IFF cuts in we can ignore the tx lobes!
-                    10
+                    6
+                    -- Or something else that looks nice.
 
                 else
                     abs <|

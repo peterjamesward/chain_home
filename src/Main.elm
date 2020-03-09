@@ -8,6 +8,7 @@ module Main exposing (main)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
+import CalculatorDisplay exposing (calculator)
 import Config exposing (..)
 import Constants exposing (..)
 import Echo exposing (..)
@@ -451,7 +452,8 @@ update msg model =
 
                 HeightInput ->
                     { model
-                        | storedElevation = Just (model.goniometerAzimuth + model.station.lineOfShoot)
+                      -- TODO: Find nearest target's elevation.
+                        | storedElevation = findTargetElevation model.targets model.polarTargets model.rangeSlider
                         , inputState = HeightRangeInput
                     }
 
@@ -464,13 +466,13 @@ update msg model =
             ( case model.inputState of
                 BearingRangeInput ->
                     { model
-                        | storedAzimuthRange = Just model.rangeSlider
+                        | storedAzimuthRange = Just (1.6 * model.rangeSlider)
                         , inputState = BearingInput
                     }
 
                 HeightRangeInput ->
                     { model
-                        | storedElevationRange = Just model.rangeSlider
+                        | storedElevationRange = Just (1.6 * model.rangeSlider)
                         , inputState = HeightInput
                     }
 
@@ -593,12 +595,12 @@ targetSelector active =
 
 calculatorPage : Model -> Element Msg
 calculatorPage model =
-    row (padding 50 :: spacing 50 :: commonStyles)
-        [ bearingDisplay "AZIMUTH" model.storedAzimuth
-        , numericDisplay "RANGE (Azimuth)" model.storedAzimuthRange
-        , bearingDisplay "ELEVATION" model.storedElevation
-        , numericDisplay "RANGE (Elevation)" model.storedElevationRange
-        ]
+    calculator
+        model.storedAzimuthRange
+        model.storedAzimuth
+        model.storedElevation
+        Nothing
+        Nothing
 
 
 inputPage : Model -> Element Msg
