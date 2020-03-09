@@ -27,6 +27,7 @@ vividGreen = rgb255 36 200 33
 white = rgb255 200 200 200
 midGray =  rgb255 80 80 80
 flatWetAsphalt = rgb255 52 73 94
+raidStrengthIndicator = rgb255 255 50 50
 
 -- These four colours from W3C 2018 palettes.
 paletteGrey = rgb255 62 62 68

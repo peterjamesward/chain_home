@@ -5,13 +5,12 @@ module CalculatorDisplay exposing (calculator)
 -}
 
 import Array
-import Color exposing (yellow)
-import Constants exposing (flatSunflower, flatWetAsphalt, lightCharcoal, vividGreen)
+import Constants exposing (..)
 import Element exposing (..)
 import Element.Font as Font
 import Messages exposing (Msg)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
-import Utils exposing (bearingDisplay)
+import Utils exposing (bearingDisplay, choose)
 
 
 type alias GridPosition =
@@ -141,7 +140,31 @@ positionGridDisplay position =
 
 strengthDisplay : Maybe Int -> Element Msg
 strengthDisplay strength =
-    none
+    let
+        makeIt label v =
+            el
+                [ Font.color <|
+                    case strength of
+                        Just n ->
+                            choose (n == v)
+                                raidStrengthIndicator
+                                flatWetAsphalt
+
+                        _ ->
+                            flatWetAsphalt
+                , Font.family
+                    [ Font.typeface "Courier New"
+                    , Font.sansSerif
+                    ]
+                , Font.size 32
+                , Font.bold
+                ]
+                (text label)
+    in
+    row [ spacing 20 ] <|
+        List.map2 makeIt
+            [ "1", "2", "3", "6", "9", "12", "18", "+" ]
+            [ 1, 2, 3, 6, 9, 12, 18, 20 ]
 
 
 friendlyDisplay : Maybe Bool -> Element Msg
@@ -180,13 +203,13 @@ heightGrid height =
     in
     -- Height is in '000 feet, sourced from config data!
     column [ spacingXY 30 20 ]
-        [ row [ width fill, spaceEvenly, spacing 30  ] <|
+        [ row [ width fill, spaceEvenly, spacing 30 ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", " 5.5" ]
                 (List.range 0 11)
                 (List.range 1 12)
-        , row [ width fill, spaceEvenly, spacing 30] <|
+        , row [ width fill, spaceEvenly, spacing 30 ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", " 10", "10.5", " 11", "11.5" ]
@@ -198,7 +221,7 @@ heightGrid height =
                 [ " 12", "12.5", " 13", "13.5", " 14", "14.5", " 15", "15.5", " 16", "16.5", " 17", "17.5" ]
                 (List.range 24 35)
                 (List.range 25 36)
-        , row [width fill, spaceEvenly, spacing 30] <|
+        , row [ width fill, spaceEvenly, spacing 30 ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ " 18", "18.5", " 19", "19.5", " 20", " 21", " 22", " 23", " 24", " 25", " 26", " 27" ]

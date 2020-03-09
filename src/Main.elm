@@ -73,6 +73,7 @@ type alias Model =
     , storedElevation : Maybe Float
     , storedAzimuthRange : Maybe Float
     , storedElevationRange : Maybe Float
+    , storedStrength : Maybe Int
     }
 
 
@@ -115,6 +116,7 @@ init _ =
       , storedElevation = Nothing
       , storedAzimuthRange = Nothing
       , storedElevationRange = Nothing
+      , storedStrength = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -481,6 +483,12 @@ update msg model =
             , Cmd.none
             )
 
+        RaidStrength strength ->
+            ( { model | storedStrength = Just strength }, Cmd.none )
+
+        RaidStrengthPlus ->
+            ( { model | storedStrength = Just 20 }, Cmd.none )
+
         ResetInputState ->
             ( { model
                 | storedAzimuthRange = Nothing
@@ -599,7 +607,7 @@ calculatorPage model =
         model.storedAzimuthRange
         model.storedAzimuth
         model.storedElevation
-        Nothing
+        model.storedStrength
         Nothing
 
 
