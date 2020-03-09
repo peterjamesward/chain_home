@@ -10,7 +10,7 @@ import Element exposing (..)
 import Element.Font as Font
 import Messages exposing (Msg)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
-import Utils exposing (bearingDisplay, choose)
+import Utils exposing (bearingDisplay, choose, edges)
 
 
 type alias GridPosition =
@@ -80,7 +80,7 @@ calculator range bearing height strength friendly =
             [ positionGridDisplay position
             , column []
                 [ row []
-                    [ column []
+                    [ column [ paddingEach { edges | bottom = 15 } ]
                         [ strengthDisplay strength
                         , friendlyDisplay friendly
                         ]
@@ -93,8 +93,8 @@ calculator range bearing height strength friendly =
                 ]
             ]
         , row []
-            [ eastingDisplay position
-            , northingDisplay position
+            [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
+            , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
         ]
 
@@ -120,19 +120,19 @@ positionGridDisplay position =
                     [ Font.typeface "Courier New"
                     , Font.sansSerif
                     ]
-                , Font.size 32
+                , Font.size 28
                 , Font.bold
                 ]
                 (text letter)
 
         displayGridRow : Int -> List String -> Element Msg
         displayGridRow north letters =
-            row [ spacing 20 ] <|
+            row [ spacing 18 ] <|
                 List.map2 (displayGridSquare north)
                     (List.range -3 3)
                     letters
     in
-    column [ centerX, padding 20, spacing 20 ] <|
+    column [ centerX, padding 10, spacingXY 20 10 ] <|
         List.map2 displayGridRow
             (List.reverse <| List.range -3 3)
             gridLettersList
@@ -156,12 +156,12 @@ strengthDisplay strength =
                     [ Font.typeface "Courier New"
                     , Font.sansSerif
                     ]
-                , Font.size 32
+                , Font.size 28
                 , Font.bold
                 ]
                 (text label)
     in
-    row [ spacing 20 ] <|
+    row [ spacing 20, paddingEach { edges | left = 30 } ] <|
         List.map2 makeIt
             [ "1", "2", "3", "6", "9", "12", "18", "+" ]
             [ 1, 2, 3, 6, 9, 12, 18, 20 ]
@@ -169,7 +169,23 @@ strengthDisplay strength =
 
 friendlyDisplay : Maybe Bool -> Element Msg
 friendlyDisplay friendly =
-    none
+    el
+        [ Font.color <|
+            case friendly of
+                Just _ ->
+                    raidStrengthIndicator
+
+                _ ->
+                    flatWetAsphalt
+        , Font.family
+            [ Font.typeface "Courier New"
+            , Font.sansSerif
+            ]
+        , Font.size 30
+        , Font.bold
+        , centerX
+        ]
+        (text "F")
 
 
 heightGrid : Maybe Float -> Element Msg
@@ -202,7 +218,7 @@ heightGrid height =
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column [ spacingXY 30 20 ]
+    column [ spacingXY 30 15 ]
         [ row [ width fill, spaceEvenly, spacing 30 ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
@@ -236,11 +252,45 @@ heightGrid height =
         ]
 
 
-eastingDisplay : Maybe GridPosition -> Element Msg
-eastingDisplay position =
-    none
+digitDisplayLamp : Maybe Int -> Int -> Element Msg
+digitDisplayLamp maybeN digit =
+    el
+        [ width (px 30)
+        , Font.center
+        , centerX
+        , Font.variant Font.tabularNumbers
+        , Font.color <|
+            case maybeN of
+                Just n ->
+                    if n == digit then
+                        vividGreen
+
+                    else
+                        flatWetAsphalt
+
+                _ ->
+                    flatWetAsphalt
+        , Font.family
+            [ Font.typeface "Courier New"
+            , Font.sansSerif
+            ]
+        , Font.size 28
+        , Font.bold
+        ]
+        (text <| String.fromInt digit)
 
 
-northingDisplay : Maybe GridPosition -> Element Msg
-northingDisplay position =
-    none
+significantDigit : Maybe Int -> Element Msg
+significantDigit maybeN =
+    column []
+        [ row [] <| List.map (digitDisplayLamp maybeN) [ 1, 2, 3, 4, 5 ]
+        , row [] <| List.map (digitDisplayLamp maybeN) [ 6, 7, 8, 9, 0 ]
+        ]
+
+
+offsetDisplay : Maybe Int -> Element Msg
+offsetDisplay easting =
+    row []
+        [ significantDigit <| Maybe.map ((//) 10) easting
+        , significantDigit <| Maybe.map (modBy 10) easting
+        ]
