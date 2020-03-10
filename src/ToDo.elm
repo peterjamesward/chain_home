@@ -5,6 +5,8 @@
 --DONE: Noise parameters to configuration.
 --DONE: Treat formations as units, with their intrinsic dancing patterns.
 --DONE: IFF.
---TODO: (WIP) Electronic calculator output.
+--DONE: Electronic calculator output.
+--TODO: Start raids further out.
+--TODO: Go! button resets timer, restarts raids from origin.
 --TODO: Narrative and on-screen prompts.
 --TODO: Physical knobs!!

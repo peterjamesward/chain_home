@@ -458,7 +458,6 @@ update msg model =
 
                 HeightInput ->
                     { model
-                      -- TODO: Find nearest target's elevation.
                         | storedElevation = findTargetElevation model.targets model.polarTargets model.rangeSlider
                         , inputState = HeightRangeInput
                     }
