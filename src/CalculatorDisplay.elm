@@ -7,6 +7,7 @@ module CalculatorDisplay exposing (calculator)
 import Array
 import Constants exposing (..)
 import Element exposing (..)
+import Element.Border as Border
 import Element.Font as Font
 import Messages exposing (Msg)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
@@ -41,7 +42,7 @@ gridLettersArray =
 gridPosition : Maybe Float -> Maybe Float -> Maybe GridPosition
 gridPosition range bearing =
     -- Ideally, use RAF grid, but doesn't really matter.
-    -- Each lettered square is 100km.
+    -- Each lettered square is 100km. Range is in km.
     -- Without much loss of generality, assume station is centred in centre square.
     let
         easting r b =
@@ -69,21 +70,20 @@ gridPosition range bearing =
             Nothing
 
 
-calculator : Maybe Float -> Maybe Float -> Maybe Float -> Maybe Int -> Maybe Bool -> Element Msg
-calculator range bearing height strength friendly =
+calculator : Maybe Float -> Maybe Float -> Maybe Float -> Maybe Int -> Maybe Bool -> Maybe Bool -> Element Msg
+calculator range bearing height strength plus friendly =
     let
         position =
             gridPosition range bearing
     in
-    column [ centerX, centerY ]
-        [ row []
+    column [ centerX ]
+        [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay position
-            , column []
-                [ row []
-                    [ column [ paddingEach { edges | bottom = 15 } ]
-                        [ strengthDisplay strength
-                        , friendlyDisplay friendly
-                        ]
+            , column [ spacing 10 ]
+                [ row [ paddingEach { edges | left = 10, bottom = 10 }, spacing 10 ]
+                    [ strengthDisplay strength
+                    , maybeBoolDisplay "+" plus
+                    , maybeBoolDisplay "F" friendly
                     , column []
                         [ none
                         , none
@@ -99,35 +99,49 @@ calculator range bearing height strength friendly =
         ]
 
 
+buttonStyle : Bool -> Element.Color -> List (Attribute Msg)
+buttonStyle enabled colour =
+    [ Font.family
+        [ Font.typeface "Courier New"
+        , Font.sansSerif
+        ]
+    , Font.center
+    , Font.bold
+    , Font.color <| choose enabled colour flatWetAsphalt
+    , Font.glow colour <| choose enabled 1.0 0.0
+    , Border.glow colour <| choose enabled 1.0 0.0
+    , Border.innerGlow colour <| choose enabled 1.0 0.0
+    , Border.rounded 25
+    , width (px 50)
+    , height (px 50)
+    , paddingEach { edges | top = 12 }
+
+    --, centerX
+    ]
+
+
 positionGridDisplay : Maybe GridPosition -> Element Msg
 positionGridDisplay position =
     let
+        thisIsTheSquare e n =
+            case position of
+                Just p ->
+                    p.gridSquareEast == e && p.gridSquareNorth == n
+
+                _ ->
+                    False
+
         displayGridSquare : Int -> Int -> String -> Element Msg
         displayGridSquare north east letter =
             el
-                [ Font.color <|
-                    case position of
-                        Just p ->
-                            if p.gridSquareEast == east && p.gridSquareNorth == north then
-                                vividGreen
-
-                            else
-                                flatWetAsphalt
-
-                        _ ->
-                            flatWetAsphalt
-                , Font.family
-                    [ Font.typeface "Courier New"
-                    , Font.sansSerif
-                    ]
-                , Font.size 28
-                , Font.bold
-                ]
+                (Font.size 28
+                    :: buttonStyle (thisIsTheSquare east north) vividGreen
+                )
                 (text letter)
 
         displayGridRow : Int -> List String -> Element Msg
         displayGridRow north letters =
-            row [ spacing 18 ] <|
+            row [ spacing 0 ] <|
                 List.map2 (displayGridSquare north)
                     (List.range -3 3)
                     letters
@@ -141,109 +155,94 @@ positionGridDisplay position =
 strengthDisplay : Maybe Int -> Element Msg
 strengthDisplay strength =
     let
+        thisIsTheSquare n =
+            case strength of
+                Just s ->
+                    s == n
+
+                _ ->
+                    False
+
         makeIt label v =
             el
-                [ Font.color <|
-                    case strength of
-                        Just n ->
-                            choose (n == v)
-                                raidStrengthIndicator
-                                flatWetAsphalt
-
-                        _ ->
-                            flatWetAsphalt
-                , Font.family
-                    [ Font.typeface "Courier New"
-                    , Font.sansSerif
-                    ]
-                , Font.size 28
-                , Font.bold
-                ]
+                (Font.size 24
+                    :: buttonStyle (thisIsTheSquare v) raidStrengthIndicator
+                )
                 (text label)
     in
     row [ spacing 20, paddingEach { edges | left = 30 } ] <|
         List.map2 makeIt
-            [ "1", "2", "3", "6", "9", "12", "18", "+" ]
-            [ 1, 2, 3, 6, 9, 12, 18, 20 ]
+            [ "1", "2", "3", "6", "9", "12", "18" ]
+            [ 1, 2, 3, 6, 9, 12, 18 ]
 
 
-friendlyDisplay : Maybe Bool -> Element Msg
-friendlyDisplay friendly =
-    el
-        [ Font.color <|
-            case friendly of
+maybeBoolDisplay : String -> Maybe Bool -> Element Msg
+maybeBoolDisplay label b =
+    let
+        theChosenOne =
+            case b of
                 Just _ ->
-                    raidStrengthIndicator
+                    True
 
                 _ ->
-                    flatWetAsphalt
-        , Font.family
-            [ Font.typeface "Courier New"
-            , Font.sansSerif
-            ]
-        , Font.size 30
-        , Font.bold
-        , centerX
-        ]
-        (text "F")
+                    False
+    in
+    el
+        (Font.size 24
+            :: buttonStyle theChosenOne raidStrengthIndicator
+        )
+        (text label)
 
 
 heightGrid : Maybe Float -> Element Msg
-heightGrid height =
+heightGrid storedHeight =
     let
+        theRightHeight low high =
+            case storedHeight of
+                Just h ->
+                    if h * 1000 >= low && h * 1000 < high then
+                        True
+
+                    else
+                        False
+
+                _ ->
+                    False
+
         lamp label low high =
             el
-                [ width (px 30)
-                , Font.center
-                , centerX
-                , Font.variant Font.tabularNumbers
-                , Font.color <|
-                    case height of
-                        Just h ->
-                            if h * 1000 >= low && h * 1000 < high then
-                                flatSunflower
-
-                            else
-                                flatWetAsphalt
-
-                        _ ->
-                            flatWetAsphalt
-                , Font.family
-                    [ Font.typeface "Courier New"
-                    , Font.sansSerif
-                    ]
-                , Font.size 22
-                , Font.bold
-                ]
+                (Font.size 24
+                    :: buttonStyle (theRightHeight low high) flatSunflower
+                )
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column [ spacingXY 30 15 ]
-        [ row [ width fill, spaceEvenly, spacing 30 ] <|
+    column []
+        [ row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", " 5.5" ]
+                [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5" ]
                 (List.range 0 11)
                 (List.range 1 12)
-        , row [ width fill, spaceEvenly, spacing 30 ] <|
+        , row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", " 10", "10.5", " 11", "11.5" ]
+                [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10", "10.5", "11", "11.5" ]
                 (List.range 12 23)
                 (List.range 13 24)
-        , row [ width fill, spaceEvenly, spacing 30 ] <|
+        , row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                [ " 12", "12.5", " 13", "13.5", " 14", "14.5", " 15", "15.5", " 16", "16.5", " 17", "17.5" ]
+                [ "12", "12.5", "13", "13.5", "14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5" ]
                 (List.range 24 35)
                 (List.range 25 36)
-        , row [ width fill, spaceEvenly, spacing 30 ] <|
+        , row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                [ " 18", "18.5", " 19", "19.5", " 20", " 21", " 22", " 23", " 24", " 25", " 26", " 27" ]
+                [ "18", "18.5", "19", "19.5", "20", "21", "22", "23", "24", "25", "26", "27" ]
                 [ 36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54 ]
                 [ 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56 ]
-        , row [ width fill, spaceEvenly, alignLeft, spacing 30 ] <|
+        , row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ " 28", " 29", " 30", "30+" ]
@@ -254,29 +253,19 @@ heightGrid height =
 
 digitDisplayLamp : Maybe Int -> Int -> Element Msg
 digitDisplayLamp maybeN digit =
-    el
-        [ width (px 30)
-        , Font.center
-        , centerX
-        , Font.variant Font.tabularNumbers
-        , Font.color <|
+    let
+        thisIsTheDigit =
             case maybeN of
                 Just n ->
-                    if n == digit then
-                        vividGreen
-
-                    else
-                        flatWetAsphalt
+                    n == digit
 
                 _ ->
-                    flatWetAsphalt
-        , Font.family
-            [ Font.typeface "Courier New"
-            , Font.sansSerif
-            ]
-        , Font.size 28
-        , Font.bold
-        ]
+                    False
+    in
+    el
+        (Font.size 24
+            :: buttonStyle thisIsTheDigit vividGreen
+        )
         (text <| String.fromInt digit)
 
 
@@ -289,8 +278,8 @@ significantDigit maybeN =
 
 
 offsetDisplay : Maybe Int -> Element Msg
-offsetDisplay easting =
-    row []
-        [ significantDigit <| Maybe.map ((//) 10) easting
-        , significantDigit <| Maybe.map (modBy 10) easting
+offsetDisplay offset =
+    row [ padding 5, spacing 10 ]
+        [ significantDigit <| Maybe.map (\n -> n // 10) offset
+        , significantDigit <| Maybe.map (modBy 10) offset
         ]
