@@ -76,7 +76,7 @@ calculator range bearing height strength plus friendly =
         position =
             gridPosition range bearing
     in
-    column [ centerX ]
+    column [ centerX, width fill ]
         [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay position
             , column [ spacing 10 ]
@@ -99,6 +99,10 @@ calculator range bearing height strength plus friendly =
         ]
 
 
+bulbSize =
+    40
+
+
 buttonStyle : Bool -> Element.Color -> List (Attribute Msg)
 buttonStyle enabled colour =
     [ Font.family
@@ -111,10 +115,10 @@ buttonStyle enabled colour =
     , Font.glow colour <| choose enabled 1.0 0.0
     , Border.glow colour <| choose enabled 1.0 0.0
     , Border.innerGlow colour <| choose enabled 1.0 0.0
-    , Border.rounded 25
-    , width (px 50)
-    , height (px 50)
-    , paddingEach { edges | top = 12 }
+    , Border.rounded (bulbSize // 2)
+    , width (px bulbSize)
+    , height (px bulbSize)
+    , paddingEach { edges | top = bulbSize // 4 }
 
     --, centerX
     ]
@@ -146,7 +150,7 @@ positionGridDisplay position =
                     (List.range -3 3)
                     letters
     in
-    column [ centerX, padding 10, spacingXY 20 10 ] <|
+    column [ centerX, padding 10, spacingXY 5 5 ] <|
         List.map2 displayGridRow
             (List.reverse <| List.range -3 3)
             gridLettersList
@@ -170,7 +174,7 @@ strengthDisplay strength =
                 )
                 (text label)
     in
-    row [ spacing 20, paddingEach { edges | left = 30 } ] <|
+    row [ spacing 20, paddingEach { edges | left = 10 } ] <|
         List.map2 makeIt
             [ "1", "2", "3", "6", "9", "12", "18" ]
             [ 1, 2, 3, 6, 9, 12, 18 ]
@@ -212,12 +216,13 @@ heightGrid storedHeight =
         lamp label low high =
             el
                 (Font.size 24
+                    :: spacingXY 10 0
                     :: buttonStyle (theRightHeight low high) flatSunflower
                 )
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column []
+    column [ width fill ]
         [ row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
@@ -242,7 +247,7 @@ heightGrid storedHeight =
                 [ "18", "18.5", "19", "19.5", "20", "21", "22", "23", "24", "25", "26", "27" ]
                 [ 36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54 ]
                 [ 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56 ]
-        , row [ width fill, spaceEvenly ] <|
+        , row [] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ " 28", " 29", " 30", "30+" ]
