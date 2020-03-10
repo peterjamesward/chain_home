@@ -81,26 +81,29 @@ targetAtTime t target =
 
 findTargetElevation : List Target -> List PolarTarget -> Float -> Maybe Float
 findTargetElevation targets polarTargets range =
-    -- "Cheat" function to avoid inverse height curves, looks to see
-    -- if your range pointer is on a an echo, and uses that target's elevation.
+    -- Find target nearest to range pointer
+    let
+        pairsOfRangeAndHeights =
+            List.map2 (\r1 p1 -> ( abs (p1.r - range * 1600), r1.height ))
+                targets
+                polarTargets
 
-    -- Any target will do today.
-    Maybe.map .height <| List.head targets
+        minByFst ( r1, h1 ) ( r2, h2 ) =
+            if r1 < r2 then
+                ( r1, h1 )
 
-{-
-    List.map2 (\rect pol -> ( pol.r, rect.height ))
-        targets
-        polarTargets
-        |> List.filterMap
-            (\( r, h ) ->
-                if abs (r - range) < 50000 then
-                    Just h
+            else
+                ( r2, h2 )
+    in
+    case ( targets, polarTargets ) of
+        ( [], [] ) ->
+            Nothing
 
-                else
-                    Nothing
-            )
-        |> List.minimum
--}
+        ( [ r1 ], [ _ ] ) ->
+            Just r1.height
+
+        ( _, _ ) ->
+            Just <| Tuple.first <| List.foldl minByFst ( 1000000, 0 ) pairsOfRangeAndHeights
 
 
 viewPolarTarget p1 =

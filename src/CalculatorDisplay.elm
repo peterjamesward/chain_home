@@ -248,7 +248,7 @@ heightGrid height =
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                 [ " 28", " 29", " 30", "30+" ]
                 [ 56, 58, 60, 62, 64 ]
-                [ 58, 60, 62, 64, 999 ]
+                [ 58, 60, 62, 64, 9999 ]
         ]
 
 

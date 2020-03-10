@@ -5,6 +5,6 @@
 --DONE: Noise parameters to configuration.
 --DONE: Treat formations as units, with their intrinsic dancing patterns.
 --DONE: IFF.
---TODO: Electronic calculator output.
+--TODO: (WIP) Electronic calculator output.
 --TODO: Narrative and on-screen prompts.
 --TODO: Physical knobs!!
