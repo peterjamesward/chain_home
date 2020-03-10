@@ -103,7 +103,7 @@ findTargetElevation targets polarTargets range =
             Just r1.height
 
         ( _, _ ) ->
-            Just <| Tuple.first <| List.foldl minByFst ( 1000000, 0 ) pairsOfRangeAndHeights
+            Just <| Tuple.second <| List.foldl minByFst ( 1000000, 0 ) pairsOfRangeAndHeights
 
 
 viewPolarTarget p1 =
