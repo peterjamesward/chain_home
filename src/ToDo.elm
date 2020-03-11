@@ -7,6 +7,6 @@
 --DONE: IFF.
 --DONE: Electronic calculator output.
 --TODO: Start raids further out.
---TODO: Go! button resets timer, restarts raids from origin.
+--DONE: Go! button resets timer, restarts raids from origin.
 --TODO: Narrative and on-screen prompts.
 --TODO: Physical knobs!!

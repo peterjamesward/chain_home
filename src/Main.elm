@@ -42,7 +42,7 @@ type Page
 type alias Model =
     { currPage : Page
     , webGLtime : Float -- now updated by the WebGL animation control.
-    , modelTime : Int -- millseconds
+    , modelTime : Int -- milliseconds
     , startTime : Int
     , azimuthModeTrace : List Echo
     , elevation_A_trace : List Echo
@@ -217,8 +217,11 @@ applyReceiver antenna rawEchoes =
 
 
 deriveModelAtTime : Model -> Int -> Model
-deriveModelAtTime model t =
+deriveModelAtTime model timeNow =
     let
+        t =
+            timeNow - model.startTime
+
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
             List.map (targetAtTime t) model.targets
@@ -252,7 +255,7 @@ deriveModelAtTime model t =
             goniometerMix model.goniometerAzimuth receiveSignals
     in
     { model
-        | modelTime = t
+        | modelTime = timeNow
         , targets = getAllTargets model.activeConfigurations
         , movedTargets = targetsNow
         , polarTargets = convertedTargets
@@ -279,8 +282,17 @@ update msg model =
             , Cmd.none
             )
 
+        StartScenario ->
+            ( { model
+                | startTime = model.modelTime
+                , webGLtime = 0.0
+                , currPage = OperatorPage
+              }
+            , Cmd.none
+            )
+
         UpdateModel time ->
-            ( deriveModelAtTime model (Time.posixToMillis time - model.startTime)
+            ( deriveModelAtTime model (Time.posixToMillis time)
             , Cmd.none
             )
 
@@ -630,7 +642,7 @@ inputPage model =
         targetSelector model.activeConfigurations
             ++ [ Input.button
                     (Attr.greenButton ++ [ width (px 200), height (px 40), alignRight ])
-                    { onPress = Just DisplayReceiver
+                    { onPress = Just StartScenario
                     , label = el [ centerX ] <| text "Go!"
                     }
                ]
