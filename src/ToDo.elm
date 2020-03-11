@@ -6,7 +6,10 @@
 --DONE: Treat formations as units, with their intrinsic dancing patterns.
 --DONE: IFF.
 --DONE: Electronic calculator output.
---TODO: Start raids further out.
+--DONE: Start raids further out.
 --DONE: Go! button resets timer, restarts raids from origin.
 --TODO: Narrative and on-screen prompts.
---TODO: Physical knobs!!
+--TODO: Physical knobs -- get a headless little server app running with a Gonio API.
+--TODO: Physical knobs -- UI app gets gonio setting from server app.
+--TODO: Physical knobs -- headless app reads from Arduino.
+--TODO: Make it run on a Raspberry Pi.

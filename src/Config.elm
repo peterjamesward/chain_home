@@ -52,19 +52,19 @@ behindStation =
 
 
 bomber1 =
-    { longitude = bawdsey.longitude + degrees 0.9
-    , latitude = bawdsey.latitude + degrees 1.0
+    { longitude = bawdsey.longitude + degrees 1.2
+    , latitude = bawdsey.latitude + degrees 0.5
     , height = 20 -- ,000 ft
     , bearing = degrees 250
     , speed = 200.0 -- mph
     , iff = Just 7
-    , iffActive = False
+    , iffActive = True
     }
 
 
 bomber2 =
     -- 2 and 2A very close to look for "beating" effect.
-    { longitude = degrees 2.0
+    { longitude = degrees 2.5
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
     , bearing = degrees 280
@@ -75,7 +75,7 @@ bomber2 =
 
 
 bomber2A =
-    { longitude = degrees 2.0
+    { longitude = degrees 2.5
     , latitude = degrees 52.04
     , height = 30.2 -- ,000 ft
     , bearing = degrees 280
@@ -87,7 +87,7 @@ bomber2A =
 
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 0.8
+    { longitude = bawdsey.longitude + degrees 1.1
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
     , bearing = degrees 270
@@ -98,7 +98,7 @@ bomber3 =
 
 
 bomber4 =
-    { longitude = bawdsey.longitude + degrees 0.8001
+    { longitude = bawdsey.longitude + degrees 1.1
     , latitude = bawdsey.latitude + degrees -0.3
     , height = 40 -- ,000 ft
     , bearing = degrees 270
@@ -123,10 +123,10 @@ fighter1 =
 tenAbreast =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 0.8
+            { longitude = bawdsey.longitude + degrees 1.17
             , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
             , height = 25
-            , bearing = degrees 270
+            , bearing = degrees 275
             , speed = 200
             , iff = Nothing
             , iffActive = False
@@ -139,11 +139,11 @@ tenAbreast =
 tenAligned =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.0 + (degrees (toFloat i - 5) * 0.001)
+            { longitude = bawdsey.longitude + degrees 1.17 + (degrees (toFloat i - 5) * 0.001)
             , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
             , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
-            , bearing = degrees 270
-            , speed = 200
+            , bearing = degrees 265
+            , speed = 250
             , iff = Nothing
             , iffActive = False
             }
