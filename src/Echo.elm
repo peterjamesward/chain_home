@@ -40,7 +40,7 @@ deriveEchoes targets txAntenna =
                         txAntenna.horizontalLobeFunction target.theta
                             * txAntenna.verticalLobeFunction target.alpha
                             -- and ad-hoc adjustment for range
-                            / logBase 100 (1 + target.r)
+                            / (logBase 10 (1 + target.r))^1.2
             }
     in
     List.map2 echoFromDirectBeam
