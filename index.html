@@ -6900,6 +6900,7 @@ var $elm$browser$Browser$document = _Browser_document;
 var $author$project$Types$Azimuth = {$: 'Azimuth'};
 var $author$project$Types$BearingInput = {$: 'BearingInput'};
 var $mdgriffith$elm_ui$Element$Desktop = {$: 'Desktop'};
+var $author$project$Types$Experienced = {$: 'Experienced'};
 var $author$project$Main$InputPage = {$: 'InputPage'};
 var $mdgriffith$elm_ui$Element$Landscape = {$: 'Landscape'};
 var $author$project$Messages$SetStartTime = function (a) {
@@ -7030,14 +7031,14 @@ var $author$project$Config$bomber1 = {
 	height: 20,
 	iff: $elm$core$Maybe$Just(7),
 	iffActive: false,
-	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(1.0),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.9),
+	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.5),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.2),
 	speed: 200.0
 };
 var $author$project$Config$loneBomber = A4(
 	$author$project$Config$TargetSelector,
 	2,
-	'One returning friendly',
+	'One incoming',
 	_List_fromArray(
 		[$author$project$Config$bomber1]),
 	false);
@@ -7045,7 +7046,7 @@ var $author$project$Config$fighter1 = {
 	bearing: $elm$core$Basics$degrees(90),
 	height: 10,
 	iff: $elm$core$Maybe$Just(1),
-	iffActive: false,
+	iffActive: true,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.01),
 	longitude: $author$project$Config$bawdsey.longitude - $elm$core$Basics$degrees(0.01),
 	speed: 300
@@ -7062,14 +7063,14 @@ var $author$project$Config$tenAligned = A2(
 	$elm$core$List$map,
 	function (i) {
 		return {
-			bearing: $elm$core$Basics$degrees(270),
+			bearing: $elm$core$Basics$degrees(265),
 			height: 25 + (A2($elm$core$Basics$modBy, 7, 100 * i) * 0.1),
 			iff: $elm$core$Maybe$Nothing,
 			iffActive: false,
 			latitude: ($author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.2)) + $elm$core$Basics$degrees(
 				0.05 * $elm$core$Basics$cos(i)),
-			longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.0)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
-			speed: 200
+			longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
+			speed: 250
 		};
 	},
 	A2($elm$core$List$range, 1, 10));
@@ -7078,12 +7079,12 @@ var $author$project$Config$tenAbreast = A2(
 	$elm$core$List$map,
 	function (i) {
 		return {
-			bearing: $elm$core$Basics$degrees(270),
+			bearing: $elm$core$Basics$degrees(275),
 			height: 25,
 			iff: $elm$core$Maybe$Nothing,
 			iffActive: false,
 			latitude: ($author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
-			longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8),
+			longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17),
 			speed: 200
 		};
 	},
@@ -7095,7 +7096,7 @@ var $author$project$Config$bomber2 = {
 	iff: $elm$core$Maybe$Nothing,
 	iffActive: false,
 	latitude: $elm$core$Basics$degrees(52.05),
-	longitude: $elm$core$Basics$degrees(2.0),
+	longitude: $elm$core$Basics$degrees(2.5),
 	speed: 200.0
 };
 var $author$project$Config$bomber2A = {
@@ -7104,7 +7105,7 @@ var $author$project$Config$bomber2A = {
 	iff: $elm$core$Maybe$Nothing,
 	iffActive: false,
 	latitude: $elm$core$Basics$degrees(52.04),
-	longitude: $elm$core$Basics$degrees(2.0),
+	longitude: $elm$core$Basics$degrees(2.5),
 	speed: 200.0
 };
 var $author$project$Config$twoCloseTargets = A4(
@@ -7120,7 +7121,7 @@ var $author$project$Config$bomber3 = {
 	iff: $elm$core$Maybe$Nothing,
 	iffActive: false,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
 	speed: 200
 };
 var $author$project$Config$bomber4 = {
@@ -7129,7 +7130,7 @@ var $author$project$Config$bomber4 = {
 	iff: $elm$core$Maybe$Nothing,
 	iffActive: false,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(-0.3),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.8001),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
 	speed: 200
 };
 var $author$project$Config$twoDistantTargets = A4(
@@ -7169,6 +7170,7 @@ var $author$project$Main$init = function (_v0) {
 			keys: $author$project$Main$noKeys,
 			modelTime: 0,
 			movedTargets: _List_Nil,
+			operatorMode: $author$project$Types$Experienced,
 			outputDevice: {_class: $mdgriffith$elm_ui$Element$Desktop, orientation: $mdgriffith$elm_ui$Element$Landscape},
 			polarTargets: _List_Nil,
 			rangeDrag: $elm$core$Maybe$Nothing,
@@ -8070,7 +8072,10 @@ var $author$project$Echo$deriveEchoes = F2(
 				return {
 					alpha: target.alpha,
 					amplitude: target.iffActive ? 6 : $elm$core$Basics$abs(
-						(txAntenna.horizontalLobeFunction(target.theta) * txAntenna.verticalLobeFunction(target.alpha)) / A2($elm$core$Basics$logBase, 100, 1 + target.r)),
+						(txAntenna.horizontalLobeFunction(target.theta) * txAntenna.verticalLobeFunction(target.alpha)) / A2(
+							$elm$core$Basics$pow,
+							A2($elm$core$Basics$logBase, 10, 1 + target.r),
+							1.2)),
 					duration: $author$project$Constants$pulseDuration,
 					phase: $elm$core$Basics$asin(
 						$elm$core$Basics$sin(target.r / $author$project$Constants$wavelength)),
@@ -8222,7 +8227,8 @@ var $author$project$Target$targetAtTime = F2(
 			});
 	});
 var $author$project$Main$deriveModelAtTime = F2(
-	function (model, t) {
+	function (model, timeNow) {
+		var t = timeNow - model.startTime;
 		var targetsNow = A2(
 			$elm$core$List$map,
 			$author$project$Target$targetAtTime(t),
@@ -8245,7 +8251,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 				elevation_B_trace: _Utils_ap($author$project$Config$groundRays, heightMode_B_Outputs),
 				gonioOutput: gonioAzimuthOut,
 				goniometerAzimuth: A2($author$project$Main$swingGoniometer, model.goniometerAzimuth, model.keys),
-				modelTime: t,
+				modelTime: timeNow,
 				movedTargets: targetsNow,
 				polarTargets: convertedTargets,
 				rangeSlider: A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys),
@@ -8431,13 +8437,19 @@ var $author$project$Main$update = F2(
 							startTime: $elm$time$Time$posixToMillis(time)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'StartScenario':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{currPage: $author$project$Main$OperatorPage, startTime: model.modelTime, webGLtime: 0.0}),
+					$elm$core$Platform$Cmd$none);
 			case 'UpdateModel':
 				var time = msg.a;
 				return _Utils_Tuple2(
 					A2(
 						$author$project$Main$deriveModelAtTime,
 						model,
-						$elm$time$Time$posixToMillis(time) - model.startTime),
+						$elm$time$Time$posixToMillis(time)),
 					$elm$core$Platform$Cmd$none);
 			case 'ToggleMenu':
 				return _Utils_Tuple2(
@@ -14134,6 +14146,8 @@ var $author$project$CalculatorDisplay$gridPosition = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
+var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
 var $mdgriffith$elm_ui$Internal$Model$Class = F2(
 	function (a, b) {
 		return {$: 'Class', a: a, b: b};
@@ -14169,6 +14183,16 @@ var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 			'color',
 			fontColor));
 };
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Utils$disableSelection = _List_fromArray(
+	[
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none')),
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-touch-callout', 'none'))
+	]);
 var $mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 	function (a, b) {
 		return {$: 'FontFamily', a: a, b: b};
@@ -14383,40 +14407,42 @@ var $mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
 var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
 var $author$project$CalculatorDisplay$buttonStyle = F2(
 	function (enabled, colour) {
-		return _List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$Font$family(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$Font$typeface('Courier New'),
-						$mdgriffith$elm_ui$Element$Font$sansSerif
-					])),
-				$mdgriffith$elm_ui$Element$Font$center,
-				$mdgriffith$elm_ui$Element$Font$bold,
-				$mdgriffith$elm_ui$Element$Font$color(
-				A3($author$project$Utils$choose, enabled, colour, $author$project$Constants$flatWetAsphalt)),
-				A2(
-				$mdgriffith$elm_ui$Element$Font$glow,
-				colour,
-				A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
-				A2(
-				$mdgriffith$elm_ui$Element$Border$glow,
-				colour,
-				A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
-				A2(
-				$mdgriffith$elm_ui$Element$Border$innerGlow,
-				colour,
-				A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
-				$mdgriffith$elm_ui$Element$Border$rounded(($author$project$CalculatorDisplay$bulbSize / 2) | 0),
-				$mdgriffith$elm_ui$Element$width(
-				$mdgriffith$elm_ui$Element$px($author$project$CalculatorDisplay$bulbSize)),
-				$mdgriffith$elm_ui$Element$height(
-				$mdgriffith$elm_ui$Element$px($author$project$CalculatorDisplay$bulbSize)),
-				$mdgriffith$elm_ui$Element$paddingEach(
-				_Utils_update(
-					$author$project$Utils$edges,
-					{top: ($author$project$CalculatorDisplay$bulbSize / 4) | 0}))
-			]);
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Font$family(
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$typeface('Courier New'),
+							$mdgriffith$elm_ui$Element$Font$sansSerif
+						])),
+					$mdgriffith$elm_ui$Element$Font$center,
+					$mdgriffith$elm_ui$Element$Font$bold,
+					$mdgriffith$elm_ui$Element$Font$color(
+					A3($author$project$Utils$choose, enabled, colour, $author$project$Constants$flatWetAsphalt)),
+					A2(
+					$mdgriffith$elm_ui$Element$Font$glow,
+					colour,
+					A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
+					A2(
+					$mdgriffith$elm_ui$Element$Border$glow,
+					colour,
+					A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
+					A2(
+					$mdgriffith$elm_ui$Element$Border$innerGlow,
+					colour,
+					A3($author$project$Utils$choose, enabled, 1.0, 0.0)),
+					$mdgriffith$elm_ui$Element$Border$rounded(($author$project$CalculatorDisplay$bulbSize / 2) | 0),
+					$mdgriffith$elm_ui$Element$width(
+					$mdgriffith$elm_ui$Element$px($author$project$CalculatorDisplay$bulbSize)),
+					$mdgriffith$elm_ui$Element$height(
+					$mdgriffith$elm_ui$Element$px($author$project$CalculatorDisplay$bulbSize)),
+					$mdgriffith$elm_ui$Element$paddingEach(
+					_Utils_update(
+						$author$project$Utils$edges,
+						{top: ($author$project$CalculatorDisplay$bulbSize / 4) | 0}))
+				]),
+			$author$project$Utils$disableSelection);
 	});
 var $mdgriffith$elm_ui$Element$el = F2(
 	function (attrs, child) {
@@ -14600,7 +14626,8 @@ var $author$project$CalculatorDisplay$heightGrid = function (storedHeight) {
 						[37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56]))),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				_List_Nil,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$alignLeft]),
 				A4(
 					$elm$core$List$map3,
 					F3(
@@ -14608,7 +14635,7 @@ var $author$project$CalculatorDisplay$heightGrid = function (storedHeight) {
 							return A3(lamp, label, low * 500, high * 500);
 						}),
 					_List_fromArray(
-						[' 28', ' 29', ' 30', '30+']),
+						['28', '29', '30', '30+']),
 					_List_fromArray(
 						[56, 58, 60, 62]),
 					_List_fromArray(
@@ -14925,7 +14952,7 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			clr));
 };
 var $author$project$Constants$flatMidnightBlue = A3($mdgriffith$elm_ui$Element$rgb255, 44, 62, 80);
-var $author$project$Messages$DisplayReceiver = {$: 'DisplayReceiver'};
+var $author$project$Messages$StartScenario = {$: 'StartScenario'};
 var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
 var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
@@ -15130,8 +15157,6 @@ var $author$project$Attr$greenButton = _List_fromArray(
 		A2($mdgriffith$elm_ui$Element$paddingXY, 20, 6)
 	]);
 var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
-var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
-var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
 var $mdgriffith$elm_ui$Internal$Model$LivePolite = {$: 'LivePolite'};
 var $mdgriffith$elm_ui$Element$Region$announce = $mdgriffith$elm_ui$Internal$Model$Describe($mdgriffith$elm_ui$Internal$Model$LivePolite);
 var $mdgriffith$elm_ui$Element$Input$applyLabel = F3(
@@ -15439,7 +15464,11 @@ var $author$project$Main$targetSelector = function (active) {
 				icon: $mdgriffith$elm_ui$Element$Input$defaultCheckbox,
 				label: A2(
 					$mdgriffith$elm_ui$Element$Input$labelRight,
-					_List_Nil,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$htmlAttribute(
+							A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
+						]),
 					$mdgriffith$elm_ui$Element$text(g.description)),
 				onChange: $author$project$Main$setConfig(g)
 			});
@@ -15479,7 +15508,7 @@ var $author$project$Main$inputPage = function (model) {
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$centerX]),
 							$mdgriffith$elm_ui$Element$text('Go!')),
-						onPress: $elm$core$Maybe$Just($author$project$Messages$DisplayReceiver)
+						onPress: $elm$core$Maybe$Just($author$project$Messages$StartScenario)
 					})
 				])));
 };
@@ -15689,6 +15718,7 @@ var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
 var $author$project$Messages$DisplayCalculator = {$: 'DisplayCalculator'};
 var $author$project$Messages$DisplayConfiguration = {$: 'DisplayConfiguration'};
+var $author$project$Messages$DisplayReceiver = {$: 'DisplayReceiver'};
 var $author$project$Main$navBar = A2(
 	$mdgriffith$elm_ui$Element$row,
 	_List_fromArray(
@@ -15704,31 +15734,41 @@ var $author$project$Main$navBar = A2(
 		[
 			A2(
 			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$pointer,
-					$mdgriffith$elm_ui$Element$alignLeft,
-					$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayConfiguration)
-				]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$pointer,
+						$mdgriffith$elm_ui$Element$alignLeft,
+						$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayConfiguration)
+					]),
+				$author$project$Utils$disableSelection),
 			$mdgriffith$elm_ui$Element$text('Configuration')),
 			A2(
 			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$pointer,
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayReceiver)
-				]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$pointer,
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayReceiver),
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
+					]),
+				$author$project$Utils$disableSelection),
 			$mdgriffith$elm_ui$Element$text('Operator')),
 			A2(
 			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$pointer,
-					$mdgriffith$elm_ui$Element$alignRight,
-					$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayCalculator)
-				]),
-			$mdgriffith$elm_ui$Element$text('Outputs'))
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$pointer,
+						$mdgriffith$elm_ui$Element$alignRight,
+						$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$DisplayCalculator),
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
+					]),
+				$author$project$Utils$disableSelection),
+			$mdgriffith$elm_ui$Element$text('Calculator'))
 		]));
 var $author$project$Messages$StoreGoniometerSetting = {$: 'StoreGoniometerSetting'};
 var $author$project$Messages$StoreRangeSetting = {$: 'StoreRangeSetting'};
@@ -15877,7 +15917,9 @@ var $author$project$PushButtons$buttonStyles = _List_fromArray(
 		$mdgriffith$elm_ui$Element$Border$widthEach(
 		{bottom: 2, left: 2, right: 2, top: 1}),
 		$mdgriffith$elm_ui$Element$focused(_List_Nil),
-		$mdgriffith$elm_ui$Element$Font$bold
+		$mdgriffith$elm_ui$Element$Font$bold,
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
 	]);
 var $author$project$Utils$commonStyles = _List_fromArray(
 	[
@@ -15911,7 +15953,9 @@ var $author$project$PushButtons$actionButtonLabelAbove = F2(
 							_Utils_update(
 								$author$project$Utils$edges,
 								{bottom: 5})),
-							$mdgriffith$elm_ui$Element$Font$bold
+							$mdgriffith$elm_ui$Element$Font$bold,
+							$mdgriffith$elm_ui$Element$htmlAttribute(
+							A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
 						]),
 					$mdgriffith$elm_ui$Element$text(label)),
 					A2(
@@ -16031,7 +16075,6 @@ var $elm$core$Basics$always = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
 var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
-var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
@@ -16178,8 +16221,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerdown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointermove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$OperatorPage$clickableGonioImage = function (theta) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -16323,7 +16364,9 @@ var $author$project$PushButtons$indicatorStyles = _List_fromArray(
 		$mdgriffith$elm_ui$Element$spacing(5),
 		$mdgriffith$elm_ui$Element$Border$rounded(5),
 		$mdgriffith$elm_ui$Element$Border$width(2),
-		$mdgriffith$elm_ui$Element$Font$bold
+		$mdgriffith$elm_ui$Element$Font$bold,
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
 	]);
 var $author$project$Constants$paletteDarkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 64, 93, 39);
 var $author$project$Constants$paletteGrey = A3($mdgriffith$elm_ui$Element$rgb255, 62, 62, 68);
@@ -16353,26 +16396,28 @@ var $author$project$PushButtons$actionButtonLabelAboveWithIndicator = F3(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{bottom: 5})),
-							$mdgriffith$elm_ui$Element$above(
-							A2(
-								$mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$centerX,
-										$mdgriffith$elm_ui$Element$paddingEach(
-										_Utils_update(
-											$author$project$Utils$edges,
-											{bottom: 5}))
-									]),
-								$author$project$PushButtons$indicatorNoLabel(state)))
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$paddingEach(
+								_Utils_update(
+									$author$project$Utils$edges,
+									{bottom: 5})),
+								$mdgriffith$elm_ui$Element$above(
+								A2(
+									$mdgriffith$elm_ui$Element$el,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$centerX,
+											$mdgriffith$elm_ui$Element$paddingEach(
+											_Utils_update(
+												$author$project$Utils$edges,
+												{bottom: 5}))
+										]),
+									$author$project$PushButtons$indicatorNoLabel(state)))
+							]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text(label)),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
@@ -16424,14 +16469,16 @@ var $author$project$PushButtons$indicatorLabelAbove = F2(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{bottom: 5}))
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$paddingEach(
+								_Utils_update(
+									$author$project$Utils$edges,
+									{bottom: 5}))
+							]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text(label)),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
@@ -16466,15 +16513,17 @@ var $author$project$PushButtons$indicatorLabelBelow = F2(
 					{label: $mdgriffith$elm_ui$Element$none, onPress: $elm$core$Maybe$Nothing}),
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{top: 5})),
-							$mdgriffith$elm_ui$Element$Font$bold
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$paddingEach(
+								_Utils_update(
+									$author$project$Utils$edges,
+									{top: 5})),
+								$mdgriffith$elm_ui$Element$Font$bold
+							]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text(label))
 				]));
 	});
@@ -16513,8 +16562,10 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 								_Utils_eq(model.goniometerMode, $author$project$Types$Azimuth) && model.receiveAB),
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[$mdgriffith$elm_ui$Element$centerX]),
+								_Utils_ap(
+									_List_fromArray(
+										[$mdgriffith$elm_ui$Element$centerX]),
+									$author$project$Utils$disableSelection),
 								$mdgriffith$elm_ui$Element$text('D/F')),
 								A2(
 								$author$project$PushButtons$indicatorLabelBelow,
@@ -16528,15 +16579,17 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 							[
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$below(
-										A2(
-											$author$project$PushButtons$actionButtonNoLabel,
-											'A <> B',
-											$author$project$Messages$SelectReceiveAntenna(!model.receiveAB))),
-										$mdgriffith$elm_ui$Element$centerX
-									]),
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$below(
+											A2(
+												$author$project$PushButtons$actionButtonNoLabel,
+												'A <> B',
+												$author$project$Messages$SelectReceiveAntenna(!model.receiveAB))),
+											$mdgriffith$elm_ui$Element$centerX
+										]),
+									$author$project$Utils$disableSelection),
 								$mdgriffith$elm_ui$Element$text('A <> B'))
 							])),
 						A2(
@@ -16550,8 +16603,10 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 								_Utils_eq(model.goniometerMode, $author$project$Types$Elevation) && model.receiveAB),
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[$mdgriffith$elm_ui$Element$centerX]),
+								_Utils_ap(
+									_List_fromArray(
+										[$mdgriffith$elm_ui$Element$centerX]),
+									$author$project$Utils$disableSelection),
 								$mdgriffith$elm_ui$Element$text('HEIGHT')),
 								A2(
 								$author$project$PushButtons$indicatorLabelBelow,
@@ -16657,13 +16712,15 @@ var $author$project$PushButtons$actionButtonLabelLeft = F2(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{right: 10}))
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$paddingEach(
+								_Utils_update(
+									$author$project$Utils$edges,
+									{right: 10}))
+							]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text(label)),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
@@ -16707,13 +16764,15 @@ var $author$project$PushButtons$actionButtonLabelRight = F2(
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{left: 10}))
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$paddingEach(
+								_Utils_update(
+									$author$project$Utils$edges,
+									{left: 10}))
+							]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text(label))
 				]));
 	});
@@ -16839,8 +16898,10 @@ var $author$project$OperatorPage$raidStrengthPanel = A2(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[$mdgriffith$elm_ui$Element$centerX]),
+					_Utils_ap(
+						_List_fromArray(
+							[$mdgriffith$elm_ui$Element$centerX]),
+						$author$project$Utils$disableSelection),
 					$mdgriffith$elm_ui$Element$text('RAID STRENGTH'))
 				]))
 		]));
@@ -17177,7 +17238,7 @@ var $author$project$CRT_WebGL$uniforms = F2(
 		};
 	});
 var $author$project$CRT_WebGL$vertexShader = {
-	src: '\n        attribute vec3 position;\n        attribute vec3 color;\n\n        uniform mat4 perspective;\n        uniform mat4 camera;\n        uniform mat4 rotation;\n        uniform float u_time;\n        uniform float lineJiggle;\n        uniform float lineSpikes;\n        uniform int numRaids; // use this to vary sort load.\n        uniform vec3 raid0;\n        uniform vec3 raid1;\n        uniform vec3 raid2;\n        uniform vec3 raid3;\n        uniform vec3 raid4;\n        uniform vec3 raid5;\n        uniform vec3 raid6;\n        uniform vec3 raid7;\n        uniform vec3 raid8;\n        uniform vec3 raid9;\n        uniform vec3 raid10;\n        uniform vec3 raid11;\n        uniform vec3 raid12;\n        uniform vec3 raid13;\n        uniform vec3 raid14;\n        uniform vec3 raid15;\n        uniform vec3 raid16;\n        uniform vec3 raid17;\n        uniform vec3 raid18;\n        uniform vec3 raid19;\n        uniform vec3 raid20;\n        uniform vec3 raid21;\n        uniform vec3 raid22;\n        uniform vec3 raid23;\n        uniform vec3 raid24;\n        uniform vec3 raid25;\n        uniform vec3 raid26;\n        uniform vec3 raid27;\n        uniform vec3 raid28;\n        uniform vec3 raid29;\n        uniform vec3 raid30;\n        uniform vec3 raid31;\n\n        varying vec3 vcolor;\n        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.\n\n        float random (in float x) {\n            return fract(sin(x) * 5000.0);\n        }\n\n        //  Function from Iñigo Quiles\n        //  www.iquilezles.org/www/articles/functions/functions.htm\n        // w = width, c = centre\n        float cubicPulse( float c, float w, float x ) {\n            x = abs(x - c); // NOTE 0 <= x <= +w\n            if (x > w) return 0.0;\n            x /= w; // 0 <= x <= +1 (width is actually 2w)\n            return 1.0 - x * x * (3.0 - 2.0 * x);\n        }\n\n        // x adjustment to keep line thickness across cubic pulse.\n        float gradient(float c, float w, float x) {\n            float x1 = abs((x - c)/w); // 0 <= x1 <= 1\n            if (x1 > 1.0) return 0.0;\n            float gradient = x1 * (1.0 - x1);\n            return gradient * sign(c - x);\n        }\n\n        // Different version of FBM.\n        float turbulence( float p ) {\n\n            float w = 100.0;\n            float t = -0.5;\n\n            for (float f = 1.0 ; f <= 10.0 ; f++ ){\n                float power = pow( 2.0, f );\n                t += random(p) / power ;\n            }\n\n          return t;\n\n        }\n\n        vec3 pulseShape(vec3 raid, float halfWidth) {\n            // returns x = x, y = displacement, z = gradient\n            float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);\n            float slope = raid.y * gradient(raid.x, halfWidth, position.x);\n            return vec3( position.x, height, slope );\n        }\n\n        void sortPulses16(inout vec3 unsorted[32]) {\n            //Network for N=16, using Best Known Arrangement.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;};\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[5].y < unsorted[10].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[6].y < unsorted[9].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[12].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n        }\n\n\n        void sortPulses32(inout vec3 unsorted[32]) {\n            // We use a precomputed exchange network because we always sort 32.\n            // And the GLSL parser appears to lack macros :(\n            // http://pages.ripco.net/~jgamble/nw.html\n            //Network for N=32, using Bose-Nelson Algorithm.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;}\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[3].y < unsorted[6].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[9].y < unsorted[12].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[1].y < unsorted[8].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[3].y < unsorted[10].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[3].y < unsorted[9].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[5].y < unsorted[12].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[7].y < unsorted[14].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[6].y < unsorted[12].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[5].y < unsorted[9].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[5].y < unsorted[8].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[6].y < unsorted[10].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[7].y < unsorted[10].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[16].y < unsorted[17].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[18].y < unsorted[19].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[16].y < unsorted[18].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[17].y < unsorted[19].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[17].y < unsorted[18].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[20].y < unsorted[21].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[22].y < unsorted[23].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[20].y < unsorted[22].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[21].y < unsorted[23].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[21].y < unsorted[22].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[16].y < unsorted[20].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[17].y < unsorted[21].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[17].y < unsorted[20].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[18].y < unsorted[22].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[19].y < unsorted[23].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[19].y < unsorted[22].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[18].y < unsorted[20].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[19].y < unsorted[21].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[19].y < unsorted[20].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[24].y < unsorted[25].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[26].y < unsorted[27].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[24].y < unsorted[26].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[25].y < unsorted[27].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[25].y < unsorted[26].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[28].y < unsorted[29].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[30].y < unsorted[31].y) {vec3 tmp = unsorted[30]; unsorted[30] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[28].y < unsorted[30].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[29].y < unsorted[31].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[29].y < unsorted[30].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[24].y < unsorted[28].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[25].y < unsorted[29].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[25].y < unsorted[28].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[26].y < unsorted[30].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[27].y < unsorted[31].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[27].y < unsorted[30].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[26].y < unsorted[28].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[27].y < unsorted[29].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[27].y < unsorted[28].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[16].y < unsorted[24].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[17].y < unsorted[25].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[17].y < unsorted[24].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[18].y < unsorted[26].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[19].y < unsorted[27].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[19].y < unsorted[26].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[18].y < unsorted[24].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[19].y < unsorted[25].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[19].y < unsorted[24].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[20].y < unsorted[28].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[21].y < unsorted[29].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[21].y < unsorted[28].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[22].y < unsorted[30].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[23].y < unsorted[31].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[23].y < unsorted[30].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[22].y < unsorted[28].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[23].y < unsorted[29].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[23].y < unsorted[28].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[20].y < unsorted[24].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[21].y < unsorted[25].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[21].y < unsorted[24].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[22].y < unsorted[26].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[23].y < unsorted[27].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[23].y < unsorted[26].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[22].y < unsorted[24].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[23].y < unsorted[25].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[23].y < unsorted[24].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[0].y < unsorted[16].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[1].y < unsorted[17].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[1].y < unsorted[16].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[2].y < unsorted[18].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[3].y < unsorted[19].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[3].y < unsorted[18].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[2].y < unsorted[16].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[3].y < unsorted[17].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[3].y < unsorted[16].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[4].y < unsorted[20].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[5].y < unsorted[21].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[5].y < unsorted[20].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[6].y < unsorted[22].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[7].y < unsorted[23].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[7].y < unsorted[22].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[6].y < unsorted[20].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[7].y < unsorted[21].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[7].y < unsorted[20].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[4].y < unsorted[16].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[5].y < unsorted[17].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[5].y < unsorted[16].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[6].y < unsorted[18].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[7].y < unsorted[19].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[7].y < unsorted[18].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[6].y < unsorted[16].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[7].y < unsorted[17].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[7].y < unsorted[16].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[8].y < unsorted[24].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[9].y < unsorted[25].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[9].y < unsorted[24].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[10].y < unsorted[26].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[11].y < unsorted[27].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[11].y < unsorted[26].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[10].y < unsorted[24].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[11].y < unsorted[25].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[11].y < unsorted[24].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[12].y < unsorted[28].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[13].y < unsorted[29].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[13].y < unsorted[28].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[14].y < unsorted[30].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[15].y < unsorted[31].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[15].y < unsorted[30].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[14].y < unsorted[28].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[15].y < unsorted[29].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[15].y < unsorted[28].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[12].y < unsorted[24].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[13].y < unsorted[25].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[13].y < unsorted[24].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[14].y < unsorted[26].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[15].y < unsorted[27].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[15].y < unsorted[26].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[14].y < unsorted[24].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[15].y < unsorted[25].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[15].y < unsorted[24].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[8].y < unsorted[16].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[9].y < unsorted[17].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[9].y < unsorted[16].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[10].y < unsorted[18].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[11].y < unsorted[19].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[11].y < unsorted[18].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[10].y < unsorted[16].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[11].y < unsorted[17].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[11].y < unsorted[16].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[12].y < unsorted[20].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[13].y < unsorted[21].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[13].y < unsorted[20].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[14].y < unsorted[22].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[15].y < unsorted[23].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[15].y < unsorted[22].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[14].y < unsorted[20].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[15].y < unsorted[21].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[15].y < unsorted[20].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[12].y < unsorted[16].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[13].y < unsorted[17].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[13].y < unsorted[16].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[14].y < unsorted[18].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[15].y < unsorted[19].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[15].y < unsorted[18].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[14].y < unsorted[16].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[15].y < unsorted[17].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[15].y < unsorted[16].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[16]; unsorted[16] = tmp;}\n        }\n\n        float coefficient(int i) {\n            return 1.0 - 2.0 * mod(float(i),2.0);\n        }\n\n        float periodicity(int i) {\n            if (i == 0) return 0.0;\n            if (i == 1) return 1.0/3.0;\n            return 2.0 / float(i);\n        }\n\n        void main () {\n            vec3 newPos = position;\n            stretch = 0.0; // The amount by which the rendered segment should be dimmed.\n\n            // Copy raids into array for easier handling, probably.\n            vec3 raid[32]; // x = x, y = amplitude, z = number of aircraft.\n            raid[0] = raid0;\n            raid[1] = raid1;\n            raid[2] = raid2;\n            raid[3] = raid3;\n            raid[4] = raid4;\n            raid[5] = raid5;\n            raid[6] = raid6;\n            raid[7] = raid7;\n            raid[8] = raid8;\n            raid[9] = raid9;\n            raid[10] = raid10;\n            raid[11] = raid11;\n            raid[12] = raid12;\n            raid[13] = raid13;\n            raid[14] = raid14;\n            raid[15] = raid15;\n            if (numRaids > 16) {\n                raid[16] = raid16;\n                raid[17] = raid17;\n                raid[18] = raid18;\n                raid[19] = raid19;\n                raid[20] = raid20;\n                raid[21] = raid21;\n                raid[22] = raid22;\n                raid[23] = raid23;\n                raid[24] = raid24;\n                raid[25] = raid25;\n                raid[26] = raid26;\n                raid[27] = raid27;\n                raid[28] = raid28;\n                raid[29] = raid29;\n                raid[30] = raid30;\n                raid[31] = raid31;\n            }\n\n            // Compute height and slope for each raid, at this x position.\n            vec3 pulse[32];\n            for (int i = 0; i < 32; i++) {\n                pulse[i] = pulseShape(raid[i], 0.02);\n            }\n\n            // Sort pulses into decreasing displacement.\n            if (numRaids > 16) {\n                sortPulses32(pulse);\n            } else {\n                sortPulses16(pulse);\n            }\n\n            // Combine pulses. Try with loop but worried it won\'t work on iOS\n            // (ref https://www.shaderific.com/glsl-types)\n            // Good news, it looks OK.\n\n            float height = 0.0;\n            float slope = 0.0;\n            for (int i = 0; i < 32; i++) {\n                // Note we use cos so that pulse[0] doesn\'t disappear.\n                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));\n                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));\n            }\n\n            // TODO: Limit slope and use that to limit height changes!\n\n          // Additional \"spiky\" line noise.\n          if (lineSpikes > 0.0) {\n              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )\n              {\n                 vec3 noise = vec3(position.x, 0.1, 0.0);\n                 vec3 spike = pulseShape(noise, 0.05);\n                 height += lineSpikes * spike.y;\n                 slope += lineSpikes * spike.z;\n              }\n          }\n\n            newPos.y -= max(0.0, height);\n            newPos.x += position.y * slope;\n            stretch = abs(slope);\n\n            // Lower the resolution of the x line to make the noise less noisy.\n            float newx = floor((position.x) * 153.0);\n            float newtime = floor(u_time / 2.0);\n\n            // add time to the noise parameters so it\'s animated\n            if (lineJiggle > 0.0) {\n                float noise = turbulence( newx * newtime );\n                float b = random( newx * newtime );\n                float displacement = lineJiggle * noise + 0.01 * b;\n                newPos.y += displacement;\n            }\n\n            // Where no signal, narrow the line a bit.\n            if (height == 0.0) {\n                newPos.y /= 2.0;\n            }\n            //if (newPos.y > 0.0) { newPos.y /= 2.0; }\n\n            gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);\n            vcolor = color;\n            stretch = abs(stretch);\n        }\n  ',
+	src: '\n        attribute vec3 position;\n        attribute vec3 color;\n\n        uniform mat4 perspective;\n        uniform mat4 camera;\n        uniform mat4 rotation;\n        uniform float u_time;\n        uniform float lineJiggle;\n        uniform float lineSpikes;\n        uniform int numRaids; // use this to vary sort load.\n        uniform vec3 raid0;\n        uniform vec3 raid1;\n        uniform vec3 raid2;\n        uniform vec3 raid3;\n        uniform vec3 raid4;\n        uniform vec3 raid5;\n        uniform vec3 raid6;\n        uniform vec3 raid7;\n        uniform vec3 raid8;\n        uniform vec3 raid9;\n        uniform vec3 raid10;\n        uniform vec3 raid11;\n        uniform vec3 raid12;\n        uniform vec3 raid13;\n        uniform vec3 raid14;\n        uniform vec3 raid15;\n        uniform vec3 raid16;\n        uniform vec3 raid17;\n        uniform vec3 raid18;\n        uniform vec3 raid19;\n        uniform vec3 raid20;\n        uniform vec3 raid21;\n        uniform vec3 raid22;\n        uniform vec3 raid23;\n        uniform vec3 raid24;\n        uniform vec3 raid25;\n        uniform vec3 raid26;\n        uniform vec3 raid27;\n        uniform vec3 raid28;\n        uniform vec3 raid29;\n        uniform vec3 raid30;\n        uniform vec3 raid31;\n\n        varying vec3 vcolor;\n        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.\n\n        float random (in float x) {\n            return fract(sin(x) * 5000.0);\n        }\n\n        //  Function from Iñigo Quiles\n        //  www.iquilezles.org/www/articles/functions/functions.htm\n        // w = width, c = centre\n        float cubicPulse( float c, float w, float x ) {\n            x = abs(x - c); // NOTE 0 <= x <= +w\n            if (x > w) return 0.0;\n            x /= w; // 0 <= x <= +1 (width is actually 2w)\n            return 1.0 - x * x * (3.0 - 2.0 * x);\n        }\n\n        // x adjustment to keep line thickness across cubic pulse.\n        float gradient(float c, float w, float x) {\n            float x1 = abs((x - c)/w); // 0 <= x1 <= 1\n            if (x1 > 1.0) return 0.0;\n            float gradient = x1 * (1.0 - x1);\n            return gradient * sign(c - x);\n        }\n\n        // Different version of FBM.\n        float turbulence( float p ) {\n\n            float w = 100.0;\n            float t = -0.5;\n\n            for (float f = 1.0 ; f <= 10.0 ; f++ ){\n                float power = pow( 2.0, f );\n                t += random(p) / power ;\n            }\n\n          return t;\n\n        }\n\n        vec3 pulseShape(vec3 raid, float halfWidth) {\n            // returns x = x, y = displacement, z = gradient\n            float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);\n            float slope = raid.y * gradient(raid.x, halfWidth, position.x);\n            return vec3( position.x, height, slope );\n        }\n\n        void sortPulses16(inout vec3 unsorted[32]) {\n            //Network for N=16, using Best Known Arrangement.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;};\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[5].y < unsorted[10].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[6].y < unsorted[9].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[12].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n        }\n\n\n        void sortPulses32(inout vec3 unsorted[32]) {\n            // We use a precomputed exchange network because we always sort 32.\n            // And the GLSL parser appears to lack macros :(\n            // http://pages.ripco.net/~jgamble/nw.html\n            //Network for N=32, using Bose-Nelson Algorithm.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;}\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[3].y < unsorted[6].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[9].y < unsorted[12].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[1].y < unsorted[8].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[3].y < unsorted[10].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[3].y < unsorted[9].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[5].y < unsorted[12].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[7].y < unsorted[14].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[6].y < unsorted[12].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[5].y < unsorted[9].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[5].y < unsorted[8].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[6].y < unsorted[10].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[7].y < unsorted[10].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[16].y < unsorted[17].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[18].y < unsorted[19].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[16].y < unsorted[18].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[17].y < unsorted[19].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[17].y < unsorted[18].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[20].y < unsorted[21].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[22].y < unsorted[23].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[20].y < unsorted[22].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[21].y < unsorted[23].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[21].y < unsorted[22].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[16].y < unsorted[20].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[17].y < unsorted[21].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[17].y < unsorted[20].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[18].y < unsorted[22].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[19].y < unsorted[23].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[19].y < unsorted[22].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[18].y < unsorted[20].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[19].y < unsorted[21].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[19].y < unsorted[20].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[24].y < unsorted[25].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[26].y < unsorted[27].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[24].y < unsorted[26].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[25].y < unsorted[27].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[25].y < unsorted[26].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[28].y < unsorted[29].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[30].y < unsorted[31].y) {vec3 tmp = unsorted[30]; unsorted[30] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[28].y < unsorted[30].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[29].y < unsorted[31].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[29].y < unsorted[30].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[24].y < unsorted[28].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[25].y < unsorted[29].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[25].y < unsorted[28].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[26].y < unsorted[30].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[27].y < unsorted[31].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[27].y < unsorted[30].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[26].y < unsorted[28].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[27].y < unsorted[29].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[27].y < unsorted[28].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[16].y < unsorted[24].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[17].y < unsorted[25].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[17].y < unsorted[24].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[18].y < unsorted[26].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[19].y < unsorted[27].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[19].y < unsorted[26].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[18].y < unsorted[24].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[19].y < unsorted[25].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[19].y < unsorted[24].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[20].y < unsorted[28].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[21].y < unsorted[29].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[21].y < unsorted[28].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[22].y < unsorted[30].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[23].y < unsorted[31].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[23].y < unsorted[30].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[22].y < unsorted[28].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[23].y < unsorted[29].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[23].y < unsorted[28].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[20].y < unsorted[24].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[21].y < unsorted[25].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[21].y < unsorted[24].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[22].y < unsorted[26].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[23].y < unsorted[27].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[23].y < unsorted[26].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[22].y < unsorted[24].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[23].y < unsorted[25].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[23].y < unsorted[24].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[0].y < unsorted[16].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[1].y < unsorted[17].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[1].y < unsorted[16].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[2].y < unsorted[18].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[3].y < unsorted[19].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[3].y < unsorted[18].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[2].y < unsorted[16].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[3].y < unsorted[17].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[3].y < unsorted[16].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[4].y < unsorted[20].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[5].y < unsorted[21].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[5].y < unsorted[20].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[6].y < unsorted[22].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[7].y < unsorted[23].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[7].y < unsorted[22].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[6].y < unsorted[20].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[7].y < unsorted[21].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[7].y < unsorted[20].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[4].y < unsorted[16].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[5].y < unsorted[17].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[5].y < unsorted[16].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[6].y < unsorted[18].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[7].y < unsorted[19].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[7].y < unsorted[18].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[6].y < unsorted[16].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[7].y < unsorted[17].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[7].y < unsorted[16].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[8].y < unsorted[24].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[9].y < unsorted[25].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[9].y < unsorted[24].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[10].y < unsorted[26].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[11].y < unsorted[27].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[11].y < unsorted[26].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[10].y < unsorted[24].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[11].y < unsorted[25].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[11].y < unsorted[24].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[12].y < unsorted[28].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[13].y < unsorted[29].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[13].y < unsorted[28].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[14].y < unsorted[30].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[15].y < unsorted[31].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[15].y < unsorted[30].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[14].y < unsorted[28].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[15].y < unsorted[29].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[15].y < unsorted[28].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[12].y < unsorted[24].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[13].y < unsorted[25].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[13].y < unsorted[24].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[14].y < unsorted[26].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[15].y < unsorted[27].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[15].y < unsorted[26].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[14].y < unsorted[24].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[15].y < unsorted[25].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[15].y < unsorted[24].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[8].y < unsorted[16].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[9].y < unsorted[17].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[9].y < unsorted[16].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[10].y < unsorted[18].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[11].y < unsorted[19].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[11].y < unsorted[18].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[10].y < unsorted[16].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[11].y < unsorted[17].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[11].y < unsorted[16].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[12].y < unsorted[20].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[13].y < unsorted[21].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[13].y < unsorted[20].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[14].y < unsorted[22].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[15].y < unsorted[23].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[15].y < unsorted[22].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[14].y < unsorted[20].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[15].y < unsorted[21].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[15].y < unsorted[20].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[12].y < unsorted[16].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[13].y < unsorted[17].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[13].y < unsorted[16].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[14].y < unsorted[18].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[15].y < unsorted[19].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[15].y < unsorted[18].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[14].y < unsorted[16].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[15].y < unsorted[17].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[15].y < unsorted[16].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[16]; unsorted[16] = tmp;}\n        }\n\n        float coefficient(int i) {\n            return 1.0 - 2.0 * mod(float(i),2.0);\n        }\n\n        float periodicity(int i) {\n            if (i == 0) return 0.0;\n            if (i == 1) return 1.0/3.0;\n            return 2.0 / float(i);\n        }\n\n        void main () {\n            vec3 newPos = position;\n            stretch = 0.0; // The amount by which the rendered segment should be dimmed.\n\n            // Copy raids into array for easier handling, probably.\n            vec3 raid[32]; // x = x, y = amplitude, z = number of aircraft.\n            raid[0] = raid0;\n            raid[1] = raid1;\n            raid[2] = raid2;\n            raid[3] = raid3;\n            raid[4] = raid4;\n            raid[5] = raid5;\n            raid[6] = raid6;\n            raid[7] = raid7;\n            raid[8] = raid8;\n            raid[9] = raid9;\n            raid[10] = raid10;\n            raid[11] = raid11;\n            raid[12] = raid12;\n            raid[13] = raid13;\n            raid[14] = raid14;\n            raid[15] = raid15;\n            if (numRaids > 16) {\n                raid[16] = raid16;\n                raid[17] = raid17;\n                raid[18] = raid18;\n                raid[19] = raid19;\n                raid[20] = raid20;\n                raid[21] = raid21;\n                raid[22] = raid22;\n                raid[23] = raid23;\n                raid[24] = raid24;\n                raid[25] = raid25;\n                raid[26] = raid26;\n                raid[27] = raid27;\n                raid[28] = raid28;\n                raid[29] = raid29;\n                raid[30] = raid30;\n                raid[31] = raid31;\n            }\n\n            // Compute height and slope for each raid, at this x position.\n            vec3 pulse[32];\n            for (int i = 0; i < 32; i++) {\n                pulse[i] = pulseShape(raid[i], 0.02);\n            }\n\n            // Sort pulses into decreasing displacement.\n            if (numRaids > 16) {\n                sortPulses32(pulse);\n            } else {\n                sortPulses16(pulse);\n            }\n\n            // Combine pulses. Try with loop but worried it won\'t work on iOS\n            // (ref https://www.shaderific.com/glsl-types)\n            // Good news, it looks OK.\n\n            float height = 0.0;\n            float slope = 0.0;\n            for (int i = 0; i < 32; i++) {\n                // Note we use cos so that pulse[0] doesn\'t disappear.\n                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));\n                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));\n            }\n\n            // TODO: Limit slope and use that to limit height changes!\n\n          // Additional \"spiky\" line noise.\n          if (lineSpikes > 0.0) {\n              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )\n              {\n                 vec3 noise = vec3(position.x, 0.1, 0.0);\n                 vec3 spike = pulseShape(noise, 0.05);\n                 height += lineSpikes * spike.y;\n                 //slope += lineSpikes * spike.z;\n              }\n          }\n\n            newPos.y -= max(0.0, height);\n            newPos.x += position.y * slope;\n            stretch = abs(slope);\n\n            // Lower the resolution of the x line to make the noise less noisy.\n            float newx = floor((position.x) * 153.0);\n            float newtime = floor(u_time / 2.0);\n\n            // add time to the noise parameters so it\'s animated\n            if (lineJiggle > 0.0) {\n                float noise = turbulence( newx * newtime );\n                float b = random( newx * newtime );\n                float displacement = lineJiggle * noise + 0.01 * b;\n                newPos.y += displacement;\n            }\n\n            // Where no signal, narrow the line a bit.\n            if (height == 0.0) {\n                newPos.y /= 2.0;\n            }\n            //if (newPos.y > 0.0) { newPos.y /= 2.0; }\n\n            gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);\n            vcolor = color;\n            stretch = abs(stretch);\n        }\n  ',
 	attributes: {color: 'color', position: 'position'},
 	uniforms: {camera: 'camera', lineJiggle: 'lineJiggle', lineSpikes: 'lineSpikes', numRaids: 'numRaids', perspective: 'perspective', raid0: 'raid0', raid1: 'raid1', raid10: 'raid10', raid11: 'raid11', raid12: 'raid12', raid13: 'raid13', raid14: 'raid14', raid15: 'raid15', raid16: 'raid16', raid17: 'raid17', raid18: 'raid18', raid19: 'raid19', raid2: 'raid2', raid20: 'raid20', raid21: 'raid21', raid22: 'raid22', raid23: 'raid23', raid24: 'raid24', raid25: 'raid25', raid26: 'raid26', raid27: 'raid27', raid28: 'raid28', raid29: 'raid29', raid3: 'raid3', raid30: 'raid30', raid31: 'raid31', raid4: 'raid4', raid5: 'raid5', raid6: 'raid6', raid7: 'raid7', raid8: 'raid8', raid9: 'raid9', rotation: 'rotation', u_time: 'u_time'}
 };
@@ -17236,8 +17297,11 @@ var $author$project$OperatorPage$rangeScale = A2(
 	A2(
 		$elm$core$List$map,
 		function (i) {
-			return $mdgriffith$elm_ui$Element$text(
-				$elm$core$String$fromInt(10 * i));
+			return A2(
+				$mdgriffith$elm_ui$Element$el,
+				$author$project$Utils$disableSelection,
+				$mdgriffith$elm_ui$Element$text(
+					$elm$core$String$fromInt(10 * i)));
 		},
 		A2($elm$core$List$range, 0, 10)));
 var $author$project$Messages$AdjustRangeValue = function (a) {

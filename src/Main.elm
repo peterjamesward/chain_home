@@ -20,6 +20,7 @@ import Element.Font as Font
 import Element.Input as Input
 import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
 import Goniometer exposing (goniometerTurnAngle)
+import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
 import Messages exposing (..)
@@ -76,6 +77,7 @@ type alias Model =
     , storedStrength : Maybe Int
     , storedFriendly : Maybe Bool
     , storedStrengthPlus : Maybe Bool
+    , operatorMode : OperatorMode
     }
 
 
@@ -121,6 +123,7 @@ init _ =
       , storedStrength = Nothing
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
+      , operatorMode = Experienced
       }
     , Task.perform SetStartTime Time.now
     )
@@ -580,9 +583,35 @@ navBar =
         , Border.color paletteSand
         , Font.color paletteLightGreen
         ]
-        [ E.el [ pointer, alignLeft, Event.onClick DisplayConfiguration ] <| text "Configuration"
-        , E.el [ pointer, centerX, Event.onClick DisplayReceiver ] <| text "Operator"
-        , E.el [ pointer, alignRight, Event.onClick DisplayCalculator ] <| text "Outputs"
+        [ E.el
+            ([ pointer
+             , alignLeft
+             , Event.onClick DisplayConfiguration
+             ]
+                ++ disableSelection
+            )
+          <|
+            text "Configuration"
+        , E.el
+            ([ pointer
+             , centerX
+             , Event.onClick DisplayReceiver
+             , htmlAttribute <| style "-webkit-user-select" "none"
+             ]
+                ++ disableSelection
+            )
+          <|
+            text "Operator"
+        , E.el
+            ([ pointer
+             , alignRight
+             , Event.onClick DisplayCalculator
+             , htmlAttribute <| style "-webkit-user-select" "none"
+             ]
+                ++ disableSelection
+            )
+          <|
+            text "Calculator"
         ]
 
 
@@ -611,7 +640,10 @@ targetSelector active =
                 { onChange = setConfig g
                 , checked = g.active
                 , label =
-                    Input.labelRight [] <|
+                    Input.labelRight
+                        [ htmlAttribute <| style "-webkit-user-select" "none"
+                        ]
+                    <|
                         E.text g.description
                 , icon = Input.defaultCheckbox
                 }

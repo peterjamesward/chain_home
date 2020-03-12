@@ -8,7 +8,6 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer)
-import Html exposing (div)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
@@ -16,7 +15,7 @@ import Nixie exposing (nixieDisplay)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import Types exposing (GoniometerMode(..), InputState(..))
-import Utils exposing (commonStyles, edges)
+import Utils exposing (commonStyles, disableSelection, edges)
 
 
 clickableRangeKnob angle =
@@ -83,7 +82,7 @@ rangeSlider model =
 rangeDisplay rangeValue =
     column [ E.centerX ]
         [ nixieDisplay 3 (truncate rangeValue)
-        , el [ E.centerX ] (E.text "RANGE")
+        , el ([ E.centerX ] ++ disableSelection) (E.text "RANGE")
         ]
 
 
@@ -93,9 +92,9 @@ showMouseCoordinates model =
             Maybe.withDefault ( 0, ( 0, 0 ) ) model.rangeDrag
     in
     column [ E.centerX ]
-        [ el [ E.centerX ] (E.text "X")
+        [ el ([ E.centerX ] ++ disableSelection) (E.text "X")
         , nixieDisplay 4 (truncate x)
-        , el [ E.centerX ] (E.text "Y")
+        , el ([ E.centerX ] ++ disableSelection) (E.text "Y")
         , nixieDisplay 4 (truncate y)
         ]
 
@@ -127,7 +126,8 @@ rangeScale =
     <|
         List.map
             (\i ->
-                text (String.fromInt (10 * i))
+                el disableSelection <|
+                    text (String.fromInt (10 * i))
             )
             (List.range 0 10)
 
@@ -176,20 +176,22 @@ modeSwitchPanel model =
             )
             [ column commonStyles
                 [ indicatorLabelAbove "A" (model.goniometerMode == Azimuth && model.receiveAB)
-                , el [ centerX ] <| text "D/F"
+                , el ([ E.centerX ] ++ disableSelection) <| text "D/F"
                 , indicatorLabelBelow "B" (model.goniometerMode == Azimuth && not model.receiveAB)
                 ]
             , column commonStyles
                 [ el
-                    [ below (actionButtonNoLabel "A <> B" (SelectReceiveAntenna (not model.receiveAB)))
-                    , centerX
-                    ]
+                    ([ below (actionButtonNoLabel "A <> B" (SelectReceiveAntenna (not model.receiveAB)))
+                     , centerX
+                     ]
+                        ++ disableSelection
+                    )
                   <|
                     text "A <> B"
                 ]
             , column commonStyles
                 [ indicatorLabelAbove "A" (model.goniometerMode == Elevation && model.receiveAB)
-                , el [ centerX ] <| text "HEIGHT"
+                , el ([ E.centerX ] ++ disableSelection) <| text "HEIGHT"
                 , indicatorLabelBelow "B" (model.goniometerMode == Elevation && not model.receiveAB)
                 ]
             ]
@@ -247,7 +249,7 @@ raidStrengthPanel =
                 ]
             ]
         , row commonStyles
-            [ el [ centerX ] <| text "RAID STRENGTH"
+            [ el ([ E.centerX ] ++ disableSelection) <| text "RAID STRENGTH"
             ]
         ]
 

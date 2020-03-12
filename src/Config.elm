@@ -58,7 +58,7 @@ bomber1 =
     , bearing = degrees 250
     , speed = 200.0 -- mph
     , iff = Just 7
-    , iffActive = True
+    , iffActive = False
     }
 
 
@@ -116,7 +116,7 @@ fighter1 =
     , bearing = degrees 90
     , speed = 300 -- mph
     , iff = Just 1
-    , iffActive = False
+    , iffActive = True
     }
 
 
@@ -161,7 +161,7 @@ outboundFriendly =
 
 
 loneBomber =
-    TargetSelector 2 "One returning friendly" [ bomber1 ] False
+    TargetSelector 2 "One incoming" [ bomber1 ] False
 
 
 twoCloseTargets =

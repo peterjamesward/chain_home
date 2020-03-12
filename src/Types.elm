@@ -30,3 +30,7 @@ type InputState
     | BearingRangeInput
     | HeightInput
     | HeightRangeInput
+
+type OperatorMode
+    = Training  -- On-screen narrative and prompts TBD.
+    | Experienced -- Absent above.

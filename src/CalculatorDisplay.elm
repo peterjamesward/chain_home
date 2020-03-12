@@ -9,9 +9,10 @@ import Constants exposing (..)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
+import Html.Attributes exposing (style)
 import Messages exposing (Msg)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
-import Utils exposing (bearingDisplay, choose, edges)
+import Utils exposing (bearingDisplay, choose, disableSelection, edges)
 
 
 type alias GridPosition =
@@ -119,9 +120,7 @@ buttonStyle enabled colour =
     , width (px bulbSize)
     , height (px bulbSize)
     , paddingEach { edges | top = bulbSize // 4 }
-
-    --, centerX
-    ]
+    ] ++ disableSelection
 
 
 positionGridDisplay : Maybe GridPosition -> Element Msg

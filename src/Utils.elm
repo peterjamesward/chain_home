@@ -7,6 +7,7 @@ import Element as E exposing (..)
 import Element.Background as B
 import Element.Border as Border exposing (..)
 import Element.Font as Font exposing (..)
+import Html.Attributes exposing (style)
 import Nixie exposing (nixieDisplay)
 import String exposing (toInt)
 
@@ -69,6 +70,12 @@ bearingDisplay label maybeBearing =
 
             _ ->
                 Nothing
+
+
+disableSelection =
+    [ htmlAttribute <| style "-webkit-user-select" "none"
+    , htmlAttribute <| style "-webkit-touch-callout" "none"
+    ]
 
 
 commonStyles =

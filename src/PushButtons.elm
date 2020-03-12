@@ -6,8 +6,9 @@ import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
 import Element.Font as Font
 import Element.Input as Input exposing (..)
+import Html.Attributes exposing (style)
 import Messages exposing (Msg)
-import Utils exposing (choose, commonStyles, edges)
+import Utils exposing (choose, commonStyles, disableSelection, edges)
 
 
 
@@ -26,6 +27,7 @@ buttonStyles =
     , Border.widthEach { bottom = 2, top = 1, right = 2, left = 2 }
     , Element.focused []
     , Font.bold
+    , htmlAttribute <| style "-webkit-user-select" "none"
     ]
 
 
@@ -37,6 +39,7 @@ indicatorStyles =
     , Border.rounded 5
     , Border.width 2
     , Font.bold
+    , htmlAttribute <| style "-webkit-user-select" "none"
     ]
 
 
@@ -63,6 +66,7 @@ actionButtonLabelAbove label msg =
             [ centerX
             , paddingEach { edges | bottom = 5 }
             , Font.bold
+            , htmlAttribute <| style "-webkit-user-select" "none"
             ]
           <|
             Element.text label
@@ -81,9 +85,9 @@ actionButtonLabelAboveWithIndicator label state msg =
     -- Hell, these buttons are becoming too specialised!
     column commonStyles
         [ el
-            [ centerX
-            , paddingEach { edges | bottom = 5 }
-            , above
+            ([ centerX
+             , paddingEach { edges | bottom = 5 }
+             , above
                 (el
                     [ centerX
                     , paddingEach { edges | bottom = 5 }
@@ -91,7 +95,9 @@ actionButtonLabelAboveWithIndicator label state msg =
                  <|
                     indicatorNoLabel state
                 )
-            ]
+             ]
+                ++ disableSelection
+            )
           <|
             Element.text label
         , Input.button
@@ -107,7 +113,13 @@ actionButtonLabelAboveWithIndicator label state msg =
 actionButtonLabelLeft : String -> Msg -> Element Msg
 actionButtonLabelLeft label msg =
     row [ alignRight, height <| minimum 30 <| fill ]
-        [ el [ paddingEach { edges | right = 10 } ] <| Element.text label
+        [ el
+            ([ paddingEach { edges | right = 10 }
+             ]
+                ++ disableSelection
+            )
+          <|
+            Element.text label
         , Input.button
             (alignRight :: Background.color green :: buttonStyles)
             { onPress = Just msg
@@ -124,7 +136,13 @@ actionButtonLabelRight label msg =
             { onPress = Just msg
             , label = none
             }
-        , el [ paddingEach { edges | left = 10 } ] <| Element.text label
+        , el
+            ([ paddingEach { edges | left = 10 }
+             ]
+                ++ disableSelection
+            )
+          <|
+            Element.text label
         ]
 
 
@@ -147,10 +165,12 @@ indicatorLabelBelow label state =
             , label = none
             }
         , el
-            [ centerX
-            , paddingEach { edges | top = 5 }
-            , Font.bold
-            ]
+            ([ centerX
+             , paddingEach { edges | top = 5 }
+             , Font.bold
+             ]
+                ++ disableSelection
+            )
           <|
             Element.text label
         ]
@@ -166,7 +186,14 @@ indicatorLabelAbove label state =
             choose state paletteSand paletteGrey
     in
     column commonStyles
-        [ el [ centerX, paddingEach { edges | bottom = 5 } ] <| Element.text label
+        [ el
+            ([ centerX
+             , paddingEach { edges | bottom = 5 }
+             ]
+                ++ disableSelection
+            )
+          <|
+            Element.text label
         , Input.button
             (Background.color colour
                 :: Border.color borderColour
