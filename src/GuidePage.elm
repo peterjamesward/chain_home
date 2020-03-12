@@ -1,5 +1,10 @@
-module OperatorPage exposing (operatorPage)
+module GuidePage exposing (guidePage)
 
+{-
+   Here we display some guidance for the Operator display.
+-}
+
+import Attr exposing (..)
 import CRT_WebGL exposing (crt)
 import Constants exposing (..)
 import Element as E exposing (..)
@@ -13,8 +18,43 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import Types exposing (GoniometerMode(..), InputState(..), OperatorMode(..))
+import Types exposing (GoniometerMode(..), InputState(..), OperatorMode(..), Prompt(..))
 import Utils exposing (choose, commonStyles, disableSelection, edges)
+
+
+guidePage model =
+    html <|
+        layoutWith { options = [ noStaticStyleSheet ] }
+            [ inFront (displayPrompt model.displayingPrompt) ]
+        <|
+            operatorPageLandscape model
+
+
+displayPrompt prompt =
+    case prompt of
+        Nothing ->
+            none
+
+        Just promptCode ->
+            el
+                [ centerY
+                , centerX
+                , Background.color blue
+                , Font.color white
+                , Font.center
+                ]
+                (promptText promptCode)
+
+
+promptText : Prompt -> Element Msg
+promptText prompt =
+    text <|
+        case prompt of
+            PromptRangeScale ->
+                "I am a range scale."
+
+            _ ->
+                "Somebody needs to write my explanation."
 
 
 clickableRangeKnob angle =
@@ -45,6 +85,7 @@ rangeSlider model =
         , E.width (E.px 560)
         , paddingEach { edges | left = 80 }
         , pointer
+        , promptSymbol PromptRangeScale
 
         -- Here is where we're creating/styling the "track"
         , E.behindContent
@@ -118,7 +159,9 @@ rangeSliderAndCRT model trace =
             , paddingEach { edges | left = 40 }
             ]
             (rangeSlider model)
-        , E.html <| crt model.webGLtime trace
+        , el [ promptSymbol PromptCRT ] <|
+            E.html <|
+                crt model.webGLtime trace
         ]
 
 
@@ -251,21 +294,3 @@ operatorPageLandscape model =
             , raidStrengthPanel
             ]
         ]
-
-
-operatorPagePortrait model =
-    column
-        commonStyles
-        [ rangeSliderAndCRT model <| traceDependingOnMode model
-        , goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-        , rangeKnob model.rangeKnobAngle
-        ]
-
-
-operatorPage model =
-    case model.outputDevice.orientation of
-        Landscape ->
-            operatorPageLandscape model
-
-        Portrait ->
-            operatorPagePortrait model

@@ -14,6 +14,7 @@ type Msg
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
+    | DisplayGuide
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point
@@ -34,4 +35,6 @@ type Msg
     | RaidStrengthPlus
     | RaidFriendly
     | SetOperatorMode OperatorMode
+    | DisplayPrompt Prompt
+    | HidePrompt
     | DummyMessage

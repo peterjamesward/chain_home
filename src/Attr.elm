@@ -4,9 +4,11 @@ import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events exposing (onMouseEnter, onMouseLeave)
 import Element.Font as Font
-import Types exposing (OperatorMode(..))
-import Utils exposing (choose)
+import Messages exposing (Msg(..))
+import Types exposing (OperatorMode(..), Prompt)
+import Utils exposing (choose, edges)
 
 
 greenButton : List (Attribute msg)
@@ -32,8 +34,21 @@ greyButton =
     ]
 
 
-promptSymbol model =
-    inFront <|
-        choose (model.operatorMode == Training)
-            (el [ Background.color blue, Font.color white ] <| text "?")
-            none
+promptSymbol : Prompt -> Attribute Msg
+promptSymbol prompt =
+    onLeft <|
+        (el
+            [ Background.color blue
+            , Font.color white
+            , width (px 30)
+            , height (px 30)
+            , Border.rounded 15
+            , Border.color white
+            , Font.center
+            , paddingEach { edges | top = 5 }
+            , onMouseEnter (DisplayPrompt prompt)
+            , onMouseLeave HidePrompt
+            ]
+         <|
+            text "?"
+        )

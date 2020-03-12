@@ -20,6 +20,7 @@ import Element.Font as Font
 import Element.Input as Input
 import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
 import Goniometer exposing (goniometerTurnAngle)
+import GuidePage exposing (guidePage)
 import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
@@ -38,6 +39,7 @@ type Page
     = InputPage
     | OperatorPage
     | OutputPage
+    | GuidePage
 
 
 type alias Model =
@@ -78,6 +80,7 @@ type alias Model =
     , storedFriendly : Maybe Bool
     , storedStrengthPlus : Maybe Bool
     , operatorMode : OperatorMode
+    , displayingPrompt : Maybe Prompt
     }
 
 
@@ -124,6 +127,7 @@ init _ =
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
       , operatorMode = Experienced
+      , displayingPrompt = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -317,6 +321,14 @@ update msg model =
         DisplayReceiver ->
             ( { model
                 | currPage = OperatorPage
+                , isMenuOpen = False
+              }
+            , Cmd.none
+            )
+
+        DisplayGuide ->
+            ( { model
+                | currPage = GuidePage
                 , isMenuOpen = False
               }
             , Cmd.none
@@ -525,6 +537,12 @@ update msg model =
         SetOperatorMode mode ->
             ( { model | operatorMode = mode }, Cmd.none )
 
+        DisplayPrompt prompt ->
+            ( { model | displayingPrompt = Just prompt }, Cmd.none )
+
+        HidePrompt  ->
+            ( { model | displayingPrompt = Nothing }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -544,10 +562,6 @@ selectTransmitAntenna ab reflect =
             transmitBNoReflect
 
 
-
--- VIEW
-
-
 view : Model -> Browser.Document Msg
 view model =
     let
@@ -561,6 +575,9 @@ view model =
 
                 OutputPage ->
                     calculatorPage model
+
+                GuidePage ->
+                    guidePage model
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -599,6 +616,7 @@ navBar =
         , spaceEvenly
         ]
         [ navItem "Configuration" DisplayConfiguration
+        , navItem "Guide" DisplayGuide
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
         ]
