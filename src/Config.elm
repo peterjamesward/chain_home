@@ -57,7 +57,7 @@ bomber1 =
     , height = 20 -- ,000 ft
     , bearing = degrees 250
     , speed = 200.0 -- mph
-    , iff = Just 7
+    , iff = Nothing
     , iffActive = False
     }
 
@@ -193,6 +193,11 @@ targetConfigurations =
     , tenDeep
     , behindYou
     ]
+
+
+trainingMode : List TargetSelector
+trainingMode =
+    [ { loneBomber | active = True } ]
 
 
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector

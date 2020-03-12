@@ -30,6 +30,7 @@ import Station exposing (..)
 import Target exposing (..)
 import Task
 import Time
+import TrainingMode exposing (..)
 import Types exposing (..)
 import Utils exposing (..)
 
@@ -38,6 +39,7 @@ type Page
     = InputPage
     | OperatorPage
     | OutputPage
+    | TrainingPage
 
 
 type alias Model =
@@ -78,7 +80,7 @@ type alias Model =
     , storedFriendly : Maybe Bool
     , storedStrengthPlus : Maybe Bool
     , operatorMode : OperatorMode
-    , displayingPrompt : Maybe Prompt
+    , trainingScenario : Maybe Scenario
     }
 
 
@@ -125,7 +127,7 @@ init _ =
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
       , operatorMode = Experienced
-      , displayingPrompt = Nothing
+      , trainingScenario = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -319,7 +321,6 @@ update msg model =
         DisplayReceiver ->
             ( { model
                 | currPage = OperatorPage
-                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -327,7 +328,6 @@ update msg model =
         DisplayConfiguration ->
             ( { model
                 | currPage = InputPage
-                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -335,7 +335,23 @@ update msg model =
         DisplayCalculator ->
             ( { model
                 | currPage = OutputPage
-                , isMenuOpen = False
+              }
+            , Cmd.none
+            )
+
+        DisplayTraining ->
+            ( { model
+                | currPage = TrainingPage
+                , activeConfigurations = trainingMode
+                , trainingScenario = Just welcomePrompt
+              }
+            , Cmd.none
+            )
+
+        ScenarioAdvance ->
+            ( { model
+                | currPage = TrainingPage
+                , trainingScenario = advanceScenario model.trainingScenario
               }
             , Cmd.none
             )
@@ -560,6 +576,8 @@ view model =
                 OutputPage ->
                     calculatorPage model
 
+                TrainingPage ->
+                    trainingPage model
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -597,7 +615,8 @@ navBar =
         , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ navItem "Configuration" DisplayConfiguration
+        [ navItem "Introduction" DisplayTraining
+        , navItem "Configuration" DisplayConfiguration
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
         ]

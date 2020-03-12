@@ -77,7 +77,7 @@ calculator range bearing height strength plus friendly =
         position =
             gridPosition range bearing
     in
-    column [ centerX, width fill ]
+    column []
         [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay position
             , column [ spacing 10 ]
@@ -120,7 +120,8 @@ buttonStyle enabled colour =
     , width (px bulbSize)
     , height (px bulbSize)
     , paddingEach { edges | top = bulbSize // 4 }
-    ] ++ disableSelection
+    ]
+        ++ disableSelection
 
 
 positionGridDisplay : Maybe GridPosition -> Element Msg
