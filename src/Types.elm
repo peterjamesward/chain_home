@@ -34,3 +34,17 @@ type InputState
 type OperatorMode
     = Training  -- On-screen narrative and prompts TBD.
     | Experienced -- Absent above.
+
+type Prompt
+    = PromptRangeScale
+    | PromptGoniometer
+    | PromptCRT
+    | PromptRangeKnob
+    | PromptAB
+    | PromptHeight
+    | PromptSense
+    | PromptRaidStrengthButtons
+    | PromptGridPosition
+    | PromptRaidStrength
+    | PromptHeightGrid
+    | PromptGridOffset

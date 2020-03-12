@@ -8,7 +8,7 @@
 --DONE: Electronic calculator output.
 --DONE: Start raids further out.
 --DONE: Go! button resets timer, restarts raids from origin.
---TODO: Stop text selection.
+--TEST: Stop text selection.
 --TODO: Narrative and on-screen prompts.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.

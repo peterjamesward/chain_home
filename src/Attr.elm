@@ -1,10 +1,12 @@
 module Attr exposing (..)
 
+import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Constants exposing (..)
+import Types exposing (OperatorMode(..))
+import Utils exposing (choose)
 
 
 greenButton : List (Attribute msg)
@@ -28,3 +30,10 @@ greyButton =
     , Font.bold
     , Font.color paletteDarkGreen
     ]
+
+
+promptSymbol model =
+    inFront <|
+        choose (model.operatorMode == Training)
+            (el [ Background.color blue, Font.color white ] <| text "?")
+            none

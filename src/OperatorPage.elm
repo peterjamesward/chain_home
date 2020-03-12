@@ -1,5 +1,6 @@
 module OperatorPage exposing (operatorPage)
 
+import Attr exposing (promptSymbol)
 import CRT_WebGL exposing (crt)
 import Constants exposing (..)
 import Element as E exposing (..)
@@ -11,11 +12,10 @@ import Goniometer exposing (drawGoniometer)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
-import Nixie exposing (nixieDisplay)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import Types exposing (GoniometerMode(..), InputState(..))
-import Utils exposing (commonStyles, disableSelection, edges)
+import Types exposing (GoniometerMode(..), InputState(..), OperatorMode(..))
+import Utils exposing (choose, commonStyles, disableSelection, edges)
 
 
 clickableRangeKnob angle =
@@ -77,26 +77,6 @@ rangeSlider model =
                 , Background.color white
                 ]
         }
-
-
-rangeDisplay rangeValue =
-    column [ E.centerX ]
-        [ nixieDisplay 3 (truncate rangeValue)
-        , el ([ E.centerX ] ++ disableSelection) (E.text "RANGE")
-        ]
-
-
-showMouseCoordinates model =
-    let
-        ( _, ( x, y ) ) =
-            Maybe.withDefault ( 0, ( 0, 0 ) ) model.rangeDrag
-    in
-    column [ E.centerX ]
-        [ el ([ E.centerX ] ++ disableSelection) (E.text "X")
-        , nixieDisplay 4 (truncate x)
-        , el ([ E.centerX ] ++ disableSelection) (E.text "Y")
-        , nixieDisplay 4 (truncate y)
-        ]
 
 
 traceDependingOnMode model =

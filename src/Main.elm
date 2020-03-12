@@ -522,6 +522,9 @@ update msg model =
             , Cmd.none
             )
 
+        SetOperatorMode mode ->
+            ( { model | operatorMode = mode }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -576,42 +579,28 @@ view model =
 
 navBar : Element Msg
 navBar =
+    let
+        navItem label action =
+            el
+                ([ pointer
+                 , Event.onClick action
+                 ]
+                    ++ disableSelection
+                )
+            <|
+                text label
+    in
     row
         [ width fill
         , paddingXY 60 10
         , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
         , Border.color paletteSand
         , Font.color paletteLightGreen
+        , spaceEvenly
         ]
-        [ E.el
-            ([ pointer
-             , alignLeft
-             , Event.onClick DisplayConfiguration
-             ]
-                ++ disableSelection
-            )
-          <|
-            text "Configuration"
-        , E.el
-            ([ pointer
-             , centerX
-             , Event.onClick DisplayReceiver
-             , htmlAttribute <| style "-webkit-user-select" "none"
-             ]
-                ++ disableSelection
-            )
-          <|
-            text "Operator"
-        , E.el
-            ([ pointer
-             , alignRight
-             , Event.onClick DisplayCalculator
-             , htmlAttribute <| style "-webkit-user-select" "none"
-             ]
-                ++ disableSelection
-            )
-          <|
-            text "Calculator"
+        [ navItem "Configuration" DisplayConfiguration
+        , navItem "Operator" DisplayReceiver
+        , navItem "Calculator" DisplayCalculator
         ]
 
 
@@ -625,7 +614,7 @@ setConfig selector newState =
     SetConfigStateMsg selector.id newState
 
 
-targetSelector : List TargetSelector -> List (Element Msg)
+targetSelector : List TargetSelector -> Element Msg
 targetSelector active =
     let
         display : TargetSelector -> Element Msg
@@ -648,7 +637,14 @@ targetSelector active =
                 , icon = Input.defaultCheckbox
                 }
     in
-    List.map display active
+    column
+        [ E.width (px 550)
+        , spacingXY 0 10
+        , paddingEach { edges | left = 100, top = 50 }
+        , Font.color lightCharcoal
+        ]
+    <|
+        List.map display active
 
 
 calculatorPage : Model -> Element Msg
@@ -662,22 +658,42 @@ calculatorPage model =
         model.storedFriendly
 
 
+toggleOperatorMode flag =
+    SetOperatorMode <| choose flag Training Experienced
+
+
 inputPage : Model -> Element Msg
 inputPage model =
-    column
-        [ E.width (px 500)
-        , spacingXY 0 10
-        , centerX
+    row
+        [ E.width fill
         , Font.color lightCharcoal
         ]
-    <|
-        targetSelector model.activeConfigurations
-            ++ [ Input.button
-                    (Attr.greenButton ++ [ width (px 200), height (px 40), alignRight ])
-                    { onPress = Just StartScenario
-                    , label = el [ centerX ] <| text "Go!"
-                    }
-               ]
+        [ targetSelector model.activeConfigurations
+        , column [ centerX, spacingXY 0 20 ]
+            [ Input.checkbox
+                [ E.height (px 40)
+                , Border.width 1
+                , Border.rounded 5
+                , Border.color lightCharcoal
+                , padding 10
+                ]
+                { onChange = toggleOperatorMode
+                , checked = model.operatorMode == Training
+                , label =
+                    Input.labelRight
+                        [ htmlAttribute <| style "-webkit-user-select" "none"
+                        ]
+                    <|
+                        E.text "Show explanations"
+                , icon = Input.defaultCheckbox
+                }
+            , Input.button
+                (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
+                { onPress = Just StartScenario
+                , label = el [ centerX ] <| text "Go!"
+                }
+            ]
+        ]
 
 
 main : Program Flags Model Msg
