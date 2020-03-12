@@ -14,7 +14,6 @@ type Msg
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
-    | DisplayGuide
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point

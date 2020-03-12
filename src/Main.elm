@@ -20,7 +20,6 @@ import Element.Font as Font
 import Element.Input as Input
 import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
 import Goniometer exposing (goniometerTurnAngle)
-import GuidePage exposing (guidePage)
 import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
 import LobeFunctions exposing (..)
@@ -39,7 +38,6 @@ type Page
     = InputPage
     | OperatorPage
     | OutputPage
-    | GuidePage
 
 
 type alias Model =
@@ -326,14 +324,6 @@ update msg model =
             , Cmd.none
             )
 
-        DisplayGuide ->
-            ( { model
-                | currPage = GuidePage
-                , isMenuOpen = False
-              }
-            , Cmd.none
-            )
-
         DisplayConfiguration ->
             ( { model
                 | currPage = InputPage
@@ -537,12 +527,6 @@ update msg model =
         SetOperatorMode mode ->
             ( { model | operatorMode = mode }, Cmd.none )
 
-        DisplayPrompt prompt ->
-            ( { model | displayingPrompt = Just prompt }, Cmd.none )
-
-        HidePrompt  ->
-            ( { model | displayingPrompt = Nothing }, Cmd.none )
-
         _ ->
             ( model, Cmd.none )
 
@@ -576,8 +560,6 @@ view model =
                 OutputPage ->
                     calculatorPage model
 
-                GuidePage ->
-                    guidePage model
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -616,7 +598,6 @@ navBar =
         , spaceEvenly
         ]
         [ navItem "Configuration" DisplayConfiguration
-        , navItem "Guide" DisplayGuide
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
         ]
