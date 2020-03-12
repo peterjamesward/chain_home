@@ -11,5 +11,6 @@
 --TODO: Narrative and on-screen prompts.
 --TODO: Physical knobs -- get a headless little server app running with a Gonio API.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.
---TODO: Physical knobs -- headless app reads from Arduino.
---TODO: Make it run on a Raspberry Pi.
+--TODO: Improve that by using WebSockets -> JS -> Subscription -> Msg.
+--TODO: Physical knobs -- headless app reads from Arduino (10 bit encoder).
+--TODO: Raspberry Pi.

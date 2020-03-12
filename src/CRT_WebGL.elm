@@ -685,7 +685,7 @@ vertexShader =
                  vec3 noise = vec3(position.x, 0.1, 0.0);
                  vec3 spike = pulseShape(noise, 0.05);
                  height += lineSpikes * spike.y;
-                 slope += lineSpikes * spike.z;
+                 //slope += lineSpikes * spike.z;
               }
           }
 
