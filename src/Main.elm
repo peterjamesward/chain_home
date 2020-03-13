@@ -259,6 +259,7 @@ update msg model =
         DisplayReceiver ->
             ( { model
                 | currPage = OperatorPage
+                , trainingScenario = Nothing
               }
             , Cmd.none
             )
@@ -280,7 +281,6 @@ update msg model =
         DisplayTraining ->
             ( { model
                 | currPage = TrainingPage
-                , activeConfigurations = trainingMode
                 , trainingScenario = Just welcomePrompt
               }
             , Cmd.none
@@ -512,7 +512,7 @@ view model =
                     calculatorPage model
 
                 TrainingPage ->
-                    trainingPage model
+                    operatorPage model
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -550,7 +550,7 @@ navBar =
         , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ navItem "Introduction" DisplayTraining
+        [ navItem "Tutorial" DisplayTraining
         , navItem "Configuration" DisplayConfiguration
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator

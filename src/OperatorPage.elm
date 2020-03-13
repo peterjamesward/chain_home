@@ -13,6 +13,7 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
+import TrainingMode exposing (tutorialMode)
 import Types exposing (..)
 import Utils exposing (choose, commonStyles, disableSelection, edges)
 
@@ -112,7 +113,10 @@ rangeScale =
 
 
 rangeSliderAndCRT model trace =
-    column [ paddingEach { edges | left = 40 } ]
+    column
+        ([ padding 5 ]
+            ++ tutorialMode model ScenarioWelcome
+        )
         [ E.el
             [ E.below rangeScale
             , paddingEach { edges | left = 40 }
