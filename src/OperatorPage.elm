@@ -13,31 +13,45 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import TrainingMode exposing (tutorialMode)
+import TrainingMode exposing (tutorialModeNSEW, tutorialTextBox)
 import Types exposing (..)
 import Utils exposing (choose, commonStyles, disableSelection, edges)
 
 
-clickableRangeKnob angle =
+clickableRangeKnob model tutorial =
     el
-        [ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
-        , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
-        , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
-        , htmlAttribute <| style "touch-action" "none"
-        , width (px 200)
-        ]
-        (html <| drawRangeKnob angle)
+        ([ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
+         , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
+         , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
+         , htmlAttribute <| style "touch-action" "none"
+         , width (px 200)
+         , pointer
+         ]
+            ++ tutorialModeNSEW model TutorialAdjustRange
+        )
+        (html <| drawRangeKnob model.rangeKnobAngle)
 
 
-clickableGonioImage theta =
+clickableGonioImage model tutorial =
+    let
+        theta =
+            model.goniometerAzimuth + model.station.lineOfShoot
+    in
     el
-        [ htmlAttribute <| Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
-        , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
-        , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
-        , htmlAttribute <| style "touch-action" "none"
-        , width (px 300)
-        ]
+        ([ htmlAttribute <| Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
+         , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
+         , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
+         , htmlAttribute <| style "touch-action" "none"
+         , width (px 300)
+         , pointer
+         ]
+            ++ tutorialModeNSEW model TutorialFindBearing
+        )
         (html <| drawGoniometer theta)
+
+
+
+--TODO: Range indicator should be front of the CRT. Sure it used to be,
 
 
 rangeSlider model =
@@ -121,38 +135,10 @@ rangeSliderAndCRT model trace =
             ]
             (rangeSlider model)
         , el
-            -- anchor for the 'inFromt'
-            [ inFront <|
-                el
-                    ([ height (px 300), width fill ]
-                        ++ tutorialMode model TutorialCRTTrace
-                        ++ tutorialMode model TutorialIncomingRaid
-                    )
-                    (text "")
-            ]
+            (tutorialModeNSEW model TutorialCRTTrace
+                ++ tutorialModeNSEW model TutorialIncomingRaid
+            )
             (E.html <| crt model.webGLtime trace)
-        ]
-
-
-rangeKnob angle =
-    E.row
-        [ pointer
-        , centerY
-        , width fill
-        ]
-        [ clickableRangeKnob angle
-        , actionButtonLabelAbove "RANGE" StoreRangeSetting
-        ]
-
-
-goniometer azimuth =
-    E.row
-        [ pointer
-        , centerY
-        , width fill
-        ]
-        [ clickableGonioImage azimuth
-        , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
         ]
 
 
@@ -246,22 +232,18 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row (centerX :: tutorialMode model TutorialWelcome)
+    row [ centerX, tutorialTextBox model ]
         [ column [ width <| fillPortion 3, centerX ]
-            [ row (tutorialMode model TutorialDescribeCRT)
-                -- This 'el' just an anchor for the 'inFront' element.
+            [ row (tutorialModeNSEW model TutorialDescribeCRT)
                 [ el
-                    [ inFront <|
-                        el
-                            (height (px 200) :: width fill :: tutorialMode model TutorialRangeScale)
-                            (text "")
-                    ]
+                    (tutorialModeNSEW model TutorialRangeScale)
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
-            , row []
-                [ clickableGonioImage (model.goniometerAzimuth + model.station.lineOfShoot)
+            , row
+                []
+                [ clickableGonioImage model TutorialAdjustRange
                 , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                , clickableRangeKnob model.rangeKnobAngle
+                , clickableRangeKnob model TutorialFindBearing
                 , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
@@ -276,8 +258,8 @@ operatorPagePortrait model =
     column
         commonStyles
         [ rangeSliderAndCRT model <| traceDependingOnMode model
-        , goniometer (model.goniometerAzimuth + model.station.lineOfShoot)
-        , rangeKnob model.rangeKnobAngle
+        , clickableGonioImage model TutorialAdjustRange
+        , clickableRangeKnob model TutorialDummy
         ]
 
 

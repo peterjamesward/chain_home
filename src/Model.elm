@@ -46,5 +46,5 @@ type alias Model =
     , storedStrength : Maybe Int
     , storedFriendly : Maybe Bool
     , storedStrengthPlus : Maybe Bool
-    , trainingScenario : Maybe Tutorial
+    , tutorialStage : Maybe Tutorial
     }

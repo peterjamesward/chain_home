@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, tutorialMode, welcomePrompt)
+module TrainingMode exposing (advanceTutorial, tutorialModeNSEW, welcomePrompt, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -23,8 +23,8 @@ import Types exposing (..)
 advanceTutorial : Model -> Model
 advanceTutorial current =
     { current
-        | trainingScenario =
-            case current.trainingScenario of
+        | tutorialStage =
+            case current.tutorialStage of
                 Just TutorialWelcome ->
                     Just TutorialDescribeCRT
 
@@ -37,13 +37,19 @@ advanceTutorial current =
                 Just TutorialCRTTrace ->
                     Just TutorialIncomingRaid
 
+                Just TutorialIncomingRaid ->
+                    Just TutorialAdjustRange
+
+                Just TutorialAdjustRange ->
+                    Just TutorialFindBearing
+
                 Just _ ->
                     Just TutorialWelcome
 
                 Nothing ->
                     Nothing
         , activeConfigurations =
-            if current.trainingScenario == Just TutorialCRTTrace then
+            if current.tutorialStage == Just TutorialCRTTrace then
                 trainingMode
 
             else
@@ -55,61 +61,86 @@ welcomePrompt =
     TutorialWelcome
 
 
-tutorialMode : Model -> Tutorial -> List (Attribute Msg)
-tutorialMode model scenario =
-    if Just scenario == model.trainingScenario then
+tutorialModeNSEW : Model -> Tutorial -> List (Attribute Msg)
+tutorialModeNSEW model scenario =
+    if Just scenario == model.tutorialStage then
         [ Border.color flatSunflower
         , Border.rounded 10
         , Border.width 1
         , Border.glow flatSunflower 2.0
         , Border.innerGlow flatSunflower 2.0
         , alpha 0.8
-        , inFront <| promptText scenario
+        , pointer
         ]
 
     else
         []
 
 
-promptText : Tutorial -> Element Msg
-promptText prompt =
-    el [ padding 10, width fill, alignBottom ] <|
-        paragraph
-            [ Background.color blue
-            , Border.color white
-            , Font.color white
-            , spacing 4
-            , padding 4
-            , alignBottom
-            , onClick TutorialAdvance
-            ]
-            [ text <|
-                case prompt of
-                    TutorialWelcome ->
-                        """Click on these text boxes to learn about the Chain Home receiver and the operator's work."""
+tutorialTextBox : Model -> Attribute Msg
+tutorialTextBox model =
+    -- Use a single central text box for all tutorial text.
+    inFront <|
+        case model.tutorialStage of
+            Nothing ->
+                none
 
-                    TutorialDescribeCRT ->
-                        """The main feature is the Cathode Ray Tube (CRT) that displays signals
-                        returned from radio wave pulses sent out from the transmitter.
-                        """
+            Just prompt ->
+                el [ padding 10
+                , centerY
+                , centerX
+                , width (px 500) ] <|
+                    paragraph
+                        [ Background.color blue
+                        , Border.color white
+                        , Border.rounded 5
+                        , Font.color white
+                        , spacing 4
+                        , padding 4
+                        , pointer
+                        , onClick TutorialAdvance
+                        ]
+                        [ text <|
+                            case prompt of
+                                TutorialWelcome ->
+                                    """Click on these text boxes to learn about the Chain Home receiver and the operator's work.
+                            """
 
-                    TutorialRangeScale ->
-                        """The numbers along the top show the range in miles.
-                        Generally, incoming aircraft will appear towards the right hand side.
-                        The operator will move the pointer at the top, using the right hand knob below, to
-                        identify a particular echo for study.
-                        """
+                                TutorialDescribeCRT ->
+                                    """The main feature is the Cathode Ray Tube (CRT) that displays signals
+                            returned from radio wave pulses sent out from the transmitter.
+                            """
 
-                    TutorialCRTTrace ->
-                        """The line on the CRT moves rapidly from left to right and "dips" for any
-                        returned signals detected. The continuous movement is just noise in the system.
-                        The large dips between 0 and 10 miles are from fixed objects near the station.
-                        """
-                    TutorialIncomingRaid ->
-                        """In fact, there is an incoming raid now. It's highlighted in white but would
-                        normally be green. We have to learn as much information about the raid as we can.
-                        """
+                                TutorialRangeScale ->
+                                    """The numbers along the top show the range in miles.
+                            Generally, incoming aircraft will appear towards the right hand side.
+                            The operator will move the pointer at the top, using the right hand knob below, to
+                            identify a particular echo for study.
+                            """
 
-                    _ ->
-                        "Somebody needs to write my explanation."
-            ]
+                                TutorialCRTTrace ->
+                                    """The line on the CRT moves rapidly from left to right and "dips" for any
+                            returned signals detected. The continuous movement is just noise in the system.
+                            The large dips between 0 and 10 miles are from fixed objects near the station.
+                            """
+
+                                TutorialIncomingRaid ->
+                                    """In fact, there is an incoming raid now. It's highlighted in white but would
+                            normally be green. We have to learn as much information about the raid as we can.
+                            """
+
+                                TutorialAdjustRange ->
+                                    """Turn the right hand knob (you can click on it or touch it and drag it around)
+                            and see that the range indicator moves. Try to position the range indicator at the
+                            left edge of the "dip" that marks the raid. This will tell you the range of the raid.
+                            """
+
+                                TutorialFindBearing ->
+                                    """Now turn the left hand knob (the goniometer) until the "dip" disappears, or
+                            as small as you can make it. The goniometer now indicates the bearing of the incoming
+                            raid. Be careful though,
+                            """
+
+                                _ ->
+                                    "Somebody needs to write my explanation."
+                        ]

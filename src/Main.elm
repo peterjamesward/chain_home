@@ -75,7 +75,7 @@ init _ =
       , storedStrength = Nothing
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
-      , trainingScenario = Nothing
+      , tutorialStage = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -260,7 +260,7 @@ update msg model =
         DisplayReceiver ->
             ( { model
                 | currPage = OperatorPage
-                , trainingScenario = Nothing
+                , tutorialStage = Nothing
               }
             , Cmd.none
             )
@@ -282,7 +282,7 @@ update msg model =
         DisplayTraining ->
             ( { model
                 | currPage = TrainingPage
-                , trainingScenario = Just welcomePrompt
+                , tutorialStage = Just welcomePrompt
               }
             , Cmd.none
             )

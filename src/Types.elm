@@ -63,4 +63,6 @@ type Tutorial
     | TutorialRangeScale
     | TutorialCRTTrace
     | TutorialIncomingRaid
+    | TutorialAdjustRange
+    | TutorialFindBearing
     | TutorialDummy
