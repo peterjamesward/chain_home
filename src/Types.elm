@@ -61,3 +61,4 @@ type Scenario
     = ScenarioWelcome
     | ScenarioDescribeCRT
     | ScenarioRangeScale
+    | DummyScenario

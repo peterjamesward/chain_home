@@ -114,9 +114,7 @@ rangeScale =
 
 rangeSliderAndCRT model trace =
     column
-        ([ padding 5 ]
-            ++ tutorialMode model ScenarioWelcome
-        )
+        [ padding 5 ]
         [ E.el
             [ E.below rangeScale
             , paddingEach { edges | left = 40 }
@@ -238,10 +236,17 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row [ centerX ]
+    row (centerX :: tutorialMode model ScenarioWelcome)
         [ column [ width <| fillPortion 3, centerX ]
-            [ row []
-                [ rangeSliderAndCRT model <| traceDependingOnMode model
+            [ row (tutorialMode model ScenarioDescribeCRT)
+                [ el
+                    -- This just an anchor for the 'inFront' element.
+                    [ inFront <|
+                        el
+                            (height (px 200) :: width fill :: tutorialMode model ScenarioRangeScale)
+                            (text "")
+                    ]
+                    (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
             , row []
                 [ clickableGonioImage (model.goniometerAzimuth + model.station.lineOfShoot)

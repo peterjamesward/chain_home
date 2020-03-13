@@ -25,6 +25,9 @@ advanceScenario current =
         Just ScenarioWelcome ->
             Just ScenarioDescribeCRT
 
+        Just ScenarioDescribeCRT ->
+            Just ScenarioRangeScale
+
         Just _ ->
             Just ScenarioWelcome
 
@@ -45,6 +48,7 @@ tutorialMode model scenario =
         , Border.glow flatSunflower 2.0
         , Border.innerGlow flatSunflower 2.0
         , alpha 0.8
+        , inFront <| promptText scenario
         ]
 
     else
@@ -53,16 +57,33 @@ tutorialMode model scenario =
 
 promptText : Scenario -> Element Msg
 promptText prompt =
-    text <|
-        case prompt of
-            ScenarioWelcome ->
-                """Click ">>" to learn about the Chain Home receiver and the operator's work.
-                """
+    el [ padding 10, width fill, alignBottom ] <|
+        paragraph
+            [ Background.color blue
+            , Border.color white
+            , Font.color white
+            , spacing 4
+            , padding 4
+            , alignBottom
+            , onClick ScenarioAdvance
+            ]
+            [ text <|
+                case prompt of
+                    ScenarioWelcome ->
+                        """Click on these text boxes to learn about the Chain Home receiver and the operator's work."""
 
-            ScenarioDescribeCRT ->
-                """The main feature is the Cathode Ray Tube (CRT) that displays signals
-                returned from radio wave pulses sent out from the transmitter.
-                """
+                    ScenarioDescribeCRT ->
+                        """The main feature is the Cathode Ray Tube (CRT) that displays signals
+returned from radio wave pulses sent out from the transmitter.
+"""
 
-            _ ->
-                "Somebody needs to write my explanation."
+                    ScenarioRangeScale ->
+                        """The numbers along the top show the range in miles. The range of this station is
+                        100 miles. Generally, incoming aircraft will appear towards the right hand side.
+                        The operator will move the pointer at the top, using the knob below, to identify
+                        a particular echo for study.
+"""
+
+                    _ ->
+                        "Somebody needs to write my explanation."
+            ]
