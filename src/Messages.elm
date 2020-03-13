@@ -34,6 +34,5 @@ type Msg
     | RaidStrength Int
     | RaidStrengthPlus
     | RaidFriendly
-    | SetOperatorMode OperatorMode
     | ScenarioAdvance
     | DummyMessage

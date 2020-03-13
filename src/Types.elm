@@ -5,6 +5,26 @@ type alias Angle =
     Float
 
 
+type Page
+    = InputPage
+    | OperatorPage
+    | OutputPage
+    | TrainingPage
+
+
+type alias Flags =
+    ()
+
+
+type alias Keys =
+    -- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
+    { gonioClock : Bool -- A
+    , gonioAnti : Bool -- Q
+    , rangeLeft : Bool -- left arrow
+    , rangeRight : Bool -- right arrow
+    }
+
+
 type alias Point =
     ( Float, Float )
 
@@ -12,39 +32,32 @@ type alias Point =
 type alias Line =
     ( Point, Point )
 
+
 type alias Range =
     Float
+
 
 type GoniometerMode
     = Azimuth
     | Elevation
+
 
 type alias Antenna =
     { verticalLobeFunction : Float -> Float
     , horizontalLobeFunction : Float -> Float
     }
 
-type InputState
+
+type
+    InputState
     -- Inferred sequence of operator actions
     = BearingInput
     | BearingRangeInput
     | HeightInput
     | HeightRangeInput
 
-type OperatorMode
-    = Training  -- On-screen narrative and prompts TBD.
-    | Experienced -- Absent above.
 
-type Prompt
-    = PromptRangeScale
-    | PromptGoniometer
-    | PromptCRT
-    | PromptRangeKnob
-    | PromptAB
-    | PromptHeight
-    | PromptSense
-    | PromptRaidStrengthButtons
-    | PromptGridPosition
-    | PromptRaidStrength
-    | PromptHeightGrid
-    | PromptGridOffset
+type Scenario
+    = ScenarioWelcome
+    | ScenarioDescribeCRT
+    | ScenarioRangeScale

@@ -13,7 +13,7 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import Types exposing (GoniometerMode(..), InputState(..), OperatorMode(..))
+import Types exposing (..)
 import Utils exposing (choose, commonStyles, disableSelection, edges)
 
 
