@@ -280,6 +280,7 @@ update msg model =
         DisplayTraining ->
             ( { model
                 | currPage = TrainingPage
+                , activeConfigurations = trainingMode
                 , trainingScenario = Just welcomePrompt
               }
             , Cmd.none

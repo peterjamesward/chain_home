@@ -14,6 +14,7 @@ type alias Target =
     , speed : Float -- miles per hour (!)
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
     , iffActive : Bool -- pulsing now.
+    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
     }
 
 
@@ -23,6 +24,7 @@ type alias PolarTarget =
     , alpha : Float -- radians, ignoring curvature for now
     , iff : Maybe Int -- pulsing; time when pulse started
     , iffActive : Bool -- pulsing now.
+    , tutorial : Bool
     }
 
 
@@ -49,6 +51,7 @@ mapToPolar station target =
     , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
     , iff = target.iff
     , iffActive = target.iffActive
+    , tutorial = target.tutorial
     }
 
 

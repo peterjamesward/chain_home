@@ -51,10 +51,10 @@ scenarioDetails =
     [ { scenarioDefaults | scenario = ScenarioWelcome, nextPrompt = ScenarioDescribeCRT }
     , { scenarioDefaults
         | scenario = ScenarioDescribeCRT
-        , verticalOffset = -50
+        , verticalOffset = -150
         , horizontalOffset = -50
-        , locusX = 260
-        , locusY = 80
+        , locusX = 80
+        , locusY = 10
         , locusHeight = 360
         , locusWidth = 660
       }
@@ -95,7 +95,9 @@ trainingPage model =
             []
         <|
             el
-                [ inFront (maybeDisplayOverlay model) ]
+                [ width fill
+                , inFront (maybeDisplayOverlay model)
+                ]
                 (operatorPage model)
 
 
@@ -111,6 +113,17 @@ maybeDisplayOverlay model =
 
 displayOverlay : ScenarioDetails -> Model -> Element Msg
 displayOverlay details model =
+    el
+        [ width fill
+        , height fill
+        , behindContent <| focusBox details
+        , inFront <| promptTextBox details model
+        ]
+    <|
+        none
+
+
+promptTextBox details model =
     column
         [ centerY
         , centerX
@@ -122,7 +135,9 @@ displayOverlay details model =
         , Border.color white
         , Border.rounded 5
         , Border.width 1
-        , alpha 0.8
+        , alpha 0.9
+        , (if details.verticalOffset < 0 then moveUp else moveDown) <| toFloat details.verticalOffset
+        , (if details.horizontalOffset < 0 then moveUp else moveDown) <| toFloat details.horizontalOffset
         ]
         [ paragraph
             [ spacing 5
@@ -133,6 +148,31 @@ displayOverlay details model =
             , el [ alignRight, onClick ScenarioAdvance ] <| text ">>"
             ]
         ]
+
+
+focusBox : ScenarioDetails -> Element Msg
+focusBox details =
+    el
+        [ width (px details.locusWidth)
+        , height (px details.locusHeight)
+        , if details.locusX < 0 then
+            moveLeft <| toFloat details.locusX
+
+          else
+            moveRight <| toFloat details.locusX
+        , if details.locusY < 0 then
+            moveUp <| toFloat details.locusX
+
+          else
+            moveRight <| toFloat details.locusY
+        , Border.color flatSunflower
+        , Border.rounded 10
+        , Border.width 1
+        , Border.glow flatSunflower 2.0
+        , Border.innerGlow flatSunflower 2.0
+        , alpha 0.8
+        ]
+        (text "")
 
 
 promptText : Scenario -> Element Msg

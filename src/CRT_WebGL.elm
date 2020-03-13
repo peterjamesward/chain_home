@@ -8,6 +8,7 @@ import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
 import Messages exposing (Msg)
+import Utils exposing (choose)
 import WebGL exposing (clearColor)
 
 
@@ -70,12 +71,14 @@ type alias Uniforms =
 
 echoToVec : Array Echo -> Int -> Vec3
 echoToVec echoes i =
+    -- Echoes are massaged into the "raids" uniforms.
+    -- We can use z to allow us to colour the raids differently in tutorial mode.
     case Array.get i echoes of
         Just echo ->
             vec3
                 (echo.r / 80000 - 1.0)
                 (echo.amplitude / 10.0)
-                0.0
+                (choose echo.tutorial 1.0 0.0)
 
         _ ->
             vec3 2.0 0.0 0.0
@@ -312,7 +315,10 @@ vertexShader =
             // returns x = x, y = displacement, z = gradient
             float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);
             float slope = raid.y * gradient(raid.x, halfWidth, position.x);
-            return vec3( position.x, height, slope );
+            float tutorialRaidIndicator = raid.z * height;
+
+           // WARNING -- x value of return used for raid colour indication!!
+            return vec3( tutorialRaidIndicator, height, slope );
         }
 
         void sortPulses16(inout vec3 unsorted[32]) {
@@ -612,6 +618,7 @@ vertexShader =
 
         void main () {
             vec3 newPos = position;
+            vec3 newColour = color;
             stretch = 0.0; // The amount by which the rendered segment should be dimmed.
 
             // Copy raids into array for easier handling, probably.
@@ -674,7 +681,13 @@ vertexShader =
                 // Note we use cos so that pulse[0] doesn't disappear.
                 height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));
                 slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));
+
+                // We have used pulse.x to pass through the raid colour identifier!!
+                if (pulse[i].x > 0.0 && position.y == 0.0) {
+                    newColour = vec3(1.0, 1.0, 1.0);
+                }
             }
+
 
             // TODO: Limit slope and use that to limit height changes!
 
@@ -712,7 +725,7 @@ vertexShader =
             //if (newPos.y > 0.0) { newPos.y /= 2.0; }
 
             gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);
-            vcolor = color;
+            vcolor = newColour;
             stretch = abs(stretch);
         }
   |]

@@ -15,6 +15,7 @@ type alias Echo =
     , phase : Float
     , duration : Float
     , amplitude : Float
+    , tutorial : Bool -- this raid needs to be highlighting in a tutorial.
     }
 
 
@@ -41,6 +42,7 @@ deriveEchoes targets txAntenna =
                             * txAntenna.verticalLobeFunction target.alpha
                             -- and ad-hoc adjustment for range
                             / (logBase 10 (1 + target.r))^1.2
+            , tutorial = target.tutorial
             }
     in
     List.map2 echoFromDirectBeam

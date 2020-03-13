@@ -19,6 +19,7 @@ groundRays =
       , phase = 0
       , duration = 0
       , amplitude = 10.0
+      , tutorial = False
       }
     , { sequence = 0
       , r = 8000
@@ -27,6 +28,7 @@ groundRays =
       , phase = 0
       , duration = 0
       , amplitude = 8.0
+      , tutorial = False
       }
     ]
 
@@ -48,6 +50,7 @@ behindStation =
     , speed = 200.0 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -59,6 +62,7 @@ bomber1 =
     , speed = 200.0 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -71,6 +75,7 @@ bomber2 =
     , speed = 200.0 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -82,6 +87,7 @@ bomber2A =
     , speed = 200.0 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -94,6 +100,7 @@ bomber3 =
     , speed = 200 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -105,6 +112,7 @@ bomber4 =
     , speed = 200 -- mph
     , iff = Nothing
     , iffActive = False
+    , tutorial = False
     }
 
 
@@ -117,6 +125,7 @@ fighter1 =
     , speed = 300 -- mph
     , iff = Just 1
     , iffActive = True
+    , tutorial = False
     }
 
 
@@ -130,6 +139,7 @@ tenAbreast =
             , speed = 200
             , iff = Nothing
             , iffActive = False
+            , tutorial = False
             }
         )
     <|
@@ -146,6 +156,7 @@ tenAligned =
             , speed = 250
             , iff = Nothing
             , iffActive = False
+            , tutorial = False
             }
         )
     <|
@@ -158,6 +169,10 @@ tenAligned =
 
 outboundFriendly =
     TargetSelector 1 "One outbound friendly fighter" [ fighter1 ] False
+
+
+tutorialBomber =
+    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] False
 
 
 loneBomber =
@@ -197,7 +212,7 @@ targetConfigurations =
 
 trainingMode : List TargetSelector
 trainingMode =
-    [ { loneBomber | active = True } ]
+    [ { tutorialBomber | active = True } ]
 
 
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector
