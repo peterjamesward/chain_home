@@ -26,6 +26,7 @@ import LobeFunctions exposing (..)
 import Messages exposing (..)
 import Model exposing (..)
 import OperatorPage exposing (operatorPage)
+import Platform.Cmd exposing (Cmd)
 import Receiver exposing (goniometerMix)
 import Station exposing (..)
 import Target exposing (..)
@@ -286,11 +287,8 @@ update msg model =
             , Cmd.none
             )
 
-        ScenarioAdvance ->
-            ( { model
-                | currPage = TrainingPage
-                , trainingScenario = advanceScenario model.trainingScenario
-              }
+        TutorialAdvance ->
+            ( advanceTutorial model
             , Cmd.none
             )
 
@@ -609,7 +607,6 @@ calculatorPage model =
         model.storedStrength
         model.storedStrengthPlus
         model.storedFriendly
-
 
 
 inputPage : Model -> Element Msg

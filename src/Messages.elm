@@ -34,5 +34,6 @@ type Msg
     | RaidStrength Int
     | RaidStrengthPlus
     | RaidFriendly
-    | ScenarioAdvance
+    | TutorialAdvance
+    | StartTutorialScenario
     | DummyMessage

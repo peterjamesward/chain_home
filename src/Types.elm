@@ -57,8 +57,10 @@ type
     | HeightRangeInput
 
 
-type Scenario
-    = ScenarioWelcome
-    | ScenarioDescribeCRT
-    | ScenarioRangeScale
-    | DummyScenario
+type Tutorial
+    = TutorialWelcome
+    | TutorialDescribeCRT
+    | TutorialRangeScale
+    | TutorialCRTTrace
+    | TutorialIncomingRaid
+    | TutorialDummy

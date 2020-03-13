@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceScenario, tutorialMode, welcomePrompt)
+module TrainingMode exposing (advanceTutorial, tutorialMode, welcomePrompt)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -8,6 +8,7 @@ module TrainingMode exposing (advanceScenario, tutorialMode, welcomePrompt)
    provide common formatting etc.
 -}
 
+import Config exposing (trainingMode)
 import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background
@@ -19,27 +20,42 @@ import Model exposing (Model)
 import Types exposing (..)
 
 
-advanceScenario : Maybe Scenario -> Maybe Scenario
-advanceScenario current =
-    case current of
-        Just ScenarioWelcome ->
-            Just ScenarioDescribeCRT
+advanceTutorial : Model -> Model
+advanceTutorial current =
+    { current
+        | trainingScenario =
+            case current.trainingScenario of
+                Just TutorialWelcome ->
+                    Just TutorialDescribeCRT
 
-        Just ScenarioDescribeCRT ->
-            Just ScenarioRangeScale
+                Just TutorialDescribeCRT ->
+                    Just TutorialRangeScale
 
-        Just _ ->
-            Just ScenarioWelcome
+                Just TutorialRangeScale ->
+                    Just TutorialCRTTrace
 
-        Nothing ->
-            Nothing
+                Just TutorialCRTTrace ->
+                    Just TutorialIncomingRaid
+
+                Just _ ->
+                    Just TutorialWelcome
+
+                Nothing ->
+                    Nothing
+        , activeConfigurations =
+            if current.trainingScenario == Just TutorialCRTTrace then
+                trainingMode
+
+            else
+                current.activeConfigurations
+    }
 
 
 welcomePrompt =
-    ScenarioWelcome
+    TutorialWelcome
 
 
-tutorialMode : Model -> Scenario -> List (Attribute Msg)
+tutorialMode : Model -> Tutorial -> List (Attribute Msg)
 tutorialMode model scenario =
     if Just scenario == model.trainingScenario then
         [ Border.color flatSunflower
@@ -55,7 +71,7 @@ tutorialMode model scenario =
         []
 
 
-promptText : Scenario -> Element Msg
+promptText : Tutorial -> Element Msg
 promptText prompt =
     el [ padding 10, width fill, alignBottom ] <|
         paragraph
@@ -65,24 +81,34 @@ promptText prompt =
             , spacing 4
             , padding 4
             , alignBottom
-            , onClick ScenarioAdvance
+            , onClick TutorialAdvance
             ]
             [ text <|
                 case prompt of
-                    ScenarioWelcome ->
+                    TutorialWelcome ->
                         """Click on these text boxes to learn about the Chain Home receiver and the operator's work."""
 
-                    ScenarioDescribeCRT ->
+                    TutorialDescribeCRT ->
                         """The main feature is the Cathode Ray Tube (CRT) that displays signals
-returned from radio wave pulses sent out from the transmitter.
-"""
+                        returned from radio wave pulses sent out from the transmitter.
+                        """
 
-                    ScenarioRangeScale ->
-                        """The numbers along the top show the range in miles. The range of this station is
-                        100 miles. Generally, incoming aircraft will appear towards the right hand side.
-                        The operator will move the pointer at the top, using the knob below, to identify
-                        a particular echo for study.
-"""
+                    TutorialRangeScale ->
+                        """The numbers along the top show the range in miles.
+                        Generally, incoming aircraft will appear towards the right hand side.
+                        The operator will move the pointer at the top, using the right hand knob below, to
+                        identify a particular echo for study.
+                        """
+
+                    TutorialCRTTrace ->
+                        """The line on the CRT moves rapidly from left to right and "dips" for any
+                        returned signals detected. The continuous movement is just noise in the system.
+                        The large dips between 0 and 10 miles are from fixed objects near the station.
+                        """
+                    TutorialIncomingRaid ->
+                        """In fact, there is an incoming raid now. It's highlighted in white but would
+                        normally be green. We have to learn as much information about the raid as we can.
+                        """
 
                     _ ->
                         "Somebody needs to write my explanation."

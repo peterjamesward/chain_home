@@ -172,7 +172,7 @@ outboundFriendly =
 
 
 tutorialBomber =
-    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] False
+    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] True
 
 
 loneBomber =
@@ -212,7 +212,7 @@ targetConfigurations =
 
 trainingMode : List TargetSelector
 trainingMode =
-    [ { tutorialBomber | active = True } ]
+    [ tutorialBomber ]
 
 
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector

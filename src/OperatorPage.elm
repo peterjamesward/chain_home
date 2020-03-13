@@ -120,7 +120,17 @@ rangeSliderAndCRT model trace =
             , paddingEach { edges | left = 40 }
             ]
             (rangeSlider model)
-        , E.html <| crt model.webGLtime trace
+        , el
+            -- anchor for the 'inFromt'
+            [ inFront <|
+                el
+                    ([ height (px 300), width fill ]
+                        ++ tutorialMode model TutorialCRTTrace
+                        ++ tutorialMode model TutorialIncomingRaid
+                    )
+                    (text "")
+            ]
+            (E.html <| crt model.webGLtime trace)
         ]
 
 
@@ -236,14 +246,14 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row (centerX :: tutorialMode model ScenarioWelcome)
+    row (centerX :: tutorialMode model TutorialWelcome)
         [ column [ width <| fillPortion 3, centerX ]
-            [ row (tutorialMode model ScenarioDescribeCRT)
+            [ row (tutorialMode model TutorialDescribeCRT)
+                -- This 'el' just an anchor for the 'inFront' element.
                 [ el
-                    -- This just an anchor for the 'inFront' element.
                     [ inFront <|
                         el
-                            (height (px 200) :: width fill :: tutorialMode model ScenarioRangeScale)
+                            (height (px 200) :: width fill :: tutorialMode model TutorialRangeScale)
                             (text "")
                     ]
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
