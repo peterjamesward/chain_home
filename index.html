@@ -7991,7 +7991,9 @@ var $author$project$Types$OperatorPage = {$: 'OperatorPage'};
 var $author$project$Types$OutputPage = {$: 'OutputPage'};
 var $author$project$Types$TrainingPage = {$: 'TrainingPage'};
 var $author$project$Types$TutorialWelcome = {$: 'TutorialWelcome'};
+var $author$project$Types$TutorialIncomingRaid = {$: 'TutorialIncomingRaid'};
 var $author$project$Types$TutorialABSwitch = {$: 'TutorialABSwitch'};
+var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
 var $author$project$Types$TutorialCRTTrace = {$: 'TutorialCRTTrace'};
 var $author$project$Types$TutorialClear = {$: 'TutorialClear'};
 var $author$project$Types$TutorialDescribeCRT = {$: 'TutorialDescribeCRT'};
@@ -7999,6 +8001,7 @@ var $author$project$TrainingMode$TutorialEntry = F3(
 	function (tutorialStep, uiComponent, tutorialText) {
 		return {tutorialStep: tutorialStep, tutorialText: tutorialText, uiComponent: uiComponent};
 	});
+var $author$project$Types$TutorialFindBearing = {$: 'TutorialFindBearing'};
 var $author$project$Types$TutorialGoniometer = {$: 'TutorialGoniometer'};
 var $author$project$Types$TutorialHeight = {$: 'TutorialHeight'};
 var $author$project$Types$TutorialLeftSide = {$: 'TutorialLeftSide'};
@@ -8034,9 +8037,12 @@ var $author$project$TrainingMode$tutorial = _List_fromArray(
 		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialABSwitch, $author$project$Types$UiAB, 'The operator can choose to look at signals from two aerial systems - \'A"\n        and \'B\'. \'A\' is usually better at longer range and \'B\' at close range, but\n        both systems have gaps in their coverage. The lights show which system is\n        active, and whether in Height or Direction Finding (D/F) mode.\n        '),
 		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialHeight, $author$project$Types$UiHeight, 'The operator alternates between working out the bearing of a range and working\n        out the height. Both modes use the goniometer to try and make the signal on the\n        CRT as small as possible. Height is only approximate and is done by the electrical\n        calculator for speed.\n        '),
 		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialSense, $author$project$Types$UiSense, 'Radar signals spread from the rear of the transmitter as well as the front.\n        This means that aircraft can be detectd behind the station (over land). The\n        \'Sense\' button turns on a reflector behind that transmitter aerial that sends\n        most of the signal forwards. With this on, signals from behind become weaker and\n        signals from in front become stronger.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialOperatorPrompts, $author$project$Types$UiOperatorPrompts, 'These two lights prompt the operator to store the goniometer and range settings\n        in the electrical calculator. SHe will do this first in D/F mode and then in Height mode.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialOperatorPrompts, $author$project$Types$UiOperatorPrompts, 'These two lights prompt the operator to store the goniometer and range settings\n        in the electrical calculator. The operator will do this first in D/F mode and then in Height mode.\n        '),
 		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRaidStrength, $author$project$Types$UiRaidStrength, 'The operator presses one of the numbered buttons to show her estimate of the\n        number of aircraft in a raid. The \'+\' button can be used to indicate that the number\n        is higher than the button label. The \'F\' button is used to show that a raid is known\n        to be a friendly aircraft, typically because they use IFF signals.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialClear, $author$project$Types$UiClear, 'The \'Clear\' button removes stored entries from the calculator.\n        ')
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialClear, $author$project$Types$UiClear, 'The \'Clear\' button removes stored entries from the calculator.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialIncomingRaid, $author$project$Types$UiCRT, 'There is an incoming raid now. It\'s highlighted in white but would\n        normally be green. We have to learn as much information about the raid as we can.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialAdjustRange, $author$project$Types$UiRangeKnob, 'Turn the right hand knob (you can click on it or touch it and drag it around)\n        and see that the range indicator moves. Try to position the range indicator at the\n        left edge of the "dip" that marks the raid. This will tell you the range of the raid.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialFindBearing, $author$project$Types$UiGoniometer, 'Now turn the left hand knob (the goniometer) until the "dip" disappears, or is\n        as small as you can make it. The goniometer now indicates the bearing of the incoming\n        raid. The raid is travelling at 200mph so you need to keep an eye on the range.\n        ')
 	]);
 var $author$project$TrainingMode$findNextStep = function (current) {
 	var findNextStepHelper = function (steps) {
@@ -8070,18 +8076,30 @@ var $author$project$TrainingMode$findNextStep = function (current) {
 	};
 	return findNextStepHelper($author$project$TrainingMode$tutorial);
 };
+var $author$project$Config$trainingMode = _List_fromArray(
+	[
+		_Utils_update(
+		$author$project$Config$bomber1,
+		{tutorial: true})
+	]);
 var $author$project$TrainingMode$advanceTutorial = function (current) {
+	var nextStep = $author$project$TrainingMode$findNextStep(current.tutorialStage);
 	return _Utils_update(
 		current,
 		{
-			activeConfigurations: current.activeConfigurations,
-			tutorialStage: $author$project$TrainingMode$findNextStep(current.tutorialStage)
+			targets: _Utils_eq(
+				nextStep,
+				$elm$core$Maybe$Just($author$project$Types$TutorialIncomingRaid)) ? $author$project$Config$trainingMode : current.targets,
+			tutorialStage: nextStep
 		});
 };
-var $elm$core$Basics$asin = _Basics_asin;
 var $author$project$Utils$choose = F3(
 	function (b, o1, o2) {
 		return b ? o1 : o2;
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
 var $mdgriffith$elm_ui$Element$BigDesktop = {$: 'BigDesktop'};
 var $mdgriffith$elm_ui$Element$Phone = {$: 'Phone'};
@@ -8158,6 +8176,7 @@ var $author$project$ElevationCurves$bElevationAdjustedEchoes = F2(
 			},
 			echoes);
 	});
+var $elm$core$Basics$asin = _Basics_asin;
 var $author$project$Constants$pulseDuration = 20.0;
 var $author$project$Constants$frequency = 20000000.0;
 var $author$project$Constants$lightSpeed = 300000000.0;
@@ -8353,8 +8372,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 				modelTime: timeNow,
 				movedTargets: targetsNow,
 				polarTargets: convertedTargets,
-				rangeSlider: A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys),
-				targets: $author$project$Config$getAllTargets(model.activeConfigurations)
+				rangeSlider: A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys)
 			});
 	});
 var $elm$core$Tuple$second = function (_v0) {
@@ -8408,6 +8426,7 @@ var $author$project$Target$findTargetElevation = F3(
 				_Utils_Tuple2(1000000, 0),
 				pairsOfRangeAndHeights).b);
 	});
+var $author$project$Goniometer$radius = 135;
 var $elm$core$Basics$toPolar = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
@@ -8422,20 +8441,56 @@ var $author$project$Goniometer$goniometerTurnAngle = F3(
 		var newX = _v1.a;
 		var newY = _v1.b;
 		var _v2 = $elm$core$Basics$toPolar(
-			_Utils_Tuple2(startX - 130, startY - 130));
+			_Utils_Tuple2(startX - $author$project$Goniometer$radius, startY - $author$project$Goniometer$radius));
 		var dragStartAngle = _v2.b;
 		var _v3 = $elm$core$Basics$toPolar(
-			_Utils_Tuple2(newX - 130, newY - 130));
+			_Utils_Tuple2(newX - $author$project$Goniometer$radius, newY - $author$project$Goniometer$radius));
 		var dragNowAngle = _v3.b;
 		return (startAngle + dragNowAngle) - dragStartAngle;
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Utils$normalise = function (theta) {
+	return A2(
+		$elm$core$Basics$atan2,
+		$elm$core$Basics$sin(theta),
+		$elm$core$Basics$cos(theta));
+};
 var $elm$core$Basics$not = _Basics_not;
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
 };
+var $author$project$TrainingMode$rangeMayUpdateTutorial = function (model) {
+	var nearEnough = true;
+	var _v0 = model.tutorialStage;
+	if (_v0.$ === 'Nothing') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		if (_v0.a.$ === 'TutorialAdjustRange') {
+			var _v1 = _v0.a;
+			return nearEnough ? $author$project$TrainingMode$findNextStep(model.tutorialStage) : model.tutorialStage;
+		} else {
+			return model.tutorialStage;
+		}
+	}
+};
+var $author$project$Range$radius = 120;
+var $author$project$Range$rangeTurnAngle = F3(
+	function (startAngle, _v0, _v1) {
+		var startX = _v0.a;
+		var startY = _v0.b;
+		var newX = _v1.a;
+		var newY = _v1.b;
+		var _v2 = $elm$core$Basics$toPolar(
+			_Utils_Tuple2(startX - $author$project$Range$radius, startY - $author$project$Range$radius));
+		var dragStartAngle = _v2.b;
+		var _v3 = $elm$core$Basics$toPolar(
+			_Utils_Tuple2(newX - $author$project$Range$radius, newY - $author$project$Range$radius));
+		var dragNowAngle = _v3.b;
+		var newAngle = (startAngle + dragNowAngle) - dragStartAngle;
+		return $author$project$Utils$normalise(newAngle);
+	});
 var $author$project$LobeFunctions$rxLoVertLobe = function (α) {
 	return $elm$core$Basics$sin(7 * α);
 };
@@ -8540,7 +8595,12 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{currPage: $author$project$Types$OperatorPage, startTime: model.modelTime, webGLtime: 0.0}),
+						{
+							currPage: $author$project$Types$OperatorPage,
+							startTime: model.modelTime,
+							targets: $author$project$Config$getAllTargets(model.activeConfigurations),
+							webGLtime: 0.0
+						}),
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateModel':
 				var time = msg.a;
@@ -8590,7 +8650,9 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							currPage: $author$project$Types$TrainingPage,
-							tutorialStage: $elm$core$Maybe$Just($author$project$Types$TutorialWelcome)
+							startTime: model.modelTime,
+							tutorialStage: $elm$core$Maybe$Just($author$project$Types$TutorialWelcome),
+							webGLtime: 0.0
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'TutorialAdvance':
@@ -8663,37 +8725,21 @@ var $author$project$Main$update = F2(
 					var _v4 = _v3.a;
 					var startAngle = _v4.a;
 					var startXY = _v4.b;
-					var newAngle = A3($author$project$Goniometer$goniometerTurnAngle, startAngle, startXY, offset);
-					var angleChange = (60 / $elm$core$Basics$pi) * $elm$core$Basics$asin(
-						$elm$core$Basics$sin(newAngle - startAngle));
-					var newRange = A2(
-						$elm$core$Basics$max,
-						0,
-						A2($elm$core$Basics$min, 100, model.rangeSlider + angleChange));
+					var stopKnob = $elm$core$Basics$pi - 0.1;
+					var newAngle = A3(
+						$elm$core$Basics$clamp,
+						0 - stopKnob,
+						stopKnob,
+						A3($author$project$Range$rangeTurnAngle, startAngle, startXY, offset));
 					return _Utils_Tuple2(
-						(angleChange > 0) ? _Utils_update(
+						_Utils_update(
 							model,
 							{
-								rangeDrag: A3(
-									$author$project$Utils$choose,
-									newRange <= 100,
-									$elm$core$Maybe$Just(
-										_Utils_Tuple2(newAngle, offset)),
-									$elm$core$Maybe$Nothing),
+								rangeDrag: $elm$core$Maybe$Just(
+									_Utils_Tuple2(newAngle, offset)),
 								rangeKnobAngle: newAngle,
-								rangeSlider: newRange
-							}) : ((angleChange < 0) ? _Utils_update(
-							model,
-							{
-								rangeDrag: A3(
-									$author$project$Utils$choose,
-									newRange >= 0,
-									$elm$core$Maybe$Just(
-										_Utils_Tuple2(newAngle, offset)),
-									$elm$core$Maybe$Nothing),
-								rangeKnobAngle: newAngle,
-								rangeSlider: newRange
-							}) : model),
+								rangeSlider: (($elm$core$Basics$pi + $author$project$Utils$normalise(newAngle)) * 50) / $elm$core$Basics$pi
+							}),
 						$elm$core$Platform$Cmd$none);
 				}
 			case 'RangeRelease':
@@ -8701,7 +8747,10 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{rangeDrag: $elm$core$Maybe$Nothing}),
+						{
+							rangeDrag: $elm$core$Maybe$Nothing,
+							tutorialStage: $author$project$TrainingMode$rangeMayUpdateTutorial(model)
+						}),
 					$elm$core$Platform$Cmd$none);
 			case 'AdjustRangeValue':
 				var newRange = msg.a;
@@ -16104,13 +16153,12 @@ var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
 var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $author$project$Goniometer$drawGoniometerPointer = function (theta) {
-	var radius = 135;
 	var originY = 0;
 	var yPoint = $elm$core$String$fromFloat(
-		originY - (radius * $elm$core$Basics$cos(theta)));
+		originY - ($author$project$Goniometer$radius * $elm$core$Basics$cos(theta)));
 	var originX = 0;
 	var xPoint = $elm$core$String$fromFloat(
-		originX + (radius * $elm$core$Basics$sin(theta)));
+		originX + ($author$project$Goniometer$radius * $elm$core$Basics$sin(theta)));
 	return _List_fromArray(
 		[
 			A2(
@@ -16437,13 +16485,12 @@ var $author$project$Messages$RangeRelease = function (a) {
 	return {$: 'RangeRelease', a: a};
 };
 var $author$project$Range$drawRangeKnob = function (theta) {
-	var radius = 120;
 	var originY = 0;
 	var yPoint = $elm$core$String$fromFloat(
-		originY - ((radius - 8) * $elm$core$Basics$cos(theta)));
+		originY - (($author$project$Range$radius - 8) * $elm$core$Basics$cos(theta)));
 	var originX = 0;
 	var xPoint = $elm$core$String$fromFloat(
-		originX + ((radius - 8) * $elm$core$Basics$sin(theta)));
+		originX + (($author$project$Range$radius - 8) * $elm$core$Basics$sin(theta)));
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -16461,7 +16508,7 @@ var $author$project$Range$drawRangeKnob = function (theta) {
 						$elm$svg$Svg$Attributes$cx('0'),
 						$elm$svg$Svg$Attributes$cy('0'),
 						$elm$svg$Svg$Attributes$r(
-						$elm$core$String$fromInt(radius)),
+						$elm$core$String$fromInt($author$project$Range$radius)),
 						$elm$svg$Svg$Attributes$stroke('grey'),
 						$elm$svg$Svg$Attributes$strokeWidth('1'),
 						$elm$svg$Svg$Attributes$fill('darkslategrey')
@@ -18156,20 +18203,29 @@ var $author$project$TrainingMode$tutorialTextBox = function (model) {
 							$mdgriffith$elm_ui$Element$inFront(
 							A2(
 								$mdgriffith$elm_ui$Element$el,
-								_List_Nil,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$width(
+										$mdgriffith$elm_ui$Element$px(500)),
+										$mdgriffith$elm_ui$Element$height(
+										$mdgriffith$elm_ui$Element$px(200)),
+										$mdgriffith$elm_ui$Element$centerX,
+										$mdgriffith$elm_ui$Element$centerY,
+										$mdgriffith$elm_ui$Element$moveUp(100),
+										$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
+										$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+										$mdgriffith$elm_ui$Element$Border$width(1),
+										$mdgriffith$elm_ui$Element$Border$rounded(5),
+										$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$TutorialAdvance)
+									]),
 								A2(
 									$mdgriffith$elm_ui$Element$paragraph,
 									_List_fromArray(
 										[
-											$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
-											$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-											$mdgriffith$elm_ui$Element$Border$width(1),
-											$mdgriffith$elm_ui$Element$Border$rounded(5),
 											$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
 											$mdgriffith$elm_ui$Element$spacing(4),
 											$mdgriffith$elm_ui$Element$padding(4),
-											$mdgriffith$elm_ui$Element$pointer,
-											$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$TutorialAdvance)
+											$mdgriffith$elm_ui$Element$pointer
 										]),
 									_List_fromArray(
 										[
@@ -18245,7 +18301,6 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 					]))
 			]));
 };
-var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
 var $author$project$Types$TutorialDummy = {$: 'TutorialDummy'};
 var $author$project$OperatorPage$operatorPagePortrait = function (model) {
 	return A2(

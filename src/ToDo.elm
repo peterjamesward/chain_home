@@ -9,7 +9,10 @@
 --DONE: Start raids further out.
 --DONE: Go! button resets timer, restarts raids from origin.
 --TEST: Stop text selection.
+--TODO: Sensing is on the receiver, not the transmitter.
 --TODO: Narrative and on-screen prompts.
+--TODO: Can we do a walk-through of a raid?
+--DONE: Move trace to lower on the CRT.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.
 --TODO: Improve that by using WebSockets -> JS -> Subscription -> Msg.

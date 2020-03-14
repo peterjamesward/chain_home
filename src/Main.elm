@@ -283,7 +283,9 @@ update msg model =
         DisplayTraining ->
             ( { model
                 | currPage = TrainingPage
-                , tutorialStage = Just TutorialWelcome
+                , tutorialStage = tutorialEntryPoint
+                , startTime = model.modelTime
+                , webGLtime = 0.0
               }
             , Cmd.none
             )
@@ -363,6 +365,7 @@ update msg model =
         RangeRelease offset ->
             ( { model
                 | rangeDrag = Nothing
+                , tutorialStage = rangeMayUpdateTutorial model
               }
             , Cmd.none
             )

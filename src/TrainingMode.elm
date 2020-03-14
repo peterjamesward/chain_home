@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, tutorialHighlighting, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, rangeMayUpdateTutorial, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -33,30 +33,16 @@ type alias TutorialEntry =
     }
 
 
+tutorialEntryPoint =
+    Just TutorialDescribeCRT
+
+
 tutorial : List TutorialEntry
 tutorial =
     [ TutorialEntry
-        TutorialWelcome
-        UiOperatorPage
-        """Welcome to the Chain Home receiver operator tutorial.
-        Click on these text panels to learn about the Chain Home receiver and the operator's work."""
-    , TutorialEntry
-        TutorialLeftSide
-        UiLeftSide
-        """The left hand side contains the main display and two control knobs that are
-        used to estimate aircraft positions and height.
-        """
-    , TutorialEntry
-        TutorialRightSide
-        UiRightSide
-        """The right hand side contains numerous buttons and indicators.
-        We will shortly explain each of these.
-        """
-    , TutorialEntry
         TutorialDescribeCRT
         UiCRT
-        """The main feature is the Cathode Ray Tube (CRT) that displays signals
-        returned from radio wave pulses sent out from the transmitter.
+        """This is the operator's screen, called the CRT.
         """
     , TutorialEntry
         TutorialCRTTrace
@@ -116,7 +102,7 @@ tutorial =
         TutorialOperatorPrompts
         UiOperatorPrompts
         """These two lights prompt the operator to store the goniometer and range settings
-        in the electrical calculator. SHe will do this first in D/F mode and then in Height mode.
+        in the electrical calculator. The operator will do this first in D/F mode and then in Height mode.
         """
     , TutorialEntry
         TutorialRaidStrength
@@ -147,7 +133,7 @@ tutorial =
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
-        """Now turn the left hand knob (the goniometer) until the "dip" disappears, or
+        """Now turn the left hand knob (the goniometer) until the "dip" disappears, or is
         as small as you can make it. The goniometer now indicates the bearing of the incoming
         raid. The raid is travelling at 200mph so you need to keep an eye on the range.
         """
@@ -273,19 +259,45 @@ tutorialTextBox model =
                     , moveLeft 80
                     , inFront <|
                         el
-                            []
+                            [ width (px 500)
+                            , height (px 200)
+                            , centerX
+                            , centerY
+                            , moveUp 100
+                            , Background.color blue
+                            , Border.color white
+                            , Border.width 1
+                            , Border.rounded 5
+                            , onClick TutorialAdvance
+                            ]
                         <|
                             paragraph
-                                [ Background.color blue
-                                , Border.color white
-                                , Border.width 1
-                                , Border.rounded 5
-                                , Font.color white
+                                [ Font.color white
                                 , spacing 4
                                 , padding 4
                                 , pointer
-                                , onClick TutorialAdvance
                                 ]
                                 [ text step.tutorialText ]
                     ]
                     (text "")
+
+
+rangeMayUpdateTutorial : Model -> Maybe Tutorial
+rangeMayUpdateTutorial model =
+    let
+        nearEnough =
+            True
+    in
+    case model.tutorialStage of
+        Nothing ->
+            Nothing
+
+        Just TutorialAdjustRange ->
+            if nearEnough then
+                findNextStep model.tutorialStage
+
+            else
+                model.tutorialStage
+
+        _ ->
+            model.tutorialStage
