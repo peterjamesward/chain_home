@@ -105,18 +105,20 @@ traceDependingOnMode model =
             model.elevation_B_trace
 
 
-rangeScale =
+rangeScale model =
     row
-        [ width (px 600)
-        , spaceEvenly
-        , paddingEach { edges | top = 10, left = 40 }
-        , Font.color beamGreen
-        , Font.size 20
-        , Font.family
+        ([ width (px 600)
+         , spaceEvenly
+         , paddingEach { edges | top = 10, left = 40 }
+         , Font.color beamGreen
+         , Font.size 20
+         , Font.family
             [ Font.typeface "Courier New"
             , Font.sansSerif
             ]
-        ]
+         ]
+            ++ tutorialHighlighting model UiRangeScale
+        )
     <|
         List.map
             (\i ->
@@ -130,7 +132,7 @@ rangeSliderAndCRT model trace =
     column
         [ padding 5 ]
         [ E.el
-            [ E.below rangeScale
+            [ E.below (rangeScale model)
             , paddingEach { edges | left = 40 }
             ]
             (rangeSlider model)
@@ -142,12 +144,13 @@ rangeSliderAndCRT model trace =
 
 modeSwitchPanel model =
     column commonStyles
-        [ row commonStyles
+        [ row (commonStyles ++ tutorialHighlighting model UiClear)
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
         , row
             (Border.widthEach { edges | left = 1, right = 1, top = 1 }
                 :: commonStyles
+                ++ tutorialHighlighting model UiAB
             )
             [ column commonStyles
                 [ indicatorLabelAbove "A" (model.goniometerMode == Azimuth && model.receiveAB)
@@ -174,12 +177,12 @@ modeSwitchPanel model =
             (Border.widthEach { edges | left = 1, right = 1, bottom = 1 }
                 :: commonStyles
             )
-            [ el [ centerX, width <| fillPortion 1 ] <|
+            [ el ([ centerX, width <| fillPortion 1 ] ++ tutorialHighlighting model UiSense) <|
                 actionButtonLabelAboveWithIndicator "SENSE" model.reflector (EnableReflector (not model.reflector))
-            , el [ centerX, width <| fillPortion 1 ] <|
+            , el ([ centerX, width <| fillPortion 1 ] ++ tutorialHighlighting model UiHeight) <|
                 actionButtonLabelAbove "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
             ]
-        , row commonStyles
+        , row (commonStyles ++ tutorialHighlighting model UiOperatorPrompts)
             [ el [ centerX, width <| fillPortion 1 ] <|
                 indicatorLabelBelow "PRESS\nGONIO" <|
                     (model.inputState == BearingInput)
@@ -192,11 +195,11 @@ modeSwitchPanel model =
         ]
 
 
-raidStrengthPanel =
+raidStrengthPanel model =
     column
         (Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
             :: paddingEach { edges | left = 20, right = 20 }
-            :: commonStyles
+            :: (commonStyles ++ tutorialHighlighting model UiRaidStrength)
         )
         [ row [ centerX ]
             [ column
@@ -230,24 +233,24 @@ raidStrengthPanel =
 
 
 operatorPageLandscape model =
-    row [ centerX, tutorialTextBox model ]
-        [ column [ width <| fillPortion 3, centerX ]
-            [ row (tutorialHighlighting model UiCRT)
+    row ([ centerX, tutorialTextBox model ] ++ tutorialHighlighting model UiOperatorPage)
+        [ column ([ width <| fillPortion 3, centerX ] ++ tutorialHighlighting model UiLeftSide)
+            [ row []
                 [ el
-                    (tutorialHighlighting model UiRangeSlider)
+                    []
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
             , row
-                []
+                (tutorialHighlighting model UiBothKnobs)
                 [ clickableGonioImage model UiRangeKnob
                 , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
                 , clickableRangeKnob model UiGoniometer
                 , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
-        , column [ width <| fillPortion 2, centerX ]
+        , column ([ width <| fillPortion 2, centerX ] ++ tutorialHighlighting model UiRightSide)
             [ modeSwitchPanel model
-            , raidStrengthPanel
+            , raidStrengthPanel model
             ]
         ]
 

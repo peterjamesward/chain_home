@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, tutorialHighlighting, tutorialTextBox, welcomePrompt)
+module TrainingMode exposing (advanceTutorial, tutorialHighlighting, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -38,7 +38,20 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiOperatorPage
-        """Click on these text panels to learn about the Chain Home receiver and the operator's work."""
+        """Welcome to the Chain Home receiver operator tutorial.
+        Click on these text panels to learn about the Chain Home receiver and the operator's work."""
+    , TutorialEntry
+        TutorialLeftSide
+        UiLeftSide
+        """The left hand side contains the main display and two control knobs that are
+        used to estimate aircraft positions and height.
+        """
+    , TutorialEntry
+        TutorialRightSide
+        UiRightSide
+        """The right hand side contains numerous buttons and indicators.
+        We will shortly explain each of these.
+        """
     , TutorialEntry
         TutorialDescribeCRT
         UiCRT
@@ -46,20 +59,83 @@ tutorial =
         returned from radio wave pulses sent out from the transmitter.
         """
     , TutorialEntry
+        TutorialCRTTrace
+        UiCRT
+        """The line on the CRT  "dips" for any
+        returned signals detected. The continuous movement is just noise in the system.
+        The large dips between 0 and 10 miles are from fixed objects near the station.
+        """
+    , TutorialEntry
         TutorialRangeScale
-        UiRangeSlider
+        UiRangeScale
         """The numbers along the top show the range in miles.
         Generally, incoming aircraft will appear towards the right hand side.
         The operator will move the pointer at the top, using the right hand knob below, to
         identify a particular echo for study."""
     , TutorialEntry
-        TutorialCRTTrace
-        UiCRT
-        """The line on the CRT moves rapidly from left to right and "dips" for any
-        returned signals detected. The continuous movement is just noise in the system.
-        The large dips between 0 and 10 miles are from fixed objects near the station.
+        TutorialGoniometer
+        UiGoniometer
+        """This is the goniometer. It is used to estimate the bearing of a raid by
+        adjusting the control until the signal disappears; the bearing is then shown
+        directly on the dial. The button to the right is used to store the setting in
+        the electrical calculator.
         """
     , TutorialEntry
+        TutorialRangeKnob
+        UiRangeKnob
+        """The smaller knob without a dial is used to move the range pointer along the
+        range scale to identify the range of the raid that the operator is currently
+        focusing on. Again, the button is used to store the setting in the calculator.
+        """
+    , TutorialEntry
+        TutorialABSwitch
+        UiAB
+        """The operator can choose to look at signals from two aerial systems - 'A"
+        and 'B'. 'A' is usually better at longer range and 'B' at close range, but
+        both systems have gaps in their coverage. The lights show which system is
+        active, and whether in Height or Direction Finding (D/F) mode.
+        """
+    , TutorialEntry
+        TutorialHeight
+        UiHeight
+        """The operator alternates between working out the bearing of a range and working
+        out the height. Both modes use the goniometer to try and make the signal on the
+        CRT as small as possible. Height is only approximate and is done by the electrical
+        calculator for speed.
+        """
+    , TutorialEntry
+        TutorialSense
+        UiSense
+        """Radar signals spread from the rear of the transmitter as well as the front.
+        This means that aircraft can be detectd behind the station (over land). The
+        'Sense' button turns on a reflector behind that transmitter aerial that sends
+        most of the signal forwards. With this on, signals from behind become weaker and
+        signals from in front become stronger.
+        """
+    , TutorialEntry
+        TutorialOperatorPrompts
+        UiOperatorPrompts
+        """These two lights prompt the operator to store the goniometer and range settings
+        in the electrical calculator. SHe will do this first in D/F mode and then in Height mode.
+        """
+    , TutorialEntry
+        TutorialRaidStrength
+        UiRaidStrength
+        """The operator presses one of the numbered buttons to show her estimate of the
+        number of aircraft in a raid. The '+' button can be used to indicate that the number
+        is higher than the button label. The 'F' button is used to show that a raid is known
+        to be a friendly aircraft, typically because they use IFF signals.
+        """
+    , TutorialEntry
+        TutorialClear
+        UiClear
+        """The 'Clear' button removes stored entries from the calculator.
+        """
+    ]
+
+
+unusedEntries =
+    [ TutorialEntry
         TutorialIncomingRaid
         UiCRT
         """In fact, there is an incoming raid now. It's highlighted in white but would
@@ -108,11 +184,11 @@ advanceTutorial current =
     { current
         | tutorialStage = findNextStep current.tutorialStage
         , activeConfigurations =
-            if current.tutorialStage == Just TutorialCRTTrace then
-                trainingMode
-
-            else
-                current.activeConfigurations
+            --if current.tutorialStage == Just TutorialCRTTrace then
+            --    trainingMode
+            --
+            --else
+            current.activeConfigurations
     }
 
 
@@ -138,6 +214,7 @@ findMatchingStep tutorialStep uiComponent =
     in
     findHelper tutorial
 
+
 findStep : Maybe Tutorial -> Maybe TutorialEntry
 findStep tutorialStep =
     let
@@ -157,9 +234,6 @@ findStep tutorialStep =
                         findHelper more
     in
     findHelper tutorial
-
-welcomePrompt =
-    TutorialWelcome
 
 
 tutorialHighlighting : Model -> UiComponent -> List (Attribute Msg)
@@ -212,6 +286,6 @@ tutorialTextBox model =
                                 , pointer
                                 , onClick TutorialAdvance
                                 ]
-                                [text step.tutorialText]
+                                [ text step.tutorialText ]
                     ]
                     (text "")

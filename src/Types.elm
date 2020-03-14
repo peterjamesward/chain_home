@@ -58,16 +58,36 @@ type
 
 type UiComponent
     = UiOperatorPage
-    | UiRangeSlider
+    | UiRangeScale
     | UiCRT
     | UiGoniometer
     | UiRangeKnob
+    | UiLeftSide
+    | UiRightSide
+    | UiBothKnobs
+    | UiSwitchPanel
+    | UiRaidStrength
+    | UiOperatorPrompts
+    | UiAB
+    | UiHeight
+    | UiSense
+    | UiClear
 
 type Tutorial
     = TutorialWelcome
+    | TutorialLeftSide
+    | TutorialRightSide
     | TutorialDescribeCRT
     | TutorialRangeScale
     | TutorialCRTTrace
+    | TutorialGoniometer
+    | TutorialRangeKnob
+    | TutorialABSwitch
+    | TutorialSense
+    | TutorialHeight
+    | TutorialOperatorPrompts
+    | TutorialClear
+    | TutorialRaidStrength
     | TutorialIncomingRaid
     | TutorialAdjustRange
     | TutorialFindBearing

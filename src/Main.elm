@@ -282,7 +282,7 @@ update msg model =
         DisplayTraining ->
             ( { model
                 | currPage = TrainingPage
-                , tutorialStage = Just welcomePrompt
+                , tutorialStage = Just TutorialWelcome
               }
             , Cmd.none
             )
