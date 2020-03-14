@@ -27,6 +27,7 @@ import Messages exposing (..)
 import Model exposing (..)
 import OperatorPage exposing (operatorPage)
 import Platform.Cmd exposing (Cmd)
+import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
 import Station exposing (..)
 import Target exposing (..)
@@ -342,35 +343,20 @@ update msg model =
 
                 Just ( startAngle, startXY ) ->
                     let
+                        stopKnob =
+                            pi - 0.1
+
+                        -- Prevent complete rotation.
                         newAngle =
-                            goniometerTurnAngle startAngle startXY offset
+                            clamp (0 - stopKnob) stopKnob <|
+                                rangeTurnAngle startAngle startXY offset
 
-                        angleChange =
-                            (newAngle - startAngle) |> sin |> asin |> (*) (60 / pi)
-
-                        newRange =
-                            max 0 <| min 100 <| (model.rangeSlider + angleChange)
                     in
-                    ( if angleChange > 0 then
-                        -- Turn clockwise, increase range
-                        { model
-                            | rangeSlider = newRange
-                            --, rangeDrag =
-                            --    choose (newRange <= 100) (Just ( newAngle, offset )) Nothing
-                            , rangeKnobAngle = newAngle
-                        }
-
-                      else if angleChange < 0 then
-                        -- Turn anticlockwise, decrease range
-                        { model
-                            | rangeSlider = newRange
-                            --, rangeDrag =
-                            --    choose (newRange >= 0) (Just ( newAngle, offset )) Nothing
-                            , rangeKnobAngle = newAngle
-                        }
-
-                      else
-                        model
+                    ( { model
+                        | rangeSlider = (pi + normalise newAngle) * 50 / pi
+                        , rangeKnobAngle = newAngle
+                        , rangeDrag = Just ( newAngle, offset )
+                      }
                     , Cmd.none
                     )
 

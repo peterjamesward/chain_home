@@ -4,6 +4,12 @@ module Range exposing (..)
 
 import Svg exposing (..)
 import Svg.Attributes as S exposing (..)
+import Types exposing (Angle, Point)
+import Utils exposing (normalise)
+
+
+radius =
+    120
 
 
 drawRangeKnob theta =
@@ -13,9 +19,6 @@ drawRangeKnob theta =
 
         originY =
             0
-
-        radius =
-            120
 
         xPoint =
             String.fromFloat <|
@@ -54,3 +57,19 @@ drawRangeKnob theta =
             ]
             []
         ]
+
+
+rangeTurnAngle : Angle -> Point -> Point -> Angle
+rangeTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
+    let
+        ( _, dragStartAngle ) =
+            toPolar ( startX - radius, startY - radius )
+
+        -- where on control was clicked
+        ( _, dragNowAngle ) =
+            toPolar ( newX - radius, newY - radius )
+
+        -- where that point is now
+        newAngle = startAngle + dragNowAngle - dragStartAngle
+    in
+    normalise newAngle

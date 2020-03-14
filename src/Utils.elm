@@ -46,6 +46,9 @@ noise t =
 fractional x =
     x - toFloat (truncate x)
 
+normalise theta =
+        atan2 (sin theta) (cos theta)
+
 
 notNearlyEqual x1 x2 =
     (10 * abs x1 < abs x2) || (10 * abs x2 < abs x1)

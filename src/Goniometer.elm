@@ -5,6 +5,7 @@ import Svg.Attributes as S exposing (..)
 import Types exposing (..)
 
 
+
 -- Assumes a suitably styled DIV is in effect ...
 
 
@@ -19,6 +20,10 @@ drawGoniometer theta =
             :: drawGoniometerPointer theta
 
 
+radius =
+    135
+
+
 drawGoniometerPointer theta =
     let
         originX =
@@ -26,9 +31,6 @@ drawGoniometerPointer theta =
 
         originY =
             0
-
-        radius =
-            135
 
         xPoint =
             String.fromFloat <|
@@ -83,11 +85,11 @@ goniometerTurnAngle : Angle -> Point -> Point -> Angle
 goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
     let
         ( _, dragStartAngle ) =
-            toPolar ( startX - 130, startY - 130 )
+            toPolar ( startX - radius, startY - radius )
 
         -- where on control was clicked
         ( _, dragNowAngle ) =
-            toPolar ( newX - 130, newY - 130 )
+            toPolar ( newX - radius, newY - radius )
 
         -- where that point is now
     in
