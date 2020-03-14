@@ -13,7 +13,7 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import TrainingMode exposing (tutorialModeNSEW, tutorialTextBox)
+import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
 import Types exposing (..)
 import Utils exposing (choose, commonStyles, disableSelection, edges)
 
@@ -27,7 +27,7 @@ clickableRangeKnob model tutorial =
          , width (px 200)
          , pointer
          ]
-            ++ tutorialModeNSEW model TutorialAdjustRange
+            ++ tutorialHighlighting model UiRangeKnob
         )
         (html <| drawRangeKnob model.rangeKnobAngle)
 
@@ -45,7 +45,7 @@ clickableGonioImage model tutorial =
          , width (px 300)
          , pointer
          ]
-            ++ tutorialModeNSEW model TutorialFindBearing
+            ++ tutorialHighlighting model UiGoniometer
         )
         (html <| drawGoniometer theta)
 
@@ -135,9 +135,7 @@ rangeSliderAndCRT model trace =
             ]
             (rangeSlider model)
         , el
-            (tutorialModeNSEW model TutorialCRTTrace
-                ++ tutorialModeNSEW model TutorialIncomingRaid
-            )
+            (tutorialHighlighting model UiCRT)
             (E.html <| crt model.webGLtime trace)
         ]
 
@@ -234,16 +232,16 @@ raidStrengthPanel =
 operatorPageLandscape model =
     row [ centerX, tutorialTextBox model ]
         [ column [ width <| fillPortion 3, centerX ]
-            [ row (tutorialModeNSEW model TutorialDescribeCRT)
+            [ row (tutorialHighlighting model UiCRT)
                 [ el
-                    (tutorialModeNSEW model TutorialRangeScale)
+                    (tutorialHighlighting model UiRangeSlider)
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
             , row
                 []
-                [ clickableGonioImage model TutorialAdjustRange
+                [ clickableGonioImage model UiRangeKnob
                 , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                , clickableRangeKnob model TutorialFindBearing
+                , clickableRangeKnob model UiGoniometer
                 , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]

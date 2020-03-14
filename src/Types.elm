@@ -56,6 +56,12 @@ type
     | HeightInput
     | HeightRangeInput
 
+type UiComponent
+    = UiOperatorPage
+    | UiRangeSlider
+    | UiCRT
+    | UiGoniometer
+    | UiRangeKnob
 
 type Tutorial
     = TutorialWelcome
