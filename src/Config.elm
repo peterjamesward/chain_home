@@ -210,9 +210,9 @@ targetConfigurations =
     ]
 
 
-trainingMode : List TargetSelector
+trainingMode : List Target
 trainingMode =
-    [ tutorialBomber ]
+    [ { bomber1 | tutorial = True } ]
 
 
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector

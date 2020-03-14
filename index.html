@@ -7990,31 +7990,53 @@ var $author$project$Types$HeightRangeInput = {$: 'HeightRangeInput'};
 var $author$project$Types$OperatorPage = {$: 'OperatorPage'};
 var $author$project$Types$OutputPage = {$: 'OutputPage'};
 var $author$project$Types$TrainingPage = {$: 'TrainingPage'};
-var $author$project$Types$TutorialCRTTrace = {$: 'TutorialCRTTrace'};
 var $author$project$Types$TutorialWelcome = {$: 'TutorialWelcome'};
-var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
+var $author$project$Types$TutorialABSwitch = {$: 'TutorialABSwitch'};
+var $author$project$Types$TutorialCRTTrace = {$: 'TutorialCRTTrace'};
+var $author$project$Types$TutorialClear = {$: 'TutorialClear'};
 var $author$project$Types$TutorialDescribeCRT = {$: 'TutorialDescribeCRT'};
 var $author$project$TrainingMode$TutorialEntry = F3(
 	function (tutorialStep, uiComponent, tutorialText) {
 		return {tutorialStep: tutorialStep, tutorialText: tutorialText, uiComponent: uiComponent};
 	});
-var $author$project$Types$TutorialFindBearing = {$: 'TutorialFindBearing'};
-var $author$project$Types$TutorialIncomingRaid = {$: 'TutorialIncomingRaid'};
+var $author$project$Types$TutorialGoniometer = {$: 'TutorialGoniometer'};
+var $author$project$Types$TutorialHeight = {$: 'TutorialHeight'};
+var $author$project$Types$TutorialLeftSide = {$: 'TutorialLeftSide'};
+var $author$project$Types$TutorialOperatorPrompts = {$: 'TutorialOperatorPrompts'};
+var $author$project$Types$TutorialRaidStrength = {$: 'TutorialRaidStrength'};
+var $author$project$Types$TutorialRangeKnob = {$: 'TutorialRangeKnob'};
 var $author$project$Types$TutorialRangeScale = {$: 'TutorialRangeScale'};
+var $author$project$Types$TutorialRightSide = {$: 'TutorialRightSide'};
+var $author$project$Types$TutorialSense = {$: 'TutorialSense'};
+var $author$project$Types$UiAB = {$: 'UiAB'};
 var $author$project$Types$UiCRT = {$: 'UiCRT'};
+var $author$project$Types$UiClear = {$: 'UiClear'};
 var $author$project$Types$UiGoniometer = {$: 'UiGoniometer'};
+var $author$project$Types$UiHeight = {$: 'UiHeight'};
+var $author$project$Types$UiLeftSide = {$: 'UiLeftSide'};
 var $author$project$Types$UiOperatorPage = {$: 'UiOperatorPage'};
+var $author$project$Types$UiOperatorPrompts = {$: 'UiOperatorPrompts'};
+var $author$project$Types$UiRaidStrength = {$: 'UiRaidStrength'};
 var $author$project$Types$UiRangeKnob = {$: 'UiRangeKnob'};
-var $author$project$Types$UiRangeSlider = {$: 'UiRangeSlider'};
+var $author$project$Types$UiRangeScale = {$: 'UiRangeScale'};
+var $author$project$Types$UiRightSide = {$: 'UiRightSide'};
+var $author$project$Types$UiSense = {$: 'UiSense'};
 var $author$project$TrainingMode$tutorial = _List_fromArray(
 	[
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialWelcome, $author$project$Types$UiOperatorPage, 'Click on these text panels to learn about the Chain Home receiver and the operator\'s work.'),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialWelcome, $author$project$Types$UiOperatorPage, 'Welcome to the Chain Home receiver operator tutorial.\n        Click on these text panels to learn about the Chain Home receiver and the operator\'s work.'),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialLeftSide, $author$project$Types$UiLeftSide, 'The left hand side contains the main display and two control knobs that are\n        used to estimate aircraft positions and height.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRightSide, $author$project$Types$UiRightSide, 'The right hand side contains numerous buttons and indicators.\n        We will shortly explain each of these.\n        '),
 		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialDescribeCRT, $author$project$Types$UiCRT, 'The main feature is the Cathode Ray Tube (CRT) that displays signals\n        returned from radio wave pulses sent out from the transmitter.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRangeScale, $author$project$Types$UiRangeSlider, 'The numbers along the top show the range in miles.\n        Generally, incoming aircraft will appear towards the right hand side.\n        The operator will move the pointer at the top, using the right hand knob below, to\n        identify a particular echo for study.'),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialCRTTrace, $author$project$Types$UiCRT, 'The line on the CRT moves rapidly from left to right and "dips" for any\n        returned signals detected. The continuous movement is just noise in the system.\n        The large dips between 0 and 10 miles are from fixed objects near the station.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialIncomingRaid, $author$project$Types$UiCRT, 'In fact, there is an incoming raid now. It\'s highlighted in white but would\n        normally be green. We have to learn as much information about the raid as we can.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialAdjustRange, $author$project$Types$UiRangeKnob, 'Turn the right hand knob (you can click on it or touch it and drag it around)\n        and see that the range indicator moves. Try to position the range indicator at the\n        left edge of the "dip" that marks the raid. This will tell you the range of the raid.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialFindBearing, $author$project$Types$UiGoniometer, 'Now turn the left hand knob (the goniometer) until the "dip" disappears, or\n        as small as you can make it. The goniometer now indicates the bearing of the incoming\n        raid. Be careful though,\n        ')
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialCRTTrace, $author$project$Types$UiCRT, 'The line on the CRT  "dips" for any\n        returned signals detected. The continuous movement is just noise in the system.\n        The large dips between 0 and 10 miles are from fixed objects near the station.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRangeScale, $author$project$Types$UiRangeScale, 'The numbers along the top show the range in miles.\n        Generally, incoming aircraft will appear towards the right hand side.\n        The operator will move the pointer at the top, using the right hand knob below, to\n        identify a particular echo for study.'),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialGoniometer, $author$project$Types$UiGoniometer, 'This is the goniometer. It is used to estimate the bearing of a raid by\n        adjusting the control until the signal disappears; the bearing is then shown\n        directly on the dial. The button to the right is used to store the setting in\n        the electrical calculator.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRangeKnob, $author$project$Types$UiRangeKnob, 'The smaller knob without a dial is used to move the range pointer along the\n        range scale to identify the range of the raid that the operator is currently\n        focusing on. Again, the button is used to store the setting in the calculator.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialABSwitch, $author$project$Types$UiAB, 'The operator can choose to look at signals from two aerial systems - \'A"\n        and \'B\'. \'A\' is usually better at longer range and \'B\' at close range, but\n        both systems have gaps in their coverage. The lights show which system is\n        active, and whether in Height or Direction Finding (D/F) mode.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialHeight, $author$project$Types$UiHeight, 'The operator alternates between working out the bearing of a range and working\n        out the height. Both modes use the goniometer to try and make the signal on the\n        CRT as small as possible. Height is only approximate and is done by the electrical\n        calculator for speed.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialSense, $author$project$Types$UiSense, 'Radar signals spread from the rear of the transmitter as well as the front.\n        This means that aircraft can be detectd behind the station (over land). The\n        \'Sense\' button turns on a reflector behind that transmitter aerial that sends\n        most of the signal forwards. With this on, signals from behind become weaker and\n        signals from in front become stronger.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialOperatorPrompts, $author$project$Types$UiOperatorPrompts, 'These two lights prompt the operator to store the goniometer and range settings\n        in the electrical calculator. SHe will do this first in D/F mode and then in Height mode.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialRaidStrength, $author$project$Types$UiRaidStrength, 'The operator presses one of the numbered buttons to show her estimate of the\n        number of aircraft in a raid. The \'+\' button can be used to indicate that the number\n        is higher than the button label. The \'F\' button is used to show that a raid is known\n        to be a friendly aircraft, typically because they use IFF signals.\n        '),
+		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialClear, $author$project$Types$UiClear, 'The \'Clear\' button removes stored entries from the calculator.\n        ')
 	]);
 var $author$project$TrainingMode$findNextStep = function (current) {
 	var findNextStepHelper = function (steps) {
@@ -8048,26 +8070,11 @@ var $author$project$TrainingMode$findNextStep = function (current) {
 	};
 	return findNextStepHelper($author$project$TrainingMode$tutorial);
 };
-var $author$project$Config$tutorialBomber = A4(
-	$author$project$Config$TargetSelector,
-	2,
-	'One incoming',
-	_List_fromArray(
-		[
-			_Utils_update(
-			$author$project$Config$bomber1,
-			{tutorial: true})
-		]),
-	true);
-var $author$project$Config$trainingMode = _List_fromArray(
-	[$author$project$Config$tutorialBomber]);
 var $author$project$TrainingMode$advanceTutorial = function (current) {
 	return _Utils_update(
 		current,
 		{
-			activeConfigurations: _Utils_eq(
-				current.tutorialStage,
-				$elm$core$Maybe$Just($author$project$Types$TutorialCRTTrace)) ? $author$project$Config$trainingMode : current.activeConfigurations,
+			activeConfigurations: current.activeConfigurations,
 			tutorialStage: $author$project$TrainingMode$findNextStep(current.tutorialStage)
 		});
 };
@@ -8510,7 +8517,6 @@ var $author$project$Main$updateKeys = F3(
 				return keys;
 		}
 	});
-var $author$project$TrainingMode$welcomePrompt = $author$project$Types$TutorialWelcome;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -8584,7 +8590,7 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							currPage: $author$project$Types$TrainingPage,
-							tutorialStage: $elm$core$Maybe$Just($author$project$TrainingMode$welcomePrompt)
+							tutorialStage: $elm$core$Maybe$Just($author$project$Types$TutorialWelcome)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'TutorialAdvance':
@@ -15875,6 +15881,7 @@ var $author$project$Main$navBar = function () {
 }();
 var $author$project$Messages$StoreGoniometerSetting = {$: 'StoreGoniometerSetting'};
 var $author$project$Messages$StoreRangeSetting = {$: 'StoreRangeSetting'};
+var $author$project$Types$UiBothKnobs = {$: 'UiBothKnobs'};
 var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
 var $mdgriffith$elm_ui$Internal$Model$Focus = {$: 'Focus'};
 var $mdgriffith$elm_ui$Internal$Model$PseudoSelector = F2(
@@ -16710,7 +16717,9 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				$author$project$Utils$commonStyles,
+				_Utils_ap(
+					$author$project$Utils$commonStyles,
+					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiClear)),
 				_List_fromArray(
 					[
 						A2($author$project$PushButtons$actionButtonLabelAbove, 'CLEAR', $author$project$Messages$ResetInputState)
@@ -16723,7 +16732,9 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 						_Utils_update(
 							$author$project$Utils$edges,
 							{left: 1, right: 1, top: 1})),
-					$author$project$Utils$commonStyles),
+					_Utils_ap(
+						$author$project$Utils$commonStyles,
+						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiAB))),
 				_List_fromArray(
 					[
 						A2(
@@ -16802,12 +16813,14 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 					[
 						A2(
 						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$centerX,
-								$mdgriffith$elm_ui$Element$width(
-								$mdgriffith$elm_ui$Element$fillPortion(1))
-							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$centerX,
+									$mdgriffith$elm_ui$Element$width(
+									$mdgriffith$elm_ui$Element$fillPortion(1))
+								]),
+							A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiSense)),
 						A3(
 							$author$project$PushButtons$actionButtonLabelAboveWithIndicator,
 							'SENSE',
@@ -16815,12 +16828,14 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 							$author$project$Messages$EnableReflector(!model.reflector))),
 						A2(
 						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$centerX,
-								$mdgriffith$elm_ui$Element$width(
-								$mdgriffith$elm_ui$Element$fillPortion(1))
-							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$centerX,
+									$mdgriffith$elm_ui$Element$width(
+									$mdgriffith$elm_ui$Element$fillPortion(1))
+								]),
+							A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiHeight)),
 						A2(
 							$author$project$PushButtons$actionButtonLabelAbove,
 							'HEIGHT',
@@ -16829,7 +16844,9 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				$author$project$Utils$commonStyles,
+				_Utils_ap(
+					$author$project$Utils$commonStyles,
+					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPrompts)),
 				_List_fromArray(
 					[
 						A2(
@@ -16953,135 +16970,139 @@ var $author$project$PushButtons$actionButtonLabelRight = F2(
 					$mdgriffith$elm_ui$Element$text(label))
 				]));
 	});
-var $author$project$OperatorPage$raidStrengthPanel = A2(
-	$mdgriffith$elm_ui$Element$column,
-	A2(
-		$elm$core$List$cons,
-		$mdgriffith$elm_ui$Element$Border$widthEach(
-			_Utils_update(
-				$author$project$Utils$edges,
-				{bottom: 1, left: 1, right: 1, top: 1})),
+var $author$project$OperatorPage$raidStrengthPanel = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
 		A2(
 			$elm$core$List$cons,
-			$mdgriffith$elm_ui$Element$paddingEach(
+			$mdgriffith$elm_ui$Element$Border$widthEach(
 				_Utils_update(
 					$author$project$Utils$edges,
-					{left: 20, right: 20})),
-			$author$project$Utils$commonStyles)),
-	_List_fromArray(
-		[
+					{bottom: 1, left: 1, right: 1, top: 1})),
 			A2(
-			$mdgriffith$elm_ui$Element$row,
-			_List_fromArray(
-				[$mdgriffith$elm_ui$Element$centerX]),
-			_List_fromArray(
-				[
-					A2(
-					$mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$Font$size(18),
-							$mdgriffith$elm_ui$Element$Font$bold
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'1',
-							$author$project$Messages$RaidStrength(1)),
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'2',
-							$author$project$Messages$RaidStrength(2)),
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'3',
-							$author$project$Messages$RaidStrength(3)),
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'6',
-							$author$project$Messages$RaidStrength(6)),
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'9',
-							$author$project$Messages$RaidStrength(9)),
-							A2(
-							$author$project$PushButtons$actionButtonLabelLeft,
-							'12',
-							$author$project$Messages$RaidStrength(12))
-						])),
-					A2(
-					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width(
-							$mdgriffith$elm_ui$Element$px(30))
-						]),
-					$mdgriffith$elm_ui$Element$none),
-					A2(
-					$mdgriffith$elm_ui$Element$column,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$Font$size(18),
-							$mdgriffith$elm_ui$Element$Font$bold
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$author$project$PushButtons$actionButtonLabelRight,
-							'18',
-							$author$project$Messages$RaidStrength(18)),
-							A2(
-							$mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Element$height(
-									A2(
-										$mdgriffith$elm_ui$Element$minimum,
-										30,
-										$mdgriffith$elm_ui$Element$px(30)))
-								]),
-							$mdgriffith$elm_ui$Element$none),
-							A2(
-							$mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Element$height(
-									A2(
-										$mdgriffith$elm_ui$Element$minimum,
-										30,
-										$mdgriffith$elm_ui$Element$px(30)))
-								]),
-							$mdgriffith$elm_ui$Element$none),
-							A2(
-							$mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Element$height(
-									A2(
-										$mdgriffith$elm_ui$Element$minimum,
-										30,
-										$mdgriffith$elm_ui$Element$px(30)))
-								]),
-							$mdgriffith$elm_ui$Element$none),
-							A2($author$project$PushButtons$actionButtonLabelRight, '+', $author$project$Messages$RaidStrengthPlus),
-							A2($author$project$PushButtons$actionButtonLabelRight, 'F', $author$project$Messages$RaidFriendly)
-						]))
-				])),
-			A2(
-			$mdgriffith$elm_ui$Element$row,
-			$author$project$Utils$commonStyles,
-			_List_fromArray(
-				[
-					A2(
-					$mdgriffith$elm_ui$Element$el,
-					_Utils_ap(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$paddingEach(
+					_Utils_update(
+						$author$project$Utils$edges,
+						{left: 20, right: 20})),
+				_Utils_ap(
+					$author$project$Utils$commonStyles,
+					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRaidStrength)))),
+		_List_fromArray(
+			[
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerX]),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$column,
 						_List_fromArray(
-							[$mdgriffith$elm_ui$Element$centerX]),
-						$author$project$Utils$disableSelection),
-					$mdgriffith$elm_ui$Element$text('RAID STRENGTH'))
-				]))
-		]));
+							[
+								$mdgriffith$elm_ui$Element$Font$size(18),
+								$mdgriffith$elm_ui$Element$Font$bold
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'1',
+								$author$project$Messages$RaidStrength(1)),
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'2',
+								$author$project$Messages$RaidStrength(2)),
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'3',
+								$author$project$Messages$RaidStrength(3)),
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'6',
+								$author$project$Messages$RaidStrength(6)),
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'9',
+								$author$project$Messages$RaidStrength(9)),
+								A2(
+								$author$project$PushButtons$actionButtonLabelLeft,
+								'12',
+								$author$project$Messages$RaidStrength(12))
+							])),
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$px(30))
+							]),
+						$mdgriffith$elm_ui$Element$none),
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$Font$size(18),
+								$mdgriffith$elm_ui$Element$Font$bold
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$PushButtons$actionButtonLabelRight,
+								'18',
+								$author$project$Messages$RaidStrength(18)),
+								A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$height(
+										A2(
+											$mdgriffith$elm_ui$Element$minimum,
+											30,
+											$mdgriffith$elm_ui$Element$px(30)))
+									]),
+								$mdgriffith$elm_ui$Element$none),
+								A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$height(
+										A2(
+											$mdgriffith$elm_ui$Element$minimum,
+											30,
+											$mdgriffith$elm_ui$Element$px(30)))
+									]),
+								$mdgriffith$elm_ui$Element$none),
+								A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$height(
+										A2(
+											$mdgriffith$elm_ui$Element$minimum,
+											30,
+											$mdgriffith$elm_ui$Element$px(30)))
+									]),
+								$mdgriffith$elm_ui$Element$none),
+								A2($author$project$PushButtons$actionButtonLabelRight, '+', $author$project$Messages$RaidStrengthPlus),
+								A2($author$project$PushButtons$actionButtonLabelRight, 'F', $author$project$Messages$RaidFriendly)
+							]))
+					])),
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				$author$project$Utils$commonStyles,
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_Utils_ap(
+							_List_fromArray(
+								[$mdgriffith$elm_ui$Element$centerX]),
+							$author$project$Utils$disableSelection),
+						$mdgriffith$elm_ui$Element$text('RAID STRENGTH'))
+					]))
+			]));
+};
 var $elm_explorations$webgl$WebGL$Internal$ClearColor = F4(
 	function (a, b, c, d) {
 		return {$: 'ClearColor', a: a, b: b, c: c, d: d};
@@ -17455,36 +17476,40 @@ var $author$project$CRT_WebGL$crt = F2(
 				]));
 	});
 var $author$project$Constants$beamGreen = A3($mdgriffith$elm_ui$Element$rgb255, 0, (0.7 * 255) | 0, 0);
-var $author$project$OperatorPage$rangeScale = A2(
-	$mdgriffith$elm_ui$Element$row,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$width(
-			$mdgriffith$elm_ui$Element$px(600)),
-			$mdgriffith$elm_ui$Element$spaceEvenly,
-			$mdgriffith$elm_ui$Element$paddingEach(
-			_Utils_update(
-				$author$project$Utils$edges,
-				{left: 40, top: 10})),
-			$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$beamGreen),
-			$mdgriffith$elm_ui$Element$Font$size(20),
-			$mdgriffith$elm_ui$Element$Font$family(
+var $author$project$OperatorPage$rangeScale = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$row,
+		_Utils_ap(
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$Font$typeface('Courier New'),
-					$mdgriffith$elm_ui$Element$Font$sansSerif
-				]))
-		]),
-	A2(
-		$elm$core$List$map,
-		function (i) {
-			return A2(
-				$mdgriffith$elm_ui$Element$el,
-				$author$project$Utils$disableSelection,
-				$mdgriffith$elm_ui$Element$text(
-					$elm$core$String$fromInt(10 * i)));
-		},
-		A2($elm$core$List$range, 0, 10)));
+					$mdgriffith$elm_ui$Element$width(
+					$mdgriffith$elm_ui$Element$px(600)),
+					$mdgriffith$elm_ui$Element$spaceEvenly,
+					$mdgriffith$elm_ui$Element$paddingEach(
+					_Utils_update(
+						$author$project$Utils$edges,
+						{left: 40, top: 10})),
+					$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$beamGreen),
+					$mdgriffith$elm_ui$Element$Font$size(20),
+					$mdgriffith$elm_ui$Element$Font$family(
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$typeface('Courier New'),
+							$mdgriffith$elm_ui$Element$Font$sansSerif
+						]))
+				]),
+			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRangeScale)),
+		A2(
+			$elm$core$List$map,
+			function (i) {
+				return A2(
+					$mdgriffith$elm_ui$Element$el,
+					$author$project$Utils$disableSelection,
+					$mdgriffith$elm_ui$Element$text(
+						$elm$core$String$fromInt(10 * i)));
+			},
+			A2($elm$core$List$range, 0, 10)));
+};
 var $author$project$Messages$AdjustRangeValue = function (a) {
 	return {$: 'AdjustRangeValue', a: a};
 };
@@ -18022,7 +18047,8 @@ var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 					$mdgriffith$elm_ui$Element$el,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$below($author$project$OperatorPage$rangeScale),
+							$mdgriffith$elm_ui$Element$below(
+							$author$project$OperatorPage$rangeScale(model)),
 							$mdgriffith$elm_ui$Element$paddingEach(
 							_Utils_update(
 								$author$project$Utils$edges,
@@ -18157,31 +18183,35 @@ var $author$project$TrainingMode$tutorialTextBox = function (model) {
 var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$row,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$centerX,
-				$author$project$TrainingMode$tutorialTextBox(model)
-			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$centerX,
+					$author$project$TrainingMode$tutorialTextBox(model)
+				]),
+			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPage)),
 		_List_fromArray(
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$column,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$fillPortion(3)),
-						$mdgriffith$elm_ui$Element$centerX
-					]),
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width(
+							$mdgriffith$elm_ui$Element$fillPortion(3)),
+							$mdgriffith$elm_ui$Element$centerX
+						]),
+					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiLeftSide)),
 				_List_fromArray(
 					[
 						A2(
 						$mdgriffith$elm_ui$Element$row,
-						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCRT),
+						_List_Nil,
 						_List_fromArray(
 							[
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRangeSlider),
+								_List_Nil,
 								A2(
 									$author$project$OperatorPage$rangeSliderAndCRT,
 									model,
@@ -18189,7 +18219,7 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 							])),
 						A2(
 						$mdgriffith$elm_ui$Element$row,
-						_List_Nil,
+						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiBothKnobs),
 						_List_fromArray(
 							[
 								A2($author$project$OperatorPage$clickableGonioImage, model, $author$project$Types$UiRangeKnob),
@@ -18200,19 +18230,22 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$column,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$fillPortion(2)),
-						$mdgriffith$elm_ui$Element$centerX
-					]),
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width(
+							$mdgriffith$elm_ui$Element$fillPortion(2)),
+							$mdgriffith$elm_ui$Element$centerX
+						]),
+					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRightSide)),
 				_List_fromArray(
 					[
 						$author$project$OperatorPage$modeSwitchPanel(model),
-						$author$project$OperatorPage$raidStrengthPanel
+						$author$project$OperatorPage$raidStrengthPanel(model)
 					]))
 			]));
 };
+var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
 var $author$project$Types$TutorialDummy = {$: 'TutorialDummy'};
 var $author$project$OperatorPage$operatorPagePortrait = function (model) {
 	return A2(

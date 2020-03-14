@@ -202,7 +202,6 @@ deriveModelAtTime model timeNow =
     in
     { model
         | modelTime = timeNow
-        , targets = getAllTargets model.activeConfigurations
         , movedTargets = targetsNow
         , polarTargets = convertedTargets
         , echoes = echoSignals
@@ -232,6 +231,7 @@ update msg model =
             ( { model
                 | startTime = model.modelTime
                 , webGLtime = 0.0
+                , targets = getAllTargets model.activeConfigurations
                 , currPage = OperatorPage
               }
             , Cmd.none
@@ -355,8 +355,8 @@ update msg model =
                         -- Turn clockwise, increase range
                         { model
                             | rangeSlider = newRange
-                            , rangeDrag =
-                                choose (newRange <= 100) (Just ( newAngle, offset )) Nothing
+                            --, rangeDrag =
+                            --    choose (newRange <= 100) (Just ( newAngle, offset )) Nothing
                             , rangeKnobAngle = newAngle
                         }
 
@@ -364,8 +364,8 @@ update msg model =
                         -- Turn anticlockwise, decrease range
                         { model
                             | rangeSlider = newRange
-                            , rangeDrag =
-                                choose (newRange >= 0) (Just ( newAngle, offset )) Nothing
+                            --, rangeDrag =
+                            --    choose (newRange >= 0) (Just ( newAngle, offset )) Nothing
                             , rangeKnobAngle = newAngle
                         }
 

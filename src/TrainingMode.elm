@@ -8,7 +8,7 @@ module TrainingMode exposing (advanceTutorial, tutorialHighlighting, tutorialTex
    provide common formatting etc.
 -}
 
-import Config exposing (trainingMode)
+import Config exposing (getAllTargets, trainingMode)
 import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background
@@ -131,14 +131,10 @@ tutorial =
         UiClear
         """The 'Clear' button removes stored entries from the calculator.
         """
-    ]
-
-
-unusedEntries =
-    [ TutorialEntry
+    , TutorialEntry
         TutorialIncomingRaid
         UiCRT
-        """In fact, there is an incoming raid now. It's highlighted in white but would
+        """There is an incoming raid now. It's highlighted in white but would
         normally be green. We have to learn as much information about the raid as we can.
         """
     , TutorialEntry
@@ -153,7 +149,7 @@ unusedEntries =
         UiGoniometer
         """Now turn the left hand knob (the goniometer) until the "dip" disappears, or
         as small as you can make it. The goniometer now indicates the bearing of the incoming
-        raid. Be careful though,
+        raid. The raid is travelling at 200mph so you need to keep an eye on the range.
         """
     ]
 
@@ -181,14 +177,18 @@ findNextStep current =
 
 advanceTutorial : Model -> Model
 advanceTutorial current =
+    let
+        nextStep =
+            findNextStep current.tutorialStage
+    in
     { current
-        | tutorialStage = findNextStep current.tutorialStage
-        , activeConfigurations =
-            --if current.tutorialStage == Just TutorialCRTTrace then
-            --    trainingMode
-            --
-            --else
-            current.activeConfigurations
+        | tutorialStage = nextStep
+        , targets =
+            if nextStep == Just TutorialIncomingRaid then
+                trainingMode
+
+            else
+                current.targets
     }
 
 
