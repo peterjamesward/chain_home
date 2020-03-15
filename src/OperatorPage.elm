@@ -16,7 +16,7 @@ import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
 import Types exposing (..)
-import Utils exposing (choose, commonStyles, disableSelection, edges)
+import Utils exposing (choose, commonStyles, disableSelection, edges, helpButton)
 
 
 clickableRangeKnob model tutorial =
@@ -255,29 +255,6 @@ operatorPageLandscape model =
             , raidStrengthPanel model
             ]
         ]
-
-
-helpButton : Element Msg
-helpButton =
-    el
-        [ alignRight
-        , alignTop
-        , Border.color white
-        , Border.width 1
-        , Border.rounded 15
-        , Background.color paletteDarkGreen
-        , Font.color white
-        , Font.size 12
-        , Font.bold
-        , Font.center
-        , paddingEach { edges | top = 6 }
-        , height (px 30)
-        , width (px 30)
-        , pointer
-        , onClick ExplainModeToggle
-        ]
-    <|
-        text "?"
 
 
 operatorPagePortrait model =
