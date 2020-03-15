@@ -585,12 +585,6 @@ calculatorPage : Model -> Element Msg
 calculatorPage model =
     calculator
         model
-        model.storedAzimuthRange
-        model.storedAzimuth
-        model.storedElevation
-        model.storedStrength
-        model.storedStrengthPlus
-        model.storedFriendly
 
 
 inputPage : Model -> Element Msg

@@ -74,11 +74,29 @@ gridPosition range bearing =
             Nothing
 
 
-calculator : Model -> Maybe Float -> Maybe Float -> Maybe Float -> Maybe Int -> Maybe Bool -> Maybe Bool -> Element Msg
-calculator model range bearing height strength plus friendly =
+calculator : Model -> Element Msg
+calculator model =
     let
         position =
             gridPosition range bearing
+
+        range =
+            model.storedAzimuthRange
+
+        bearing =
+            model.storedAzimuth
+
+        height =
+            model.storedElevation
+
+        strength =
+            model.storedStrength
+
+        plus =
+            model.storedStrengthPlus
+
+        friendly =
+            model.storedFriendly
     in
     column []
         [ row [ spacing 10, padding 5 ]
