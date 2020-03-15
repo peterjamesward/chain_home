@@ -2,15 +2,17 @@ module Utils exposing (..)
 
 -- SVG requires a line to be expressed as a space separated string of pairs.
 
-import Constants exposing (flatWetAsphalt, paletteSand)
+import Constants exposing (flatWetAsphalt, paletteDarkGreen, paletteSand, white)
 import Element as E exposing (..)
-import Element.Background as B
+import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
+import Element.Events exposing (onClick)
 import Element.Font as Font exposing (..)
 import Html.Attributes exposing (style)
+import Messages exposing (Msg(..))
 import Nixie exposing (nixieDisplay)
-import String exposing (toInt)
 
+epsilon = 0.01
 
 stringifyPoint ( x, y ) =
     String.fromFloat x
@@ -93,3 +95,26 @@ commonStyles =
         , Font.sansSerif
         ]
     ]
+
+helpButton : Element Msg
+helpButton =
+    el
+        [ E.alignRight
+        , E.alignTop
+        , Border.color white
+        , Border.width 1
+        , Border.rounded 15
+        , Background.color paletteDarkGreen
+        , Font.color white
+        , Font.size 12
+        , Font.bold
+        , Font.center
+        , paddingEach { edges | top = 6 }
+        , E.height (px 30)
+        , E.width (px 30)
+        , pointer
+        , onClick ExplainModeToggle
+        ]
+    <|
+        text "?"
+

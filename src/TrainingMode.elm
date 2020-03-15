@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, rangeMayUpdateTutorial, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, rangeMayUpdateTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -15,9 +15,11 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events exposing (onClick)
 import Element.Font as Font
+import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
 import Types exposing (..)
+import Utils exposing (epsilon)
 
 
 
@@ -57,6 +59,16 @@ tutorial =
         """The operator turns the range knob until the range indicator
         lines up with the left edge of the raid on the CRT.
         """
+    , TutorialEntry
+        TutorialFindBearing
+        UiGoniometer
+        """The operator 'swings' the goniometer until the 'V' on the CRT vanishes.
+        The goniometer scale now shows the bearing of the raid.
+        """
+    , TutorialEntry
+        TutorialDummy
+        UiBothKnobs
+        """ To Be Continued ..."""
     ]
 
 
@@ -68,6 +80,7 @@ uiExplanations =
     , ( UiRangeScale, """Range scale (miles) and range indicator""" )
     , ( UiSwitchPanel, """Mode switches""" )
     , ( UiRaidStrength, """Raid strength entry buttons""" )
+    , ( UiStrengthDisplay, """Estimate of number of planes in raid""")
     ]
 
 
@@ -108,6 +121,7 @@ findNextStep current =
 
 advanceTutorial : Model -> Model
 advanceTutorial current =
+    --TODO:  Code more neatly by passing the model struct through a cascade of updates.
     let
         nextStep =
             findNextStep current.tutorialStage
@@ -116,10 +130,72 @@ advanceTutorial current =
         | tutorialStage = nextStep
         , targets =
             if nextStep == Just TutorialIncomingRaid then
-                trainingMode -- start the incoming raid.
+                trainingMode
+                -- start the incoming raid.
 
             else
                 current.targets
+    }
+
+
+tutorialAutomation : Model -> Model
+tutorialAutomation model =
+    -- If we're running a tutorial, we can take over using fake keys presses.
+    case model.tutorialStage of
+        Nothing ->
+            model
+
+        Just TutorialAdjustRange ->
+            chaseTheRaidRange model
+
+        Just TutorialFindBearing ->
+            swingThatGoniometer model
+
+        Just _ ->
+            model
+
+
+chaseTheRaidRange : Model -> Model
+chaseTheRaidRange model =
+    -- Use simulated key presses to mimic the operator tracking the raid
+    let
+        rangeInMetres =
+            Maybe.withDefault 50000 <|
+                List.head <|
+                    List.map .r model.polarTargets
+
+        rangeInMiles =
+            toFloat <| floor <| rangeInMetres / 1600
+
+        currentKeys =
+            model.keys
+    in
+    { model
+        | keys =
+            { currentKeys
+                | rangeLeft = model.rangeSlider > rangeInMiles + 1
+                , rangeRight = model.rangeSlider < rangeInMiles - 1
+            }
+    }
+
+swingThatGoniometer : Model -> Model
+swingThatGoniometer model =
+    -- Use simulated key presses to mimic the operator tracking the raid
+    let
+        targetBearing =
+            Maybe.withDefault 0.0 <|
+                List.head <|
+                    List.map .theta model.polarTargets
+
+        currentKeys =
+            model.keys
+    in
+    { model
+        | keys =
+            { currentKeys
+                | gonioClock = model.goniometerAzimuth < targetBearing - (degrees 1)
+                , gonioAnti = model.goniometerAzimuth > targetBearing + (degrees 1)
+            }
     }
 
 

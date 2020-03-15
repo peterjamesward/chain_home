@@ -22,6 +22,7 @@ import ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEch
 import Goniometer exposing (goniometerTurnAngle)
 import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
+import Keys exposing (Keys, noKeys, updateKeys)
 import LobeFunctions exposing (..)
 import Messages exposing (..)
 import Model exposing (..)
@@ -81,30 +82,6 @@ init _ =
       }
     , Task.perform SetStartTime Time.now
     )
-
-
-noKeys : Keys
-noKeys =
-    Keys False False False False
-
-
-updateKeys : Bool -> String -> Keys -> Keys
-updateKeys isDown key keys =
-    case key of
-        "q" ->
-            { keys | gonioAnti = isDown }
-
-        "a" ->
-            { keys | gonioClock = isDown }
-
-        "," ->
-            { keys | rangeLeft = isDown }
-
-        "." ->
-            { keys | rangeRight = isDown }
-
-        _ ->
-            keys
 
 
 swingGoniometer : Angle -> Keys -> Angle
@@ -209,19 +186,20 @@ deriveModelAtTime model timeNow =
             -- Map 0..100 onto -pi..+pi
             (newRangeSliderPosition - 50) * pi / 50
     in
-    { model
-        | modelTime = timeNow
-        , movedTargets = targetsNow
-        , polarTargets = convertedTargets
-        , echoes = echoSignals
-        , gonioOutput = gonioAzimuthOut
-        , azimuthModeTrace = groundRays ++ gonioAzimuthOut
-        , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
-        , rangeSlider = newRangeSliderPosition
-        , rangeKnobAngle = newRangeKnobPosition
-        , elevation_A_trace = groundRays ++ heightMode_A_Outputs
-        , elevation_B_trace = groundRays ++ heightMode_B_Outputs
-    }
+    tutorialAutomation
+        { model
+            | modelTime = timeNow
+            , movedTargets = targetsNow
+            , polarTargets = convertedTargets
+            , echoes = echoSignals
+            , gonioOutput = gonioAzimuthOut
+            , azimuthModeTrace = groundRays ++ gonioAzimuthOut
+            , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
+            , rangeSlider = newRangeSliderPosition
+            , rangeKnobAngle = newRangeKnobPosition
+            , elevation_A_trace = groundRays ++ heightMode_A_Outputs
+            , elevation_B_trace = groundRays ++ heightMode_B_Outputs
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -266,7 +244,6 @@ update msg model =
               }
             , Cmd.none
             )
-
 
         SetConfigStateMsg index newState ->
             ( { model
@@ -607,6 +584,7 @@ targetSelector active =
 calculatorPage : Model -> Element Msg
 calculatorPage model =
     calculator
+        model
         model.storedAzimuthRange
         model.storedAzimuth
         model.storedElevation

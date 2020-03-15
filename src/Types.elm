@@ -16,15 +16,6 @@ type alias Flags =
     ()
 
 
-type alias Keys =
-    -- Keep track of any significant keys' state, such as for adjusting goniometer or range slider.
-    { gonioClock : Bool -- A
-    , gonioAnti : Bool -- Q
-    , rangeLeft : Bool -- left arrow
-    , rangeRight : Bool -- right arrow
-    }
-
-
 type alias Point =
     ( Float, Float )
 
@@ -56,6 +47,7 @@ type
     | HeightInput
     | HeightRangeInput
 
+
 type UiComponent
     = UiOperatorPage
     | UiRangeScale
@@ -72,6 +64,8 @@ type UiComponent
     | UiHeight
     | UiSense
     | UiClear
+    | UiStrengthDisplay
+
 
 type Tutorial
     = TutorialWelcome

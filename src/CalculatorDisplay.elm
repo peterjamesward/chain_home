@@ -11,8 +11,11 @@ import Element.Border as Border
 import Element.Font as Font
 import Html.Attributes exposing (style)
 import Messages exposing (Msg)
+import Model exposing (Model)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
-import Utils exposing (bearingDisplay, choose, disableSelection, edges)
+import TrainingMode exposing (tutorialHighlighting)
+import Types exposing (UiComponent(..))
+import Utils exposing (bearingDisplay, choose, disableSelection, edges, helpButton)
 
 
 type alias GridPosition =
@@ -71,8 +74,8 @@ gridPosition range bearing =
             Nothing
 
 
-calculator : Maybe Float -> Maybe Float -> Maybe Float -> Maybe Int -> Maybe Bool -> Maybe Bool -> Element Msg
-calculator range bearing height strength plus friendly =
+calculator : Model -> Maybe Float -> Maybe Float -> Maybe Float -> Maybe Int -> Maybe Bool -> Maybe Bool -> Element Msg
+calculator model range bearing height strength plus friendly =
     let
         position =
             gridPosition range bearing
@@ -82,7 +85,7 @@ calculator range bearing height strength plus friendly =
             [ positionGridDisplay position
             , column [ spacing 10 ]
                 [ row [ paddingEach { edges | left = 10, bottom = 10 }, spacing 10 ]
-                    [ strengthDisplay strength
+                    [ strengthDisplay model strength
                     , maybeBoolDisplay "+" plus
                     , maybeBoolDisplay "F" friendly
                     , column []
@@ -92,6 +95,7 @@ calculator range bearing height strength plus friendly =
                     ]
                 , heightGrid height
                 ]
+            , helpButton
             ]
         , row []
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
@@ -156,8 +160,8 @@ positionGridDisplay position =
             gridLettersList
 
 
-strengthDisplay : Maybe Int -> Element Msg
-strengthDisplay strength =
+strengthDisplay : Model -> Maybe Int -> Element Msg
+strengthDisplay model strength =
     let
         thisIsTheSquare n =
             case strength of
@@ -174,7 +178,13 @@ strengthDisplay strength =
                 )
                 (text label)
     in
-    row [ spacing 20, paddingEach { edges | left = 10 } ] <|
+    row
+        ([ spacing 20
+         , paddingEach { edges | left = 10 }
+         ]
+            ++ tutorialHighlighting model UiStrengthDisplay
+        )
+    <|
         List.map2 makeIt
             [ "1", "2", "3", "6", "9", "12", "18" ]
             [ 1, 2, 3, 6, 9, 12, 18 ]
