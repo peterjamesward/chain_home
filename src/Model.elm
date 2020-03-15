@@ -47,4 +47,5 @@ type alias Model =
     , storedFriendly : Maybe Bool
     , storedStrengthPlus : Maybe Bool
     , tutorialStage : Maybe Tutorial
+    , explainMode : Bool
     }

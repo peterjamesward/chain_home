@@ -5,6 +5,7 @@ import Constants exposing (..)
 import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events exposing (onClick, onMouseEnter)
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer)
@@ -143,7 +144,7 @@ rangeSliderAndCRT model trace =
 
 
 modeSwitchPanel model =
-    column commonStyles
+    column (commonStyles ++ tutorialHighlighting model UiSwitchPanel)
         [ row (commonStyles ++ tutorialHighlighting model UiClear)
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
@@ -249,10 +250,34 @@ operatorPageLandscape model =
                 ]
             ]
         , column ([ width <| fillPortion 2, centerX ] ++ tutorialHighlighting model UiRightSide)
-            [ modeSwitchPanel model
+            [ helpButton
+            , modeSwitchPanel model
             , raidStrengthPanel model
             ]
         ]
+
+
+helpButton : Element Msg
+helpButton =
+    el
+        [ alignRight
+        , alignTop
+        , Border.color white
+        , Border.width 1
+        , Border.rounded 15
+        , Background.color paletteDarkGreen
+        , Font.color white
+        , Font.size 12
+        , Font.bold
+        , Font.center
+        , paddingEach { edges | top = 6 }
+        , height (px 30)
+        , width (px 30)
+        , pointer
+        , onClick ExplainModeToggle
+        ]
+    <|
+        text "?"
 
 
 operatorPagePortrait model =

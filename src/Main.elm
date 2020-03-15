@@ -77,6 +77,7 @@ init _ =
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
       , tutorialStage = Nothing
+      , explainMode = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -200,6 +201,13 @@ deriveModelAtTime model timeNow =
         gonioAzimuthOut =
             -- 'Blend' X and Y inputs to find target's azimuth.
             goniometerMix model.goniometerAzimuth receiveSignals
+
+        newRangeSliderPosition =
+            slideRangeSlider model.rangeSlider model.keys
+
+        newRangeKnobPosition =
+            -- Map 0..100 onto -pi..+pi
+            (newRangeSliderPosition - 50) * pi / 50
     in
     { model
         | modelTime = timeNow
@@ -209,7 +217,8 @@ deriveModelAtTime model timeNow =
         , gonioOutput = gonioAzimuthOut
         , azimuthModeTrace = groundRays ++ gonioAzimuthOut
         , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
-        , rangeSlider = slideRangeSlider model.rangeSlider model.keys
+        , rangeSlider = newRangeSliderPosition
+        , rangeKnobAngle = newRangeKnobPosition
         , elevation_A_trace = groundRays ++ heightMode_A_Outputs
         , elevation_B_trace = groundRays ++ heightMode_B_Outputs
     }
@@ -234,6 +243,7 @@ update msg model =
                 , webGLtime = 0.0
                 , targets = getAllTargets model.activeConfigurations
                 , currPage = OperatorPage
+                , tutorialStage = Nothing
               }
             , Cmd.none
             )
@@ -249,6 +259,14 @@ update msg model =
               }
             , Cmd.none
             )
+
+        ExplainModeToggle ->
+            ( { model
+                | explainMode = not model.explainMode
+              }
+            , Cmd.none
+            )
+
 
         SetConfigStateMsg index newState ->
             ( { model
@@ -352,7 +370,6 @@ update msg model =
                         newAngle =
                             clamp (0 - stopKnob) stopKnob <|
                                 rangeTurnAngle startAngle startXY offset
-
                     in
                     ( { model
                         | rangeSlider = (pi + normalise newAngle) * 50 / pi
@@ -537,7 +554,7 @@ navBar =
         , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ navItem "Tutorial" DisplayTraining
+        [ navItem "Learn" DisplayTraining
         , navItem "Configuration" DisplayConfiguration
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
