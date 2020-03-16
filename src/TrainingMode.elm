@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, goBackInTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -50,7 +50,8 @@ tutorial =
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
-        """The white V shape under the 100 is a new raid.\n
+        """The white V shape under the 100 is a new raid.
+
         Click ► to see the operator start to examine the raid.
         """
     , TutorialEntry
@@ -133,6 +134,27 @@ findNextStep current =
     findNextStepHelper tutorial
 
 
+findPrevStep : Maybe Tutorial -> Maybe Tutorial
+findPrevStep current =
+    let
+        findPrevStepHelper steps =
+            case steps of
+                [] ->
+                    Just TutorialWelcome
+
+                step1 :: step2 :: more ->
+                    if Just step2.tutorialStep == current then
+                        Just step1.tutorialStep
+
+                    else
+                        findPrevStepHelper (step2 :: more)
+
+                _ :: more ->
+                    findPrevStepHelper more
+    in
+    findPrevStepHelper tutorial
+
+
 advanceTutorial : Model -> Model
 advanceTutorial current =
     --TODO:  Code more neatly by passing the model struct through a cascade of updates.
@@ -149,6 +171,13 @@ advanceTutorial current =
 
             else
                 current.targets
+    }
+
+
+goBackInTutorial : Model -> Model
+goBackInTutorial model =
+    { model
+        | tutorialStage = findPrevStep model.tutorialStage
     }
 
 
@@ -348,8 +377,8 @@ tutorialTextBox model =
                     , Font.family [ Font.typeface "Helvetica" ]
                     ]
                 <|
-                    row []
-                        [ text "◀︎"
+                    row [ width fill ]
+                        [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
                         , paragraph
                             [ Background.color blue
                             , spacing 4
@@ -357,28 +386,6 @@ tutorialTextBox model =
                             , Font.size 16
                             ]
                             [ text step.tutorialText ]
-                        , el [ onClick TutorialAdvance, pointer ] <|
+                        , el [ onClick TutorialAdvance, alignRight, pointer ] <|
                             text "►"
                         ]
-
-
-
---rangeMayUpdateTutorial : Model -> Maybe Tutorial
---rangeMayUpdateTutorial model =
---    let
---        nearEnough =
---            True
---    in
---    case model.tutorialStage of
---        Nothing ->
---            Nothing
---
---        Just TutorialAdjustRange ->
---            if nearEnough then
---                findNextStep model.tutorialStage
---
---            else
---                model.tutorialStage
---
---        _ ->
---            model.tutorialStage

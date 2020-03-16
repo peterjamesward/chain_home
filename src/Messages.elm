@@ -36,5 +36,6 @@ type Msg
     | RaidFriendly
     | TutorialAdvance
     | ExplainModeToggle
+    | TutorialBack
     | StartTutorialScenario
     | DummyMessage

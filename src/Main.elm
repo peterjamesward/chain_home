@@ -290,6 +290,11 @@ update msg model =
             , Cmd.none
             )
 
+        TutorialBack ->
+            ( goBackInTutorial model
+            , Cmd.none
+            )
+
         KeyChanged isDown key ->
             ( { model | keys = updateKeys isDown key model.keys }
             , Cmd.none

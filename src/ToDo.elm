@@ -8,18 +8,19 @@
 --DONE: Electronic calculator output.
 --DONE: Start raids further out.
 --DONE: Go! button resets timer, restarts raids from origin.
---TEST: Stop text selection.
+--DONE: Stop text selection.
 --DROP: Sensing is on the receiver, not the transmitter. (Actually, both. No changes required.)
---TODO: Narrative and on-screen prompts.
---TODO: Forward & Back buttons for tutorial.
---TODO: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
---TODO: Can we do a walk-through of a raid? -- Yes, WIP.
---TODO: Tutorial strings can be dynamic if we pass model in.
---TODO: Drop any targets moved beyond 100 miles range.
+--DONE: Forward & Back buttons for tutorial.
 --DONE: Explanations on Calculator page.
 --DONE: Tweak epsilon to stop endless range and bearing seeky behaviour.
 --DONE: Move trace to lower on the CRT.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.
+--TODO: Narrative and on-screen prompts.
+--TODO: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
+--TODO: PO to decide which raid scenarios to be in narrative.
+--DONE: Can we do a walk-through of a raid? -- Yes, WIP.
+--TODO: Tutorial strings can be dynamic if we pass model in.
+--TODO: Drop any targets moved beyond 100 miles range.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.
 --TODO: Improve that by using WebSockets -> JS -> Subscription -> Msg.
 --TODO: Physical knobs -- headless app reads from Arduino (10 bit encoder).
