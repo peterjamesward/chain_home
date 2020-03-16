@@ -28,9 +28,11 @@ import Types exposing (..)
 
 
 type alias TutorialEntry =
-    { tutorialStep : Tutorial
-    , uiComponent : UiComponent
-    , tutorialText : String
+    { tutorialStep : Tutorial -- The unique step identifier
+    , uiComponent : UiComponent -- The UI component to be highlighted
+    , entryAction : TutorialAction -- Changes to the model so we can be idempotent
+    , exitAction : TutorialAction -- Changes to the model, to make sure we exit cleanly
+    , tutorialText : String -- What we display to the user.
     }
 
 
@@ -43,6 +45,8 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
+        noEntryAction
+        noExitAction
         """We'll watch the operator work out the position of an incoming raid.
 
         Click ► to begin.
@@ -50,6 +54,8 @@ tutorial =
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
+        noEntryAction
+        noExitAction
         """The white V shape under the 100 is a new raid.
 
         Click ► to see the operator start to examine the raid.
@@ -57,29 +63,39 @@ tutorial =
     , TutorialEntry
         TutorialAdjustRange
         UiRangeKnob
+        noEntryAction
+        noExitAction
         """The operator turns the range knob until the range indicator
         lines up with the left edge of the raid on the CRT.
         """
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
+        noEntryAction
+        noExitAction
         """The operator 'swings' the goniometer until the 'V' on the CRT vanishes.
         The goniometer scale now shows the bearing of the raid.
         """
     , TutorialEntry
         TutorialStoreBearing
         UiGonioButton
+        noEntryAction
+        noExitAction
         """Pressing the GONIO button stores the bearing in the calculator.
         """
     , TutorialEntry
         TutorialStoreRange1
         UIRangeButton
+        noEntryAction
+        noExitAction
         """Pressing the RANGE button stores the range in the calculator.
 
         """
     , TutorialEntry
         TutorialDummy
         UiBothKnobs
+        noEntryAction
+        noExitAction
         """ To Be Continued ..."""
     ]
 
@@ -98,6 +114,13 @@ uiExplanations =
     , ( UiCalcOffset, """The approximate position within the grid square""" )
     ]
 
+type alias TutorialAction = Model -> Model
+
+noEntryAction : TutorialAction
+noEntryAction = identity
+
+noExitAction : TutorialAction
+noExitAction = identity
 
 lookupUiExplanation : UiComponent -> Maybe String
 lookupUiExplanation ui =
