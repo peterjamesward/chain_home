@@ -7,6 +7,7 @@ import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
 import Messages exposing (Msg)
+import Types exposing (Point)
 import Utils exposing (choose)
 import WebGL exposing (clearColor)
 
@@ -111,15 +112,11 @@ type alias Vertex =
 
 lineMesh : WebGL.Mesh Vertex
 lineMesh =
-    WebGL.triangles <| fatLineTwo 0.04 <| lineScaleTest 1000
+    WebGL.triangles <| fatLineTwo 0.04 <| subDivideTheLine 1000
 
 
-type alias Point =
-    ( Float, Float )
-
-
-lineScaleTest : Int -> List Point
-lineScaleTest n =
+subDivideTheLine : Int -> List Point
+subDivideTheLine n =
     let
         fraction i =
             toFloat i / toFloat n
@@ -338,10 +335,12 @@ vertexShader =
             if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};
         }
 
+        // Kludged to try to look OK with multiple raids.
         float coefficient(int i) {
             return 1.0 - 2.0 * mod(float(i),2.0);
         }
 
+        // Kludged to try to look OK with multiple raids.
         float periodicity(int i) {
             if (i == 0) return 0.0;
             if (i == 1) return 1.0/3.0;
@@ -354,7 +353,7 @@ vertexShader =
             stretch = 0.0; // The amount by which the rendered segment should be dimmed.
 
             // Copy raids into array for easier handling, probably.
-            vec3 raid[32]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).
+            vec3 raid[16]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).
             raid[0] = raid0;
             raid[1] = raid1;
             raid[2] = raid2;

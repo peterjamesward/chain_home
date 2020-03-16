@@ -68,16 +68,19 @@ aElevationAdjustedEchoes goniometerSetting echoes =
         (estimateEchoInElevationMode aSystemElevationCurveBasic goniometerSetting)
         echoes
 
+
 estimateEchoInElevationMode : ElevationCurve -> Float -> Echo -> Echo
 estimateEchoInElevationMode curve gonio echo =
-        { echo
-            | amplitude =
+    { echo
+        | amplitude =
+            abs <|
                 4.0
                     * sin
                         (gonio
                             - goniometerPositionForAlpha curve echo.alpha
                         )
-        }
+    }
+
 
 bElevationAdjustedEchoes : Float -> List Echo -> List Echo
 bElevationAdjustedEchoes goniometerSetting echoes =
