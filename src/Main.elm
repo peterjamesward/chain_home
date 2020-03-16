@@ -54,7 +54,7 @@ init _ =
       , polarTargets = []
       , echoes = []
       , skyline = []
-      , goniometerAzimuth = degrees 10 -- relative to Line Of Shoot.
+      , goniometerAzimuth = degrees 40 -- relative to Line Of Shoot.
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
@@ -359,7 +359,7 @@ update msg model =
         RangeRelease offset ->
             ( { model
                 | rangeDrag = Nothing
-                , tutorialStage = rangeMayUpdateTutorial model
+                --, tutorialStage = rangeMayUpdateTutorial model
               }
             , Cmd.none
             )

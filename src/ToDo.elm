@@ -15,7 +15,8 @@
 --TODO: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
 --TODO: Can we do a walk-through of a raid? -- Yes, WIP.
 --TODO: Tutorial strings can be dynamic if we pass model in.
---TODO: Explanations on Calculator page.
+--TODO: Drop any targets moved beyond 100 miles range.
+--DONE: Explanations on Calculator page.
 --DONE: Tweak epsilon to stop endless range and bearing seeky behaviour.
 --DONE: Move trace to lower on the CRT.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.

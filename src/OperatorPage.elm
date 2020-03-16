@@ -131,14 +131,14 @@ rangeScale model =
 
 rangeSliderAndCRT model trace =
     column
-        [ padding 5 ]
+        ([ padding 5 ] ++ tutorialHighlighting model UiCRT)
         [ E.el
             [ E.below (rangeScale model)
             , paddingEach { edges | left = 40 }
             ]
             (rangeSlider model)
         , el
-            (tutorialHighlighting model UiCRT)
+            []
             (E.html <| crt model.webGLtime trace)
         ]
 

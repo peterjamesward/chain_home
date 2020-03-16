@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, rangeMayUpdateTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
 
 {-
    This aims to be a "wrapper" of sorts for the Operator page,
@@ -19,7 +19,6 @@ import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
 import Types exposing (..)
-import Utils exposing (epsilon)
 
 
 
@@ -46,14 +45,13 @@ tutorial =
         UiCRT
         """We'll watch the operator work out the position of an incoming raid.
 
-        Click on this blue box to begin.
+        Click ► to begin.
         """
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
-        """A raid has appeared near the right of the CRT.
-
-        Click to see the operator start to examine the raid.
+        """The white V shape under the 100 is a new raid.\n
+        Click ► to see the operator start to examine the raid.
         """
     , TutorialEntry
         TutorialAdjustRange
@@ -341,41 +339,46 @@ tutorialTextBox model =
                     , centerY
                     , moveUp 100
                     , moveLeft 80
-                    , Background.color blue
-                    , Border.color white
-                    , Border.width 1
+                    , Border.color flatSunflower
+                    , Border.width 2
                     , Border.rounded 5
-                    , pointer
-                    , onClick TutorialAdvance
+                    , Font.center
+                    , Font.color white
+                    , Font.size 32
+                    , Font.family [ Font.typeface "Helvetica" ]
                     ]
                 <|
-                    paragraph
-                        [ Font.color white
-                        , Font.size 16
-                        , Font.family [ Font.typeface "Helvetica" ]
-                        , spacing 4
-                        , padding 4
-                        , Font.center
+                    row []
+                        [ text "◀︎"
+                        , paragraph
+                            [ Background.color blue
+                            , spacing 4
+                            , padding 10
+                            , Font.size 16
+                            ]
+                            [ text step.tutorialText ]
+                        , el [ onClick TutorialAdvance, pointer ] <|
+                            text "►"
                         ]
-                        [ text step.tutorialText ]
 
 
-rangeMayUpdateTutorial : Model -> Maybe Tutorial
-rangeMayUpdateTutorial model =
-    let
-        nearEnough =
-            True
-    in
-    case model.tutorialStage of
-        Nothing ->
-            Nothing
 
-        Just TutorialAdjustRange ->
-            if nearEnough then
-                findNextStep model.tutorialStage
-
-            else
-                model.tutorialStage
-
-        _ ->
-            model.tutorialStage
+--rangeMayUpdateTutorial : Model -> Maybe Tutorial
+--rangeMayUpdateTutorial model =
+--    let
+--        nearEnough =
+--            True
+--    in
+--    case model.tutorialStage of
+--        Nothing ->
+--            Nothing
+--
+--        Just TutorialAdjustRange ->
+--            if nearEnough then
+--                findNextStep model.tutorialStage
+--
+--            else
+--                model.tutorialStage
+--
+--        _ ->
+--            model.tutorialStage
