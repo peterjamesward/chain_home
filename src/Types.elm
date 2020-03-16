@@ -65,6 +65,8 @@ type UiComponent
     | UiSense
     | UiClear
     | UiStrengthDisplay
+    | UiGonioButton
+    | UIRangeButton
 
 
 type Tutorial
@@ -85,4 +87,6 @@ type Tutorial
     | TutorialIncomingRaid
     | TutorialAdjustRange
     | TutorialFindBearing
+    | TutorialStoreBearing
+    | TutorialStoreRange1
     | TutorialDummy

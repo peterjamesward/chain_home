@@ -244,9 +244,11 @@ operatorPageLandscape model =
             , row
                 (tutorialHighlighting model UiBothKnobs)
                 [ clickableGonioImage model UiRangeKnob
-                , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+                , el (tutorialHighlighting model UiGonioButton) <|
+                    actionButtonLabelAbove "GONIO" StoreGoniometerSetting
                 , clickableRangeKnob model UiGoniometer
-                , actionButtonLabelAbove "RANGE" StoreRangeSetting
+                , el (tutorialHighlighting model UIRangeButton) <|
+                    actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
         , column ([ width <| fillPortion 2, centerX ] ++ tutorialHighlighting model UiRightSide)

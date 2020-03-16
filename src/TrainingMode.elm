@@ -44,14 +44,16 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
-        """We'll watch what the operator must do to work out the position of an incoming raid.
+        """We'll watch the operator work out the position of an incoming raid.
+
         Click on this blue box to begin.
         """
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
-        """An incoming raid has appeared near the right of the CRT.
-        Click here to see the operator start to examine the raid.
+        """A raid has appeared near the right of the CRT.
+
+        Click to see the operator start to examine the raid.
         """
     , TutorialEntry
         TutorialAdjustRange
@@ -64,6 +66,17 @@ tutorial =
         UiGoniometer
         """The operator 'swings' the goniometer until the 'V' on the CRT vanishes.
         The goniometer scale now shows the bearing of the raid.
+        """
+    , TutorialEntry
+        TutorialStoreBearing
+        UiGonioButton
+        """Pressing the GONIO button stores the bearing in the calculator.
+        """
+    , TutorialEntry
+        TutorialStoreRange1
+        UIRangeButton
+        """Pressing the RANGE button stores the range in the calculator.
+
         """
     , TutorialEntry
         TutorialDummy
@@ -80,7 +93,7 @@ uiExplanations =
     , ( UiRangeScale, """Range scale (miles) and range indicator""" )
     , ( UiSwitchPanel, """Mode switches""" )
     , ( UiRaidStrength, """Raid strength entry buttons""" )
-    , ( UiStrengthDisplay, """Estimate of number of planes in raid""")
+    , ( UiStrengthDisplay, """Estimate of number of planes in raid""" )
     ]
 
 
@@ -151,6 +164,19 @@ tutorialAutomation model =
         Just TutorialFindBearing ->
             swingThatGoniometer model
 
+        Just TutorialStoreBearing ->
+            --TODO: Factor out this copied code.
+            { model
+                | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
+                , inputState = BearingRangeInput
+            }
+
+        Just TutorialStoreRange1 ->
+            { model
+                | storedAzimuthRange = Just (1.6 * model.rangeSlider)
+                , inputState = BearingInput
+            }
+
         Just _ ->
             model
 
@@ -178,6 +204,7 @@ chaseTheRaidRange model =
             }
     }
 
+
 swingThatGoniometer : Model -> Model
 swingThatGoniometer model =
     -- Use simulated key presses to mimic the operator tracking the raid
@@ -193,8 +220,8 @@ swingThatGoniometer model =
     { model
         | keys =
             { currentKeys
-                | gonioClock = model.goniometerAzimuth < targetBearing - (degrees 1)
-                , gonioAnti = model.goniometerAzimuth > targetBearing + (degrees 1)
+                | gonioClock = model.goniometerAzimuth < targetBearing - degrees 1
+                , gonioAnti = model.goniometerAzimuth > targetBearing + degrees 1
             }
     }
 
