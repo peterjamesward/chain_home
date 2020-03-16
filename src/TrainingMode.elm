@@ -93,7 +93,10 @@ uiExplanations =
     , ( UiRangeScale, """Range scale (miles) and range indicator""" )
     , ( UiSwitchPanel, """Mode switches""" )
     , ( UiRaidStrength, """Raid strength entry buttons""" )
-    , ( UiStrengthDisplay, """Estimate of number of planes in raid""" )
+    , ( UiCalcStrength, """Estimate of number of planes in raid""" )
+    , ( UiCalcGrid, """The 100km map grid square containing the raid""" )
+    , ( UiCalcHeight, """The approximate height of the raid""" )
+    , ( UiCalcOffset, """The approximate position within the grid square""" )
     ]
 
 
@@ -333,35 +336,28 @@ tutorialTextBox model =
 
             Just step ->
                 el
-                    [ width fill
-                    , centerY
+                    [ width (px 500)
                     , centerX
+                    , centerY
                     , moveUp 100
                     , moveLeft 80
-                    , inFront <|
-                        el
-                            [ width (px 500)
-                            , centerX
-                            , centerY
-                            , Background.color blue
-                            , Border.color white
-                            , Border.width 1
-                            , Border.rounded 5
-                            , pointer
-                            , onClick TutorialAdvance
-                            ]
-                        <|
-                            paragraph
-                                [ Font.color white
-                                , Font.size 16
-                                , Font.family [ Font.typeface "Helvetica" ]
-                                , spacing 4
-                                , padding 4
-                                , Font.center
-                                ]
-                                [ text step.tutorialText ]
+                    , Background.color blue
+                    , Border.color white
+                    , Border.width 1
+                    , Border.rounded 5
+                    , pointer
+                    , onClick TutorialAdvance
                     ]
-                    (text "")
+                <|
+                    paragraph
+                        [ Font.color white
+                        , Font.size 16
+                        , Font.family [ Font.typeface "Helvetica" ]
+                        , spacing 4
+                        , padding 4
+                        , Font.center
+                        ]
+                        [ text step.tutorialText ]
 
 
 rangeMayUpdateTutorial : Model -> Maybe Tutorial

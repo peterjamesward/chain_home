@@ -100,7 +100,7 @@ calculator model =
     in
     column []
         [ row [ spacing 10, padding 5 ]
-            [ positionGridDisplay position
+            [ positionGridDisplay model position
             , column [ spacing 10 ]
                 [ row [ paddingEach { edges | left = 10, bottom = 10 }, spacing 10 ]
                     [ strengthDisplay model strength
@@ -111,11 +111,11 @@ calculator model =
                         , none
                         ]
                     ]
-                , heightGrid height
+                , heightGrid model height
                 ]
             , helpButton
             ]
-        , row []
+        , row (tutorialHighlighting model UiCalcOffset)
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -146,8 +146,8 @@ buttonStyle enabled colour =
         ++ disableSelection
 
 
-positionGridDisplay : Maybe GridPosition -> Element Msg
-positionGridDisplay position =
+positionGridDisplay : Model -> Maybe GridPosition -> Element Msg
+positionGridDisplay model position =
     let
         thisIsTheSquare e n =
             case position of
@@ -172,7 +172,11 @@ positionGridDisplay position =
                     (List.range -3 3)
                     letters
     in
-    column [ centerX, padding 10, spacingXY 5 5 ] <|
+    column
+        ([ centerX, padding 10, spacingXY 5 5 ]
+            ++ tutorialHighlighting model UiCalcGrid
+        )
+    <|
         List.map2 displayGridRow
             (List.reverse <| List.range -3 3)
             gridLettersList
@@ -200,7 +204,7 @@ strengthDisplay model strength =
         ([ spacing 20
          , paddingEach { edges | left = 10 }
          ]
-            ++ tutorialHighlighting model UiStrengthDisplay
+            ++ tutorialHighlighting model UiCalcStrength
         )
     <|
         List.map2 makeIt
@@ -226,8 +230,8 @@ maybeBoolDisplay label b =
         (text label)
 
 
-heightGrid : Maybe Float -> Element Msg
-heightGrid storedHeight =
+heightGrid : Model -> Maybe Float -> Element Msg
+heightGrid model storedHeight =
     let
         theRightHeight low high =
             case storedHeight of
@@ -250,7 +254,7 @@ heightGrid storedHeight =
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column [ width fill ]
+    column ([ width fill ] ++ tutorialHighlighting model UiCalcHeight)
         [ row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))

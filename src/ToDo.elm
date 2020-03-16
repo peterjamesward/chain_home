@@ -11,7 +11,8 @@
 --TEST: Stop text selection.
 --DROP: Sensing is on the receiver, not the transmitter. (Actually, both. No changes required.)
 --TODO: Narrative and on-screen prompts.
---TODO: Back button for tutorial.
+--TODO: Forward & Back buttons for tutorial.
+--TODO: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
 --TODO: Can we do a walk-through of a raid? -- Yes, WIP.
 --TODO: Tutorial strings can be dynamic if we pass model in.
 --TODO: Explanations on Calculator page.

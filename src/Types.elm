@@ -64,9 +64,12 @@ type UiComponent
     | UiHeight
     | UiSense
     | UiClear
-    | UiStrengthDisplay
+    | UiCalcStrength
     | UiGonioButton
     | UIRangeButton
+    | UiCalcGrid
+    | UiCalcHeight
+    | UiCalcOffset
 
 
 type Tutorial
