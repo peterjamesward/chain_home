@@ -16,8 +16,10 @@
 --DONE: Move trace to lower on the CRT.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.
 --TODO: Narrative and on-screen prompts.
---TODO: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
---TODO: PO to decide which raid scenarios to be in narrative.
+--DONE: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
+--DONE: PO to decide which raid scenarios to be in narrative.
+--TODO: Learning menu of raid types (one, two, 3-6, IFF).
+--TODO: Play mode to only use learnt raid types.
 --DONE: Can we do a walk-through of a raid? -- Yes, WIP.
 --TODO: Tutorial strings can be dynamic if we pass model in.
 --TODO: Drop any targets moved beyond 100 miles range.

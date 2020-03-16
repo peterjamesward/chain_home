@@ -172,7 +172,7 @@ outboundFriendly =
 
 
 tutorialBomber =
-    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] True
+    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] False
 
 
 loneBomber =

@@ -30,8 +30,9 @@ import Types exposing (..)
 type alias TutorialEntry =
     { tutorialStep : Tutorial -- The unique step identifier
     , uiComponent : UiComponent -- The UI component to be highlighted
-    , entryAction : TutorialAction -- Changes to the model so we can be idempotent
-    , exitAction : TutorialAction -- Changes to the model, to make sure we exit cleanly
+    , entryActions : TutorialActionList -- Changes to the model so we can be idempotent
+    , stateActions : TutorialActionList -- Things we must do whilst in this state.
+    , exitActions : TutorialActionList -- Changes to the model, to make sure we exit cleanly
     , tutorialText : String -- What we display to the user.
     }
 
@@ -45,8 +46,9 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
-        noEntryAction
-        noExitAction
+        noEntryActions
+        noStateActions
+        noExitActions
         """We'll watch the operator work out the position of an incoming raid.
 
         Click ► to begin.
@@ -54,8 +56,9 @@ tutorial =
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
-        noEntryAction
-        noExitAction
+        [ setupTutorialRaid ]
+        noStateActions
+        noExitActions
         """The white V shape under the 100 is a new raid.
 
         Click ► to see the operator start to examine the raid.
@@ -63,39 +66,44 @@ tutorial =
     , TutorialEntry
         TutorialAdjustRange
         UiRangeKnob
-        noEntryAction
-        noExitAction
+        noEntryActions
+        [ chaseTheRaidRange ]
+        noExitActions
         """The operator turns the range knob until the range indicator
         lines up with the left edge of the raid on the CRT.
         """
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
-        noEntryAction
-        noExitAction
+        noEntryActions
+        [ swingThatGoniometer ]
+        noExitActions
         """The operator 'swings' the goniometer until the 'V' on the CRT vanishes.
         The goniometer scale now shows the bearing of the raid.
         """
     , TutorialEntry
         TutorialStoreBearing
         UiGonioButton
-        noEntryAction
-        noExitAction
+        noEntryActions
+        noStateActions
+        [ tutorialStoreBearing ]
         """Pressing the GONIO button stores the bearing in the calculator.
         """
     , TutorialEntry
         TutorialStoreRange1
         UIRangeButton
-        noEntryAction
-        noExitAction
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
         """Pressing the RANGE button stores the range in the calculator.
 
         """
     , TutorialEntry
         TutorialDummy
         UiBothKnobs
-        noEntryAction
-        noExitAction
+        noEntryActions
+        noStateActions
+        noExitActions
         """ To Be Continued ..."""
     ]
 
@@ -114,13 +122,29 @@ uiExplanations =
     , ( UiCalcOffset, """The approximate position within the grid square""" )
     ]
 
-type alias TutorialAction = Model -> Model
 
-noEntryAction : TutorialAction
-noEntryAction = identity
+type alias TutorialAction =
+    Model -> Model
 
-noExitAction : TutorialAction
-noExitAction = identity
+
+type alias TutorialActionList =
+    List TutorialAction
+
+
+noEntryActions : TutorialActionList
+noEntryActions =
+    []
+
+
+noExitActions : TutorialActionList
+noExitActions =
+    []
+
+
+noStateActions : TutorialActionList
+noStateActions =
+    []
+
 
 lookupUiExplanation : UiComponent -> Maybe String
 lookupUiExplanation ui =
@@ -180,58 +204,95 @@ findPrevStep current =
 
 advanceTutorial : Model -> Model
 advanceTutorial current =
-    --TODO:  Code more neatly by passing the model struct through a cascade of updates.
     let
-        nextStep =
+        nextStepId =
             findNextStep current.tutorialStage
-    in
-    { current
-        | tutorialStage = nextStep
-        , targets =
-            if nextStep == Just TutorialIncomingRaid then
-                trainingMode
-                -- start the incoming raid.
 
-            else
-                current.targets
-    }
+        currentStep =
+            findStep current.tutorialStage
+
+        maybeNextStep =
+            findStep nextStepId
+    in
+    case ( currentStep, maybeNextStep ) of
+        ( Just thisStage, Just nextStep ) ->
+            applyActions nextStep.entryActions <|
+                applyActions thisStage.exitActions <|
+                    { current | tutorialStage = nextStepId }
+
+        ( Just thisStage, Nothing ) ->
+            applyActions thisStage.exitActions <|
+                { current | tutorialStage = Nothing }
+
+        _ ->
+            current
+
+
+applyActions : TutorialActionList -> Model -> Model
+applyActions actions model =
+    -- Applicative style of applying functions in a chain.
+    List.foldl (\a m -> a m) model actions
+
+
+setupTutorialRaid : TutorialAction
+setupTutorialRaid model =
+    { model | targets = trainingMode }
 
 
 goBackInTutorial : Model -> Model
-goBackInTutorial model =
+goBackInTutorial current =
+    let
+        prevStepId =
+            findPrevStep current.tutorialStage
+
+        currentStep =
+            findStep current.tutorialStage
+
+        maybePrevStep =
+            findStep prevStepId
+    in
+    case ( currentStep, maybePrevStep ) of
+        ( Just thisStage, Just prevStep ) ->
+            applyActions prevStep.entryActions <|
+                applyActions thisStage.exitActions <|
+                    { current | tutorialStage = prevStepId }
+
+        ( Just thisStage, Nothing ) ->
+            applyActions thisStage.exitActions <|
+                { current | tutorialStage = Nothing }
+
+        _ ->
+            current
+
+
+tutorialAutomation : TutorialAction
+tutorialAutomation model =
+    -- This is the hook where we need to keep track of control positions etc.
+    -- I.E. not only on state transitions.
+    let
+        currentStep =
+            findStep model.tutorialStage
+    in
+    case currentStep of
+        Just thisStage ->
+            applyActions thisStage.stateActions model
+
+        _ ->
+            model
+
+
+tutorialStoreBearing model =
     { model
-        | tutorialStage = findPrevStep model.tutorialStage
+        | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
+        , inputState = BearingRangeInput
     }
 
 
-tutorialAutomation : Model -> Model
-tutorialAutomation model =
-    -- If we're running a tutorial, we can take over using fake keys presses.
-    case model.tutorialStage of
-        Nothing ->
-            model
-
-        Just TutorialAdjustRange ->
-            chaseTheRaidRange model
-
-        Just TutorialFindBearing ->
-            swingThatGoniometer model
-
-        Just TutorialStoreBearing ->
-            --TODO: Factor out this copied code.
-            { model
-                | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
-                , inputState = BearingRangeInput
-            }
-
-        Just TutorialStoreRange1 ->
-            { model
-                | storedAzimuthRange = Just (1.6 * model.rangeSlider)
-                , inputState = BearingInput
-            }
-
-        Just _ ->
-            model
+tutorialStoreRange1 model =
+    { model
+        | storedAzimuthRange = Just (1.6 * model.rangeSlider)
+        , inputState = BearingInput
+    }
 
 
 chaseTheRaidRange : Model -> Model
