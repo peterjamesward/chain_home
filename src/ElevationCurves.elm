@@ -1,4 +1,4 @@
-module ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes)
+module ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes, estimateEchoInElevationMode)
 
 import Echo exposing (Echo)
 import Target exposing (Target)
@@ -65,18 +65,19 @@ aElevationAdjustedEchoes goniometerSetting echoes =
     -- difference between the goniometer setting and the setting obtained
     -- by reading the known elevation off the height curve.
     List.map
-        (\e ->
-            { e
-                | amplitude =
-                    4.0
-                        * sin
-                            (goniometerSetting
-                                - goniometerPositionForAlpha aSystemElevationCurveBasic e.alpha
-                            )
-            }
-        )
+        (estimateEchoInElevationMode aSystemElevationCurveBasic goniometerSetting)
         echoes
 
+estimateEchoInElevationMode : ElevationCurve -> Float -> Echo -> Echo
+estimateEchoInElevationMode curve gonio echo =
+        { echo
+            | amplitude =
+                4.0
+                    * sin
+                        (gonio
+                            - goniometerPositionForAlpha curve echo.alpha
+                        )
+        }
 
 bElevationAdjustedEchoes : Float -> List Echo -> List Echo
 bElevationAdjustedEchoes goniometerSetting echoes =
@@ -84,14 +85,5 @@ bElevationAdjustedEchoes goniometerSetting echoes =
     -- difference between the goniometer setting and the setting obtained
     -- by reading the known elevation off the height curve.
     List.map
-        (\e ->
-            { e
-                | amplitude =
-                    4.0
-                        * sin
-                            (goniometerSetting
-                                - goniometerPositionForAlpha bSystemElevationCurveBasic e.alpha
-                            )
-            }
-        )
+        (estimateEchoInElevationMode bSystemElevationCurveBasic goniometerSetting)
         echoes

@@ -74,22 +74,11 @@ type UiComponent
 
 type Tutorial
     = TutorialWelcome
-    | TutorialLeftSide
-    | TutorialRightSide
-    | TutorialDescribeCRT
-    | TutorialRangeScale
-    | TutorialCRTTrace
-    | TutorialGoniometer
-    | TutorialRangeKnob
-    | TutorialABSwitch
-    | TutorialSense
-    | TutorialHeight
-    | TutorialOperatorPrompts
-    | TutorialClear
-    | TutorialRaidStrength
     | TutorialIncomingRaid
     | TutorialAdjustRange
     | TutorialFindBearing
     | TutorialStoreBearing
     | TutorialStoreRange1
+    | TutorialHeightMode
+    | TutorialFindElevation
     | TutorialDummy

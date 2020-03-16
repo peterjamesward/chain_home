@@ -175,7 +175,7 @@ deriveModelAtTime model timeNow =
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
 
-        gonioAzimuthOut =
+        gonioOutput =
             -- 'Blend' X and Y inputs to find target's azimuth.
             goniometerMix model.goniometerAzimuth receiveSignals
 
@@ -192,8 +192,8 @@ deriveModelAtTime model timeNow =
             , movedTargets = targetsNow
             , polarTargets = convertedTargets
             , echoes = echoSignals
-            , gonioOutput = gonioAzimuthOut
-            , azimuthModeTrace = groundRays ++ gonioAzimuthOut
+            , gonioOutput = gonioOutput
+            , azimuthModeTrace = groundRays ++ gonioOutput
             , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
             , rangeSlider = newRangeSliderPosition
             , rangeKnobAngle = newRangeKnobPosition

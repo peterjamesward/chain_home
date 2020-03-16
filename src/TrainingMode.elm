@@ -15,6 +15,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events exposing (onClick)
 import Element.Font as Font
+import ElevationCurves exposing (estimateEchoInElevationMode)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
@@ -95,6 +96,22 @@ tutorial =
         [ tutorialStoreRange1 ]
         """Pressing the RANGE button stores the range in the calculator.
 
+        """
+    , TutorialEntry
+        TutorialHeightMode
+        UiHeight
+        [ tutorialHeightMode ]
+        noStateActions
+        noExitActions
+        """The operator will now try to work out the height.
+        """
+    , TutorialEntry
+        TutorialFindElevation
+        UiGoniometer
+        noEntryActions
+        [ tutorialSeekElevation True ]
+        [ tutorialSeekElevation False ]
+        """The operator swings the gonio again, to minimise the V.
         """
     , TutorialEntry
         TutorialDummy
@@ -232,11 +249,6 @@ applyActions actions model =
     List.foldl (\a m -> a m) model actions
 
 
-setupTutorialRaid : TutorialAction
-setupTutorialRaid model =
-    { model | targets = trainingMode }
-
-
 goBackInTutorial : Model -> Model
 goBackInTutorial current =
     let
@@ -279,6 +291,12 @@ tutorialAutomation model =
             model
 
 
+setupTutorialRaid : TutorialAction
+setupTutorialRaid model =
+    { model | targets = trainingMode }
+
+
+tutorialStoreBearing : TutorialAction
 tutorialStoreBearing model =
     { model
         | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
@@ -286,10 +304,19 @@ tutorialStoreBearing model =
     }
 
 
+tutorialStoreRange1 : TutorialAction
 tutorialStoreRange1 model =
     { model
         | storedAzimuthRange = Just (1.6 * model.rangeSlider)
         , inputState = BearingInput
+    }
+
+
+tutorialHeightMode : TutorialAction
+tutorialHeightMode model =
+    { model
+        | goniometerMode = Elevation
+        , inputState = HeightInput
     }
 
 
@@ -334,6 +361,28 @@ swingThatGoniometer active model =
             { currentKeys
                 | gonioClock = active && model.goniometerAzimuth < targetBearing - degrees 1
                 , gonioAnti = active && model.goniometerAzimuth > targetBearing + degrees 1
+            }
+    }
+
+
+tutorialSeekElevation : Bool -> Model -> Model
+tutorialSeekElevation active model =
+    -- Use simulated key presses to mimic the operator tracking the raid.
+    -- Unlike bearing, we don't know which way to move, so just go clockwise and
+    -- don't try for zero!
+    let
+        targetElevation =
+            Maybe.withDefault 1.5 <|
+                List.head <|
+                    List.map .alpha model.elevation_A_trace
+
+        currentKeys =
+            model.keys
+    in
+    { model
+        | keys =
+            { currentKeys
+                | gonioClock = active && targetElevation > 0.1
             }
     }
 
