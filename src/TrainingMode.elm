@@ -59,27 +59,25 @@ tutorial =
         [ setupTutorialRaid ]
         noStateActions
         noExitActions
-        """The white V shape under the 100 is a new raid.
-
+        """The white V shape under the 100 on the 'tube' is a new raid.
         Click ► to see the operator start to examine the raid.
         """
     , TutorialEntry
         TutorialAdjustRange
         UiRangeKnob
         noEntryActions
-        [ chaseTheRaidRange ]
-        noExitActions
-        """The operator turns the range knob until the range indicator
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        """The operator turns the range knob until the pointer
         lines up with the left edge of the raid on the CRT.
         """
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
         noEntryActions
-        [ swingThatGoniometer ]
-        noExitActions
-        """The operator 'swings' the goniometer until the 'V' on the CRT vanishes.
-        The goniometer scale now shows the bearing of the raid.
+        [ swingThatGoniometer True ]
+        [ swingThatGoniometer False ]
+        """The operator 'swings' the gonio until the V on the CRT vanishes.
         """
     , TutorialEntry
         TutorialStoreBearing
@@ -295,8 +293,8 @@ tutorialStoreRange1 model =
     }
 
 
-chaseTheRaidRange : Model -> Model
-chaseTheRaidRange model =
+chaseTheRaidRange : Bool -> Model -> Model
+chaseTheRaidRange active model =
     -- Use simulated key presses to mimic the operator tracking the raid
     let
         rangeInMetres =
@@ -313,14 +311,14 @@ chaseTheRaidRange model =
     { model
         | keys =
             { currentKeys
-                | rangeLeft = model.rangeSlider > rangeInMiles + 1
-                , rangeRight = model.rangeSlider < rangeInMiles - 1
+                | rangeLeft = active && model.rangeSlider > rangeInMiles + 1
+                , rangeRight = active && model.rangeSlider < rangeInMiles - 1
             }
     }
 
 
-swingThatGoniometer : Model -> Model
-swingThatGoniometer model =
+swingThatGoniometer : Bool -> Model -> Model
+swingThatGoniometer active model =
     -- Use simulated key presses to mimic the operator tracking the raid
     let
         targetBearing =
@@ -334,8 +332,8 @@ swingThatGoniometer model =
     { model
         | keys =
             { currentKeys
-                | gonioClock = model.goniometerAzimuth < targetBearing - degrees 1
-                , gonioAnti = model.goniometerAzimuth > targetBearing + degrees 1
+                | gonioClock = active && model.goniometerAzimuth < targetBearing - degrees 1
+                , gonioAnti = active && model.goniometerAzimuth > targetBearing + degrees 1
             }
     }
 
