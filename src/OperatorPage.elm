@@ -1,6 +1,7 @@
 module OperatorPage exposing (operatorPage)
 
 import CRT_WebGL exposing (crt)
+import Config exposing (groundRays)
 import Constants exposing (..)
 import Element as E exposing (..)
 import Element.Background as Background
@@ -95,15 +96,17 @@ rangeSlider model =
 
 
 traceDependingOnMode model =
-    case ( model.goniometerMode, model.receiveAB ) of
-        ( Azimuth, _ ) ->
-            model.azimuthModeTrace
+    groundRays
+        ++ (case ( model.goniometerMode, model.receiveAB ) of
+                ( Azimuth, _ ) ->
+                    model.azimuthModeTrace
 
-        ( Elevation, True ) ->
-            model.elevation_A_trace
+                ( Elevation, True ) ->
+                    model.elevation_A_trace
 
-        ( Elevation, False ) ->
-            model.elevation_B_trace
+                ( Elevation, False ) ->
+                    model.elevation_B_trace
+           )
 
 
 rangeScale model =

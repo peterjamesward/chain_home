@@ -47,7 +47,7 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
-        noEntryActions
+        [ tutorialBearingMode ]
         noStateActions
         noExitActions
         """We'll watch the operator work out the position of an incoming raid.
@@ -320,6 +320,14 @@ tutorialHeightMode model =
     }
 
 
+tutorialBearingMode : TutorialAction
+tutorialBearingMode model =
+    { model
+        | goniometerMode = Azimuth
+        , inputState = BearingInput
+    }
+
+
 chaseTheRaidRange : Bool -> Model -> Model
 chaseTheRaidRange active model =
     -- Use simulated key presses to mimic the operator tracking the raid
@@ -374,7 +382,7 @@ tutorialSeekElevation active model =
         targetElevation =
             Maybe.withDefault 1.5 <|
                 List.head <|
-                    List.map .alpha model.elevation_A_trace
+                    List.map .amplitude model.elevation_A_trace
 
         currentKeys =
             model.keys
@@ -382,7 +390,7 @@ tutorialSeekElevation active model =
     { model
         | keys =
             { currentKeys
-                | gonioClock = active && targetElevation > 0.1
+                | gonioClock = active && targetElevation > 0.2
             }
     }
 

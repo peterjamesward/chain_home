@@ -193,12 +193,12 @@ deriveModelAtTime model timeNow =
             , polarTargets = convertedTargets
             , echoes = echoSignals
             , gonioOutput = gonioOutput
-            , azimuthModeTrace = groundRays ++ gonioOutput
+            , azimuthModeTrace = gonioOutput
             , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
             , rangeSlider = newRangeSliderPosition
             , rangeKnobAngle = newRangeKnobPosition
-            , elevation_A_trace = groundRays ++ heightMode_A_Outputs
-            , elevation_B_trace = groundRays ++ heightMode_B_Outputs
+            , elevation_A_trace = heightMode_A_Outputs
+            , elevation_B_trace = heightMode_B_Outputs
         }
 
 
