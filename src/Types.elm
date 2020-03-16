@@ -70,6 +70,7 @@ type UiComponent
     | UiCalcGrid
     | UiCalcHeight
     | UiCalcOffset
+    | UiCalculator
 
 
 type Tutorial
@@ -78,7 +79,12 @@ type Tutorial
     | TutorialAdjustRange
     | TutorialFindBearing
     | TutorialStoreBearing
-    | TutorialStoreRange1
+    | TutorialStoreRange1 -- relates to bearing
     | TutorialHeightMode
     | TutorialFindElevation
+    | TutorialStoreElevation
+    | TutorialAdjustRangeForHeight
+    | TutorialStoreRange2 -- relates to height
+    | TutorialStoreStrength
+    | TutorialShowCalculator
     | TutorialDummy

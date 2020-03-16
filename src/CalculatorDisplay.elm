@@ -13,7 +13,7 @@ import Html.Attributes exposing (style)
 import Messages exposing (Msg)
 import Model exposing (Model)
 import Nixie exposing (maybeNixieDisplay, nixieDisplay)
-import TrainingMode exposing (tutorialHighlighting)
+import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
 import Types exposing (UiComponent(..))
 import Utils exposing (bearingDisplay, choose, disableSelection, edges, helpButton)
 
@@ -98,7 +98,7 @@ calculator model =
         friendly =
             model.storedFriendly
     in
-    column []
+    column ([ centerX, tutorialTextBox model ] ++ tutorialHighlighting model UiCalculator)
         [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay model position
             , column [ spacing 10 ]

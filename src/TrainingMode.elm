@@ -19,6 +19,7 @@ import ElevationCurves exposing (estimateEchoInElevationMode)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
+import Target exposing (findTargetElevation)
 import Types exposing (..)
 
 
@@ -95,7 +96,6 @@ tutorial =
         noStateActions
         [ tutorialStoreRange1 ]
         """Pressing the RANGE button stores the range in the calculator.
-
         """
     , TutorialEntry
         TutorialHeightMode
@@ -114,12 +114,44 @@ tutorial =
         """The operator swings the gonio again, to minimise the V.
         """
     , TutorialEntry
-        TutorialDummy
-        UiBothKnobs
+        TutorialStoreElevation
+        UiGonioButton
         noEntryActions
         noStateActions
+        [ tutorialStoreElevation ]
+        """The GONIO setting is stored, this gives the elevation.
+        """
+    , TutorialEntry
+        TutorialAdjustRangeForHeight
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        """Adjust the range pointer because the raid has moved.
+        """
+    , TutorialEntry
+        TutorialStoreRange2
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        """Pressing the RANGE button stores the range in the calculator.
+        """
+    , TutorialEntry
+        TutorialStoreStrength
+        UiRaidStrength
+        [ tutorialStoreStrength 1 ]
+        noStateActions
         noExitActions
-        """ To Be Continued ..."""
+        """Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft.
+        """
+    , TutorialEntry
+        TutorialShowCalculator
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        noExitActions
+        tutorialInterpretCalculator
     ]
 
 
@@ -304,11 +336,33 @@ tutorialStoreBearing model =
     }
 
 
+tutorialStoreElevation : TutorialAction
+tutorialStoreElevation model =
+    -- Use the actual known elevation for target near range setting.
+    { model
+        | storedElevation = findTargetElevation model.targets model.polarTargets model.rangeSlider
+        , inputState = HeightRangeInput
+    }
+
+
+tutorialStoreStrength : Int -> TutorialAction
+tutorialStoreStrength strength model =
+    { model | storedStrength = Just strength }
+
+
 tutorialStoreRange1 : TutorialAction
 tutorialStoreRange1 model =
     { model
         | storedAzimuthRange = Just (1.6 * model.rangeSlider)
         , inputState = BearingInput
+    }
+
+
+tutorialStoreRange2 : TutorialAction
+tutorialStoreRange2 model =
+    { model
+        | storedElevationRange = Just (1.6 * model.rangeSlider)
+        , inputState = HeightInput
     }
 
 
@@ -326,6 +380,18 @@ tutorialBearingMode model =
         | goniometerMode = Azimuth
         , inputState = BearingInput
     }
+
+
+tutorialShowCalculator : TutorialAction
+tutorialShowCalculator model =
+    { model
+        | currPage = OutputPage
+    }
+
+
+tutorialInterpretCalculator : String
+tutorialInterpretCalculator =
+    "Hello World."
 
 
 chaseTheRaidRange : Bool -> Model -> Model
