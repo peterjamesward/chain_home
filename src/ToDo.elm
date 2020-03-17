@@ -25,7 +25,7 @@
 --TODO: Two plane scenario
 --TODO: 3-6 scenario
 --TODO: IFF scenario
---TODO: Play mode to only use learnt raid types.
+--TODO: Operate mode to only use learnt raid types.
 --TODO: Drop any targets moved beyond 100 miles range.
 --TODO: Raspberry Pi with touch screen.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.

@@ -36,7 +36,7 @@ type alias Model =
     , goniometerMode : GoniometerMode
     , transmitAntenna : Antenna
     , reflector : Bool
-    , isMenuOpen : Bool
+    , isMenuOpen : Bool -- use this for a dfropdown "Learn" menu.
     , receiveAB : Bool
     , receiveAntenna : Antenna
     , inputState : InputState

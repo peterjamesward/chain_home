@@ -231,7 +231,7 @@ update msg model =
             , Cmd.none
             )
 
-        ToggleMenu ->
+        ToggleLearnMenu ->
             ( { model
                 | isMenuOpen = not model.isMenuOpen
               }
@@ -257,6 +257,7 @@ update msg model =
             ( { model
                 | currPage = OperatorPage
                 , tutorialStage = Nothing
+                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -264,6 +265,7 @@ update msg model =
         DisplayConfiguration ->
             ( { model
                 | currPage = InputPage
+                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -271,6 +273,7 @@ update msg model =
         DisplayCalculator ->
             ( { model
                 | currPage = OutputPage
+                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -281,6 +284,7 @@ update msg model =
                 , tutorialStage = tutorialEntryPoint
                 , startTime = model.modelTime
                 , webGLtime = 0.0
+                , isMenuOpen = False
               }
             , Cmd.none
             )
@@ -364,6 +368,7 @@ update msg model =
         RangeRelease offset ->
             ( { model
                 | rangeDrag = Nothing
+
                 --, tutorialStage = rangeMayUpdateTutorial model
               }
             , Cmd.none
@@ -508,26 +513,26 @@ view model =
             ]
           <|
             column [ E.width E.fill, spacingXY 0 20 ]
-                [ navBar
+                [ navBar model
                 , content
                 ]
         ]
     }
 
 
-navBar : Element Msg
-navBar =
-    let
-        navItem label action =
-            el
-                ([ pointer
-                 , Event.onClick action
-                 ]
-                    ++ disableSelection
-                )
-            <|
-                text label
-    in
+navItem label action =
+    el
+        ([ pointer
+         , Event.onClick action
+         ]
+            ++ disableSelection
+        )
+    <|
+        text label
+
+
+navBar : Model -> Element Msg
+navBar model =
     row
         [ width fill
         , paddingXY 60 10
@@ -536,10 +541,37 @@ navBar =
         , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ navItem "Learn" DisplayTraining
+        [ el
+            (if model.isMenuOpen then
+                [ below learningMenu ]
+
+             else
+                []
+            )
+          <|
+            navItem "Learn" ToggleLearnMenu
         , navItem "Configuration" DisplayConfiguration
         , navItem "Operator" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
+        ]
+
+
+learningMenu : Element Msg
+learningMenu =
+    column
+        [ spacing 20
+        , Background.color flatMidnightBlue
+        , Border.color paletteLightGreen
+        , Border.width 2
+        , moveDown 10
+        , padding 20
+        , Font.color white
+        ]
+        [ navItem "Basic operation" DisplayTraining
+        , navItem "2 aircraft together" DisplayTraining
+        , navItem "2 aircraft apart" DisplayTraining
+        , navItem "3 to 6 strong raid" DisplayTraining
+        , navItem "Friendly (IFF)" DisplayTraining
         ]
 
 
@@ -650,7 +682,7 @@ menuPanel model =
                 items
 
         overlay =
-            el [ width <| fillPortion 4, height fill, Event.onClick ToggleMenu ] none
+            el [ width <| fillPortion 4, height fill, Event.onClick ToggleLearnMenu ] none
     in
     if model.isMenuOpen then
         row [ width fill, height fill ] [ overlay, panel ]

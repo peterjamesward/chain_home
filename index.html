@@ -7172,7 +7172,7 @@ var $author$project$Main$init = function (_v0) {
 			explainMode: false,
 			gonioDrag: $elm$core$Maybe$Nothing,
 			gonioOutput: _List_Nil,
-			goniometerAzimuth: $elm$core$Basics$degrees(10),
+			goniometerAzimuth: $elm$core$Basics$degrees(40),
 			goniometerMode: $author$project$Types$Azimuth,
 			inputState: $author$project$Types$BearingInput,
 			isMenuOpen: false,
@@ -7991,32 +7991,574 @@ var $author$project$Types$HeightRangeInput = {$: 'HeightRangeInput'};
 var $author$project$Types$OperatorPage = {$: 'OperatorPage'};
 var $author$project$Types$OutputPage = {$: 'OutputPage'};
 var $author$project$Types$TrainingPage = {$: 'TrainingPage'};
-var $author$project$Types$TutorialIncomingRaid = {$: 'TutorialIncomingRaid'};
+var $author$project$TrainingMode$applyActions = F2(
+	function (actions, model) {
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (a, m) {
+					return a(m);
+				}),
+			model,
+			actions);
+	});
 var $author$project$Types$TutorialWelcome = {$: 'TutorialWelcome'};
 var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
-var $author$project$Types$TutorialDummy = {$: 'TutorialDummy'};
-var $author$project$TrainingMode$TutorialEntry = F3(
-	function (tutorialStep, uiComponent, tutorialText) {
-		return {tutorialStep: tutorialStep, tutorialText: tutorialText, uiComponent: uiComponent};
+var $author$project$Types$TutorialAdjustRangeForHeight = {$: 'TutorialAdjustRangeForHeight'};
+var $author$project$Types$TutorialEnded = {$: 'TutorialEnded'};
+var $author$project$TrainingMode$TutorialEntry = F6(
+	function (tutorialStep, uiComponent, entryActions, stateActions, exitActions, tutorialText) {
+		return {entryActions: entryActions, exitActions: exitActions, stateActions: stateActions, tutorialStep: tutorialStep, tutorialText: tutorialText, uiComponent: uiComponent};
 	});
 var $author$project$Types$TutorialFindBearing = {$: 'TutorialFindBearing'};
+var $author$project$Types$TutorialFindElevation = {$: 'TutorialFindElevation'};
+var $author$project$Types$TutorialHeightMode = {$: 'TutorialHeightMode'};
+var $author$project$Types$TutorialIncomingRaid = {$: 'TutorialIncomingRaid'};
+var $author$project$Types$TutorialShowCalculator = {$: 'TutorialShowCalculator'};
 var $author$project$Types$TutorialStoreBearing = {$: 'TutorialStoreBearing'};
+var $author$project$Types$TutorialStoreElevation = {$: 'TutorialStoreElevation'};
 var $author$project$Types$TutorialStoreRange1 = {$: 'TutorialStoreRange1'};
+var $author$project$Types$TutorialStoreRange2 = {$: 'TutorialStoreRange2'};
+var $author$project$Types$TutorialStoreStrength = {$: 'TutorialStoreStrength'};
 var $author$project$Types$UIRangeButton = {$: 'UIRangeButton'};
-var $author$project$Types$UiBothKnobs = {$: 'UiBothKnobs'};
 var $author$project$Types$UiCRT = {$: 'UiCRT'};
+var $author$project$Types$UiCalculator = {$: 'UiCalculator'};
+var $author$project$Types$UiDummy = {$: 'UiDummy'};
 var $author$project$Types$UiGonioButton = {$: 'UiGonioButton'};
 var $author$project$Types$UiGoniometer = {$: 'UiGoniometer'};
+var $author$project$Types$UiHeight = {$: 'UiHeight'};
+var $author$project$Types$UiRaidStrength = {$: 'UiRaidStrength'};
 var $author$project$Types$UiRangeKnob = {$: 'UiRangeKnob'};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$TrainingMode$chaseTheRaidRange = F2(
+	function (active, model) {
+		var rangeInMetres = A2(
+			$elm$core$Maybe$withDefault,
+			50000,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$map,
+					function ($) {
+						return $.r;
+					},
+					model.polarTargets)));
+		var rangeInMiles = $elm$core$Basics$floor(rangeInMetres / 1600);
+		var currentKeys = model.keys;
+		return _Utils_update(
+			model,
+			{
+				keys: _Utils_update(
+					currentKeys,
+					{
+						rangeLeft: active && (_Utils_cmp(model.rangeSlider, rangeInMiles + 1) > 0),
+						rangeRight: active && (_Utils_cmp(model.rangeSlider, rangeInMiles - 1) < 0)
+					})
+			});
+	});
+var $author$project$TrainingMode$noEntryActions = _List_Nil;
+var $author$project$TrainingMode$noExitActions = _List_Nil;
+var $author$project$TrainingMode$noStateActions = _List_Nil;
+var $author$project$Config$trainingMode = _List_fromArray(
+	[
+		_Utils_update(
+		$author$project$Config$bomber1,
+		{tutorial: true})
+	]);
+var $author$project$TrainingMode$setupTutorialRaid = function (model) {
+	return _Utils_update(
+		model,
+		{targets: $author$project$Config$trainingMode});
+};
+var $author$project$TrainingMode$static = function (s) {
+	return function (_v0) {
+		return s;
+	};
+};
+var $author$project$TrainingMode$stopTutorialRaid = function (model) {
+	return _Utils_update(
+		model,
+		{targets: _List_Nil});
+};
+var $author$project$TrainingMode$swingThatGoniometer = F2(
+	function (active, model) {
+		var targetBearing = A2(
+			$elm$core$Maybe$withDefault,
+			0.0,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$map,
+					function ($) {
+						return $.theta;
+					},
+					model.polarTargets)));
+		var currentKeys = model.keys;
+		return _Utils_update(
+			model,
+			{
+				keys: _Utils_update(
+					currentKeys,
+					{
+						gonioAnti: active && (_Utils_cmp(
+							model.goniometerAzimuth,
+							targetBearing + $elm$core$Basics$degrees(1)) > 0),
+						gonioClock: active && (_Utils_cmp(
+							model.goniometerAzimuth,
+							targetBearing - $elm$core$Basics$degrees(1)) < 0)
+					})
+			});
+	});
+var $author$project$TrainingMode$tutorialBearingMode = function (model) {
+	return _Utils_update(
+		model,
+		{goniometerMode: $author$project$Types$Azimuth, inputState: $author$project$Types$BearingInput});
+};
+var $author$project$Types$TutorialDummy = {$: 'TutorialDummy'};
+var $author$project$TrainingMode$tutorialExit = function (model) {
+	return _Utils_update(
+		model,
+		{tutorialStage: $elm$core$Maybe$Nothing});
+};
+var $author$project$TrainingMode$tutorialCloseStep = A6(
+	$author$project$TrainingMode$TutorialEntry,
+	$author$project$Types$TutorialDummy,
+	$author$project$Types$UiDummy,
+	_List_fromArray(
+		[$author$project$TrainingMode$tutorialExit]),
+	$author$project$TrainingMode$noStateActions,
+	$author$project$TrainingMode$noExitActions,
+	$author$project$TrainingMode$static('No text.'));
+var $author$project$TrainingMode$tutorialHeightMode = function (model) {
+	return _Utils_update(
+		model,
+		{goniometerMode: $author$project$Types$Elevation, inputState: $author$project$Types$HeightInput});
+};
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$Basics$sin = _Basics_sin;
+var $elm$core$Basics$truncate = _Basics_truncate;
+var $author$project$Grid$gridPosition = F2(
+	function (range, bearing) {
+		var northing = F2(
+			function (r, b) {
+				return ((r * $elm$core$Basics$cos(b)) + 50) | 0;
+			});
+		var northSquareBoundary = F2(
+			function (r, b) {
+				return $elm$core$Basics$floor(
+					A2(northing, r, b) / 100.0);
+			});
+		var easting = F2(
+			function (r, b) {
+				return ((r * $elm$core$Basics$sin(b)) + 50) | 0;
+			});
+		var eastSquareBoundary = F2(
+			function (r, b) {
+				return $elm$core$Basics$floor(
+					A2(easting, r, b) / 100.0);
+			});
+		var _v0 = _Utils_Tuple2(range, bearing);
+		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+			var r = _v0.a.a;
+			var b = _v0.b.a;
+			return $elm$core$Maybe$Just(
+				{
+					gridSquareEast: A2(eastSquareBoundary, r, b),
+					gridSquareNorth: A2(northSquareBoundary, r, b),
+					gridSquareOffsetEast: A2(easting, r, b) - (100 * A2(eastSquareBoundary, r, b)),
+					gridSquareOffsetNorth: A2(northing, r, b) - (100 * A2(northSquareBoundary, r, b))
+				});
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $author$project$Grid$gridLettersList = _List_fromArray(
+	[
+		_List_fromArray(
+		['Y', 'Z', 'V', 'W', 'X', 'Y', 'Z']),
+		_List_fromArray(
+		['D', 'E', 'A', 'B', 'C', 'D', 'E']),
+		_List_fromArray(
+		['J', 'K', 'F', 'G', 'H', 'J', 'K']),
+		_List_fromArray(
+		['O', 'P', 'L', 'M', 'N', 'O', 'P']),
+		_List_fromArray(
+		['T', 'U', 'Q', 'R', 'S', 'T', 'U']),
+		_List_fromArray(
+		['Y', 'Z', 'V', 'W', 'X', 'Y', 'Z']),
+		_List_fromArray(
+		['D', 'E', 'A', 'B', 'C', 'D', 'E'])
+	]);
+var $author$project$Grid$letterFromGrid = function (maybeGridPosition) {
+	var gridLetter = F2(
+		function (east, north) {
+			var gridRow = $elm$core$List$head(
+				A2($elm$core$List$drop, 3 - north, $author$project$Grid$gridLettersList));
+			if (gridRow.$ === 'Just') {
+				var row = gridRow.a;
+				return $elm$core$List$head(
+					A2($elm$core$List$drop, east + 3, row));
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		});
+	if (maybeGridPosition.$ === 'Nothing') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var gridPos = maybeGridPosition.a;
+		return A2(gridLetter, gridPos.gridSquareEast, gridPos.gridSquareNorth);
+	}
+};
+var $author$project$Grid$tutorialInterpretCalculator = function (model) {
+	var gridPos = A2($author$project$Grid$gridPosition, model.storedAzimuthRange, model.storedAzimuth);
+	var letter = $author$project$Grid$letterFromGrid(gridPos);
+	return 'Raid at grid position ' + (function () {
+		var _v0 = _Utils_Tuple2(gridPos, letter);
+		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+			var grid = _v0.a.a;
+			var g = _v0.b.a;
+			return _Utils_ap(
+				g,
+				_Utils_ap(
+					$elm$core$String$fromInt(grid.gridSquareOffsetEast),
+					$elm$core$String$fromInt(grid.gridSquareOffsetNorth)));
+		} else {
+			return 'unknown';
+		}
+	}() + (', height ' + (function () {
+		var _v1 = model.storedElevation;
+		if (_v1.$ === 'Just') {
+			var h = _v1.a;
+			return $elm$core$String$fromFloat(h) + ',000 ft';
+		} else {
+			return 'unknown';
+		}
+	}() + (', strength ' + (function () {
+		var _v2 = model.storedStrengthPlus;
+		if ((_v2.$ === 'Just') && _v2.a) {
+			return 'more than ';
+		} else {
+			return '';
+		}
+	}() + (function () {
+		var _v3 = model.storedStrength;
+		if (_v3.$ === 'Just') {
+			var n = _v3.a;
+			return $elm$core$String$fromInt(n);
+		} else {
+			return ' unknown';
+		}
+	}() + function () {
+		var _v4 = model.storedFriendly;
+		if ((_v4.$ === 'Just') && _v4.a) {
+			return ', friendly.';
+		} else {
+			return '.';
+		}
+	}()))))));
+};
+var $author$project$TrainingMode$tutorialSeekElevation = F2(
+	function (active, model) {
+		var targetElevation = A2(
+			$elm$core$Maybe$withDefault,
+			1.5,
+			$elm$core$List$head(
+				A2(
+					$elm$core$List$map,
+					function ($) {
+						return $.amplitude;
+					},
+					model.elevation_A_trace)));
+		var currentKeys = model.keys;
+		return _Utils_update(
+			model,
+			{
+				keys: _Utils_update(
+					currentKeys,
+					{gonioClock: active && (targetElevation > 0.2)})
+			});
+	});
+var $author$project$TrainingMode$tutorialShowCalculator = function (model) {
+	return _Utils_update(
+		model,
+		{currPage: $author$project$Types$OutputPage});
+};
+var $author$project$TrainingMode$tutorialShowOperator = function (model) {
+	return _Utils_update(
+		model,
+		{currPage: $author$project$Types$OperatorPage});
+};
+var $author$project$TrainingMode$tutorialStoreBearing = function (model) {
+	return _Utils_update(
+		model,
+		{
+			inputState: $author$project$Types$BearingRangeInput,
+			storedAzimuth: $elm$core$Maybe$Just(model.goniometerAzimuth + model.station.lineOfShoot)
+		});
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Target$findTargetElevation = F3(
+	function (targets, polarTargets, range) {
+		var pairsOfRangeAndHeights = A3(
+			$elm$core$List$map2,
+			F2(
+				function (r1, p1) {
+					return _Utils_Tuple2(
+						$elm$core$Basics$abs(p1.r - (range * 1600)),
+						r1.height);
+				}),
+			targets,
+			polarTargets);
+		var minByFst = F2(
+			function (_v3, _v4) {
+				var r1 = _v3.a;
+				var h1 = _v3.b;
+				var r2 = _v4.a;
+				var h2 = _v4.b;
+				return (_Utils_cmp(r1, r2) < 0) ? _Utils_Tuple2(r1, h1) : _Utils_Tuple2(r2, h2);
+			});
+		var _v0 = _Utils_Tuple2(targets, polarTargets);
+		_v0$2:
+		while (true) {
+			if (!_v0.a.b) {
+				if (!_v0.b.b) {
+					return $elm$core$Maybe$Nothing;
+				} else {
+					break _v0$2;
+				}
+			} else {
+				if (((!_v0.a.b.b) && _v0.b.b) && (!_v0.b.b.b)) {
+					var _v1 = _v0.a;
+					var r1 = _v1.a;
+					var _v2 = _v0.b;
+					return $elm$core$Maybe$Just(r1.height);
+				} else {
+					break _v0$2;
+				}
+			}
+		}
+		return $elm$core$Maybe$Just(
+			A3(
+				$elm$core$List$foldl,
+				minByFst,
+				_Utils_Tuple2(1000000, 0),
+				pairsOfRangeAndHeights).b);
+	});
+var $author$project$TrainingMode$tutorialStoreElevation = function (model) {
+	return _Utils_update(
+		model,
+		{
+			inputState: $author$project$Types$HeightRangeInput,
+			storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.polarTargets, model.rangeSlider)
+		});
+};
+var $author$project$TrainingMode$tutorialStoreRange1 = function (model) {
+	return _Utils_update(
+		model,
+		{
+			inputState: $author$project$Types$BearingInput,
+			storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
+		});
+};
+var $author$project$TrainingMode$tutorialStoreStrength = F2(
+	function (strength, model) {
+		return _Utils_update(
+			model,
+			{
+				storedStrength: $elm$core$Maybe$Just(strength)
+			});
+	});
 var $author$project$TrainingMode$tutorial = _List_fromArray(
 	[
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialWelcome, $author$project$Types$UiCRT, 'We\'ll watch the operator work out the position of an incoming raid.\n\n        Click on this blue box to begin.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialIncomingRaid, $author$project$Types$UiCRT, 'A raid has appeared near the right of the CRT.\n\n        Click to see the operator start to examine the raid.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialAdjustRange, $author$project$Types$UiRangeKnob, 'The operator turns the range knob until the range indicator\n        lines up with the left edge of the raid on the CRT.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialFindBearing, $author$project$Types$UiGoniometer, 'The operator \'swings\' the goniometer until the \'V\' on the CRT vanishes.\n        The goniometer scale now shows the bearing of the raid.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialStoreBearing, $author$project$Types$UiGonioButton, 'Pressing the GONIO button stores the bearing in the calculator.\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialStoreRange1, $author$project$Types$UIRangeButton, 'Pressing the RANGE button stores the range in the calculator.\n\n        '),
-		A3($author$project$TrainingMode$TutorialEntry, $author$project$Types$TutorialDummy, $author$project$Types$UiBothKnobs, ' To Be Continued ...')
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialWelcome,
+		$author$project$Types$UiCRT,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialBearingMode]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('We\'ll watch the operator work out the position of an incoming raid.\n        Click ► to begin.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIncomingRaid,
+		$author$project$Types$UiCRT,
+		_List_fromArray(
+			[$author$project$TrainingMode$setupTutorialRaid]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The white V shape under the 100 on the \'tube\' is a new raid.\n        Click ► to see the operator start to examine the raid.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialAdjustRange,
+		$author$project$Types$UiRangeKnob,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(false)
+			]),
+		$author$project$TrainingMode$static('The operator turns the range knob until the pointer\n        lines up with the left edge of the raid on the CRT.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindBearing,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$swingThatGoniometer(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$swingThatGoniometer(false)
+			]),
+		$author$project$TrainingMode$static('The operator \'swings\' the gonio until the V on the CRT vanishes.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreBearing,
+		$author$project$Types$UiGonioButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreBearing]),
+		$author$project$TrainingMode$static('Pressing the GONIO button stores the bearing in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreRange1,
+		$author$project$Types$UIRangeButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreRange1]),
+		$author$project$TrainingMode$static('Pressing the RANGE button stores the range in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialHeightMode,
+		$author$project$Types$UiHeight,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialHeightMode]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The operator will now try to work out the height.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindElevation,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialSeekElevation(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialSeekElevation(false)
+			]),
+		$author$project$TrainingMode$static('The operator swings the gonio again, to minimise the V.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreElevation,
+		$author$project$Types$UiGonioButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreElevation]),
+		$author$project$TrainingMode$static('The GONIO setting is stored, this gives the elevation.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialAdjustRangeForHeight,
+		$author$project$Types$UiRangeKnob,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(false)
+			]),
+		$author$project$TrainingMode$static('Adjust the range pointer because the raid has moved.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreRange2,
+		$author$project$Types$UIRangeButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreRange1]),
+		$author$project$TrainingMode$static('Pressing the RANGE button stores the range in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreStrength,
+		$author$project$Types$UiRaidStrength,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialStoreStrength(1)
+			]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialShowCalculator,
+		$author$project$Types$UiCalculator,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowCalculator]),
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowOperator]),
+		$author$project$Grid$tutorialInterpretCalculator),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialEnded,
+		$author$project$Types$UiDummy,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$stopTutorialRaid]),
+		$author$project$TrainingMode$static('Choose more training or click on Operate.\n        ')),
+		$author$project$TrainingMode$tutorialCloseStep
 	]);
 var $author$project$TrainingMode$findNextStep = function (current) {
 	var findNextStepHelper = function (steps) {
@@ -8050,22 +8592,60 @@ var $author$project$TrainingMode$findNextStep = function (current) {
 	};
 	return findNextStepHelper($author$project$TrainingMode$tutorial);
 };
-var $author$project$Config$trainingMode = _List_fromArray(
-	[
-		_Utils_update(
-		$author$project$Config$bomber1,
-		{tutorial: true})
-	]);
+var $author$project$TrainingMode$findStep = function (tutorialStep) {
+	var findHelper = function (steps) {
+		findHelper:
+		while (true) {
+			if (!steps.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var step1 = steps.a;
+				var more = steps.b;
+				if (_Utils_eq(
+					$elm$core$Maybe$Just(step1.tutorialStep),
+					tutorialStep)) {
+					return $elm$core$Maybe$Just(step1);
+				} else {
+					var $temp$steps = more;
+					steps = $temp$steps;
+					continue findHelper;
+				}
+			}
+		}
+	};
+	return findHelper($author$project$TrainingMode$tutorial);
+};
 var $author$project$TrainingMode$advanceTutorial = function (current) {
-	var nextStep = $author$project$TrainingMode$findNextStep(current.tutorialStage);
-	return _Utils_update(
-		current,
-		{
-			targets: _Utils_eq(
-				nextStep,
-				$elm$core$Maybe$Just($author$project$Types$TutorialIncomingRaid)) ? $author$project$Config$trainingMode : current.targets,
-			tutorialStage: nextStep
-		});
+	var nextStepId = $author$project$TrainingMode$findNextStep(current.tutorialStage);
+	var maybeNextStep = $author$project$TrainingMode$findStep(nextStepId);
+	var currentStep = $author$project$TrainingMode$findStep(current.tutorialStage);
+	var _v0 = _Utils_Tuple2(currentStep, maybeNextStep);
+	if (_v0.a.$ === 'Just') {
+		if (_v0.b.$ === 'Just') {
+			var thisStage = _v0.a.a;
+			var nextStep = _v0.b.a;
+			return A2(
+				$author$project$TrainingMode$applyActions,
+				nextStep.entryActions,
+				A2(
+					$author$project$TrainingMode$applyActions,
+					thisStage.exitActions,
+					_Utils_update(
+						current,
+						{tutorialStage: nextStepId})));
+		} else {
+			var thisStep = _v0.a.a;
+			var _v1 = _v0.b;
+			return A2(
+				$author$project$TrainingMode$applyActions,
+				thisStep.exitActions,
+				_Utils_update(
+					current,
+					{tutorialStage: $elm$core$Maybe$Nothing}));
+		}
+	} else {
+		return current;
+	}
 };
 var $author$project$Utils$choose = F3(
 	function (b, o1, o2) {
@@ -8104,19 +8684,21 @@ var $author$project$ElevationCurves$goniometerPositionForAlpha = F2(
 		var gonioOffset = ((curveValue - 0.0) * $elm$core$Basics$degrees(150)) + ((2.0 - curveValue) * $elm$core$Basics$degrees(20));
 		return gonioOffset;
 	});
-var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$ElevationCurves$estimateEchoInElevationMode = F3(
+	function (curve, gonio, echo) {
+		return _Utils_update(
+			echo,
+			{
+				amplitude: $elm$core$Basics$abs(
+					4.0 * $elm$core$Basics$sin(
+						gonio - A2($author$project$ElevationCurves$goniometerPositionForAlpha, curve, echo.alpha)))
+			});
+	});
 var $author$project$ElevationCurves$aElevationAdjustedEchoes = F2(
 	function (goniometerSetting, echoes) {
 		return A2(
 			$elm$core$List$map,
-			function (e) {
-				return _Utils_update(
-					e,
-					{
-						amplitude: 4.0 * $elm$core$Basics$sin(
-							goniometerSetting - A2($author$project$ElevationCurves$goniometerPositionForAlpha, $author$project$ElevationCurves$aSystemElevationCurveBasic, e.alpha))
-					});
-			},
+			A2($author$project$ElevationCurves$estimateEchoInElevationMode, $author$project$ElevationCurves$aSystemElevationCurveBasic, goniometerSetting),
 			echoes);
 	});
 var $author$project$Main$applyReceiver = F2(
@@ -8140,14 +8722,7 @@ var $author$project$ElevationCurves$bElevationAdjustedEchoes = F2(
 	function (goniometerSetting, echoes) {
 		return A2(
 			$elm$core$List$map,
-			function (e) {
-				return _Utils_update(
-					e,
-					{
-						amplitude: 4.0 * $elm$core$Basics$sin(
-							goniometerSetting - A2($author$project$ElevationCurves$goniometerPositionForAlpha, $author$project$ElevationCurves$bSystemElevationCurveBasic, e.alpha))
-					});
-			},
+			A2($author$project$ElevationCurves$estimateEchoInElevationMode, $author$project$ElevationCurves$bSystemElevationCurveBasic, goniometerSetting),
 			echoes);
 	});
 var $elm$core$Basics$asin = _Basics_asin;
@@ -8200,11 +8775,6 @@ var $author$project$Receiver$goniometerMix = F2(
 			$author$project$Receiver$gonioMixEcho(angle),
 			echoes);
 	});
-var $author$project$Config$groundRays = _List_fromArray(
-	[
-		{alpha: 0, amplitude: 10.0, duration: 0, phase: 0, r: 5000, sequence: 0, theta: 0, tutorial: false},
-		{alpha: 0, amplitude: 8.0, duration: 0, phase: 0, r: 8000, sequence: 0, theta: 0, tutorial: false}
-	]);
 var $elm$core$Basics$atan2 = _Basics_atan2;
 var $author$project$Spherical$bearing = F2(
 	function (_v0, _v1) {
@@ -8318,106 +8888,13 @@ var $author$project$Target$targetAtTime = F2(
 				longitude: newLong
 			});
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $author$project$TrainingMode$chaseTheRaidRange = function (model) {
-	var rangeInMetres = A2(
-		$elm$core$Maybe$withDefault,
-		50000,
-		$elm$core$List$head(
-			A2(
-				$elm$core$List$map,
-				function ($) {
-					return $.r;
-				},
-				model.polarTargets)));
-	var rangeInMiles = $elm$core$Basics$floor(rangeInMetres / 1600);
-	var currentKeys = model.keys;
-	return _Utils_update(
-		model,
-		{
-			keys: _Utils_update(
-				currentKeys,
-				{
-					rangeLeft: _Utils_cmp(model.rangeSlider, rangeInMiles + 1) > 0,
-					rangeRight: _Utils_cmp(model.rangeSlider, rangeInMiles - 1) < 0
-				})
-		});
-};
-var $author$project$TrainingMode$swingThatGoniometer = function (model) {
-	var targetBearing = A2(
-		$elm$core$Maybe$withDefault,
-		0.0,
-		$elm$core$List$head(
-			A2(
-				$elm$core$List$map,
-				function ($) {
-					return $.theta;
-				},
-				model.polarTargets)));
-	var currentKeys = model.keys;
-	return _Utils_update(
-		model,
-		{
-			keys: _Utils_update(
-				currentKeys,
-				{
-					gonioAnti: _Utils_cmp(
-						model.goniometerAzimuth,
-						targetBearing + $elm$core$Basics$degrees(1)) > 0,
-					gonioClock: _Utils_cmp(
-						model.goniometerAzimuth,
-						targetBearing - $elm$core$Basics$degrees(1)) < 0
-				})
-		});
-};
 var $author$project$TrainingMode$tutorialAutomation = function (model) {
-	var _v0 = model.tutorialStage;
-	if (_v0.$ === 'Nothing') {
-		return model;
+	var currentStep = $author$project$TrainingMode$findStep(model.tutorialStage);
+	if (currentStep.$ === 'Just') {
+		var thisStage = currentStep.a;
+		return A2($author$project$TrainingMode$applyActions, thisStage.stateActions, model);
 	} else {
-		switch (_v0.a.$) {
-			case 'TutorialAdjustRange':
-				var _v1 = _v0.a;
-				return $author$project$TrainingMode$chaseTheRaidRange(model);
-			case 'TutorialFindBearing':
-				var _v2 = _v0.a;
-				return $author$project$TrainingMode$swingThatGoniometer(model);
-			case 'TutorialStoreBearing':
-				var _v3 = _v0.a;
-				return _Utils_update(
-					model,
-					{
-						inputState: $author$project$Types$BearingRangeInput,
-						storedAzimuth: $elm$core$Maybe$Just(model.goniometerAzimuth + model.station.lineOfShoot)
-					});
-			case 'TutorialStoreRange1':
-				var _v4 = _v0.a;
-				return _Utils_update(
-					model,
-					{
-						inputState: $author$project$Types$BearingInput,
-						storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
-					});
-			default:
-				return model;
-		}
+		return model;
 	}
 };
 var $author$project$Main$deriveModelAtTime = F2(
@@ -8437,16 +8914,16 @@ var $author$project$Main$deriveModelAtTime = F2(
 		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var heightMode_B_Outputs = A2($author$project$ElevationCurves$bElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var receiveSignals = A2($author$project$Main$applyReceiver, model.receiveAntenna, echoSignals);
-		var gonioAzimuthOut = A2($author$project$Receiver$goniometerMix, model.goniometerAzimuth, receiveSignals);
+		var gonioOutput = A2($author$project$Receiver$goniometerMix, model.goniometerAzimuth, receiveSignals);
 		return $author$project$TrainingMode$tutorialAutomation(
 			_Utils_update(
 				model,
 				{
-					azimuthModeTrace: _Utils_ap($author$project$Config$groundRays, gonioAzimuthOut),
+					azimuthModeTrace: gonioOutput,
 					echoes: echoSignals,
-					elevation_A_trace: _Utils_ap($author$project$Config$groundRays, heightMode_A_Outputs),
-					elevation_B_trace: _Utils_ap($author$project$Config$groundRays, heightMode_B_Outputs),
-					gonioOutput: gonioAzimuthOut,
+					elevation_A_trace: heightMode_A_Outputs,
+					elevation_B_trace: heightMode_B_Outputs,
+					gonioOutput: gonioOutput,
 					goniometerAzimuth: A2($author$project$Main$swingGoniometer, model.goniometerAzimuth, model.keys),
 					modelTime: timeNow,
 					movedTargets: targetsNow,
@@ -8455,57 +8932,70 @@ var $author$project$Main$deriveModelAtTime = F2(
 					rangeSlider: newRangeSliderPosition
 				}));
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $author$project$Target$findTargetElevation = F3(
-	function (targets, polarTargets, range) {
-		var pairsOfRangeAndHeights = A3(
-			$elm$core$List$map2,
-			F2(
-				function (r1, p1) {
-					return _Utils_Tuple2(
-						$elm$core$Basics$abs(p1.r - (range * 1600)),
-						r1.height);
-				}),
-			targets,
-			polarTargets);
-		var minByFst = F2(
-			function (_v3, _v4) {
-				var r1 = _v3.a;
-				var h1 = _v3.b;
-				var r2 = _v4.a;
-				var h2 = _v4.b;
-				return (_Utils_cmp(r1, r2) < 0) ? _Utils_Tuple2(r1, h1) : _Utils_Tuple2(r2, h2);
-			});
-		var _v0 = _Utils_Tuple2(targets, polarTargets);
-		_v0$2:
+var $author$project$TrainingMode$findPrevStep = function (current) {
+	var findPrevStepHelper = function (steps) {
+		findPrevStepHelper:
 		while (true) {
-			if (!_v0.a.b) {
-				if (!_v0.b.b) {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					break _v0$2;
-				}
+			if (!steps.b) {
+				return $elm$core$Maybe$Just($author$project$Types$TutorialWelcome);
 			} else {
-				if (((!_v0.a.b.b) && _v0.b.b) && (!_v0.b.b.b)) {
-					var _v1 = _v0.a;
-					var r1 = _v1.a;
-					var _v2 = _v0.b;
-					return $elm$core$Maybe$Just(r1.height);
+				if (steps.b.b) {
+					var step1 = steps.a;
+					var _v1 = steps.b;
+					var step2 = _v1.a;
+					var more = _v1.b;
+					if (_Utils_eq(
+						$elm$core$Maybe$Just(step2.tutorialStep),
+						current)) {
+						return $elm$core$Maybe$Just(step1.tutorialStep);
+					} else {
+						var $temp$steps = A2($elm$core$List$cons, step2, more);
+						steps = $temp$steps;
+						continue findPrevStepHelper;
+					}
 				} else {
-					break _v0$2;
+					var more = steps.b;
+					var $temp$steps = more;
+					steps = $temp$steps;
+					continue findPrevStepHelper;
 				}
 			}
 		}
-		return $elm$core$Maybe$Just(
-			A3(
-				$elm$core$List$foldl,
-				minByFst,
-				_Utils_Tuple2(1000000, 0),
-				pairsOfRangeAndHeights).b);
-	});
+	};
+	return findPrevStepHelper($author$project$TrainingMode$tutorial);
+};
+var $author$project$TrainingMode$goBackInTutorial = function (current) {
+	var prevStepId = $author$project$TrainingMode$findPrevStep(current.tutorialStage);
+	var maybePrevStep = $author$project$TrainingMode$findStep(prevStepId);
+	var currentStep = $author$project$TrainingMode$findStep(current.tutorialStage);
+	var _v0 = _Utils_Tuple2(currentStep, maybePrevStep);
+	if (_v0.a.$ === 'Just') {
+		if (_v0.b.$ === 'Just') {
+			var thisStage = _v0.a.a;
+			var prevStep = _v0.b.a;
+			return A2(
+				$author$project$TrainingMode$applyActions,
+				prevStep.entryActions,
+				A2(
+					$author$project$TrainingMode$applyActions,
+					thisStage.exitActions,
+					_Utils_update(
+						current,
+						{tutorialStage: prevStepId})));
+		} else {
+			var thisStage = _v0.a.a;
+			var _v1 = _v0.b;
+			return A2(
+				$author$project$TrainingMode$applyActions,
+				thisStage.exitActions,
+				_Utils_update(
+					current,
+					{tutorialStage: $elm$core$Maybe$Nothing}));
+		}
+	} else {
+		return current;
+	}
+};
 var $author$project$Goniometer$radius = 135;
 var $elm$core$Basics$toPolar = function (_v0) {
 	var x = _v0.a;
@@ -8540,20 +9030,6 @@ var $elm$core$Basics$not = _Basics_not;
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
-};
-var $author$project$TrainingMode$rangeMayUpdateTutorial = function (model) {
-	var nearEnough = true;
-	var _v0 = model.tutorialStage;
-	if (_v0.$ === 'Nothing') {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		if (_v0.a.$ === 'TutorialAdjustRange') {
-			var _v1 = _v0.a;
-			return nearEnough ? $author$project$TrainingMode$findNextStep(model.tutorialStage) : model.tutorialStage;
-		} else {
-			return model.tutorialStage;
-		}
-	}
 };
 var $author$project$Range$radius = 120;
 var $author$project$Range$rangeTurnAngle = F3(
@@ -8757,6 +9233,10 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					$author$project$TrainingMode$advanceTutorial(model),
 					$elm$core$Platform$Cmd$none);
+			case 'TutorialBack':
+				return _Utils_Tuple2(
+					$author$project$TrainingMode$goBackInTutorial(model),
+					$elm$core$Platform$Cmd$none);
 			case 'KeyChanged':
 				var isDown = msg.a;
 				var key = msg.b;
@@ -8845,10 +9325,7 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{
-							rangeDrag: $elm$core$Maybe$Nothing,
-							tutorialStage: $author$project$TrainingMode$rangeMayUpdateTutorial(model)
-						}),
+						{rangeDrag: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
 			case 'AdjustRangeValue':
 				var newRange = msg.a;
@@ -8981,6 +9458,17 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Types$UiCalcOffset = {$: 'UiCalcOffset'};
+var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Top = {$: 'Top'};
+var $mdgriffith$elm_ui$Element$alignTop = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$Top);
+var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
+	return {$: 'AlignX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
+var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
 var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
 	return {$: 'Unkeyed', a: a};
 };
@@ -9303,7 +9791,6 @@ var $mdgriffith$elm_ui$Internal$Model$Style = F2(
 var $mdgriffith$elm_ui$Internal$Style$dot = function (c) {
 	return '.' + c;
 };
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_ui$Internal$Model$formatColor = function (_v0) {
 	var red = _v0.a;
 	var green = _v0.b;
@@ -14341,45 +14828,7 @@ var $mdgriffith$elm_ui$Element$column = F2(
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
 var $author$project$Utils$edges = {bottom: 0, left: 0, right: 0, top: 0};
-var $elm$core$Basics$truncate = _Basics_truncate;
-var $author$project$CalculatorDisplay$gridPosition = F2(
-	function (range, bearing) {
-		var northing = F2(
-			function (r, b) {
-				return ((r * $elm$core$Basics$cos(b)) + 50) | 0;
-			});
-		var northSquareBoundary = F2(
-			function (r, b) {
-				return $elm$core$Basics$floor(
-					A2(northing, r, b) / 100.0);
-			});
-		var easting = F2(
-			function (r, b) {
-				return ((r * $elm$core$Basics$sin(b)) + 50) | 0;
-			});
-		var eastSquareBoundary = F2(
-			function (r, b) {
-				return $elm$core$Basics$floor(
-					A2(easting, r, b) / 100.0);
-			});
-		var _v0 = _Utils_Tuple2(range, bearing);
-		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
-			var r = _v0.a.a;
-			var b = _v0.b.a;
-			return $elm$core$Maybe$Just(
-				{
-					gridSquareEast: A2(eastSquareBoundary, r, b),
-					gridSquareNorth: A2(northSquareBoundary, r, b),
-					gridSquareOffsetEast: A2(easting, r, b) - (100 * A2(eastSquareBoundary, r, b)),
-					gridSquareOffsetNorth: A2(northing, r, b) - (100 * A2(northSquareBoundary, r, b))
-				});
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
-	return {$: 'AlignX', a: a};
-};
+var $author$project$Types$UiCalcHeight = {$: 'UiCalcHeight'};
 var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
 var $mdgriffith$elm_ui$Internal$Model$Class = F2(
@@ -14758,404 +15207,6 @@ var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $author$project$CalculatorDisplay$heightGrid = function (storedHeight) {
-	var theRightHeight = F2(
-		function (low, high) {
-			if (storedHeight.$ === 'Just') {
-				var h = storedHeight.a;
-				return ((_Utils_cmp(h * 1000, low) > -1) && (_Utils_cmp(h * 1000, high) < 0)) ? true : false;
-			} else {
-				return false;
-			}
-		});
-	var lamp = F3(
-		function (label, low, high) {
-			return A2(
-				$mdgriffith$elm_ui$Element$el,
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$Font$size(24),
-					A2(
-						$elm$core$List$cons,
-						A2($mdgriffith$elm_ui$Element$spacingXY, 10, 0),
-						A2(
-							$author$project$CalculatorDisplay$buttonStyle,
-							A2(theRightHeight, low, high),
-							$author$project$Constants$flatSunflower))),
-				$mdgriffith$elm_ui$Element$text(label));
-		});
-	return A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$spaceEvenly
-					]),
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (label, low, high) {
-							return A3(lamp, label, low * 500, high * 500);
-						}),
-					_List_fromArray(
-						['.5-', '.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5']),
-					A2($elm$core$List$range, 0, 11),
-					A2($elm$core$List$range, 1, 12))),
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$spaceEvenly
-					]),
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (label, low, high) {
-							return A3(lamp, label, low * 500, high * 500);
-						}),
-					_List_fromArray(
-						['6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10', '10.5', '11', '11.5']),
-					A2($elm$core$List$range, 12, 23),
-					A2($elm$core$List$range, 13, 24))),
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$spaceEvenly
-					]),
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (label, low, high) {
-							return A3(lamp, label, low * 500, high * 500);
-						}),
-					_List_fromArray(
-						['12', '12.5', '13', '13.5', '14', '14.5', '15', '15.5', '16', '16.5', '17', '17.5']),
-					A2($elm$core$List$range, 24, 35),
-					A2($elm$core$List$range, 25, 36))),
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$mdgriffith$elm_ui$Element$spaceEvenly
-					]),
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (label, low, high) {
-							return A3(lamp, label, low * 500, high * 500);
-						}),
-					_List_fromArray(
-						['18', '18.5', '19', '19.5', '20', '21', '22', '23', '24', '25', '26', '27']),
-					_List_fromArray(
-						[36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54]),
-					_List_fromArray(
-						[37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56]))),
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$alignLeft]),
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (label, low, high) {
-							return A3(lamp, label, low * 500, high * 500);
-						}),
-					_List_fromArray(
-						['28', '29', '30', '30+']),
-					_List_fromArray(
-						[56, 58, 60, 62]),
-					_List_fromArray(
-						[58, 60, 62, 9999])))
-			]));
-};
-var $author$project$Messages$ExplainModeToggle = {$: 'ExplainModeToggle'};
-var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
-var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
-var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$Top = {$: 'Top'};
-var $mdgriffith$elm_ui$Element$alignTop = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$Top);
-var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
-var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
-var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'border-color',
-			clr));
-};
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
-var $author$project$Constants$paletteDarkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 64, 93, 39);
-var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
-var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
-var $author$project$Constants$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
-var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
-	function (a, b, c, d, e) {
-		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Element$Border$width = function (v) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + $elm$core$String$fromInt(v),
-			v,
-			v,
-			v,
-			v));
-};
-var $author$project$Utils$helpButton = A2(
-	$mdgriffith$elm_ui$Element$el,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$alignRight,
-			$mdgriffith$elm_ui$Element$alignTop,
-			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-			$mdgriffith$elm_ui$Element$Border$width(1),
-			$mdgriffith$elm_ui$Element$Border$rounded(15),
-			$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$paletteDarkGreen),
-			$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
-			$mdgriffith$elm_ui$Element$Font$size(12),
-			$mdgriffith$elm_ui$Element$Font$bold,
-			$mdgriffith$elm_ui$Element$Font$center,
-			$mdgriffith$elm_ui$Element$paddingEach(
-			_Utils_update(
-				$author$project$Utils$edges,
-				{top: 6})),
-			$mdgriffith$elm_ui$Element$height(
-			$mdgriffith$elm_ui$Element$px(30)),
-			$mdgriffith$elm_ui$Element$width(
-			$mdgriffith$elm_ui$Element$px(30)),
-			$mdgriffith$elm_ui$Element$pointer,
-			$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$ExplainModeToggle)
-		]),
-	$mdgriffith$elm_ui$Element$text('?'));
-var $author$project$Constants$raidStrengthIndicator = A3($mdgriffith$elm_ui$Element$rgb255, 255, 50, 50);
-var $author$project$CalculatorDisplay$maybeBoolDisplay = F2(
-	function (label, b) {
-		var theChosenOne = function () {
-			if (b.$ === 'Just') {
-				return true;
-			} else {
-				return false;
-			}
-		}();
-		return A2(
-			$mdgriffith$elm_ui$Element$el,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$Font$size(24),
-				A2($author$project$CalculatorDisplay$buttonStyle, theChosenOne, $author$project$Constants$raidStrengthIndicator)),
-			$mdgriffith$elm_ui$Element$text(label));
-	});
-var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
-var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
-var $author$project$Constants$vividGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
-var $author$project$CalculatorDisplay$digitDisplayLamp = F2(
-	function (maybeN, digit) {
-		var thisIsTheDigit = function () {
-			if (maybeN.$ === 'Just') {
-				var n = maybeN.a;
-				return _Utils_eq(n, digit);
-			} else {
-				return false;
-			}
-		}();
-		return A2(
-			$mdgriffith$elm_ui$Element$el,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$Font$size(24),
-				A2($author$project$CalculatorDisplay$buttonStyle, thisIsTheDigit, $author$project$Constants$vividGreen)),
-			$mdgriffith$elm_ui$Element$text(
-				$elm$core$String$fromInt(digit)));
-	});
-var $author$project$CalculatorDisplay$significantDigit = function (maybeN) {
-	return A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_Nil,
-				A2(
-					$elm$core$List$map,
-					$author$project$CalculatorDisplay$digitDisplayLamp(maybeN),
-					_List_fromArray(
-						[1, 2, 3, 4, 5]))),
-				A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_Nil,
-				A2(
-					$elm$core$List$map,
-					$author$project$CalculatorDisplay$digitDisplayLamp(maybeN),
-					_List_fromArray(
-						[6, 7, 8, 9, 0])))
-			]));
-};
-var $mdgriffith$elm_ui$Element$spacing = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$spacing,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
-			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
-			x,
-			x));
-};
-var $author$project$CalculatorDisplay$offsetDisplay = function (offset) {
-	return A2(
-		$mdgriffith$elm_ui$Element$row,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$padding(5),
-				$mdgriffith$elm_ui$Element$spacing(10)
-			]),
-		_List_fromArray(
-			[
-				$author$project$CalculatorDisplay$significantDigit(
-				A2(
-					$elm$core$Maybe$map,
-					function (n) {
-						return (n / 10) | 0;
-					},
-					offset)),
-				$author$project$CalculatorDisplay$significantDigit(
-				A2(
-					$elm$core$Maybe$map,
-					$elm$core$Basics$modBy(10),
-					offset))
-			]));
-};
-var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
-var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
-var $author$project$CalculatorDisplay$gridLettersList = _List_fromArray(
-	[
-		_List_fromArray(
-		['Y', 'Z', 'V', 'W', 'X', 'Y', 'Z']),
-		_List_fromArray(
-		['D', 'E', 'A', 'B', 'C', 'D', 'E']),
-		_List_fromArray(
-		['J', 'K', 'F', 'G', 'H', 'J', 'K']),
-		_List_fromArray(
-		['O', 'P', 'L', 'M', 'N', 'O', 'P']),
-		_List_fromArray(
-		['T', 'U', 'Q', 'R', 'S', 'T', 'U']),
-		_List_fromArray(
-		['Y', 'Z', 'V', 'W', 'X', 'Y', 'Z']),
-		_List_fromArray(
-		['D', 'E', 'A', 'B', 'C', 'D', 'E'])
-	]);
-var $author$project$CalculatorDisplay$positionGridDisplay = function (position) {
-	var thisIsTheSquare = F2(
-		function (e, n) {
-			if (position.$ === 'Just') {
-				var p = position.a;
-				return _Utils_eq(p.gridSquareEast, e) && _Utils_eq(p.gridSquareNorth, n);
-			} else {
-				return false;
-			}
-		});
-	var displayGridSquare = F3(
-		function (north, east, letter) {
-			return A2(
-				$mdgriffith$elm_ui$Element$el,
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$Font$size(28),
-					A2(
-						$author$project$CalculatorDisplay$buttonStyle,
-						A2(thisIsTheSquare, east, north),
-						$author$project$Constants$vividGreen)),
-				$mdgriffith$elm_ui$Element$text(letter));
-		});
-	var displayGridRow = F2(
-		function (north, letters) {
-			return A2(
-				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$spacing(0)
-					]),
-				A3(
-					$elm$core$List$map2,
-					displayGridSquare(north),
-					A2($elm$core$List$range, -3, 3),
-					letters));
-		});
-	return A2(
-		$mdgriffith$elm_ui$Element$column,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$centerX,
-				$mdgriffith$elm_ui$Element$padding(10),
-				A2($mdgriffith$elm_ui$Element$spacingXY, 5, 5)
-			]),
-		A3(
-			$elm$core$List$map2,
-			displayGridRow,
-			$elm$core$List$reverse(
-				A2($elm$core$List$range, -3, 3)),
-			$author$project$CalculatorDisplay$gridLettersList));
-};
-var $author$project$Types$UiStrengthDisplay = {$: 'UiStrengthDisplay'};
 var $mdgriffith$elm_ui$Internal$Model$Transparency = F2(
 	function (a, b) {
 		return {$: 'Transparency', a: a, b: b};
@@ -15177,10 +15228,33 @@ var $mdgriffith$elm_ui$Element$alpha = function (o) {
 			'transparency-' + $mdgriffith$elm_ui$Internal$Model$floatClass(transparency),
 			transparency));
 };
+var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
+var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'border-color',
+			clr));
+};
 var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
-var $author$project$Types$UiRaidStrength = {$: 'UiRaidStrength'};
+var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var $author$project$Types$UiCalcGrid = {$: 'UiCalcGrid'};
+var $author$project$Types$UiCalcStrength = {$: 'UiCalcStrength'};
 var $author$project$Types$UiRangeScale = {$: 'UiRangeScale'};
 var $author$project$Types$UiSwitchPanel = {$: 'UiSwitchPanel'};
 var $author$project$TrainingMode$uiExplanations = _List_fromArray(
@@ -15191,7 +15265,10 @@ var $author$project$TrainingMode$uiExplanations = _List_fromArray(
 		_Utils_Tuple2($author$project$Types$UiRangeScale, 'Range scale (miles) and range indicator'),
 		_Utils_Tuple2($author$project$Types$UiSwitchPanel, 'Mode switches'),
 		_Utils_Tuple2($author$project$Types$UiRaidStrength, 'Raid strength entry buttons'),
-		_Utils_Tuple2($author$project$Types$UiStrengthDisplay, 'Estimate of number of planes in raid')
+		_Utils_Tuple2($author$project$Types$UiCalcStrength, 'Estimate of number of planes in raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcGrid, 'The 100km map grid square containing the raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcHeight, 'The approximate height of the raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcOffset, 'The approximate position within the grid square')
 	]);
 var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
 	return $elm$core$List$head(
@@ -15204,10 +15281,34 @@ var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
 			},
 			$author$project$TrainingMode$uiExplanations));
 };
+var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
+var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
 var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
 	return {$: 'Describe', a: a};
 };
 var $mdgriffith$elm_ui$Internal$Model$Paragraph = {$: 'Paragraph'};
+var $mdgriffith$elm_ui$Element$spacing = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$spacing,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
+			x,
+			x));
+};
 var $mdgriffith$elm_ui$Element$paragraph = F2(
 	function (attrs, children) {
 		return A4(
@@ -15226,6 +15327,23 @@ var $mdgriffith$elm_ui$Element$paragraph = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $author$project$Constants$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
+var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
+	function (a, b, c, d, e) {
+		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + $elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
 var $author$project$TrainingMode$explanatoryText = function (uiComponent) {
 	var uiComponentDescription = $author$project$TrainingMode$lookupUiExplanation(uiComponent);
 	if (uiComponentDescription.$ === 'Just') {
@@ -15304,6 +15422,8 @@ var $mdgriffith$elm_ui$Element$createNearby = F2(
 var $mdgriffith$elm_ui$Element$inFront = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
 };
+var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
+var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
 var $author$project$TrainingMode$tutorialHighlighting = F2(
 	function (model, uiComponent) {
 		var _v0 = _Utils_Tuple2(
@@ -15333,6 +15453,320 @@ var $author$project$TrainingMode$tutorialHighlighting = F2(
 					]);
 			}
 		}
+	});
+var $author$project$CalculatorDisplay$heightGrid = F2(
+	function (model, storedHeight) {
+		var theRightHeight = F2(
+			function (low, high) {
+				if (storedHeight.$ === 'Just') {
+					var h = storedHeight.a;
+					return ((_Utils_cmp(h * 1000, low) > -1) && (_Utils_cmp(h * 1000, high) < 0)) ? true : false;
+				} else {
+					return false;
+				}
+			});
+		var lamp = F3(
+			function (label, low, high) {
+				return A2(
+					$mdgriffith$elm_ui$Element$el,
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$Font$size(24),
+						A2(
+							$elm$core$List$cons,
+							A2($mdgriffith$elm_ui$Element$spacingXY, 10, 0),
+							A2(
+								$author$project$CalculatorDisplay$buttonStyle,
+								A2(theRightHeight, low, high),
+								$author$project$Constants$flatSunflower))),
+					$mdgriffith$elm_ui$Element$text(label));
+			});
+		return A2(
+			$mdgriffith$elm_ui$Element$column,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+					]),
+				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcHeight)),
+			_List_fromArray(
+				[
+					A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$spaceEvenly
+						]),
+					A4(
+						$elm$core$List$map3,
+						F3(
+							function (label, low, high) {
+								return A3(lamp, label, low * 500, high * 500);
+							}),
+						_List_fromArray(
+							['.5-', '.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5']),
+						A2($elm$core$List$range, 0, 11),
+						A2($elm$core$List$range, 1, 12))),
+					A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$spaceEvenly
+						]),
+					A4(
+						$elm$core$List$map3,
+						F3(
+							function (label, low, high) {
+								return A3(lamp, label, low * 500, high * 500);
+							}),
+						_List_fromArray(
+							['6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10', '10.5', '11', '11.5']),
+						A2($elm$core$List$range, 12, 23),
+						A2($elm$core$List$range, 13, 24))),
+					A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$spaceEvenly
+						]),
+					A4(
+						$elm$core$List$map3,
+						F3(
+							function (label, low, high) {
+								return A3(lamp, label, low * 500, high * 500);
+							}),
+						_List_fromArray(
+							['12', '12.5', '13', '13.5', '14', '14.5', '15', '15.5', '16', '16.5', '17', '17.5']),
+						A2($elm$core$List$range, 24, 35),
+						A2($elm$core$List$range, 25, 36))),
+					A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$spaceEvenly
+						]),
+					A4(
+						$elm$core$List$map3,
+						F3(
+							function (label, low, high) {
+								return A3(lamp, label, low * 500, high * 500);
+							}),
+						_List_fromArray(
+							['18', '18.5', '19', '19.5', '20', '21', '22', '23', '24', '25', '26', '27']),
+						_List_fromArray(
+							[36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54]),
+						_List_fromArray(
+							[37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56]))),
+					A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[$mdgriffith$elm_ui$Element$alignLeft]),
+					A4(
+						$elm$core$List$map3,
+						F3(
+							function (label, low, high) {
+								return A3(lamp, label, low * 500, high * 500);
+							}),
+						_List_fromArray(
+							['28', '29', '30', '30+']),
+						_List_fromArray(
+							[56, 58, 60, 62]),
+						_List_fromArray(
+							[58, 60, 62, 9999])))
+				]));
+	});
+var $author$project$Messages$ExplainModeToggle = {$: 'ExplainModeToggle'};
+var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
+var $author$project$Constants$paletteDarkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 64, 93, 39);
+var $author$project$Utils$helpButton = A2(
+	$mdgriffith$elm_ui$Element$el,
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$alignRight,
+			$mdgriffith$elm_ui$Element$alignTop,
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+			$mdgriffith$elm_ui$Element$Border$width(1),
+			$mdgriffith$elm_ui$Element$Border$rounded(15),
+			$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$paletteDarkGreen),
+			$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+			$mdgriffith$elm_ui$Element$Font$size(12),
+			$mdgriffith$elm_ui$Element$Font$bold,
+			$mdgriffith$elm_ui$Element$Font$center,
+			$mdgriffith$elm_ui$Element$paddingEach(
+			_Utils_update(
+				$author$project$Utils$edges,
+				{top: 6})),
+			$mdgriffith$elm_ui$Element$height(
+			$mdgriffith$elm_ui$Element$px(30)),
+			$mdgriffith$elm_ui$Element$width(
+			$mdgriffith$elm_ui$Element$px(30)),
+			$mdgriffith$elm_ui$Element$pointer,
+			$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$ExplainModeToggle)
+		]),
+	$mdgriffith$elm_ui$Element$text('?'));
+var $author$project$Constants$raidStrengthIndicator = A3($mdgriffith$elm_ui$Element$rgb255, 255, 50, 50);
+var $author$project$CalculatorDisplay$maybeBoolDisplay = F2(
+	function (label, b) {
+		var theChosenOne = function () {
+			if (b.$ === 'Just') {
+				return true;
+			} else {
+				return false;
+			}
+		}();
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$Font$size(24),
+				A2($author$project$CalculatorDisplay$buttonStyle, theChosenOne, $author$project$Constants$raidStrengthIndicator)),
+			$mdgriffith$elm_ui$Element$text(label));
+	});
+var $author$project$Constants$vividGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
+var $author$project$CalculatorDisplay$digitDisplayLamp = F2(
+	function (maybeN, digit) {
+		var thisIsTheDigit = function () {
+			if (maybeN.$ === 'Just') {
+				var n = maybeN.a;
+				return _Utils_eq(n, digit);
+			} else {
+				return false;
+			}
+		}();
+		return A2(
+			$mdgriffith$elm_ui$Element$el,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$Font$size(24),
+				A2($author$project$CalculatorDisplay$buttonStyle, thisIsTheDigit, $author$project$Constants$vividGreen)),
+			$mdgriffith$elm_ui$Element$text(
+				$elm$core$String$fromInt(digit)));
+	});
+var $author$project$CalculatorDisplay$significantDigit = function (maybeN) {
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					$author$project$CalculatorDisplay$digitDisplayLamp(maybeN),
+					_List_fromArray(
+						[1, 2, 3, 4, 5]))),
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					$author$project$CalculatorDisplay$digitDisplayLamp(maybeN),
+					_List_fromArray(
+						[6, 7, 8, 9, 0])))
+			]));
+};
+var $author$project$CalculatorDisplay$offsetDisplay = function (offset) {
+	return A2(
+		$mdgriffith$elm_ui$Element$row,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$padding(5),
+				$mdgriffith$elm_ui$Element$spacing(10)
+			]),
+		_List_fromArray(
+			[
+				$author$project$CalculatorDisplay$significantDigit(
+				A2(
+					$elm$core$Maybe$map,
+					function (n) {
+						return (n / 10) | 0;
+					},
+					offset)),
+				$author$project$CalculatorDisplay$significantDigit(
+				A2(
+					$elm$core$Maybe$map,
+					$elm$core$Basics$modBy(10),
+					offset))
+			]));
+};
+var $author$project$CalculatorDisplay$positionGridDisplay = F2(
+	function (model, position) {
+		var thisIsTheSquare = F2(
+			function (e, n) {
+				if (position.$ === 'Just') {
+					var p = position.a;
+					return _Utils_eq(p.gridSquareEast, e) && _Utils_eq(p.gridSquareNorth, n);
+				} else {
+					return false;
+				}
+			});
+		var displayGridSquare = F3(
+			function (north, east, letter) {
+				return A2(
+					$mdgriffith$elm_ui$Element$el,
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$Font$size(28),
+						A2(
+							$author$project$CalculatorDisplay$buttonStyle,
+							A2(thisIsTheSquare, east, north),
+							$author$project$Constants$vividGreen)),
+					$mdgriffith$elm_ui$Element$text(letter));
+			});
+		var displayGridRow = F2(
+			function (north, letters) {
+				return A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$spacing(0)
+						]),
+					A3(
+						$elm$core$List$map2,
+						displayGridSquare(north),
+						A2($elm$core$List$range, -3, 3),
+						letters));
+			});
+		return A2(
+			$mdgriffith$elm_ui$Element$column,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$padding(10),
+						A2($mdgriffith$elm_ui$Element$spacingXY, 5, 5)
+					]),
+				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcGrid)),
+			A3(
+				$elm$core$List$map2,
+				displayGridRow,
+				$elm$core$List$reverse(
+					A2($elm$core$List$range, -3, 3)),
+				$author$project$Grid$gridLettersList));
 	});
 var $author$project$CalculatorDisplay$strengthDisplay = F2(
 	function (model, strength) {
@@ -15368,7 +15802,7 @@ var $author$project$CalculatorDisplay$strengthDisplay = F2(
 							$author$project$Utils$edges,
 							{left: 10}))
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiStrengthDisplay)),
+				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcStrength)),
 			A3(
 				$elm$core$List$map2,
 				makeIt,
@@ -15377,6 +15811,80 @@ var $author$project$CalculatorDisplay$strengthDisplay = F2(
 				_List_fromArray(
 					[1, 2, 3, 6, 9, 12, 18])));
 	});
+var $author$project$Messages$TutorialAdvance = {$: 'TutorialAdvance'};
+var $author$project$Messages$TutorialBack = {$: 'TutorialBack'};
+var $author$project$TrainingMode$tutorialTextBox = F2(
+	function (model, attribs) {
+		return $mdgriffith$elm_ui$Element$inFront(
+			function () {
+				var _v0 = $author$project$TrainingMode$findStep(model.tutorialStage);
+				if (_v0.$ === 'Nothing') {
+					return $mdgriffith$elm_ui$Element$none;
+				} else {
+					var step = _v0.a;
+					return A2(
+						$mdgriffith$elm_ui$Element$el,
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$width(
+									$mdgriffith$elm_ui$Element$px(500)),
+									$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$flatSunflower),
+									$mdgriffith$elm_ui$Element$Border$width(2),
+									$mdgriffith$elm_ui$Element$Border$rounded(5),
+									$mdgriffith$elm_ui$Element$Font$center,
+									$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+									$mdgriffith$elm_ui$Element$Font$size(32),
+									$mdgriffith$elm_ui$Element$Font$family(
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
+										]))
+								]),
+							attribs),
+						A2(
+							$mdgriffith$elm_ui$Element$row,
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$mdgriffith$elm_ui$Element$el,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$TutorialBack),
+											$mdgriffith$elm_ui$Element$pointer
+										]),
+									$mdgriffith$elm_ui$Element$text('◀︎')),
+									A2(
+									$mdgriffith$elm_ui$Element$paragraph,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
+											$mdgriffith$elm_ui$Element$spacing(4),
+											$mdgriffith$elm_ui$Element$padding(10),
+											$mdgriffith$elm_ui$Element$Font$size(16)
+										]),
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$text(
+											step.tutorialText(model))
+										])),
+									A2(
+									$mdgriffith$elm_ui$Element$el,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$TutorialAdvance),
+											$mdgriffith$elm_ui$Element$alignRight,
+											$mdgriffith$elm_ui$Element$pointer
+										]),
+									$mdgriffith$elm_ui$Element$text('►'))
+								])));
+				}
+			}());
+	});
 var $author$project$CalculatorDisplay$calculator = function (model) {
 	var strength = model.storedStrength;
 	var range = model.storedAzimuthRange;
@@ -15384,10 +15892,20 @@ var $author$project$CalculatorDisplay$calculator = function (model) {
 	var height = model.storedElevation;
 	var friendly = model.storedFriendly;
 	var bearing = model.storedAzimuth;
-	var position = A2($author$project$CalculatorDisplay$gridPosition, range, bearing);
+	var position = A2($author$project$Grid$gridPosition, range, bearing);
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
-		_List_Nil,
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$centerX,
+					A2(
+					$author$project$TrainingMode$tutorialTextBox,
+					model,
+					_List_fromArray(
+						[$mdgriffith$elm_ui$Element$alignTop, $mdgriffith$elm_ui$Element$centerX]))
+				]),
+			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalculator)),
 		_List_fromArray(
 			[
 				A2(
@@ -15399,7 +15917,7 @@ var $author$project$CalculatorDisplay$calculator = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$author$project$CalculatorDisplay$positionGridDisplay(position),
+						A2($author$project$CalculatorDisplay$positionGridDisplay, model, position),
 						A2(
 						$mdgriffith$elm_ui$Element$column,
 						_List_fromArray(
@@ -15429,13 +15947,13 @@ var $author$project$CalculatorDisplay$calculator = function (model) {
 										_List_fromArray(
 											[$mdgriffith$elm_ui$Element$none, $mdgriffith$elm_ui$Element$none]))
 									])),
-								$author$project$CalculatorDisplay$heightGrid(height)
+								A2($author$project$CalculatorDisplay$heightGrid, model, height)
 							])),
 						$author$project$Utils$helpButton
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				_List_Nil,
+				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcOffset),
 				_List_fromArray(
 					[
 						$author$project$CalculatorDisplay$offsetDisplay(
@@ -16224,6 +16742,7 @@ var $author$project$Main$navBar = function () {
 }();
 var $author$project$Messages$StoreGoniometerSetting = {$: 'StoreGoniometerSetting'};
 var $author$project$Messages$StoreRangeSetting = {$: 'StoreRangeSetting'};
+var $author$project$Types$UiBothKnobs = {$: 'UiBothKnobs'};
 var $author$project$Types$UiLeftSide = {$: 'UiLeftSide'};
 var $author$project$Types$UiOperatorPage = {$: 'UiOperatorPage'};
 var $author$project$Types$UiRightSide = {$: 'UiRightSide'};
@@ -16801,7 +17320,6 @@ var $author$project$Messages$SelectReceiveAntenna = function (a) {
 };
 var $author$project$Types$UiAB = {$: 'UiAB'};
 var $author$project$Types$UiClear = {$: 'UiClear'};
-var $author$project$Types$UiHeight = {$: 'UiHeight'};
 var $author$project$Types$UiOperatorPrompts = {$: 'UiOperatorPrompts'};
 var $author$project$Types$UiSense = {$: 'UiSense'};
 var $mdgriffith$elm_ui$Internal$Model$Above = {$: 'Above'};
@@ -17148,6 +17666,16 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 							_Utils_eq(model.inputState, $author$project$Types$BearingRangeInput) || _Utils_eq(model.inputState, $author$project$Types$HeightRangeInput)))
 					]))
 			]));
+};
+var $mdgriffith$elm_ui$Internal$Model$MoveX = function (a) {
+	return {$: 'MoveX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Flag$moveX = $mdgriffith$elm_ui$Internal$Flag$flag(25);
+var $mdgriffith$elm_ui$Element$moveLeft = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveX,
+		$mdgriffith$elm_ui$Internal$Model$MoveX(-x));
 };
 var $author$project$Messages$RaidFriendly = {$: 'RaidFriendly'};
 var $author$project$Messages$RaidStrength = function (a) {
@@ -17532,7 +18060,7 @@ var $author$project$CRT_WebGL$fatLineTwo = F2(
 		var segments = _v0.b;
 		return segments;
 	});
-var $author$project$CRT_WebGL$lineScaleTest = function (n) {
+var $author$project$CRT_WebGL$subDivideTheLine = function (n) {
 	var fraction = function (i) {
 		return i / n;
 	};
@@ -17555,7 +18083,7 @@ var $author$project$CRT_WebGL$lineMesh = $elm_explorations$webgl$WebGL$triangles
 	A2(
 		$author$project$CRT_WebGL$fatLineTwo,
 		0.04,
-		$author$project$CRT_WebGL$lineScaleTest(1000)));
+		$author$project$CRT_WebGL$subDivideTheLine(1000)));
 var $elm_explorations$webgl$WebGL$toHtmlWith = F3(
 	function (options, attributes, entities) {
 		return A3(_WebGL_toHtml, options, attributes, entities);
@@ -17610,7 +18138,7 @@ var $author$project$CRT_WebGL$echoToVec = F2(
 				echo.amplitude / 10.0,
 				A3($author$project$Utils$choose, echo.tutorial, 1.0, 0.0));
 		} else {
-			return A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 2.0, 0.0, 0.0);
+			return A3($elm_explorations$linear_algebra$Math$Vector3$vec3, -1.0, 0.0, 0.0);
 		}
 	});
 var $elm$core$Array$fromListHelp = F3(
@@ -17663,7 +18191,10 @@ var $author$project$CRT_WebGL$uniforms = F2(
 				A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 0, 1, 0)),
 			lineJiggle: 0.03,
 			lineSpikes: 0.2,
-			numRaids: $elm$core$List$length(echoes),
+			numRaids: A2(
+				$elm$core$Basics$min,
+				16,
+				$elm$core$List$length(echoes)),
 			perspective: A4($elm_explorations$linear_algebra$Math$Matrix4$makePerspective, 19, 1, 0.1, 10),
 			raid0: A2($author$project$CRT_WebGL$echoToVec, echoArray, 0),
 			raid1: A2($author$project$CRT_WebGL$echoToVec, echoArray, 1),
@@ -17673,24 +18204,8 @@ var $author$project$CRT_WebGL$uniforms = F2(
 			raid13: A2($author$project$CRT_WebGL$echoToVec, echoArray, 13),
 			raid14: A2($author$project$CRT_WebGL$echoToVec, echoArray, 14),
 			raid15: A2($author$project$CRT_WebGL$echoToVec, echoArray, 15),
-			raid16: A2($author$project$CRT_WebGL$echoToVec, echoArray, 16),
-			raid17: A2($author$project$CRT_WebGL$echoToVec, echoArray, 17),
-			raid18: A2($author$project$CRT_WebGL$echoToVec, echoArray, 18),
-			raid19: A2($author$project$CRT_WebGL$echoToVec, echoArray, 19),
 			raid2: A2($author$project$CRT_WebGL$echoToVec, echoArray, 2),
-			raid20: A2($author$project$CRT_WebGL$echoToVec, echoArray, 20),
-			raid21: A2($author$project$CRT_WebGL$echoToVec, echoArray, 21),
-			raid22: A2($author$project$CRT_WebGL$echoToVec, echoArray, 22),
-			raid23: A2($author$project$CRT_WebGL$echoToVec, echoArray, 23),
-			raid24: A2($author$project$CRT_WebGL$echoToVec, echoArray, 24),
-			raid25: A2($author$project$CRT_WebGL$echoToVec, echoArray, 25),
-			raid26: A2($author$project$CRT_WebGL$echoToVec, echoArray, 26),
-			raid27: A2($author$project$CRT_WebGL$echoToVec, echoArray, 27),
-			raid28: A2($author$project$CRT_WebGL$echoToVec, echoArray, 28),
-			raid29: A2($author$project$CRT_WebGL$echoToVec, echoArray, 29),
 			raid3: A2($author$project$CRT_WebGL$echoToVec, echoArray, 3),
-			raid30: A2($author$project$CRT_WebGL$echoToVec, echoArray, 30),
-			raid31: A2($author$project$CRT_WebGL$echoToVec, echoArray, 31),
 			raid4: A2($author$project$CRT_WebGL$echoToVec, echoArray, 4),
 			raid5: A2($author$project$CRT_WebGL$echoToVec, echoArray, 5),
 			raid6: A2($author$project$CRT_WebGL$echoToVec, echoArray, 6),
@@ -17711,9 +18226,9 @@ var $author$project$CRT_WebGL$uniforms = F2(
 		};
 	});
 var $author$project$CRT_WebGL$vertexShader = {
-	src: '\n        attribute vec3 position;\n        attribute vec3 color;\n\n        uniform mat4 perspective;\n        uniform mat4 camera;\n        uniform mat4 rotation;\n        uniform float u_time;\n        uniform float lineJiggle;\n        uniform float lineSpikes;\n        uniform int numRaids; // use this to vary sort load.\n        uniform vec3 raid0;\n        uniform vec3 raid1;\n        uniform vec3 raid2;\n        uniform vec3 raid3;\n        uniform vec3 raid4;\n        uniform vec3 raid5;\n        uniform vec3 raid6;\n        uniform vec3 raid7;\n        uniform vec3 raid8;\n        uniform vec3 raid9;\n        uniform vec3 raid10;\n        uniform vec3 raid11;\n        uniform vec3 raid12;\n        uniform vec3 raid13;\n        uniform vec3 raid14;\n        uniform vec3 raid15;\n        uniform vec3 raid16;\n        uniform vec3 raid17;\n        uniform vec3 raid18;\n        uniform vec3 raid19;\n        uniform vec3 raid20;\n        uniform vec3 raid21;\n        uniform vec3 raid22;\n        uniform vec3 raid23;\n        uniform vec3 raid24;\n        uniform vec3 raid25;\n        uniform vec3 raid26;\n        uniform vec3 raid27;\n        uniform vec3 raid28;\n        uniform vec3 raid29;\n        uniform vec3 raid30;\n        uniform vec3 raid31;\n\n        varying vec3 vcolor;\n        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.\n\n        float random (in float x) {\n            return fract(sin(x) * 5000.0);\n        }\n\n        //  Function from Iñigo Quiles\n        //  www.iquilezles.org/www/articles/functions/functions.htm\n        // w = width, c = centre\n        float cubicPulse( float c, float w, float x ) {\n            x = abs(x - c); // NOTE 0 <= x <= +w\n            if (x > w) return 0.0;\n            x /= w; // 0 <= x <= +1 (width is actually 2w)\n            return 1.0 - x * x * (3.0 - 2.0 * x);\n        }\n\n        // x adjustment to keep line thickness across cubic pulse.\n        float gradient(float c, float w, float x) {\n            float x1 = abs((x - c)/w); // 0 <= x1 <= 1\n            if (x1 > 1.0) return 0.0;\n            float gradient = x1 * (1.0 - x1);\n            return gradient * sign(c - x);\n        }\n\n        // Different version of FBM.\n        float turbulence( float p ) {\n\n            float w = 100.0;\n            float t = -0.5;\n\n            for (float f = 1.0 ; f <= 10.0 ; f++ ){\n                float power = pow( 2.0, f );\n                t += random(p) / power ;\n            }\n\n          return t;\n\n        }\n\n        vec3 pulseShape(vec3 raid, float halfWidth) {\n            // returns x = x, y = displacement, z = gradient\n            float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);\n            float slope = raid.y * gradient(raid.x, halfWidth, position.x);\n            float tutorialRaidIndicator = raid.z * height;\n\n           // WARNING -- x value of return used for raid colour indication!!\n            return vec3( tutorialRaidIndicator, height, slope );\n        }\n\n        void sortPulses16(inout vec3 unsorted[32]) {\n            //Network for N=16, using Best Known Arrangement.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;};\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[5].y < unsorted[10].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[6].y < unsorted[9].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[12].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n        }\n\n\n        void sortPulses32(inout vec3 unsorted[32]) {\n            // We use a precomputed exchange network because we always sort 32.\n            // And the GLSL parser appears to lack macros :(\n            // http://pages.ripco.net/~jgamble/nw.html\n            //Network for N=32, using Bose-Nelson Algorithm.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;}\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;}\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;}\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;}\n            if (unsorted[3].y < unsorted[6].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[6]; unsorted[6] = tmp;}\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;}\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;}\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[9].y < unsorted[12].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[1].y < unsorted[8].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[3].y < unsorted[10].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[3].y < unsorted[9].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[5].y < unsorted[12].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;}\n            if (unsorted[7].y < unsorted[14].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[14]; unsorted[14] = tmp;}\n            if (unsorted[6].y < unsorted[12].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;}\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;}\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[5].y < unsorted[9].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[5].y < unsorted[8].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[6].y < unsorted[10].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;}\n            if (unsorted[7].y < unsorted[10].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[10]; unsorted[10] = tmp;}\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;}\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;}\n            if (unsorted[16].y < unsorted[17].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[18].y < unsorted[19].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[16].y < unsorted[18].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[17].y < unsorted[19].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[17].y < unsorted[18].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[20].y < unsorted[21].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[22].y < unsorted[23].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[20].y < unsorted[22].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[21].y < unsorted[23].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[21].y < unsorted[22].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[16].y < unsorted[20].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[17].y < unsorted[21].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[17].y < unsorted[20].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[18].y < unsorted[22].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[19].y < unsorted[23].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[19].y < unsorted[22].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[18].y < unsorted[20].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[19].y < unsorted[21].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[19].y < unsorted[20].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[24].y < unsorted[25].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[26].y < unsorted[27].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[24].y < unsorted[26].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[25].y < unsorted[27].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[25].y < unsorted[26].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[28].y < unsorted[29].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[30].y < unsorted[31].y) {vec3 tmp = unsorted[30]; unsorted[30] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[28].y < unsorted[30].y) {vec3 tmp = unsorted[28]; unsorted[28] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[29].y < unsorted[31].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[29].y < unsorted[30].y) {vec3 tmp = unsorted[29]; unsorted[29] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[24].y < unsorted[28].y) {vec3 tmp = unsorted[24]; unsorted[24] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[25].y < unsorted[29].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[25].y < unsorted[28].y) {vec3 tmp = unsorted[25]; unsorted[25] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[26].y < unsorted[30].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[27].y < unsorted[31].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[27].y < unsorted[30].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[26].y < unsorted[28].y) {vec3 tmp = unsorted[26]; unsorted[26] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[27].y < unsorted[29].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[27].y < unsorted[28].y) {vec3 tmp = unsorted[27]; unsorted[27] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[16].y < unsorted[24].y) {vec3 tmp = unsorted[16]; unsorted[16] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[17].y < unsorted[25].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[17].y < unsorted[24].y) {vec3 tmp = unsorted[17]; unsorted[17] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[18].y < unsorted[26].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[19].y < unsorted[27].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[19].y < unsorted[26].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[18].y < unsorted[24].y) {vec3 tmp = unsorted[18]; unsorted[18] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[19].y < unsorted[25].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[19].y < unsorted[24].y) {vec3 tmp = unsorted[19]; unsorted[19] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[20].y < unsorted[28].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[21].y < unsorted[29].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[21].y < unsorted[28].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[22].y < unsorted[30].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[23].y < unsorted[31].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[23].y < unsorted[30].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[22].y < unsorted[28].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[23].y < unsorted[29].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[23].y < unsorted[28].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[20].y < unsorted[24].y) {vec3 tmp = unsorted[20]; unsorted[20] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[21].y < unsorted[25].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[21].y < unsorted[24].y) {vec3 tmp = unsorted[21]; unsorted[21] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[22].y < unsorted[26].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[23].y < unsorted[27].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[23].y < unsorted[26].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[22].y < unsorted[24].y) {vec3 tmp = unsorted[22]; unsorted[22] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[23].y < unsorted[25].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[23].y < unsorted[24].y) {vec3 tmp = unsorted[23]; unsorted[23] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[0].y < unsorted[16].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[1].y < unsorted[17].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[1].y < unsorted[16].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[2].y < unsorted[18].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[3].y < unsorted[19].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[3].y < unsorted[18].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[2].y < unsorted[16].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[3].y < unsorted[17].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[3].y < unsorted[16].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[4].y < unsorted[20].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[5].y < unsorted[21].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[5].y < unsorted[20].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[6].y < unsorted[22].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[7].y < unsorted[23].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[7].y < unsorted[22].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[6].y < unsorted[20].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[7].y < unsorted[21].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[7].y < unsorted[20].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[4].y < unsorted[16].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[5].y < unsorted[17].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[5].y < unsorted[16].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[6].y < unsorted[18].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[7].y < unsorted[19].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[7].y < unsorted[18].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[6].y < unsorted[16].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[7].y < unsorted[17].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[7].y < unsorted[16].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[8].y < unsorted[24].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[9].y < unsorted[25].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[9].y < unsorted[24].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[10].y < unsorted[26].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[11].y < unsorted[27].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[11].y < unsorted[26].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[10].y < unsorted[24].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[11].y < unsorted[25].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[11].y < unsorted[24].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[12].y < unsorted[28].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[13].y < unsorted[29].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[13].y < unsorted[28].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[14].y < unsorted[30].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[15].y < unsorted[31].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[31]; unsorted[31] = tmp;}\n            if (unsorted[15].y < unsorted[30].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[30]; unsorted[30] = tmp;}\n            if (unsorted[14].y < unsorted[28].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[15].y < unsorted[29].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[29]; unsorted[29] = tmp;}\n            if (unsorted[15].y < unsorted[28].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[28]; unsorted[28] = tmp;}\n            if (unsorted[12].y < unsorted[24].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[13].y < unsorted[25].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[13].y < unsorted[24].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[14].y < unsorted[26].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[15].y < unsorted[27].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[27]; unsorted[27] = tmp;}\n            if (unsorted[15].y < unsorted[26].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[26]; unsorted[26] = tmp;}\n            if (unsorted[14].y < unsorted[24].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[15].y < unsorted[25].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[25]; unsorted[25] = tmp;}\n            if (unsorted[15].y < unsorted[24].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[24]; unsorted[24] = tmp;}\n            if (unsorted[8].y < unsorted[16].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[9].y < unsorted[17].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[9].y < unsorted[16].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[10].y < unsorted[18].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[11].y < unsorted[19].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[11].y < unsorted[18].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[10].y < unsorted[16].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[11].y < unsorted[17].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[11].y < unsorted[16].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[12].y < unsorted[20].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[13].y < unsorted[21].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[13].y < unsorted[20].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[14].y < unsorted[22].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[15].y < unsorted[23].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[23]; unsorted[23] = tmp;}\n            if (unsorted[15].y < unsorted[22].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[22]; unsorted[22] = tmp;}\n            if (unsorted[14].y < unsorted[20].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[15].y < unsorted[21].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[21]; unsorted[21] = tmp;}\n            if (unsorted[15].y < unsorted[20].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[20]; unsorted[20] = tmp;}\n            if (unsorted[12].y < unsorted[16].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[13].y < unsorted[17].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[13].y < unsorted[16].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[14].y < unsorted[18].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[15].y < unsorted[19].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[19]; unsorted[19] = tmp;}\n            if (unsorted[15].y < unsorted[18].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[18]; unsorted[18] = tmp;}\n            if (unsorted[14].y < unsorted[16].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[16]; unsorted[16] = tmp;}\n            if (unsorted[15].y < unsorted[17].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[17]; unsorted[17] = tmp;}\n            if (unsorted[15].y < unsorted[16].y) {vec3 tmp = unsorted[15]; unsorted[15] = unsorted[16]; unsorted[16] = tmp;}\n        }\n\n        float coefficient(int i) {\n            return 1.0 - 2.0 * mod(float(i),2.0);\n        }\n\n        float periodicity(int i) {\n            if (i == 0) return 0.0;\n            if (i == 1) return 1.0/3.0;\n            return 2.0 / float(i);\n        }\n\n        void main () {\n            vec3 newPos = position;\n            vec3 newColour = color;\n            stretch = 0.0; // The amount by which the rendered segment should be dimmed.\n\n            // Copy raids into array for easier handling, probably.\n            vec3 raid[32]; // x = x, y = amplitude, z = number of aircraft.\n            raid[0] = raid0;\n            raid[1] = raid1;\n            raid[2] = raid2;\n            raid[3] = raid3;\n            raid[4] = raid4;\n            raid[5] = raid5;\n            raid[6] = raid6;\n            raid[7] = raid7;\n            raid[8] = raid8;\n            raid[9] = raid9;\n            raid[10] = raid10;\n            raid[11] = raid11;\n            raid[12] = raid12;\n            raid[13] = raid13;\n            raid[14] = raid14;\n            raid[15] = raid15;\n            if (numRaids > 16) {\n                raid[16] = raid16;\n                raid[17] = raid17;\n                raid[18] = raid18;\n                raid[19] = raid19;\n                raid[20] = raid20;\n                raid[21] = raid21;\n                raid[22] = raid22;\n                raid[23] = raid23;\n                raid[24] = raid24;\n                raid[25] = raid25;\n                raid[26] = raid26;\n                raid[27] = raid27;\n                raid[28] = raid28;\n                raid[29] = raid29;\n                raid[30] = raid30;\n                raid[31] = raid31;\n            }\n\n            // Compute height and slope for each raid, at this x position.\n            vec3 pulse[32];\n            for (int i = 0; i < 32; i++) {\n                pulse[i] = pulseShape(raid[i], 0.02);\n            }\n\n            // Sort pulses into decreasing displacement.\n            if (numRaids > 16) {\n                sortPulses32(pulse);\n            } else {\n                sortPulses16(pulse);\n            }\n\n            // Combine pulses. Try with loop but worried it won\'t work on iOS\n            // (ref https://www.shaderific.com/glsl-types)\n            // Good news, it looks OK.\n\n            float height = 0.0;\n            float slope = 0.0;\n            for (int i = 0; i < 32; i++) {\n                // Note we use cos so that pulse[0] doesn\'t disappear.\n                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));\n                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));\n\n                // We have used pulse.x to pass through the raid colour identifier!!\n                if (pulse[i].x > 0.0 && position.y == 0.0) {\n                    newColour = vec3(1.0, 1.0, 1.0);\n                }\n            }\n\n\n            // TODO: Limit slope and use that to limit height changes!\n\n          // Additional \"spiky\" line noise.\n          if (lineSpikes > 0.0) {\n              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )\n              {\n                 vec3 noise = vec3(position.x, 0.1, 0.0);\n                 vec3 spike = pulseShape(noise, 0.05);\n                 height += lineSpikes * spike.y;\n                 //slope += lineSpikes * spike.z;\n              }\n          }\n\n            newPos.y -= max(0.0, height);\n            newPos.x += position.y * slope;\n            stretch = abs(slope);\n\n            // Lower the resolution of the x line to make the noise less noisy.\n            float newx = floor((position.x) * 153.0);\n            float newtime = floor(u_time / 2.0);\n\n            // add time to the noise parameters so it\'s animated\n            if (lineJiggle > 0.0) {\n                float noise = turbulence( newx * newtime );\n                float b = random( newx * newtime );\n                float displacement = lineJiggle * noise + 0.01 * b;\n                newPos.y += displacement;\n            }\n\n            // Where no signal, narrow the line a bit.\n            if (height == 0.0) {\n                newPos.y /= 2.0;\n            }\n            //if (newPos.y > 0.0) { newPos.y /= 2.0; }\n\n            gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);\n            vcolor = newColour;\n            stretch = abs(stretch);\n        }\n  ',
+	src: '\n        attribute vec3 position;\n        attribute vec3 color;\n\n        uniform mat4 perspective;\n        uniform mat4 camera;\n        uniform mat4 rotation;\n        uniform float u_time;\n        uniform float lineJiggle;\n        uniform float lineSpikes;\n        uniform int numRaids; // use this to vary sort load.\n        uniform vec3 raid0;\n        uniform vec3 raid1;\n        uniform vec3 raid2;\n        uniform vec3 raid3;\n        uniform vec3 raid4;\n        uniform vec3 raid5;\n        uniform vec3 raid6;\n        uniform vec3 raid7;\n        uniform vec3 raid8;\n        uniform vec3 raid9;\n        uniform vec3 raid10;\n        uniform vec3 raid11;\n        uniform vec3 raid12;\n        uniform vec3 raid13;\n        uniform vec3 raid14;\n        uniform vec3 raid15;\n\n\n        varying vec3 vcolor;\n        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.\n\n        float random (in float x) {\n            return fract(sin(x) * 5000.0);\n        }\n\n        //  Function from Iñigo Quiles\n        //  www.iquilezles.org/www/articles/functions/functions.htm\n        // w = width, c = centre\n        float cubicPulse( float c, float w, float x ) {\n            x = abs(x - c); // NOTE 0 <= x <= +w\n            if (x > w) return 0.0;\n            x /= w; // 0 <= x <= +1 (width is actually 2w)\n            return 1.0 - x * x * (3.0 - 2.0 * x);\n        }\n\n        // x adjustment to keep line thickness across cubic pulse.\n        float gradient(float c, float w, float x) {\n            float x1 = abs((x - c)/w); // 0 <= x1 <= 1\n            if (x1 > 1.0) return 0.0;\n            float gradient = x1 * (1.0 - x1);\n            return gradient * sign(c - x);\n        }\n\n        // Different version of FBM.\n        float turbulence( float p ) {\n\n            float w = 100.0;\n            float t = -0.5;\n\n            for (float f = 1.0 ; f <= 10.0 ; f++ ){\n                float power = pow( 2.0, f );\n                t += random(p) / power ;\n            }\n\n          return t;\n\n        }\n\n        vec3 pulseShape(vec3 raid, float halfWidth) {\n            // returns x = x, y = displacement, z = gradient\n            float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);\n            float slope = raid.y * gradient(raid.x, halfWidth, position.x);\n            float tutorialRaidIndicator = raid.z * height;\n\n           // WARNING -- x value of return used for raid colour indication!!\n            return vec3( tutorialRaidIndicator, height, slope );\n        }\n\n        void sortPulses16(inout vec3 unsorted[16]) {\n            //Network for N=16, using Best Known Arrangement.\n\n            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;};\n            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;};\n            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;};\n            if (unsorted[5].y < unsorted[10].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[6].y < unsorted[9].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[12].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;};\n            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;};\n            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;};\n            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;};\n            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;};\n            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;};\n            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;};\n            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};\n            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;};\n            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};\n            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;};\n            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};\n            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};\n        }\n\n        // Kludged to try to look OK with multiple raids.\n        float coefficient(int i) {\n            return 1.0 - 2.0 * mod(float(i),2.0);\n        }\n\n        // Kludged to try to look OK with multiple raids.\n        float periodicity(int i) {\n            if (i == 0) return 0.0;\n            if (i == 1) return 1.0/3.0;\n            return 2.0 / float(i);\n        }\n\n        void main () {\n            vec3 newPos = position;\n            vec3 newColour = color;\n            stretch = 0.0; // The amount by which the rendered segment should be dimmed.\n\n            // Copy raids into array for easier handling, probably.\n            vec3 raid[16]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).\n            raid[0] = raid0;\n            raid[1] = raid1;\n            raid[2] = raid2;\n            raid[3] = raid3;\n            raid[4] = raid4;\n            raid[5] = raid5;\n            raid[6] = raid6;\n            raid[7] = raid7;\n            raid[8] = raid8;\n            raid[9] = raid9;\n            raid[10] = raid10;\n            raid[11] = raid11;\n            raid[12] = raid12;\n            raid[13] = raid13;\n            raid[14] = raid14;\n            raid[15] = raid15;\n\n\n            // Compute height and slope for each raid, at this x position.\n            vec3 pulse[16];\n            for (int i = 0; i < 16; i++) {\n                pulse[i] = pulseShape(raid[i], 0.02);\n            }\n\n            // Sort pulses into decreasing displacement.\n            sortPulses16(pulse);\n\n            // Combine pulses. Try with loop but worried it won\'t work on iOS\n            // (ref https://www.shaderific.com/glsl-types)\n            // Good news, it looks OK.\n\n            float height = 0.0;\n            float slope = 0.0;\n            for (int i = 0; i < 16; i++) {\n                // Note we use cos so that pulse[0] doesn\'t disappear.\n                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));\n                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));\n\n                // We have used pulse.x to pass through the raid colour identifier!!\n                if (pulse[i].x > 0.0 && position.y == 0.0) {\n                    newColour = vec3(1.0, 1.0, 1.0);\n                }\n            }\n\n\n            // TODO: Limit slope and use that to limit height changes!\n\n          // Additional \"spiky\" line noise.\n          if (lineSpikes > 0.0) {\n              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )\n              {\n                 vec3 noise = vec3(position.x, 0.1, 0.0);\n                 vec3 spike = pulseShape(noise, 0.05);\n                 height += lineSpikes * spike.y;\n                 //slope += lineSpikes * spike.z;\n              }\n          }\n\n            newPos.y -= max(0.0, height);\n            newPos.x += position.y * slope;\n            stretch = abs(slope);\n\n            // Lower the resolution of the x line to make the noise less noisy.\n            float newx = floor((position.x) * 153.0);\n            float newtime = floor(u_time / 2.0);\n\n            // add time to the noise parameters so it\'s animated\n            if (lineJiggle > 0.0) {\n                float noise = turbulence( newx * newtime );\n                float b = random( newx * newtime );\n                float displacement = lineJiggle * noise + 0.01 * b;\n                newPos.y += displacement;\n            }\n\n            // Where no signal, narrow the line a bit.\n            if (height == 0.0) {\n                newPos.y /= 2.0;\n            }\n            //if (newPos.y > 0.0) { newPos.y /= 2.0; }\n\n            gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);\n            vcolor = newColour;\n            stretch = abs(stretch);\n        }\n  ',
 	attributes: {color: 'color', position: 'position'},
-	uniforms: {camera: 'camera', lineJiggle: 'lineJiggle', lineSpikes: 'lineSpikes', numRaids: 'numRaids', perspective: 'perspective', raid0: 'raid0', raid1: 'raid1', raid10: 'raid10', raid11: 'raid11', raid12: 'raid12', raid13: 'raid13', raid14: 'raid14', raid15: 'raid15', raid16: 'raid16', raid17: 'raid17', raid18: 'raid18', raid19: 'raid19', raid2: 'raid2', raid20: 'raid20', raid21: 'raid21', raid22: 'raid22', raid23: 'raid23', raid24: 'raid24', raid25: 'raid25', raid26: 'raid26', raid27: 'raid27', raid28: 'raid28', raid29: 'raid29', raid3: 'raid3', raid30: 'raid30', raid31: 'raid31', raid4: 'raid4', raid5: 'raid5', raid6: 'raid6', raid7: 'raid7', raid8: 'raid8', raid9: 'raid9', rotation: 'rotation', u_time: 'u_time'}
+	uniforms: {camera: 'camera', lineJiggle: 'lineJiggle', lineSpikes: 'lineSpikes', numRaids: 'numRaids', perspective: 'perspective', raid0: 'raid0', raid1: 'raid1', raid10: 'raid10', raid11: 'raid11', raid12: 'raid12', raid13: 'raid13', raid14: 'raid14', raid15: 'raid15', raid2: 'raid2', raid3: 'raid3', raid4: 'raid4', raid5: 'raid5', raid6: 'raid6', raid7: 'raid7', raid8: 'raid8', raid9: 'raid9', rotation: 'rotation', u_time: 'u_time'}
 };
 var $elm$html$Html$Attributes$width = function (n) {
 	return A2(
@@ -18307,12 +18822,15 @@ var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 	function (model, trace) {
 		return A2(
 			$mdgriffith$elm_ui$Element$column,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$padding(5)
+					]),
+				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCRT)),
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$padding(5)
-				]),
-			_List_fromArray(
-				[
+					$mdgriffith$elm_ui$Element$none,
 					A2(
 					$mdgriffith$elm_ui$Element$el,
 					_List_fromArray(
@@ -18327,114 +18845,32 @@ var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 					$author$project$OperatorPage$rangeSlider(model)),
 					A2(
 					$mdgriffith$elm_ui$Element$el,
-					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCRT),
+					_List_Nil,
 					$mdgriffith$elm_ui$Element$html(
 						A2($author$project$CRT_WebGL$crt, model.webGLtime, trace)))
 				]));
 	});
+var $author$project$Config$groundRays = _List_fromArray(
+	[
+		{alpha: 0, amplitude: 10.0, duration: 0, phase: 0, r: 5000, sequence: 0, theta: 0, tutorial: false},
+		{alpha: 0, amplitude: 8.0, duration: 0, phase: 0, r: 8000, sequence: 0, theta: 0, tutorial: false}
+	]);
 var $author$project$OperatorPage$traceDependingOnMode = function (model) {
-	var _v0 = _Utils_Tuple2(model.goniometerMode, model.receiveAB);
-	if (_v0.a.$ === 'Azimuth') {
-		var _v1 = _v0.a;
-		return model.azimuthModeTrace;
-	} else {
-		if (_v0.b) {
-			var _v2 = _v0.a;
-			return model.elevation_A_trace;
-		} else {
-			var _v3 = _v0.a;
-			return model.elevation_B_trace;
-		}
-	}
-};
-var $author$project$Messages$TutorialAdvance = {$: 'TutorialAdvance'};
-var $author$project$TrainingMode$findStep = function (tutorialStep) {
-	var findHelper = function (steps) {
-		findHelper:
-		while (true) {
-			if (!steps.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var step1 = steps.a;
-				var more = steps.b;
-				if (_Utils_eq(
-					$elm$core$Maybe$Just(step1.tutorialStep),
-					tutorialStep)) {
-					return $elm$core$Maybe$Just(step1);
-				} else {
-					var $temp$steps = more;
-					steps = $temp$steps;
-					continue findHelper;
-				}
-			}
-		}
-	};
-	return findHelper($author$project$TrainingMode$tutorial);
-};
-var $mdgriffith$elm_ui$Internal$Model$MoveX = function (a) {
-	return {$: 'MoveX', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Flag$moveX = $mdgriffith$elm_ui$Internal$Flag$flag(25);
-var $mdgriffith$elm_ui$Element$moveLeft = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
-		$mdgriffith$elm_ui$Internal$Flag$moveX,
-		$mdgriffith$elm_ui$Internal$Model$MoveX(-x));
-};
-var $author$project$TrainingMode$tutorialTextBox = function (model) {
-	return $mdgriffith$elm_ui$Element$inFront(
+	return _Utils_ap(
+		$author$project$Config$groundRays,
 		function () {
-			var _v0 = $author$project$TrainingMode$findStep(model.tutorialStage);
-			if (_v0.$ === 'Nothing') {
-				return $mdgriffith$elm_ui$Element$none;
+			var _v0 = _Utils_Tuple2(model.goniometerMode, model.receiveAB);
+			if (_v0.a.$ === 'Azimuth') {
+				var _v1 = _v0.a;
+				return model.azimuthModeTrace;
 			} else {
-				var step = _v0.a;
-				return A2(
-					$mdgriffith$elm_ui$Element$el,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$centerY,
-							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$moveUp(100),
-							$mdgriffith$elm_ui$Element$moveLeft(80),
-							$mdgriffith$elm_ui$Element$inFront(
-							A2(
-								$mdgriffith$elm_ui$Element$el,
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$width(
-										$mdgriffith$elm_ui$Element$px(500)),
-										$mdgriffith$elm_ui$Element$centerX,
-										$mdgriffith$elm_ui$Element$centerY,
-										$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
-										$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-										$mdgriffith$elm_ui$Element$Border$width(1),
-										$mdgriffith$elm_ui$Element$Border$rounded(5),
-										$mdgriffith$elm_ui$Element$pointer,
-										$mdgriffith$elm_ui$Element$Events$onClick($author$project$Messages$TutorialAdvance)
-									]),
-								A2(
-									$mdgriffith$elm_ui$Element$paragraph,
-									_List_fromArray(
-										[
-											$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
-											$mdgriffith$elm_ui$Element$Font$size(16),
-											$mdgriffith$elm_ui$Element$Font$family(
-											_List_fromArray(
-												[
-													$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
-												])),
-											$mdgriffith$elm_ui$Element$spacing(4),
-											$mdgriffith$elm_ui$Element$padding(4),
-											$mdgriffith$elm_ui$Element$Font$center
-										]),
-									_List_fromArray(
-										[
-											$mdgriffith$elm_ui$Element$text(step.tutorialText)
-										]))))
-						]),
-					$mdgriffith$elm_ui$Element$text(''));
+				if (_v0.b) {
+					var _v2 = _v0.a;
+					return model.elevation_A_trace;
+				} else {
+					var _v3 = _v0.a;
+					return model.elevation_B_trace;
+				}
 			}
 		}());
 };
@@ -18445,7 +18881,16 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$centerX,
-					$author$project$TrainingMode$tutorialTextBox(model)
+					A2(
+					$author$project$TrainingMode$tutorialTextBox,
+					model,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$moveUp(100),
+							$mdgriffith$elm_ui$Element$moveLeft(80),
+							$mdgriffith$elm_ui$Element$centerX,
+							$mdgriffith$elm_ui$Element$centerY
+						]))
 				]),
 			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPage)),
 		_List_fromArray(
