@@ -71,6 +71,7 @@ type UiComponent
     | UiCalcHeight
     | UiCalcOffset
     | UiCalculator
+    | UiDummy
 
 
 type Tutorial
@@ -87,4 +88,5 @@ type Tutorial
     | TutorialStoreRange2 -- relates to height
     | TutorialStoreStrength
     | TutorialShowCalculator
-    | TutorialDummy
+    | TutorialEnded -- last thing we show
+    | TutorialDummy -- not shown, if it occurs.

@@ -21,9 +21,9 @@
 --TODO: Learning menu of raid types (one, two, 3-6, IFF).
 --TODO: Play mode to only use learnt raid types.
 --DONE: Can we do a walk-through of a raid? -- Yes, WIP.
---TODO: Tutorial strings can be dynamic if we pass model in.
+--DONE: Tutorial strings can be dynamic if we pass model in.
 --TODO: Drop any targets moved beyond 100 miles range.
+--TODO: Raspberry Pi with touch screen.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.
 --TODO: Improve that by using WebSockets -> JS -> Subscription -> Msg.
 --TODO: Physical knobs -- headless app reads from Arduino (10 bit encoder).
---TODO: Raspberry Pi.

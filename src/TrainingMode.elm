@@ -8,7 +8,7 @@ module TrainingMode exposing (advanceTutorial, goBackInTutorial, tutorialAutomat
    provide common formatting etc.
 -}
 
-import Config exposing (trainingMode)
+import Config exposing (targetConfigurations, trainingMode)
 import Constants exposing (blue, flatSunflower, white)
 import Element exposing (..)
 import Element.Background as Background
@@ -47,7 +47,7 @@ tutorialEntryPoint =
 
 static : String -> (Model -> String)
 static s =
-    (\_ -> s)
+    \_ -> s
 
 
 tutorial : List TutorialEntry
@@ -59,9 +59,10 @@ tutorial =
         noStateActions
         noExitActions
         (static
-        """We'll watch the operator work out the position of an incoming raid.
+            """We'll watch the operator work out the position of an incoming raid.
         Click ► to begin.
-        """)
+        """
+        )
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
@@ -69,9 +70,10 @@ tutorial =
         noStateActions
         noExitActions
         (static
-        """The white V shape under the 100 on the 'tube' is a new raid.
+            """The white V shape under the 100 on the 'tube' is a new raid.
         Click ► to see the operator start to examine the raid.
-        """)
+        """
+        )
     , TutorialEntry
         TutorialAdjustRange
         UiRangeKnob
@@ -79,9 +81,10 @@ tutorial =
         [ chaseTheRaidRange True ]
         [ chaseTheRaidRange False ]
         (static
-        """The operator turns the range knob until the pointer
+            """The operator turns the range knob until the pointer
         lines up with the left edge of the raid on the CRT.
-        """)
+        """
+        )
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
@@ -89,8 +92,9 @@ tutorial =
         [ swingThatGoniometer True ]
         [ swingThatGoniometer False ]
         (static
-        """The operator 'swings' the gonio until the V on the CRT vanishes.
-        """)
+            """The operator 'swings' the gonio until the V on the CRT vanishes.
+        """
+        )
     , TutorialEntry
         TutorialStoreBearing
         UiGonioButton
@@ -98,8 +102,9 @@ tutorial =
         noStateActions
         [ tutorialStoreBearing ]
         (static
-        """Pressing the GONIO button stores the bearing in the calculator.
-        """)
+            """Pressing the GONIO button stores the bearing in the calculator.
+        """
+        )
     , TutorialEntry
         TutorialStoreRange1
         UIRangeButton
@@ -107,8 +112,9 @@ tutorial =
         noStateActions
         [ tutorialStoreRange1 ]
         (static
-        """Pressing the RANGE button stores the range in the calculator.
-        """)
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
     , TutorialEntry
         TutorialHeightMode
         UiHeight
@@ -116,8 +122,9 @@ tutorial =
         noStateActions
         noExitActions
         (static
-        """The operator will now try to work out the height.
-        """)
+            """The operator will now try to work out the height.
+        """
+        )
     , TutorialEntry
         TutorialFindElevation
         UiGoniometer
@@ -125,8 +132,9 @@ tutorial =
         [ tutorialSeekElevation True ]
         [ tutorialSeekElevation False ]
         (static
-        """The operator swings the gonio again, to minimise the V.
-        """)
+            """The operator swings the gonio again, to minimise the V.
+        """
+        )
     , TutorialEntry
         TutorialStoreElevation
         UiGonioButton
@@ -134,8 +142,9 @@ tutorial =
         noStateActions
         [ tutorialStoreElevation ]
         (static
-        """The GONIO setting is stored, this gives the elevation.
-        """)
+            """The GONIO setting is stored, this gives the elevation.
+        """
+        )
     , TutorialEntry
         TutorialAdjustRangeForHeight
         UiRangeKnob
@@ -143,8 +152,9 @@ tutorial =
         [ chaseTheRaidRange True ]
         [ chaseTheRaidRange False ]
         (static
-        """Adjust the range pointer because the raid has moved.
-        """)
+            """Adjust the range pointer because the raid has moved.
+        """
+        )
     , TutorialEntry
         TutorialStoreRange2
         UIRangeButton
@@ -152,8 +162,9 @@ tutorial =
         noStateActions
         [ tutorialStoreRange1 ]
         (static
-        """Pressing the RANGE button stores the range in the calculator.
-        """)
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
     , TutorialEntry
         TutorialStoreStrength
         UiRaidStrength
@@ -161,15 +172,24 @@ tutorial =
         noStateActions
         noExitActions
         (static
-        """Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft.
-        """)
+            """Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft.
+        """
+        )
     , TutorialEntry
         TutorialShowCalculator
         UiCalculator
         [ tutorialShowCalculator ]
         noStateActions
         noExitActions
-        (tutorialInterpretCalculator )
+        tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialEnded
+        UiDummy
+        [ tutorialShowOperator ]
+        noStateActions
+        [ stopTutorialRaid, tutorialExit ]
+        (static """Choose more training or click on Operate.
+        """)
     ]
 
 
@@ -285,8 +305,8 @@ advanceTutorial current =
                 applyActions thisStage.exitActions <|
                     { current | tutorialStage = nextStepId }
 
-        ( Just thisStage, Nothing ) ->
-            applyActions thisStage.exitActions <|
+        ( Just thisStep, Nothing ) ->
+            applyActions thisStep.exitActions <|
                 { current | tutorialStage = Nothing }
 
         _ ->
@@ -346,6 +366,10 @@ setupTutorialRaid model =
     { model | targets = trainingMode }
 
 
+stopTutorialRaid model =
+    { model | targets = [] }
+
+
 tutorialStoreBearing : TutorialAction
 tutorialStoreBearing model =
     { model
@@ -402,9 +426,17 @@ tutorialBearingMode model =
 
 tutorialShowCalculator : TutorialAction
 tutorialShowCalculator model =
-    { model
-        | currPage = OutputPage
-    }
+    { model | currPage = OutputPage }
+
+
+tutorialShowOperator : TutorialAction
+tutorialShowOperator model =
+    { model | currPage = OperatorPage }
+
+
+tutorialExit : TutorialAction
+tutorialExit model =
+    { model | tutorialStage = Nothing }
 
 
 chaseTheRaidRange : Bool -> Model -> Model
@@ -603,7 +635,7 @@ tutorialTextBox model attribs =
                             , padding 10
                             , Font.size 16
                             ]
-                            [ text (step.tutorialText model)]
+                            [ text (step.tutorialText model) ]
                         , el [ onClick TutorialAdvance, alignRight, pointer ] <|
                             text "►"
                         ]
