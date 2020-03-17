@@ -15,14 +15,17 @@
 --DONE: Tweak epsilon to stop endless range and bearing seeky behaviour.
 --DONE: Move trace to lower on the CRT.
 --DONE: Physical knobs -- get a headless little server app running with a Gonio API.
---TODO: Narrative and on-screen prompts.
+--DONE: Narrative and on-screen prompts.
 --DONE: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
 --DONE: PO to decide which raid scenarios to be in narrative.
---TODO: Range indicator should be front of the scale. Sure it used to be,
---TODO: Learning menu of raid types (one, two, 3-6, IFF).
---TODO: Play mode to only use learnt raid types.
+--DROP: Range indicator should be front of the scale. Sure it used to be,
 --DONE: Can we do a walk-through of a raid? -- Yes, WIP.
 --DONE: Tutorial strings can be dynamic if we pass model in.
+--TODO: Learning menu of raid types (one, two, 3-6, IFF).
+--TODO: Two plane scenario
+--TODO: 3-6 scenario
+--TODO: IFF scenario
+--TODO: Play mode to only use learnt raid types.
 --TODO: Drop any targets moved beyond 100 miles range.
 --TODO: Raspberry Pi with touch screen.
 --TODO: Physical knobs -- UI app gets gonio setting from server app.
