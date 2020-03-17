@@ -8,14 +8,14 @@ module TrainingMode exposing (advanceTutorial, goBackInTutorial, tutorialAutomat
    provide common formatting etc.
 -}
 
-import Config exposing (getAllTargets, trainingMode)
-import Constants exposing (..)
+import Config exposing (trainingMode)
+import Constants exposing (blue, flatSunflower, white)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events exposing (onClick)
 import Element.Font as Font
-import ElevationCurves exposing (estimateEchoInElevationMode)
+import Grid exposing (tutorialInterpretCalculator)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
@@ -35,12 +35,19 @@ type alias TutorialEntry =
     , entryActions : TutorialActionList -- Changes to the model so we can be idempotent
     , stateActions : TutorialActionList -- Things we must do whilst in this state.
     , exitActions : TutorialActionList -- Changes to the model, to make sure we exit cleanly
-    , tutorialText : String -- What we display to the user.
+    , tutorialText :
+        Model
+        -> String -- What we display to the user.
     }
 
 
 tutorialEntryPoint =
     Maybe.map .tutorialStep <| List.head tutorial
+
+
+static : String -> (Model -> String)
+static s =
+    (\_ -> s)
 
 
 tutorial : List TutorialEntry
@@ -51,107 +58,118 @@ tutorial =
         [ tutorialBearingMode ]
         noStateActions
         noExitActions
+        (static
         """We'll watch the operator work out the position of an incoming raid.
-
         Click ► to begin.
-        """
+        """)
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
         [ setupTutorialRaid ]
         noStateActions
         noExitActions
+        (static
         """The white V shape under the 100 on the 'tube' is a new raid.
         Click ► to see the operator start to examine the raid.
-        """
+        """)
     , TutorialEntry
         TutorialAdjustRange
         UiRangeKnob
         noEntryActions
         [ chaseTheRaidRange True ]
         [ chaseTheRaidRange False ]
+        (static
         """The operator turns the range knob until the pointer
         lines up with the left edge of the raid on the CRT.
-        """
+        """)
     , TutorialEntry
         TutorialFindBearing
         UiGoniometer
         noEntryActions
         [ swingThatGoniometer True ]
         [ swingThatGoniometer False ]
+        (static
         """The operator 'swings' the gonio until the V on the CRT vanishes.
-        """
+        """)
     , TutorialEntry
         TutorialStoreBearing
         UiGonioButton
         noEntryActions
         noStateActions
         [ tutorialStoreBearing ]
+        (static
         """Pressing the GONIO button stores the bearing in the calculator.
-        """
+        """)
     , TutorialEntry
         TutorialStoreRange1
         UIRangeButton
         noEntryActions
         noStateActions
         [ tutorialStoreRange1 ]
+        (static
         """Pressing the RANGE button stores the range in the calculator.
-        """
+        """)
     , TutorialEntry
         TutorialHeightMode
         UiHeight
         [ tutorialHeightMode ]
         noStateActions
         noExitActions
+        (static
         """The operator will now try to work out the height.
-        """
+        """)
     , TutorialEntry
         TutorialFindElevation
         UiGoniometer
         noEntryActions
         [ tutorialSeekElevation True ]
         [ tutorialSeekElevation False ]
+        (static
         """The operator swings the gonio again, to minimise the V.
-        """
+        """)
     , TutorialEntry
         TutorialStoreElevation
         UiGonioButton
         noEntryActions
         noStateActions
         [ tutorialStoreElevation ]
+        (static
         """The GONIO setting is stored, this gives the elevation.
-        """
+        """)
     , TutorialEntry
         TutorialAdjustRangeForHeight
         UiRangeKnob
         noEntryActions
         [ chaseTheRaidRange True ]
         [ chaseTheRaidRange False ]
+        (static
         """Adjust the range pointer because the raid has moved.
-        """
+        """)
     , TutorialEntry
         TutorialStoreRange2
         UIRangeButton
         noEntryActions
         noStateActions
         [ tutorialStoreRange1 ]
+        (static
         """Pressing the RANGE button stores the range in the calculator.
-        """
+        """)
     , TutorialEntry
         TutorialStoreStrength
         UiRaidStrength
         [ tutorialStoreStrength 1 ]
         noStateActions
         noExitActions
+        (static
         """Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft.
-        """
+        """)
     , TutorialEntry
         TutorialShowCalculator
         UiCalculator
         [ tutorialShowCalculator ]
         noStateActions
         noExitActions
-        tutorialInterpretCalculator
+        (tutorialInterpretCalculator )
     ]
 
 
@@ -389,11 +407,6 @@ tutorialShowCalculator model =
     }
 
 
-tutorialInterpretCalculator : String
-tutorialInterpretCalculator =
-    "Hello World."
-
-
 chaseTheRaidRange : Bool -> Model -> Model
 chaseTheRaidRange active model =
     -- Use simulated key presses to mimic the operator tracking the raid
@@ -558,9 +571,10 @@ explanatoryText uiComponent =
             none
 
 
-tutorialTextBox : Model -> Attribute Msg
-tutorialTextBox model =
+tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg
+tutorialTextBox model attribs =
     -- Use a single central text box for all tutorial text.
+    -- Second argument allows caller to finesse the position
     inFront <|
         case findStep model.tutorialStage of
             Nothing ->
@@ -568,21 +582,20 @@ tutorialTextBox model =
 
             Just step ->
                 el
-                    [ width (px 500)
-                    , centerX
-                    , centerY
-                    , moveUp 100
-                    , moveLeft 80
-                    , Border.color flatSunflower
-                    , Border.width 2
-                    , Border.rounded 5
-                    , Font.center
-                    , Font.color white
-                    , Font.size 32
-                    , Font.family [ Font.typeface "Helvetica" ]
-                    ]
+                    ([ width (px 500)
+                     , Border.color flatSunflower
+                     , Border.width 2
+                     , Border.rounded 5
+                     , Font.center
+                     , Font.color white
+                     , Font.size 32
+                     , Font.family [ Font.typeface "Helvetica" ]
+                     ]
+                        ++ attribs
+                    )
                 <|
-                    row [ width fill ]
+                    row
+                        [ width fill ]
                         [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
                         , paragraph
                             [ Background.color blue
@@ -590,7 +603,7 @@ tutorialTextBox model =
                             , padding 10
                             , Font.size 16
                             ]
-                            [ text step.tutorialText ]
+                            [ text (step.tutorialText model)]
                         , el [ onClick TutorialAdvance, alignRight, pointer ] <|
                             text "►"
                         ]

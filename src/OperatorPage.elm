@@ -237,7 +237,17 @@ raidStrengthPanel model =
 
 
 operatorPageLandscape model =
-    row ([ centerX, tutorialTextBox model ] ++ tutorialHighlighting model UiOperatorPage)
+    row
+        ([ centerX
+         , tutorialTextBox model
+            [ moveUp 100
+            , moveLeft 80
+            , centerX
+            , centerY
+            ]
+         ]
+            ++ tutorialHighlighting model UiOperatorPage
+        )
         [ column ([ width <| fillPortion 3, centerX ] ++ tutorialHighlighting model UiLeftSide)
             [ row []
                 [ el

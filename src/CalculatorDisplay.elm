@@ -4,74 +4,16 @@ module CalculatorDisplay exposing (calculator)
    We attempt to mimic the output panel for the electronic calculator.
 -}
 
-import Array
 import Constants exposing (..)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
-import Html.Attributes exposing (style)
+import Grid exposing (GridPosition, gridLettersList, gridPosition)
 import Messages exposing (Msg)
 import Model exposing (Model)
-import Nixie exposing (maybeNixieDisplay, nixieDisplay)
 import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
 import Types exposing (UiComponent(..))
-import Utils exposing (bearingDisplay, choose, disableSelection, edges, helpButton)
-
-
-type alias GridPosition =
-    { gridSquareEast : Int -- 0 = station, +ve east, -ve west
-    , gridSquareNorth : Int -- 0 = station, +ve north, -ve south
-    , gridSquareOffsetEast : Int -- Two digits within square
-    , gridSquareOffsetNorth : Int -- Two digits within square
-    }
-
-
-gridLettersList : List (List String)
-gridLettersList =
-    [ [ "Y", "Z", "V", "W", "X", "Y", "Z" ]
-    , [ "D", "E", "A", "B", "C", "D", "E" ]
-    , [ "J", "K", "F", "G", "H", "J", "K" ]
-    , [ "O", "P", "L", "M", "N", "O", "P" ]
-    , [ "T", "U", "Q", "R", "S", "T", "U" ]
-    , [ "Y", "Z", "V", "W", "X", "Y", "Z" ]
-    , [ "D", "E", "A", "B", "C", "D", "E" ]
-    ]
-
-
-gridLettersArray =
-    Array.fromList <|
-        List.map Array.fromList gridLettersList
-
-
-gridPosition : Maybe Float -> Maybe Float -> Maybe GridPosition
-gridPosition range bearing =
-    -- Ideally, use RAF grid, but doesn't really matter.
-    -- Each lettered square is 100km. Range is in km.
-    -- Without much loss of generality, assume station is centred in centre square.
-    let
-        easting r b =
-            truncate <| r * sin b + 50
-
-        northing r b =
-            truncate <| r * cos b + 50
-
-        eastSquareBoundary r b =
-            floor <| toFloat (easting r b) / 100.0
-
-        northSquareBoundary r b =
-            floor <| toFloat (northing r b) / 100.0
-    in
-    case ( range, bearing ) of
-        ( Just r, Just b ) ->
-            Just
-                { gridSquareEast = eastSquareBoundary r b
-                , gridSquareNorth = northSquareBoundary r b
-                , gridSquareOffsetEast = easting r b - 100 * eastSquareBoundary r b
-                , gridSquareOffsetNorth = northing r b - 100 * northSquareBoundary r b
-                }
-
-        ( _, _ ) ->
-            Nothing
+import Utils exposing (choose, disableSelection, edges, helpButton)
 
 
 calculator : Model -> Element Msg
@@ -98,7 +40,15 @@ calculator model =
         friendly =
             model.storedFriendly
     in
-    column ([ centerX, tutorialTextBox model ] ++ tutorialHighlighting model UiCalculator)
+    column
+        ([ centerX
+         , tutorialTextBox model
+            [ alignTop
+            , centerX
+            ]
+         ]
+            ++ tutorialHighlighting model UiCalculator
+        )
         [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay model position
             , column [ spacing 10 ]
