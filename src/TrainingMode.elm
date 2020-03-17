@@ -41,6 +41,17 @@ type alias TutorialEntry =
     }
 
 
+tutorialCloseStep : TutorialEntry
+tutorialCloseStep =
+    TutorialEntry
+        TutorialDummy
+        UiDummy
+        [ tutorialExit ]
+        noStateActions
+        noExitActions
+        (static "No text.")
+
+
 tutorialEntryPoint =
     Maybe.map .tutorialStep <| List.head tutorial
 
@@ -180,16 +191,17 @@ tutorial =
         UiCalculator
         [ tutorialShowCalculator ]
         noStateActions
-        noExitActions
+        [ tutorialShowOperator ]
         tutorialInterpretCalculator
     , TutorialEntry
         TutorialEnded
         UiDummy
-        [ tutorialShowOperator ]
+        noEntryActions
         noStateActions
-        [ stopTutorialRaid, tutorialExit ]
+        [ stopTutorialRaid ]
         (static """Choose more training or click on Operate.
         """)
+    , tutorialCloseStep
     ]
 
 

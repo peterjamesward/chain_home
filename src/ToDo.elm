@@ -18,6 +18,7 @@
 --TODO: Narrative and on-screen prompts.
 --DONE: Each tutorial stage needs entry and exit (Model -> Model) to ensure consistency.
 --DONE: PO to decide which raid scenarios to be in narrative.
+--TODO: Range indicator should be front of the scale. Sure it used to be,
 --TODO: Learning menu of raid types (one, two, 3-6, IFF).
 --TODO: Play mode to only use learnt raid types.
 --DONE: Can we do a walk-through of a raid? -- Yes, WIP.

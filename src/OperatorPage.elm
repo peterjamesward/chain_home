@@ -52,10 +52,6 @@ clickableGonioImage model tutorial =
         (html <| drawGoniometer theta)
 
 
-
---TODO: Range indicator should be front of the CRT. Sure it used to be,
-
-
 rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
@@ -135,7 +131,8 @@ rangeScale model =
 rangeSliderAndCRT model trace =
     column
         ([ padding 5 ] ++ tutorialHighlighting model UiCRT)
-        [ E.el
+        [ none
+        , el
             [ E.below (rangeScale model)
             , paddingEach { edges | left = 40 }
             ]
