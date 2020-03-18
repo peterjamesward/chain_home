@@ -245,7 +245,7 @@ operatorPageLandscape model =
          ]
             ++ tutorialHighlighting model UiOperatorPage
         )
-        [ column ([ width <| fillPortion 3, centerX ] ++ tutorialHighlighting model UiLeftSide)
+        [ column [ width <| fillPortion 3, centerX ]
             [ row []
                 [ el
                     []
@@ -261,7 +261,7 @@ operatorPageLandscape model =
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
-        , column ([ width <| fillPortion 2, centerX ] ++ tutorialHighlighting model UiRightSide)
+        , column [ width <| fillPortion 2, centerX ]
             [ helpButton
             , modeSwitchPanel model
             , raidStrengthPanel model
@@ -271,10 +271,35 @@ operatorPageLandscape model =
 
 operatorPagePortrait model =
     column
-        commonStyles
-        [ rangeSliderAndCRT model <| traceDependingOnMode model
-        , clickableGonioImage model TutorialAdjustRange
-        , clickableRangeKnob model TutorialDummy
+        ([ centerX
+         , tutorialTextBox model
+            [ moveUp 220
+            , moveLeft 0
+            , centerX
+            , centerY
+            ]
+         ]
+            ++ tutorialHighlighting model UiOperatorPage
+        )
+        [ row []
+            [ el
+                []
+                (rangeSliderAndCRT model <| traceDependingOnMode model)
+            ]
+        , row
+            (tutorialHighlighting model UiBothKnobs)
+            [ clickableGonioImage model UiRangeKnob
+            , el (tutorialHighlighting model UiGonioButton) <|
+                actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+            , clickableRangeKnob model UiGoniometer
+            , el (tutorialHighlighting model UIRangeButton) <|
+                actionButtonLabelAbove "RANGE" StoreRangeSetting
+            , el [alignBottom] helpButton
+            ]
+        , row [ width <| fillPortion 2, centerX ]
+            [ modeSwitchPanel model
+            , raidStrengthPanel model
+            ]
         ]
 
 

@@ -18,6 +18,16 @@ import Utils exposing (choose, disableSelection, edges, helpButton)
 
 calculator : Model -> Element Msg
 calculator model =
+    case model.outputDevice.orientation of
+        Landscape ->
+            calculatorLandscape model
+
+        Portrait ->
+            calculatorPortrait model
+
+
+calculatorLandscape : Model -> Element Msg
+calculatorLandscape model =
     let
         position =
             gridPosition range bearing
@@ -69,6 +79,59 @@ calculator model =
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
+        ]
+
+
+calculatorPortrait : Model -> Element Msg
+calculatorPortrait model =
+    let
+        position =
+            gridPosition range bearing
+
+        range =
+            model.storedAzimuthRange
+
+        bearing =
+            model.storedAzimuth
+
+        height =
+            model.storedElevation
+
+        strength =
+            model.storedStrength
+
+        plus =
+            model.storedStrengthPlus
+
+        friendly =
+            model.storedFriendly
+    in
+    column
+        ([ centerX
+         , width fill
+         , tutorialTextBox model
+            [ alignTop
+            , centerX
+            ]
+         ]
+            ++ tutorialHighlighting model UiCalculator
+        )
+        [ row [ centerX ]
+            [ positionGridDisplay model
+                position
+            , helpButton
+            ]
+        , column
+            (tutorialHighlighting model UiCalcOffset ++ [ centerX ])
+            [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
+            , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
+            ]
+        , row [ centerX ]
+            [ strengthDisplay model strength
+            , maybeBoolDisplay "+" plus
+            , maybeBoolDisplay "F" friendly
+            ]
+        , heightGrid model height
         ]
 
 
