@@ -17,19 +17,11 @@ drawGoniometer theta =
         ]
     <|
         drawGoniometerScale
-            ++ drawGoniometerPointer theta
+            :: drawGoniometerPointer theta
 
 
-knobRadius =
+radius =
     135
-
-
-dialRadius =
-    160
-
-
-tickRadius =
-    150
 
 
 drawGoniometerPointer theta =
@@ -43,13 +35,13 @@ drawGoniometerPointer theta =
         xPoint =
             String.fromFloat <|
                 (+) originX <|
-                    (*) knobRadius <|
+                    (*) radius <|
                         sin theta
 
         yPoint =
             String.fromFloat <|
                 (-) originY <|
-                    (*) knobRadius <|
+                    (*) radius <|
                         cos theta
     in
     [ Svg.circle
@@ -78,7 +70,7 @@ drawGoniometerPointer theta =
 -- Image inside SVG.
 
 
-drawGoniometerScaleWIthImage =
+drawGoniometerScale =
     Svg.image
         [ x "-190"
         , y "-190"
@@ -89,98 +81,15 @@ drawGoniometerScaleWIthImage =
         []
 
 
-drawGoniometerScale =
-    let
-        originX =
-            0
-
-        originY =
-            0
-
-        xFromIndex i =
-            String.fromFloat <|
-                (+) originX <|
-                    (*) dialRadius <|
-                        sin <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        yFromIndex i =
-            String.fromFloat <|
-                (-) (originY + 4) <|
-                    (*) dialRadius <|
-                        cos <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        xTick i =
-            String.fromFloat <|
-                (+) originX <|
-                    (*) tickRadius <|
-                        sin <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        yTick i =
-            String.fromFloat <|
-                (-) (originY + 4) <|
-                    (*) tickRadius <|
-                        cos <|
-                            degrees <|
-                                toFloat <|
-                                    i
-                                        * 10
-
-        labelPoint i =
-            [ Svg.line
-                [ x1 "0"
-                , y1 "0"
-                , x2 (xTick i)
-                , y2 (yTick i)
-                , stroke "antiquewhite"
-                , strokeWidth "2"
-                , strokeLinecap "round"
-                ]
-                []
-            , Svg.text_
-                [ x <| xFromIndex i
-                , y <| yFromIndex i
-                , fill "antiquewhite"
-                , textAnchor "middle"
-                , fontFamily "monospace"
-                , fontSize "16"
-                ]
-                [ Svg.text (String.fromInt (i * 10))
-                ]
-            ]
-    in
-    Svg.circle
-        [ cx "0"
-        , cy "0"
-        , r "180"
-        , stroke "grey"
-        , strokeWidth "1"
-        , fill "dimgrey"
-        ]
-        []
-        :: List.concatMap labelPoint (List.range 0 35)
-
-
 goniometerTurnAngle : Angle -> Point -> Point -> Angle
 goniometerTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
     let
         ( _, dragStartAngle ) =
-            toPolar ( startX - knobRadius, startY - knobRadius )
+            toPolar ( startX - radius, startY - radius )
 
         -- where on control was clicked
         ( _, dragNowAngle ) =
-            toPolar ( newX - knobRadius, newY - knobRadius )
+            toPolar ( newX - radius, newY - radius )
 
         -- where that point is now
     in
