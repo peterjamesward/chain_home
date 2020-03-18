@@ -356,12 +356,21 @@ update msg model =
                         newAngle =
                             clamp (0 - stopKnob) stopKnob <|
                                 rangeTurnAngle startAngle startXY offset
+
+                        newSliderPosition =
+                            (pi + normalise newAngle) * 50 / pi
                     in
-                    ( { model
-                        | rangeSlider = (pi + normalise newAngle) * 50 / pi
-                        , rangeKnobAngle = newAngle
-                        , rangeDrag = Just ( newAngle, offset )
-                      }
+                    ( if abs (newSliderPosition - model.rangeSlider) < 50 then
+                        -- Looks like a reasonable move
+                        { model
+                            | rangeSlider = newSliderPosition
+                            , rangeKnobAngle = newAngle
+                            , rangeDrag = Just ( newAngle, offset )
+                        }
+
+                      else
+                        -- Looks like it's wrapped around
+                        { model | rangeDrag = Just ( newAngle, offset ) }
                     , Cmd.none
                     )
 

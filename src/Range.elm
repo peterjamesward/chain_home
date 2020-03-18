@@ -61,6 +61,7 @@ drawRangeKnob theta =
 
 rangeTurnAngle : Angle -> Point -> Point -> Angle
 rangeTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
+    -- Adding check to prevent flipping between +/- pi
     let
         ( _, dragStartAngle ) =
             toPolar ( startX - radius, startY - radius )
@@ -70,6 +71,12 @@ rangeTurnAngle startAngle ( startX, startY ) ( newX, newY ) =
             toPolar ( newX - radius, newY - radius )
 
         -- where that point is now
-        newAngle = startAngle + dragNowAngle - dragStartAngle
+        newAngle =
+            startAngle + dragNowAngle - dragStartAngle
     in
-    normalise newAngle
+    if abs (dragNowAngle - dragStartAngle) > pi then
+        startAngle
+        -- i.e. don't let it move
+
+    else
+        normalise newAngle
