@@ -67,10 +67,10 @@ tutorial =
         TutorialWelcome
         UiCRT
         [ tutorialBearingMode ]
-        noStateActions
+        [ tutorialGoniometerSwinging ]
         noExitActions
         (static
-            """We'll watch the operator work out the position of an incoming raid.
+            """The operator is turning the gonio, looking for any sign of a signal.
         Click ► to begin.
         """
         )
@@ -449,6 +449,11 @@ tutorialShowOperator model =
 tutorialExit : TutorialAction
 tutorialExit model =
     { model | tutorialStage = Nothing }
+
+
+tutorialGoniometerSwinging : TutorialAction
+tutorialGoniometerSwinging model =
+    { model | goniometerAzimuth = 1.2 * sin (toFloat model.modelTime / 1000) }
 
 
 chaseTheRaidRange : Bool -> Model -> Model
