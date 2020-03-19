@@ -78,6 +78,7 @@ init _ =
       , storedFriendly = Nothing
       , storedStrengthPlus = Nothing
       , tutorialStage = Nothing
+      , tutorialScenario = Nothing
       , explainMode = False
       }
     , Task.perform SetStartTime Time.now
@@ -281,10 +282,11 @@ update msg model =
             , Cmd.none
             )
 
-        DisplayTraining ->
+        DisplayTraining scenario ->
             ( { cleanModel
                 | currPage = TrainingPage
-                , tutorialStage = tutorialEntryPoint
+                , tutorialStage = tutorialEntryPoint scenario
+                , tutorialScenario = Just scenario
                 , startTime = model.modelTime
                 , webGLtime = 0.0
                 , isMenuOpen = False
@@ -579,11 +581,11 @@ learningMenu =
         , padding 20
         , Font.color white
         ]
-        [ navItem "Basic operation" DisplayTraining
-        , navItem "2 aircraft together" DisplayTraining
-        , navItem "2 aircraft apart" DisplayTraining
-        , navItem "3 to 6 strong raid" DisplayTraining
-        , navItem "Friendly (IFF)" DisplayTraining
+        [ navItem "Basic operation" (DisplayTraining ScenarioBasic)
+        , navItem "2 aircraft together" (DisplayTraining ScenarioTwoTogether)
+        , navItem "2 aircraft apart" (DisplayTraining ScenarioTwoSeparate)
+        , navItem "3 to 6 strong raid" (DisplayTraining ScenarioThreeOrMore)
+        , navItem "Friendly (IFF)" (DisplayTraining ScenarioFriendly)
         ]
 
 

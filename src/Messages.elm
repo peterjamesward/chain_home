@@ -14,7 +14,7 @@ type Msg
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
-    | DisplayTraining
+    | DisplayTraining TutorialScenario
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point
@@ -37,5 +37,3 @@ type Msg
     | TutorialAdvance
     | ExplainModeToggle
     | TutorialBack
-    | StartTutorialScenario
-    | DummyMessage

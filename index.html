@@ -8253,6 +8253,12 @@ var $author$project$Grid$letterFromGrid = function (maybeGridPosition) {
 	}
 };
 var $author$project$Grid$tutorialInterpretCalculator = function (model) {
+	var twoDigits = function (x) {
+		return _Utils_ap(
+			$elm$core$String$fromInt((x / 10) | 0),
+			$elm$core$String$fromInt(
+				A2($elm$core$Basics$modBy, 10, x)));
+	};
 	var gridPos = A2($author$project$Grid$gridPosition, model.storedAzimuthRange, model.storedAzimuth);
 	var letter = $author$project$Grid$letterFromGrid(gridPos);
 	return 'Raid at grid position ' + (function () {
@@ -8263,8 +8269,8 @@ var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 			return _Utils_ap(
 				g,
 				_Utils_ap(
-					$elm$core$String$fromInt(grid.gridSquareOffsetEast),
-					$elm$core$String$fromInt(grid.gridSquareOffsetNorth)));
+					twoDigits(grid.gridSquareOffsetEast),
+					twoDigits(grid.gridSquareOffsetNorth)));
 		} else {
 			return 'unknown';
 		}
@@ -8940,6 +8946,16 @@ var $author$project$Main$deriveModelAtTime = F2(
 					rangeSlider: newRangeSliderPosition
 				}));
 	});
+var $author$project$TrainingMode$exitTutorial = function (model) {
+	var _v0 = model.tutorialStage;
+	if (_v0.$ === 'Nothing') {
+		return model;
+	} else {
+		var step = _v0.a;
+		return $author$project$TrainingMode$exitTutorial(
+			$author$project$TrainingMode$advanceTutorial(model));
+	}
+};
 var $author$project$TrainingMode$findPrevStep = function (current) {
 	var findPrevStepHelper = function (steps) {
 		findPrevStepHelper:
@@ -9156,6 +9172,7 @@ var $author$project$Keys$updateKeys = F3(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
+		var cleanModel = $author$project$TrainingMode$exitTutorial(model);
 		switch (msg.$) {
 			case 'TimeDelta':
 				var dt = msg.a;
@@ -9176,12 +9193,11 @@ var $author$project$Main$update = F2(
 			case 'StartScenario':
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						cleanModel,
 						{
 							currPage: $author$project$Types$OperatorPage,
 							startTime: model.modelTime,
 							targets: $author$project$Config$getAllTargets(model.activeConfigurations),
-							tutorialStage: $elm$core$Maybe$Nothing,
 							webGLtime: 0.0
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -9218,25 +9234,25 @@ var $author$project$Main$update = F2(
 			case 'DisplayReceiver':
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						cleanModel,
 						{currPage: $author$project$Types$OperatorPage, isMenuOpen: false, tutorialStage: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
 			case 'DisplayConfiguration':
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						cleanModel,
 						{currPage: $author$project$Types$InputPage, isMenuOpen: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'DisplayCalculator':
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						cleanModel,
 						{currPage: $author$project$Types$OutputPage, isMenuOpen: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'DisplayTraining':
 				return _Utils_Tuple2(
 					_Utils_update(
-						model,
+						cleanModel,
 						{currPage: $author$project$Types$TrainingPage, isMenuOpen: false, startTime: model.modelTime, tutorialStage: $author$project$TrainingMode$tutorialEntryPoint, webGLtime: 0.0}),
 					$elm$core$Platform$Cmd$none);
 			case 'TutorialAdvance':

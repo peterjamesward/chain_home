@@ -22,7 +22,7 @@ import Types exposing (..)
 
 
 type alias TutorialEntry =
-    { tutorialStep : Tutorial -- The unique step identifier
+    { tutorialStep : TutorialStep -- The unique step identifier
     , uiComponent : UiComponent -- The UI component to be highlighted
     , entryActions : TutorialActionList -- Changes to the model so we can be idempotent
     , stateActions : TutorialActionList -- Things we must do whilst in this state.
@@ -44,8 +44,27 @@ tutorialCloseStep =
         (static "No text.")
 
 
-tutorialEntryPoint =
-    Maybe.map .tutorialStep <| List.head tutorial
+tutorialEntryPoint : TutorialScenario -> Maybe TutorialStep
+tutorialEntryPoint scenario =
+    let
+        t =
+            case scenario of
+                ScenarioBasic ->
+                    tutorial
+
+                ScenarioTwoTogether ->
+                    tutorial
+
+                ScenarioTwoSeparate ->
+                    tutorial
+
+                ScenarioThreeOrMore ->
+                    tutorial
+
+                ScenarioFriendly ->
+                    tutorial
+    in
+    Maybe.map .tutorialStep <| List.head t
 
 
 static : String -> (Model -> String)
@@ -58,7 +77,7 @@ tutorial =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
-        [ tutorialBearingMode ]
+        [ tutorialBearingMode, clearCalculator ]
         [ tutorialGoniometerSwinging ]
         noExitActions
         (static
@@ -250,7 +269,7 @@ lookupUiExplanation ui =
             uiExplanations
 
 
-findNextStep : Maybe Tutorial -> Maybe Tutorial
+findNextStep : Maybe TutorialStep -> Maybe TutorialStep
 findNextStep current =
     let
         findNextStepHelper steps =
@@ -271,7 +290,7 @@ findNextStep current =
     findNextStepHelper tutorial
 
 
-findPrevStep : Maybe Tutorial -> Maybe Tutorial
+findPrevStep : Maybe TutorialStep -> Maybe TutorialStep
 findPrevStep current =
     let
         findPrevStepHelper steps =
@@ -308,11 +327,13 @@ advanceTutorial current =
         ( Just thisStage, Just nextStep ) ->
             applyActions nextStep.entryActions <|
                 applyActions thisStage.exitActions <|
-                    { current | tutorialStage = nextStepId }
+                    { current
+                        | tutorialStage = nextStepId
+                    }
 
         ( Just thisStep, Nothing ) ->
-            applyActions thisStep.exitActions <|
-                { current | tutorialStage = Nothing }
+            tutorialExit <|
+                applyActions thisStep.exitActions current
 
         _ ->
             current
@@ -465,7 +486,10 @@ tutorialShowOperator model =
 
 tutorialExit : TutorialAction
 tutorialExit model =
-    { model | tutorialStage = Nothing }
+    { model
+        | tutorialStage = Nothing
+        , tutorialScenario = Nothing
+    }
 
 
 tutorialGoniometerSwinging : TutorialAction
@@ -540,7 +564,7 @@ tutorialSeekElevation active model =
     }
 
 
-findMatchingStep : Maybe Tutorial -> UiComponent -> Maybe TutorialEntry
+findMatchingStep : Maybe TutorialStep -> UiComponent -> Maybe TutorialEntry
 findMatchingStep tutorialStep uiComponent =
     let
         findHelper steps =
@@ -563,7 +587,7 @@ findMatchingStep tutorialStep uiComponent =
     findHelper tutorial
 
 
-findStep : Maybe Tutorial -> Maybe TutorialEntry
+findStep : Maybe TutorialStep -> Maybe TutorialEntry
 findStep tutorialStep =
     let
         findHelper steps =

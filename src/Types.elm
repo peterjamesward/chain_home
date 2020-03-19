@@ -74,7 +74,14 @@ type UiComponent
     | UiDummy
 
 
-type Tutorial
+type TutorialScenario
+    = ScenarioBasic
+    | ScenarioTwoTogether
+    | ScenarioTwoSeparate
+    | ScenarioThreeOrMore
+    | ScenarioFriendly
+
+type TutorialStep
     = TutorialWelcome
     | TutorialIncomingRaid
     | TutorialAdjustRange
