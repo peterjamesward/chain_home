@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, exitTutorial, clearCalculator, explanatoryText, goBackInTutorial, tutorialAutomation, tutorialStartScenario, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, clearCalculator, exitTutorial, explanatoryText, goBackInTutorial, tutorialAutomation, tutorialStartScenario, tutorialTextBox)
 
 import Config exposing (targetConfigurations, trainingMode)
 import Constants exposing (blue, flatSunflower, white)
@@ -290,7 +290,9 @@ tutorialStartScenario id model =
             model
 
         Just step ->
-            setActiveTutorial step <| applyActions step.entryActions model
+            setActiveTutorial step <|
+                applyActions step.entryActions <|
+                    exitTutorial model
 
 
 lookupUiExplanation : UiComponent -> Maybe String
@@ -489,6 +491,7 @@ clearCalculator model =
         , storedFriendly = Nothing
         , storedStrengthPlus = Nothing
     }
+
 
 tutorialStoreBearing : TutorialAction
 tutorialStoreBearing model =

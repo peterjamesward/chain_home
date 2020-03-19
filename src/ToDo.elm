@@ -23,17 +23,18 @@
 --DONE: Tutorial strings can be dynamic if we pass model in.
 --DONE: Start tutorial with some general gonio swinging.
 --DONE: Drop down learn menu selection should reset active tutorial.
---TODO: Clean up the Maybe madness in tutorial world.
---TODO: Select tutorial whilst active does not reset properly.
---TODO: Possibly, explain button in calc display not working. -- BECAUSE lookup now expects a tutorial!
+--DONE: Clean up the Maybe madness in tutorial world.
+--DONE: Select tutorial whilst active does not reset properly.
+--DONE: Possibly, explain button in calc display not working. -- BECAUSE lookup now expects a tutorial!
 --DONE: Learning menu of raid types (one, two, 3-6, IFF).
---TODO: Two planes same bearing scenario (both variants together or separate?)
+--TODO: Two planes same bearing scenario
+--TODO: Two planes different bearings
 --TODO: 3-6 scenario
 --TODO: IFF scenario
 --TODO: Operate mode to only use learnt raid types.
 --TODO: Drop any targets moved beyond 100 miles range.
 --TODO: Test on Android tablet !!
---TODO: Raspberry Pi with touch screen ??
---TODO: Physical knobs -- UI app gets gonio setting from server app.
---TODO: Improve that by using WebSockets -> JS -> Subscription -> Msg.
---TODO: Physical knobs -- headless app reads from Arduino (10 bit encoder).
+--NOPE: Raspberry Pi with touch screen ??
+--NOPE: Physical knobs -- UI app gets gonio setting from server app.
+--NOPE: Improve that by using WebSockets -> JS -> Subscription -> Msg.
+--NOPE: Physical knobs -- headless app reads from Arduino (10 bit encoder).
