@@ -91,13 +91,16 @@ tutorialInterpretCalculator model =
 
         letter =
             letterFromGrid gridPos
+
+        twoDigits x =
+            String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
     in
     "Raid at grid position "
         ++ (case ( gridPos, letter ) of
                 ( Just grid, Just g ) ->
                     g
-                        ++ String.fromInt grid.gridSquareOffsetEast
-                        ++ String.fromInt grid.gridSquareOffsetNorth
+                        ++ twoDigits grid.gridSquareOffsetEast
+                        ++ twoDigits grid.gridSquareOffsetNorth
 
                 _ ->
                     "unknown"
