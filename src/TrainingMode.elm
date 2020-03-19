@@ -33,6 +33,10 @@ type alias TutorialEntry =
     }
 
 
+type alias Tutorial =
+    List TutorialEntry
+
+
 tutorialCloseStep : TutorialEntry
 tutorialCloseStep =
     TutorialEntry
@@ -49,8 +53,24 @@ static s =
     \_ -> s
 
 
-tutorial : List TutorialEntry
-tutorial =
+tutorialTBD : List TutorialEntry
+tutorialTBD =
+    [ TutorialEntry
+        TutorialWelcome
+        UiDummy
+        noEntryActions
+        noStateActions
+        noExitActions
+        (static
+            """Ask Pete to write this tutorial.
+        """
+        )
+    , tutorialCloseStep
+    ]
+
+
+tutorialBasic : List TutorialEntry
+tutorialBasic =
     [ TutorialEntry
         TutorialWelcome
         UiCRT
@@ -235,19 +255,19 @@ noStateActions =
 tutorialFromId id =
     case id of
         ScenarioBasic ->
-            tutorial
+            tutorialBasic
 
         ScenarioTwoTogether ->
-            tutorial
+            tutorialTBD
 
         ScenarioTwoSeparate ->
-            tutorial
+            tutorialTBD
 
         ScenarioThreeOrMore ->
-            tutorial
+            tutorialTBD
 
         ScenarioFriendly ->
-            tutorial
+            tutorialTBD
 
 
 tutorialStartScenario id model =
@@ -285,16 +305,16 @@ lookupUiExplanation ui =
             uiExplanations
 
 
-findNextStep : Maybe TutorialStep -> Maybe TutorialStep
-findNextStep current =
+findNextStep : Maybe Tutorial -> Maybe TutorialStep -> Maybe TutorialStep
+findNextStep currentTutorial currentStep =
     let
         findNextStepHelper steps =
             case steps of
                 [] ->
-                    Just TutorialWelcome
+                    Nothing
 
                 step1 :: step2 :: more ->
-                    if Just step1.tutorialStep == current then
+                    if Just step1.tutorialStep == currentStep then
                         Just step2.tutorialStep
 
                     else
@@ -303,11 +323,16 @@ findNextStep current =
                 _ :: more ->
                     findNextStepHelper more
     in
-    findNextStepHelper tutorial
+    case currentTutorial of
+        Just t ->
+            findNextStepHelper t
+
+        _ ->
+            Nothing
 
 
-findPrevStep : Maybe TutorialStep -> Maybe TutorialStep
-findPrevStep current =
+findPrevStep : Maybe Tutorial -> Maybe TutorialStep -> Maybe TutorialStep
+findPrevStep currentutorial currentStep =
     let
         findPrevStepHelper steps =
             case steps of
@@ -315,7 +340,7 @@ findPrevStep current =
                     Just TutorialWelcome
 
                 step1 :: step2 :: more ->
-                    if Just step2.tutorialStep == current then
+                    if Just step2.tutorialStep == currentStep then
                         Just step1.tutorialStep
 
                     else
@@ -324,35 +349,49 @@ findPrevStep current =
                 _ :: more ->
                     findPrevStepHelper more
     in
-    findPrevStepHelper tutorial
+    case currentutorial of
+        Just t ->
+            findPrevStepHelper t
+
+        _ ->
+            Nothing
 
 
 advanceTutorial : Model -> Model
 advanceTutorial current =
     let
-        nextStepId =
-            findNextStep current.tutorialStage
+        nextStepId t =
+            findNextStep t current.tutorialStage
 
-        currentStep =
-            findStep current.tutorialStage
+        currentStep t =
+            findStep t current.tutorialStage
 
-        maybeNextStep =
-            findStep nextStepId
+        maybeNextStep t =
+            findStep t (nextStepId t)
     in
-    case ( currentStep, maybeNextStep ) of
-        ( Just thisStage, Just nextStep ) ->
-            applyActions nextStep.entryActions <|
-                applyActions thisStage.exitActions <|
-                    { current
-                        | tutorialStage = nextStepId
-                    }
-
-        ( Just thisStep, Nothing ) ->
-            tutorialExitAction <|
-                applyActions thisStep.exitActions current
-
-        _ ->
+    case current.tutorialScenario of
+        Nothing ->
             current
+
+        Just scenarioId ->
+            let
+                t =
+                    Just <| tutorialFromId scenarioId
+            in
+            case ( currentStep t, maybeNextStep t ) of
+                ( Just thisStage, Just nextStep ) ->
+                    applyActions nextStep.entryActions <|
+                        applyActions thisStage.exitActions <|
+                            { current
+                                | tutorialStage = nextStepId t
+                            }
+
+                ( Just thisStep, Nothing ) ->
+                    tutorialExitAction <|
+                        applyActions thisStep.exitActions current
+
+                _ ->
+                    current
 
 
 exitTutorial : Model -> Model
@@ -370,33 +409,41 @@ exitTutorial model =
 
 applyActions : TutorialActionList -> Model -> Model
 applyActions actions model =
-    -- Applicative style of applying functions in a chain.
     List.foldl (\a m -> a m) model actions
 
 
 goBackInTutorial : Model -> Model
 goBackInTutorial current =
     let
-        prevStepId =
-            findPrevStep current.tutorialStage
+        prevStepId t =
+            findPrevStep t current.tutorialStage
 
-        currentStep =
-            findStep current.tutorialStage
+        currentStep t =
+            findStep t current.tutorialStage
 
-        maybePrevStep =
-            findStep prevStepId
+        maybePrevStep t =
+            findStep t (prevStepId t)
     in
-    case ( currentStep, maybePrevStep ) of
-        ( Just thisStage, Just prevStep ) ->
-            applyActions prevStep.entryActions <|
-                applyActions thisStage.exitActions <|
-                    { current | tutorialStage = prevStepId }
+    case current.tutorialScenario of
+        Just id ->
+            let
+                t =
+                    Just <| tutorialFromId id
+            in
+            case ( currentStep t, maybePrevStep t ) of
+                ( Just thisStage, Just prevStep ) ->
+                    applyActions prevStep.entryActions <|
+                        applyActions thisStage.exitActions <|
+                            { current | tutorialStage = prevStepId t }
 
-        ( Just thisStage, Nothing ) ->
-            applyActions thisStage.exitActions <|
-                { current | tutorialStage = Nothing }
+                ( Just thisStage, Nothing ) ->
+                    applyActions thisStage.exitActions <|
+                        { current | tutorialStage = Nothing }
 
-        _ ->
+                _ ->
+                    current
+
+        Nothing ->
             current
 
 
@@ -405,12 +452,17 @@ tutorialAutomation model =
     -- This is the hook where we need to keep track of control positions etc.
     -- I.E. not only on state transitions.
     let
-        currentStep =
-            findStep model.tutorialStage
+        currentStep id =
+            findStep (Just (tutorialFromId id)) model.tutorialStage
     in
-    case currentStep of
-        Just thisStage ->
-            applyActions thisStage.stateActions model
+    case ( model.tutorialScenario, model.tutorialStage ) of
+        ( Just scenario, Just stage ) ->
+            case currentStep scenario of
+                Just step ->
+                    applyActions step.stateActions model
+
+                Nothing ->
+                    model
 
         _ ->
             model
@@ -581,8 +633,8 @@ tutorialSeekElevation active model =
     }
 
 
-findMatchingStep : Maybe TutorialStep -> UiComponent -> Maybe TutorialEntry
-findMatchingStep tutorialStep uiComponent =
+findMatchingStep : TutorialScenario -> Maybe TutorialStep -> UiComponent -> Maybe TutorialEntry
+findMatchingStep tutorialId tutorialStep uiComponent =
     let
         findHelper steps =
             case steps of
@@ -601,11 +653,11 @@ findMatchingStep tutorialStep uiComponent =
                     else
                         findHelper more
     in
-    findHelper tutorial
+    findHelper <| tutorialFromId tutorialId
 
 
-findStep : Maybe TutorialStep -> Maybe TutorialEntry
-findStep tutorialStep =
+findStep : Maybe Tutorial -> Maybe TutorialStep -> Maybe TutorialEntry
+findStep currentTutorial tutorialStep =
     let
         findHelper steps =
             case steps of
@@ -622,30 +674,40 @@ findStep tutorialStep =
                     else
                         findHelper more
     in
-    findHelper tutorial
+    case currentTutorial of
+        Just tut ->
+            findHelper tut
+
+        Nothing ->
+            Nothing
 
 
 tutorialHighlighting : Model -> UiComponent -> List (Attribute Msg)
 tutorialHighlighting model uiComponent =
     -- Apply highlighting if there is a tutorial detail entry that
     -- matches the ui component and the current tutorial step.
-    case ( findMatchingStep model.tutorialStage uiComponent, model.explainMode ) of
-        ( Just _, _ ) ->
-            [ Border.color flatSunflower
-            , Border.rounded 10
-            , Border.width 1
-            , Border.glow flatSunflower 2.0
-            , Border.innerGlow flatSunflower 2.0
-            , alpha 0.8
-            , pointer
-            ]
+    case model.tutorialScenario of
+        Just tutId ->
+            case ( findMatchingStep tutId model.tutorialStage uiComponent, model.explainMode ) of
+                ( Just _, _ ) ->
+                    [ Border.color flatSunflower
+                    , Border.rounded 10
+                    , Border.width 1
+                    , Border.glow flatSunflower 2.0
+                    , Border.innerGlow flatSunflower 2.0
+                    , alpha 0.8
+                    , pointer
+                    ]
 
-        ( Nothing, False ) ->
+                ( Nothing, False ) ->
+                    []
+
+                ( Nothing, True ) ->
+                    [ inFront <| explanatoryText uiComponent
+                    ]
+
+        Nothing ->
             []
-
-        ( Nothing, True ) ->
-            [ inFront <| explanatoryText uiComponent
-            ]
 
 
 explanatoryText : UiComponent -> Element Msg
@@ -679,38 +741,43 @@ explanatoryText uiComponent =
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg
-tutorialTextBox model attribs =
+tutorialTextBox model adjustments =
     -- Use a single central text box for all tutorial text.
     -- Second argument allows caller to finesse the position
     inFront <|
-        case findStep model.tutorialStage of
+        case model.tutorialScenario of
             Nothing ->
                 none
 
-            Just step ->
-                el
-                    ([ width (px 500)
-                     , Border.color flatSunflower
-                     , Border.width 2
-                     , Border.rounded 5
-                     , Font.center
-                     , Font.color white
-                     , Font.size 32
-                     , Font.family [ Font.typeface "Helvetica" ]
-                     ]
-                        ++ attribs
-                    )
-                <|
-                    row
-                        [ width fill ]
-                        [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
-                        , paragraph
-                            [ Background.color blue
-                            , spacing 4
-                            , padding 10
-                            , Font.size 16
-                            ]
-                            [ text (step.tutorialText model) ]
-                        , el [ onClick TutorialAdvance, alignRight, pointer ] <|
-                            text "►"
-                        ]
+            Just scenario ->
+                case findStep (Just (tutorialFromId scenario)) model.tutorialStage of
+                    Nothing ->
+                        none
+
+                    Just step ->
+                        el
+                            ([ width (px 500)
+                             , Border.color flatSunflower
+                             , Border.width 2
+                             , Border.rounded 5
+                             , Font.center
+                             , Font.color white
+                             , Font.size 32
+                             , Font.family [ Font.typeface "Helvetica" ]
+                             ]
+                                ++ adjustments
+                            )
+                        <|
+                            row
+                                [ width fill ]
+                                [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
+                                , paragraph
+                                    [ Background.color blue
+                                    , spacing 4
+                                    , padding 10
+                                    , Font.size 16
+                                    ]
+                                    [ text (step.tutorialText model) ]
+                                , el [ onClick TutorialAdvance, alignRight, pointer ] <|
+                                    text "►"
+                                ]

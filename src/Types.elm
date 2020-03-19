@@ -97,3 +97,4 @@ type TutorialStep
     | TutorialShowCalculator
     | TutorialEnded -- last thing we show
     | TutorialDummy -- not shown, if it occurs.
+

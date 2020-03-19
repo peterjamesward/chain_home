@@ -23,7 +23,9 @@
 --DONE: Tutorial strings can be dynamic if we pass model in.
 --DONE: Start tutorial with some general gonio swinging.
 --DONE: Drop down learn menu selection should reset active tutorial.
---TODO: Learning menu of raid types (one, two, 3-6, IFF).
+--TODO: Clean up the Maybe madness in tutorial world.
+--TODO: Select tutorial whilst active does not reset properly.
+--DONE: Learning menu of raid types (one, two, 3-6, IFF).
 --TODO: Two planes same bearing scenario (both variants together or separate?)
 --TODO: 3-6 scenario
 --TODO: IFF scenario
