@@ -1,12 +1,4 @@
-module TrainingMode exposing (advanceTutorial, goBackInTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
-
-{-
-   This aims to be a "wrapper" of sorts for the Operator page,
-   allowing us to walk through a basic scenario.
-   Tried to do this as non-invasive overlay but positioning is nigh impossible.
-   Other way is to make all components "tutorial" aware and just use this to
-   provide common formatting etc.
--}
+module TrainingMode exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
 
 import Config exposing (targetConfigurations, trainingMode)
 import Constants exposing (blue, flatSunflower, white)
@@ -199,6 +191,7 @@ tutorial =
         noEntryActions
         noStateActions
         [ stopTutorialRaid ]
+        --, clearCalculator ]
         (static """Choose more training or click on Operate.
         """)
     , tutorialCloseStep
@@ -325,6 +318,18 @@ advanceTutorial current =
             current
 
 
+exitTutorial : Model -> Model
+exitTutorial model =
+    -- Maybe reliable way to exit cleanly is to fast forward
+    -- so that all state exit actions are performed.
+    case model.tutorialStage of
+        Nothing ->
+            model
+
+        Just step ->
+            exitTutorial <| advanceTutorial model
+
+
 applyActions : TutorialActionList -> Model -> Model
 applyActions actions model =
     -- Applicative style of applying functions in a chain.
@@ -380,6 +385,18 @@ setupTutorialRaid model =
 
 stopTutorialRaid model =
     { model | targets = [] }
+
+
+clearCalculator model =
+    { model
+        | storedAzimuth = Nothing
+        , storedElevation = Nothing
+        , storedAzimuthRange = Nothing
+        , storedElevationRange = Nothing
+        , storedStrength = Nothing
+        , storedFriendly = Nothing
+        , storedStrengthPlus = Nothing
+    }
 
 
 tutorialStoreBearing : TutorialAction

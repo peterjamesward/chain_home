@@ -204,6 +204,10 @@ deriveModelAtTime model timeNow =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        cleanModel =
+            exitTutorial model
+    in
     case msg of
         TimeDelta dt ->
             ( { model | webGLtime = model.webGLtime + dt / 100.0 }
@@ -216,12 +220,11 @@ update msg model =
             )
 
         StartScenario ->
-            ( { model
+            ( { cleanModel
                 | startTime = model.modelTime
                 , webGLtime = 0.0
                 , targets = getAllTargets model.activeConfigurations
                 , currPage = OperatorPage
-                , tutorialStage = Nothing
               }
             , Cmd.none
             )
@@ -254,7 +257,7 @@ update msg model =
             )
 
         DisplayReceiver ->
-            ( { model
+            ( { cleanModel
                 | currPage = OperatorPage
                 , tutorialStage = Nothing
                 , isMenuOpen = False
@@ -263,7 +266,7 @@ update msg model =
             )
 
         DisplayConfiguration ->
-            ( { model
+            ( { cleanModel
                 | currPage = InputPage
                 , isMenuOpen = False
               }
@@ -271,7 +274,7 @@ update msg model =
             )
 
         DisplayCalculator ->
-            ( { model
+            ( { cleanModel
                 | currPage = OutputPage
                 , isMenuOpen = False
               }
@@ -279,7 +282,7 @@ update msg model =
             )
 
         DisplayTraining ->
-            ( { model
+            ( { cleanModel
                 | currPage = TrainingPage
                 , tutorialStage = tutorialEntryPoint
                 , startTime = model.modelTime

@@ -21,7 +21,7 @@
 --DROP: Range indicator should be front of the scale. Sure it used to be,
 --DONE: Can we do a walk-through of a raid? -- Yes, WIP.
 --DONE: Tutorial strings can be dynamic if we pass model in.
---TODO: Start tutorial with some general gonio swinging.
+--DONE: Start tutorial with some general gonio swinging.
 --TODO: Learning menu of raid types (one, two, 3-6, IFF).
 --TODO: Drop down learn menu selection should reset active tutorial.
 --TODO: Two planes same bearing scenario (both variants together or separate?)
