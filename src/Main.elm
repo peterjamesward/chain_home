@@ -283,14 +283,7 @@ update msg model =
             )
 
         DisplayTraining scenario ->
-            ( { cleanModel
-                | currPage = TrainingPage
-                , tutorialStage = tutorialEntryPoint scenario
-                , tutorialScenario = Just scenario
-                , startTime = model.modelTime
-                , webGLtime = 0.0
-                , isMenuOpen = False
-              }
+            ( tutorialStartScenario scenario model
             , Cmd.none
             )
 

@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialEntryPoint, tutorialHighlighting, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialHighlighting, tutorialStartScenario, tutorialTextBox)
 
 import Config exposing (targetConfigurations, trainingMode)
 import Constants exposing (blue, flatSunflower, white)
@@ -38,33 +38,10 @@ tutorialCloseStep =
     TutorialEntry
         TutorialDummy
         UiDummy
-        [ tutorialExit ]
+        [ tutorialExitAction ]
         noStateActions
-        noExitActions
+        [ clearCalculator ]
         (static "No text.")
-
-
-tutorialEntryPoint : TutorialScenario -> Maybe TutorialStep
-tutorialEntryPoint scenario =
-    let
-        t =
-            case scenario of
-                ScenarioBasic ->
-                    tutorial
-
-                ScenarioTwoTogether ->
-                    tutorial
-
-                ScenarioTwoSeparate ->
-                    tutorial
-
-                ScenarioThreeOrMore ->
-                    tutorial
-
-                ScenarioFriendly ->
-                    tutorial
-    in
-    Maybe.map .tutorialStep <| List.head t
 
 
 static : String -> (Model -> String)
@@ -255,6 +232,45 @@ noStateActions =
     []
 
 
+tutorialFromId id =
+    case id of
+        ScenarioBasic ->
+            tutorial
+
+        ScenarioTwoTogether ->
+            tutorial
+
+        ScenarioTwoSeparate ->
+            tutorial
+
+        ScenarioThreeOrMore ->
+            tutorial
+
+        ScenarioFriendly ->
+            tutorial
+
+
+tutorialStartScenario id model =
+    let
+        firstStep =
+            List.head <| tutorialFromId id
+
+        setActiveTutorial s m =
+            { m
+                | tutorialScenario = Just id
+                , tutorialStage = Just s.tutorialStep
+                , currPage = OperatorPage
+                , isMenuOpen = False
+            }
+    in
+    case firstStep of
+        Nothing ->
+            model
+
+        Just step ->
+            setActiveTutorial step <| applyActions step.entryActions model
+
+
 lookupUiExplanation : UiComponent -> Maybe String
 lookupUiExplanation ui =
     List.head <|
@@ -332,7 +348,7 @@ advanceTutorial current =
                     }
 
         ( Just thisStep, Nothing ) ->
-            tutorialExit <|
+            tutorialExitAction <|
                 applyActions thisStep.exitActions current
 
         _ ->
@@ -343,12 +359,13 @@ exitTutorial : Model -> Model
 exitTutorial model =
     -- Maybe reliable way to exit cleanly is to fast forward
     -- so that all state exit actions are performed.
-    case model.tutorialStage of
-        Nothing ->
-            model
+    case model.tutorialScenario of
+        Just id ->
+            -- Apply all stage exit actions in correct order
+            applyActions (List.concatMap .exitActions <| tutorialFromId id) model
 
-        Just step ->
-            exitTutorial <| advanceTutorial model
+        _ ->
+            tutorialExitAction model
 
 
 applyActions : TutorialActionList -> Model -> Model
@@ -484,8 +501,8 @@ tutorialShowOperator model =
     { model | currPage = OperatorPage }
 
 
-tutorialExit : TutorialAction
-tutorialExit model =
+tutorialExitAction : TutorialAction
+tutorialExitAction model =
     { model
         | tutorialStage = Nothing
         , tutorialScenario = Nothing
