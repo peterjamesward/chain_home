@@ -25,6 +25,7 @@
 --DONE: Drop down learn menu selection should reset active tutorial.
 --TODO: Clean up the Maybe madness in tutorial world.
 --TODO: Select tutorial whilst active does not reset properly.
+--TODO: Possibly, explain button in calc display not working. -- BECAUSE lookup now expects a tutorial!
 --DONE: Learning menu of raid types (one, two, 3-6, IFF).
 --TODO: Two planes same bearing scenario (both variants together or separate?)
 --TODO: 3-6 scenario

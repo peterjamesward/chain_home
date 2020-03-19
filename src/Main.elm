@@ -465,14 +465,7 @@ update msg model =
             ( { model | storedFriendly = Just True }, Cmd.none )
 
         ResetInputState ->
-            ( { model
-                | storedAzimuthRange = Nothing
-                , storedAzimuth = Nothing
-                , storedElevation = Nothing
-                , storedElevationRange = Nothing
-                , inputState = BearingInput
-                , goniometerMode = Azimuth
-              }
+            ( clearCalculator model
             , Cmd.none
             )
 

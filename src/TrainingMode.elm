@@ -1,4 +1,4 @@
-module TrainingMode exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialHighlighting, tutorialStartScenario, tutorialTextBox)
+module TrainingMode exposing (advanceTutorial, exitTutorial, clearCalculator, explanatoryText, goBackInTutorial, tutorialAutomation, tutorialStartScenario, tutorialTextBox)
 
 import Config exposing (targetConfigurations, trainingMode)
 import Constants exposing (blue, flatSunflower, white)
@@ -39,6 +39,7 @@ type alias Tutorial =
 
 tutorialCloseStep : TutorialEntry
 tutorialCloseStep =
+    -- Intended to be final step in any tutorial.
     TutorialEntry
         TutorialDummy
         UiDummy
@@ -50,6 +51,7 @@ tutorialCloseStep =
 
 static : String -> (Model -> String)
 static s =
+    -- As we now allow derived tutorial strings, we need a way to declare a fixed string.
     \_ -> s
 
 
@@ -488,7 +490,6 @@ clearCalculator model =
         , storedStrengthPlus = Nothing
     }
 
-
 tutorialStoreBearing : TutorialAction
 tutorialStoreBearing model =
     { model
@@ -682,62 +683,36 @@ findStep currentTutorial tutorialStep =
             Nothing
 
 
-tutorialHighlighting : Model -> UiComponent -> List (Attribute Msg)
-tutorialHighlighting model uiComponent =
-    -- Apply highlighting if there is a tutorial detail entry that
-    -- matches the ui component and the current tutorial step.
-    case model.tutorialScenario of
-        Just tutId ->
-            case ( findMatchingStep tutId model.tutorialStage uiComponent, model.explainMode ) of
-                ( Just _, _ ) ->
-                    [ Border.color flatSunflower
-                    , Border.rounded 10
-                    , Border.width 1
-                    , Border.glow flatSunflower 2.0
-                    , Border.innerGlow flatSunflower 2.0
-                    , alpha 0.8
-                    , pointer
-                    ]
-
-                ( Nothing, False ) ->
-                    []
-
-                ( Nothing, True ) ->
-                    [ inFront <| explanatoryText uiComponent
-                    ]
-
-        Nothing ->
-            []
-
-
-explanatoryText : UiComponent -> Element Msg
-explanatoryText uiComponent =
+explanatoryText : Model -> UiComponent -> List (Attribute Msg)
+explanatoryText model uiComponent =
     let
         uiComponentDescription =
             lookupUiExplanation uiComponent
     in
-    case uiComponentDescription of
-        Just txt ->
-            el
-                [ centerX
-                , centerY
-                , Background.color blue
-                , Border.color white
-                , Border.width 1
-                , Border.rounded 5
-                ]
-            <|
-                paragraph
-                    [ spacing 1
-                    , Font.size 16
-                    , Font.family [ Font.typeface "Helvetica" ]
-                    , Font.color white
-                    , padding 5
+    [ inFront <|
+        case ( model.explainMode, uiComponentDescription ) of
+            ( True, Just txt ) ->
+                el
+                    [ centerX
+                    , centerY
+                    , Background.color blue
+                    , Border.color white
+                    , Border.width 1
+                    , Border.rounded 5
                     ]
-                    [ text txt ]
+                <|
+                    paragraph
+                        [ spacing 1
+                        , Font.size 16
+                        , Font.family [ Font.typeface "Helvetica" ]
+                        , Font.color white
+                        , padding 5
+                        ]
+                        [ text txt ]
 
-        _ ->
-            none
+            _ ->
+                none
+    ]
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg

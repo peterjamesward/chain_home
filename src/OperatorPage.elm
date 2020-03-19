@@ -15,7 +15,7 @@ import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
+import TrainingMode exposing (explanatoryText, tutorialTextBox)
 import Types exposing (..)
 import Utils exposing (choose, commonStyles, disableSelection, edges, helpButton)
 
@@ -29,7 +29,7 @@ clickableRangeKnob model tutorial =
          , width (px 200)
          , pointer
          ]
-            ++ tutorialHighlighting model UiRangeKnob
+            ++ explanatoryText model UiRangeKnob
         )
         (html <| drawRangeKnob model.rangeKnobAngle)
 
@@ -47,7 +47,7 @@ clickableGonioImage model tutorial =
          , width (px 300)
          , pointer
          ]
-            ++ tutorialHighlighting model UiGoniometer
+            ++ explanatoryText model UiGoniometer
         )
         (html <| drawGoniometer theta)
 
@@ -117,7 +117,7 @@ rangeScale model =
             , Font.sansSerif
             ]
          ]
-            ++ tutorialHighlighting model UiRangeScale
+            ++ explanatoryText model UiRangeScale
         )
     <|
         List.map
@@ -130,7 +130,7 @@ rangeScale model =
 
 rangeSliderAndCRT model trace =
     column
-        ([ padding 5 ] ++ tutorialHighlighting model UiCRT)
+        ([ padding 5 ] ++ explanatoryText model UiCRT)
         [ none
         , el
             [ E.below (rangeScale model)
@@ -144,14 +144,14 @@ rangeSliderAndCRT model trace =
 
 
 modeSwitchPanel model =
-    column (commonStyles ++ tutorialHighlighting model UiSwitchPanel)
-        [ row (commonStyles ++ tutorialHighlighting model UiClear)
+    column (commonStyles ++ explanatoryText model UiSwitchPanel)
+        [ row (commonStyles ++ explanatoryText model UiClear)
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
         , row
             (Border.widthEach { edges | left = 1, right = 1, top = 1 }
                 :: commonStyles
-                ++ tutorialHighlighting model UiAB
+                ++ explanatoryText model UiAB
             )
             [ column commonStyles
                 [ indicatorLabelAbove "A" (model.goniometerMode == Azimuth && model.receiveAB)
@@ -178,12 +178,12 @@ modeSwitchPanel model =
             (Border.widthEach { edges | left = 1, right = 1, bottom = 1 }
                 :: commonStyles
             )
-            [ el ([ centerX, width <| fillPortion 1 ] ++ tutorialHighlighting model UiSense) <|
+            [ el ([ centerX, width <| fillPortion 1 ] ++ explanatoryText model UiSense) <|
                 actionButtonLabelAboveWithIndicator "SENSE" model.reflector (EnableReflector (not model.reflector))
-            , el ([ centerX, width <| fillPortion 1 ] ++ tutorialHighlighting model UiHeight) <|
+            , el ([ centerX, width <| fillPortion 1 ] ++ explanatoryText model UiHeight) <|
                 actionButtonLabelAbove "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
             ]
-        , row (commonStyles ++ tutorialHighlighting model UiOperatorPrompts)
+        , row (commonStyles ++ explanatoryText model UiOperatorPrompts)
             [ el [ centerX, width <| fillPortion 1 ] <|
                 indicatorLabelBelow "PRESS\nGONIO" <|
                     (model.inputState == BearingInput)
@@ -200,7 +200,7 @@ raidStrengthPanel model =
     column
         (Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
             :: paddingEach { edges | left = 20, right = 20 }
-            :: (commonStyles ++ tutorialHighlighting model UiRaidStrength)
+            :: (commonStyles ++ explanatoryText model UiRaidStrength)
         )
         [ row [ centerX ]
             [ column
@@ -243,7 +243,7 @@ operatorPageLandscape model =
             , centerY
             ]
          ]
-            ++ tutorialHighlighting model UiOperatorPage
+            ++ explanatoryText model UiOperatorPage
         )
         [ column [ width <| fillPortion 3, centerX ]
             [ row []
@@ -252,12 +252,12 @@ operatorPageLandscape model =
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
             , row
-                (tutorialHighlighting model UiBothKnobs)
+                (explanatoryText model UiBothKnobs)
                 [ clickableGonioImage model UiRangeKnob
-                , el (tutorialHighlighting model UiGonioButton) <|
+                , el (explanatoryText model UiGonioButton) <|
                     actionButtonLabelAbove "GONIO" StoreGoniometerSetting
                 , clickableRangeKnob model UiGoniometer
-                , el (tutorialHighlighting model UIRangeButton) <|
+                , el (explanatoryText model UIRangeButton) <|
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
@@ -279,7 +279,7 @@ operatorPagePortrait model =
             , centerY
             ]
          ]
-            ++ tutorialHighlighting model UiOperatorPage
+            ++ explanatoryText model UiOperatorPage
         )
         [ row []
             [ el
@@ -287,12 +287,12 @@ operatorPagePortrait model =
                 (rangeSliderAndCRT model <| traceDependingOnMode model)
             ]
         , row
-            (tutorialHighlighting model UiBothKnobs)
+            (explanatoryText model UiBothKnobs)
             [ clickableGonioImage model UiRangeKnob
-            , el (tutorialHighlighting model UiGonioButton) <|
+            , el (explanatoryText model UiGonioButton) <|
                 actionButtonLabelAbove "GONIO" StoreGoniometerSetting
             , clickableRangeKnob model UiGoniometer
-            , el (tutorialHighlighting model UIRangeButton) <|
+            , el (explanatoryText model UIRangeButton) <|
                 actionButtonLabelAbove "RANGE" StoreRangeSetting
             , el [alignBottom] helpButton
             ]

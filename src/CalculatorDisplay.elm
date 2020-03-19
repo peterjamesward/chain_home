@@ -11,7 +11,7 @@ import Element.Font as Font
 import Grid exposing (GridPosition, gridLettersList, gridPosition)
 import Messages exposing (Msg)
 import Model exposing (Model)
-import TrainingMode exposing (tutorialHighlighting, tutorialTextBox)
+import TrainingMode exposing (explanatoryText, tutorialTextBox)
 import Types exposing (UiComponent(..))
 import Utils exposing (choose, disableSelection, edges, helpButton)
 
@@ -57,7 +57,7 @@ calculatorLandscape model =
             , centerX
             ]
          ]
-            ++ tutorialHighlighting model UiCalculator
+            ++ explanatoryText model UiCalculator
         )
         [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay model position
@@ -75,7 +75,7 @@ calculatorLandscape model =
                 ]
             , helpButton
             ]
-        , row (tutorialHighlighting model UiCalcOffset)
+        , row (explanatoryText model UiCalcOffset)
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -114,7 +114,7 @@ calculatorPortrait model =
             , centerX
             ]
          ]
-            ++ tutorialHighlighting model UiCalculator
+            ++ explanatoryText model UiCalculator
         )
         [ row [ centerX ]
             [ positionGridDisplay model
@@ -122,7 +122,7 @@ calculatorPortrait model =
             , helpButton
             ]
         , column
-            (tutorialHighlighting model UiCalcOffset ++ [ centerX ])
+            (explanatoryText model UiCalcOffset ++ [ centerX ])
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -187,7 +187,7 @@ positionGridDisplay model position =
     in
     column
         ([ centerX, padding 10, spacingXY 5 5 ]
-            ++ tutorialHighlighting model UiCalcGrid
+            ++ explanatoryText model UiCalcGrid
         )
     <|
         List.map2 displayGridRow
@@ -217,7 +217,7 @@ strengthDisplay model strength =
         ([ spacing 20
          , paddingEach { edges | left = 10 }
          ]
-            ++ tutorialHighlighting model UiCalcStrength
+            ++ explanatoryText model UiCalcStrength
         )
     <|
         List.map2 makeIt
@@ -267,7 +267,7 @@ heightGrid model storedHeight =
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column ([ width fill ] ++ tutorialHighlighting model UiCalcHeight)
+    column ([ width fill ] ++ explanatoryText model UiCalcHeight)
         [ row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
