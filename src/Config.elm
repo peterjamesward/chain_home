@@ -106,7 +106,7 @@ bomber3 =
 
 bomber4 =
     { longitude = bawdsey.longitude + degrees 1.1
-    , latitude = bawdsey.latitude + degrees -0.3
+    , latitude = bawdsey.latitude - degrees 0.3
     , height = 40 -- ,000 ft
     , bearing = degrees 270
     , speed = 200 -- mph
@@ -217,8 +217,17 @@ trainingMode =
 
 trainingMode2 : List Target
 trainingMode2 =
+    -- Two planes same range same bearing
     [ { bomber2 | tutorial = True }
     , { bomber2A | tutorial = True }
+    ]
+
+
+trainingMode3 : List Target
+trainingMode3 =
+    -- Two planes same range different bearings
+    [ { bomber3 | tutorial = True }
+    , { bomber4 | tutorial = True }
     ]
 
 

@@ -27,7 +27,7 @@
 --DONE: Select tutorial whilst active does not reset properly.
 --DONE: Possibly, explain button in calc display not working. -- BECAUSE lookup now expects a tutorial!
 --DONE: Learning menu of raid types (one, two, 3-6, IFF).
---TODO: Two planes same bearing scenario
+--DONE: Two planes same bearing scenario
 --TODO: Two planes different bearings
 --TODO: 3-6 scenario
 --TODO: IFF scenario

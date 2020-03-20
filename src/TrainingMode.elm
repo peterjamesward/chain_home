@@ -1,6 +1,6 @@
 module TrainingMode exposing (..)
 
-import Config exposing (targetConfigurations, trainingMode, trainingMode2)
+import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3)
 import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
@@ -118,7 +118,7 @@ tutorialFromId id =
             tutorial2SameBearing
 
         ScenarioTwoSeparate ->
-            tutorialTBD
+            tutorial2DifferentBearings
 
         ScenarioThreeOrMore ->
             tutorialTBD
@@ -417,6 +417,125 @@ tutorial2SameBearing =
     , tutorialCloseStep
     ]
 
+tutorial2DifferentBearings : Tutorial
+tutorial2DifferentBearings =
+    [ TutorialEntry
+        TutorialWelcome
+        UiGoniometer
+        [ tutorialBearingMode, clearCalculator ]
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """The operator is turning the gonio, looking for any sign of a signal.
+        Click ► to begin.
+        """
+        )
+    , TutorialEntry
+        TutorialIncomingRaid
+        UiCRT
+        [ setupTutorialRaid2DifferentBearings ]
+        noStateActions
+        noExitActions
+        (static
+            """The white V shape under the 90 on the 'tube' is a new raid.
+        Note how it moves up and down. This is always two aircraft.
+        Let's find their bearing and height.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRange
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """The operator turns the range knob until the pointer
+        lines up with the left edge of the raid on the CRT.
+        """
+        )
+    , TutorialEntry
+        TutorialFindBearing
+        UiGoniometer
+        noEntryActions
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """The operator swings the gonio but the V will not disappear completely.
+            This means that the two planes are not together - they are on different bearings.
+        """
+        )
+    , TutorialEntry
+        TutorialFindBearingPlaneA
+        UiGoniometer
+        noEntryActions
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """We can find the bearing where the V stopes going up and down.
+            This means we have located one of the aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreBearing
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreBearing ]
+        (static
+            """Pressing the GONIO button stores the bearing in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange1
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialHeightMode
+        UiHeight
+        [ tutorialHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """There's no point trying to find the height because we won't know
+            which aircraft it is. The gonio can only do bearing or height, not both.
+        """
+        )
+
+    , TutorialEntry
+        TutorialStoreStrength
+        UiRaidStrength
+        [ tutorialStoreStrength 1 ]
+        noStateActions
+        noExitActions
+        (static
+            """Finally, the operator presses Raid Strength 1 because the plot is for one aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialShowCalculator
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        [ tutorialShowOperator ]
+        tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialEnded
+        UiDummy
+        noEntryActions
+        noStateActions
+        [ stopTutorialRaid ]
+        --, clearCalculator ]
+        (static """Choose more training or click on Operate.
+        """)
+    , tutorialCloseStep
+    ]
+
 
 tutorialStartScenario id model =
     let
@@ -626,6 +745,10 @@ setupTutorialRaid model =
 setupTutorialRaid2SameBearing : TutorialAction
 setupTutorialRaid2SameBearing model =
     { model | targets = trainingMode2 }
+
+setupTutorialRaid2DifferentBearings : TutorialAction
+setupTutorialRaid2DifferentBearings model =
+    { model | targets = trainingMode3 }
 
 
 stopTutorialRaid model =
