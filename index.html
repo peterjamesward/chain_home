@@ -7136,7 +7136,7 @@ var $author$project$Config$bomber4 = {
 	height: 40,
 	iff: $elm$core$Maybe$Nothing,
 	iffActive: false,
-	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(-0.3),
+	latitude: $author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.3),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
 	speed: 200,
 	tutorial: false
@@ -8075,21 +8075,19 @@ var $author$project$TrainingMode$tutorialExitAction = function (model) {
 		{tutorialScenario: $elm$core$Maybe$Nothing, tutorialStage: $elm$core$Maybe$Nothing});
 };
 var $author$project$Types$TutorialAdjustRange = {$: 'TutorialAdjustRange'};
-var $author$project$Types$TutorialAdjustRangeForHeight = {$: 'TutorialAdjustRangeForHeight'};
 var $author$project$Types$TutorialEnded = {$: 'TutorialEnded'};
 var $author$project$TrainingMode$TutorialEntry = F6(
 	function (tutorialStep, uiComponent, entryActions, stateActions, exitActions, tutorialText) {
 		return {entryActions: entryActions, exitActions: exitActions, stateActions: stateActions, tutorialStep: tutorialStep, tutorialText: tutorialText, uiComponent: uiComponent};
 	});
 var $author$project$Types$TutorialFindBearing = {$: 'TutorialFindBearing'};
-var $author$project$Types$TutorialFindElevation = {$: 'TutorialFindElevation'};
+var $author$project$Types$TutorialFindBearingPlaneA = {$: 'TutorialFindBearingPlaneA'};
+var $author$project$Types$TutorialFindBearingPlaneB = {$: 'TutorialFindBearingPlaneB'};
 var $author$project$Types$TutorialHeightMode = {$: 'TutorialHeightMode'};
 var $author$project$Types$TutorialIncomingRaid = {$: 'TutorialIncomingRaid'};
 var $author$project$Types$TutorialShowCalculator = {$: 'TutorialShowCalculator'};
 var $author$project$Types$TutorialStoreBearing = {$: 'TutorialStoreBearing'};
-var $author$project$Types$TutorialStoreElevation = {$: 'TutorialStoreElevation'};
 var $author$project$Types$TutorialStoreRange1 = {$: 'TutorialStoreRange1'};
-var $author$project$Types$TutorialStoreRange2 = {$: 'TutorialStoreRange2'};
 var $author$project$Types$TutorialStoreStrength = {$: 'TutorialStoreStrength'};
 var $author$project$Types$TutorialWelcome = {$: 'TutorialWelcome'};
 var $author$project$Types$UIRangeButton = {$: 'UIRangeButton'};
@@ -8149,42 +8147,42 @@ var $author$project$TrainingMode$clearCalculator = function (model) {
 		model,
 		{storedAzimuth: $elm$core$Maybe$Nothing, storedAzimuthRange: $elm$core$Maybe$Nothing, storedElevation: $elm$core$Maybe$Nothing, storedElevationRange: $elm$core$Maybe$Nothing, storedFriendly: $elm$core$Maybe$Nothing, storedStrength: $elm$core$Maybe$Nothing, storedStrengthPlus: $elm$core$Maybe$Nothing});
 };
-var $author$project$TrainingMode$noEntryActions = _List_Nil;
-var $author$project$TrainingMode$noExitActions = _List_Nil;
-var $author$project$TrainingMode$noStateActions = _List_Nil;
-var $author$project$Config$trainingMode = _List_fromArray(
-	[
-		_Utils_update(
-		$author$project$Config$bomber1,
-		{tutorial: true})
-	]);
-var $author$project$TrainingMode$setupTutorialRaid = function (model) {
-	return _Utils_update(
-		model,
-		{targets: $author$project$Config$trainingMode});
-};
-var $author$project$TrainingMode$static = function (s) {
-	return function (_v0) {
-		return s;
-	};
-};
-var $author$project$TrainingMode$stopTutorialRaid = function (model) {
-	return _Utils_update(
-		model,
-		{targets: _List_Nil});
-};
-var $author$project$TrainingMode$swingThatGoniometer = F2(
-	function (active, model) {
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $author$project$TrainingMode$findBearingOfNumberedTarget = F3(
+	function (active, index, model) {
 		var targetBearing = A2(
 			$elm$core$Maybe$withDefault,
 			0.0,
 			$elm$core$List$head(
 				A2(
-					$elm$core$List$map,
-					function ($) {
-						return $.theta;
-					},
-					model.polarTargets)));
+					$elm$core$List$drop,
+					index,
+					A2(
+						$elm$core$List$map,
+						function ($) {
+							return $.theta;
+						},
+						model.polarTargets))));
 		var currentKeys = model.keys;
 		return _Utils_update(
 			model,
@@ -8201,6 +8199,33 @@ var $author$project$TrainingMode$swingThatGoniometer = F2(
 					})
 			});
 	});
+var $author$project$TrainingMode$noEntryActions = _List_Nil;
+var $author$project$TrainingMode$noExitActions = _List_Nil;
+var $author$project$TrainingMode$noStateActions = _List_Nil;
+var $author$project$Config$trainingMode3 = _List_fromArray(
+	[
+		_Utils_update(
+		$author$project$Config$bomber3,
+		{tutorial: true}),
+		_Utils_update(
+		$author$project$Config$bomber4,
+		{tutorial: true})
+	]);
+var $author$project$TrainingMode$setupTutorialRaid2DifferentBearings = function (model) {
+	return _Utils_update(
+		model,
+		{targets: $author$project$Config$trainingMode3});
+};
+var $author$project$TrainingMode$static = function (s) {
+	return function (_v0) {
+		return s;
+	};
+};
+var $author$project$TrainingMode$stopTutorialRaid = function (model) {
+	return _Utils_update(
+		model,
+		{targets: _List_Nil});
+};
 var $author$project$TrainingMode$tutorialBearingMode = function (model) {
 	return _Utils_update(
 		model,
@@ -8230,7 +8255,6 @@ var $author$project$TrainingMode$tutorialHeightMode = function (model) {
 		model,
 		{goniometerMode: $author$project$Types$Elevation, inputState: $author$project$Types$HeightInput});
 };
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$truncate = _Basics_truncate;
 var $author$project$Grid$gridPosition = F2(
 	function (range, bearing) {
@@ -8265,27 +8289,6 @@ var $author$project$Grid$gridPosition = F2(
 				});
 		} else {
 			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
 		}
 	});
 var $author$project$Grid$gridLettersList = _List_fromArray(
@@ -8351,7 +8354,7 @@ var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 		var _v1 = model.storedElevation;
 		if (_v1.$ === 'Just') {
 			var h = _v1.a;
-			return $elm$core$String$fromFloat(h) + ',000 ft';
+			return $elm$core$String$fromInt(h | 0) + ',000 ft';
 		} else {
 			return 'unknown';
 		}
@@ -8379,6 +8382,190 @@ var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 		}
 	}()))))));
 };
+var $author$project$TrainingMode$tutorialShowCalculator = function (model) {
+	return _Utils_update(
+		model,
+		{currPage: $author$project$Types$OutputPage});
+};
+var $author$project$TrainingMode$tutorialShowOperator = function (model) {
+	return _Utils_update(
+		model,
+		{currPage: $author$project$Types$OperatorPage});
+};
+var $author$project$TrainingMode$tutorialStoreBearing = function (model) {
+	return _Utils_update(
+		model,
+		{
+			inputState: $author$project$Types$BearingRangeInput,
+			storedAzimuth: $elm$core$Maybe$Just(model.goniometerAzimuth + model.station.lineOfShoot)
+		});
+};
+var $author$project$TrainingMode$tutorialStoreRange1 = function (model) {
+	return _Utils_update(
+		model,
+		{
+			inputState: $author$project$Types$BearingInput,
+			storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
+		});
+};
+var $author$project$TrainingMode$tutorialStoreStrength = F2(
+	function (strength, model) {
+		return _Utils_update(
+			model,
+			{
+				storedStrength: $elm$core$Maybe$Just(strength)
+			});
+	});
+var $author$project$TrainingMode$tutorial2DifferentBearings = _List_fromArray(
+	[
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialWelcome,
+		$author$project$Types$UiGoniometer,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialBearingMode, $author$project$TrainingMode$clearCalculator]),
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialGoniometerSwinging]),
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The operator is turning the gonio, looking for any sign of a signal.\n        Click ► to begin.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIncomingRaid,
+		$author$project$Types$UiCRT,
+		_List_fromArray(
+			[$author$project$TrainingMode$setupTutorialRaid2DifferentBearings]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The white V shape under the 90 on the \'tube\' is a new raid.\n        Note how it moves up and down. This is always two aircraft.\n        Let\'s find their bearing and height.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialAdjustRange,
+		$author$project$Types$UiRangeKnob,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(false)
+			]),
+		$author$project$TrainingMode$static('The operator turns the range knob until the pointer\n        lines up with the left edge of the raid on the CRT.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindBearing,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialGoniometerSwinging]),
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The operator swings the gonio but the V will not disappear completely.\n            This means that the two planes are not together - they are on different bearings.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindBearingPlaneA,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, true, 0)
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, false, 0)
+			]),
+		$author$project$TrainingMode$static('We can find the bearing where the V stops going up and down.\n            This means we have located one of the aircraft.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreBearing,
+		$author$project$Types$UiGonioButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreBearing]),
+		$author$project$TrainingMode$static('Pressing the GONIO button stores the bearing in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreRange1,
+		$author$project$Types$UIRangeButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreRange1]),
+		$author$project$TrainingMode$static('Pressing the RANGE button stores the range in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialHeightMode,
+		$author$project$Types$UiHeight,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialHeightMode]),
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialBearingMode]),
+		$author$project$TrainingMode$static('There\'s no point trying to find the height because we won\'t know\n            which aircraft it is. The gonio can only do bearing or height, not both.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreStrength,
+		$author$project$Types$UiRaidStrength,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialStoreStrength(1)
+			]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('Finally, the operator presses Raid Strength 1 because the plot is for one aircraft.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialShowCalculator,
+		$author$project$Types$UiCalculator,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowCalculator]),
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowOperator]),
+		$author$project$Grid$tutorialInterpretCalculator),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindBearingPlaneB,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, true, 1)
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, false, 1)
+			]),
+		$author$project$TrainingMode$static('Then we find another bearing where the movement stops.\n            This means we have located the other the aircraft.\n            The rest of the steps are the same.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialEnded,
+		$author$project$Types$UiDummy,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$stopTutorialRaid]),
+		$author$project$TrainingMode$static('Choose more training or click on Operate.\n        ')),
+		$author$project$TrainingMode$tutorialCloseStep
+	]);
+var $author$project$Types$TutorialAdjustRangeForHeight = {$: 'TutorialAdjustRangeForHeight'};
+var $author$project$Types$TutorialFindElevation = {$: 'TutorialFindElevation'};
+var $author$project$Types$TutorialStoreElevation = {$: 'TutorialStoreElevation'};
+var $author$project$Types$TutorialStoreRange2 = {$: 'TutorialStoreRange2'};
+var $author$project$Config$trainingMode2 = _List_fromArray(
+	[
+		_Utils_update(
+		$author$project$Config$bomber2,
+		{tutorial: true}),
+		_Utils_update(
+		$author$project$Config$bomber2A,
+		{tutorial: true})
+	]);
+var $author$project$TrainingMode$setupTutorialRaid2SameBearing = function (model) {
+	return _Utils_update(
+		model,
+		{targets: $author$project$Config$trainingMode2});
+};
 var $author$project$TrainingMode$tutorialSeekElevation = F2(
 	function (active, model) {
 		var targetElevation = A2(
@@ -8400,24 +8587,6 @@ var $author$project$TrainingMode$tutorialSeekElevation = F2(
 					{gonioClock: active && (targetElevation > 0.2)})
 			});
 	});
-var $author$project$TrainingMode$tutorialShowCalculator = function (model) {
-	return _Utils_update(
-		model,
-		{currPage: $author$project$Types$OutputPage});
-};
-var $author$project$TrainingMode$tutorialShowOperator = function (model) {
-	return _Utils_update(
-		model,
-		{currPage: $author$project$Types$OperatorPage});
-};
-var $author$project$TrainingMode$tutorialStoreBearing = function (model) {
-	return _Utils_update(
-		model,
-		{
-			inputState: $author$project$Types$BearingRangeInput,
-			storedAzimuth: $elm$core$Maybe$Just(model.goniometerAzimuth + model.station.lineOfShoot)
-		});
-};
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -8477,28 +8646,177 @@ var $author$project$TrainingMode$tutorialStoreElevation = function (model) {
 			storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.polarTargets, model.rangeSlider)
 		});
 };
-var $author$project$TrainingMode$tutorialStoreRange1 = function (model) {
+var $author$project$TrainingMode$tutorial2SameBearing = _List_fromArray(
+	[
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialWelcome,
+		$author$project$Types$UiGoniometer,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialBearingMode, $author$project$TrainingMode$clearCalculator]),
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialGoniometerSwinging]),
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The operator is turning the gonio, looking for any sign of a signal.\n        Click ► to begin.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIncomingRaid,
+		$author$project$Types$UiCRT,
+		_List_fromArray(
+			[$author$project$TrainingMode$setupTutorialRaid2SameBearing]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The white V shape under the 90 on the \'tube\' is a new raid.\n        Note how it moves up and down. This is always two aircraft.\n        Let\'s find their bearing and height.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialAdjustRange,
+		$author$project$Types$UiRangeKnob,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(false)
+			]),
+		$author$project$TrainingMode$static('The operator turns the range knob until the pointer\n        lines up with the left edge of the raid on the CRT.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindBearing,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, true, 0)
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, false, 0)
+			]),
+		$author$project$TrainingMode$static('The operator \'swings\' the gonio until the V on the CRT vanishes.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreBearing,
+		$author$project$Types$UiGonioButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreBearing]),
+		$author$project$TrainingMode$static('Pressing the GONIO button stores the bearing in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreRange1,
+		$author$project$Types$UIRangeButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreRange1]),
+		$author$project$TrainingMode$static('Pressing the RANGE button stores the range in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialHeightMode,
+		$author$project$Types$UiHeight,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialHeightMode]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The operator will now try to work out the height.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialFindElevation,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialSeekElevation(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialSeekElevation(false)
+			]),
+		$author$project$TrainingMode$static('The operator swings the gonio again, to minimise the V.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreElevation,
+		$author$project$Types$UiGonioButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreElevation]),
+		$author$project$TrainingMode$static('The GONIO setting is stored, this gives the elevation.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialAdjustRangeForHeight,
+		$author$project$Types$UiRangeKnob,
+		$author$project$TrainingMode$noEntryActions,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(true)
+			]),
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$chaseTheRaidRange(false)
+			]),
+		$author$project$TrainingMode$static('Adjust the range pointer because the raid has moved.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreRange2,
+		$author$project$Types$UIRangeButton,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialStoreRange1]),
+		$author$project$TrainingMode$static('Pressing the RANGE button stores the range in the calculator.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialStoreStrength,
+		$author$project$Types$UiRaidStrength,
+		_List_fromArray(
+			[
+				$author$project$TrainingMode$tutorialStoreStrength(2)
+			]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('Finally, the operator presses Raid Strength 2, because this bouncing signal is two aircraft.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialShowCalculator,
+		$author$project$Types$UiCalculator,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowCalculator]),
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$tutorialShowOperator]),
+		$author$project$Grid$tutorialInterpretCalculator),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialEnded,
+		$author$project$Types$UiDummy,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$stopTutorialRaid]),
+		$author$project$TrainingMode$static('Choose more training or click on Operate.\n        ')),
+		$author$project$TrainingMode$tutorialCloseStep
+	]);
+var $author$project$Config$trainingMode = _List_fromArray(
+	[
+		_Utils_update(
+		$author$project$Config$bomber1,
+		{tutorial: true})
+	]);
+var $author$project$TrainingMode$setupTutorialRaid = function (model) {
 	return _Utils_update(
 		model,
-		{
-			inputState: $author$project$Types$BearingInput,
-			storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
-		});
+		{targets: $author$project$Config$trainingMode});
 };
-var $author$project$TrainingMode$tutorialStoreStrength = F2(
-	function (strength, model) {
-		return _Utils_update(
-			model,
-			{
-				storedStrength: $elm$core$Maybe$Just(strength)
-			});
-	});
 var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 	[
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialWelcome,
-		$author$project$Types$UiCRT,
+		$author$project$Types$UiGoniometer,
 		_List_fromArray(
 			[$author$project$TrainingMode$tutorialBearingMode, $author$project$TrainingMode$clearCalculator]),
 		_List_fromArray(
@@ -8535,11 +8853,11 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 		$author$project$TrainingMode$noEntryActions,
 		_List_fromArray(
 			[
-				$author$project$TrainingMode$swingThatGoniometer(true)
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, true, 0)
 			]),
 		_List_fromArray(
 			[
-				$author$project$TrainingMode$swingThatGoniometer(false)
+				A2($author$project$TrainingMode$findBearingOfNumberedTarget, false, 0)
 			]),
 		$author$project$TrainingMode$static('The operator \'swings\' the gonio until the V on the CRT vanishes.\n        ')),
 		A6(
@@ -8664,9 +8982,9 @@ var $author$project$TrainingMode$tutorialFromId = function (id) {
 		case 'ScenarioBasic':
 			return $author$project$TrainingMode$tutorialBasic;
 		case 'ScenarioTwoTogether':
-			return $author$project$TrainingMode$tutorialTBD;
+			return $author$project$TrainingMode$tutorial2SameBearing;
 		case 'ScenarioTwoSeparate':
-			return $author$project$TrainingMode$tutorialTBD;
+			return $author$project$TrainingMode$tutorial2DifferentBearings;
 		case 'ScenarioThreeOrMore':
 			return $author$project$TrainingMode$tutorialTBD;
 		default:
@@ -9946,6 +10264,7 @@ var $mdgriffith$elm_ui$Internal$Model$Style = F2(
 var $mdgriffith$elm_ui$Internal$Style$dot = function (c) {
 	return '.' + c;
 };
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_ui$Internal$Model$formatColor = function (_v0) {
 	var red = _v0.a;
 	var green = _v0.b;
@@ -15122,6 +15441,65 @@ var $mdgriffith$elm_ui$Element$Font$family = function (families) {
 			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
 			families));
 };
+var $author$project$TrainingMode$findMatchingStep = F3(
+	function (tutorialId, tutorialStep, uiComponent) {
+		var findHelper = function (steps) {
+			findHelper:
+			while (true) {
+				if (!steps.b) {
+					return $elm$core$Maybe$Nothing;
+				} else {
+					var step1 = steps.a;
+					var more = steps.b;
+					if (_Utils_eq(
+						$elm$core$Maybe$Just(step1.tutorialStep),
+						tutorialStep) && _Utils_eq(step1.uiComponent, uiComponent)) {
+						return $elm$core$Maybe$Just(step1);
+					} else {
+						var $temp$steps = more;
+						steps = $temp$steps;
+						continue findHelper;
+					}
+				}
+			}
+		};
+		return findHelper(
+			$author$project$TrainingMode$tutorialFromId(tutorialId));
+	});
+var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
+	return $elm$core$String$concat(
+		_List_fromArray(
+			[
+				shadow.inset ? 'box-inset' : 'box-',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.a) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.b) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.blur) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.size) + 'px',
+				$mdgriffith$elm_ui$Internal$Model$formatColorClass(shadow.color)
+			]));
+};
+var $mdgriffith$elm_ui$Internal$Flag$shadows = $mdgriffith$elm_ui$Internal$Flag$flag(19);
+var $mdgriffith$elm_ui$Element$Border$shadow = function (almostShade) {
+	var shade = {blur: almostShade.blur, color: almostShade.color, inset: false, offset: almostShade.offset, size: almostShade.size};
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$shadows,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
+			'box-shadow',
+			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
+};
+var $mdgriffith$elm_ui$Element$Border$glow = F2(
+	function (clr, size) {
+		return $mdgriffith$elm_ui$Element$Border$shadow(
+			{
+				blur: size * 2,
+				color: clr,
+				offset: _Utils_Tuple2(0, 0),
+				size: size
+			});
+	});
 var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
 var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
 	function (a, b) {
@@ -15139,6 +15517,27 @@ var $mdgriffith$elm_ui$Element$createNearby = F2(
 var $mdgriffith$elm_ui$Element$inFront = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
 };
+var $mdgriffith$elm_ui$Element$Border$innerShadow = function (almostShade) {
+	var shade = {blur: almostShade.blur, color: almostShade.color, inset: true, offset: almostShade.offset, size: almostShade.size};
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$shadows,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
+			'box-shadow',
+			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
+};
+var $mdgriffith$elm_ui$Element$Border$innerGlow = F2(
+	function (clr, size) {
+		return $mdgriffith$elm_ui$Element$Border$innerShadow(
+			{
+				blur: size * 2,
+				color: clr,
+				offset: _Utils_Tuple2(0, 0),
+				size: size
+			});
+	});
 var $author$project$Types$UiCalcGrid = {$: 'UiCalcGrid'};
 var $author$project$Types$UiCalcHeight = {$: 'UiCalcHeight'};
 var $author$project$Types$UiCalcStrength = {$: 'UiCalcStrength'};
@@ -15168,8 +15567,6 @@ var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
 			},
 			$author$project$TrainingMode$uiExplanations));
 };
-var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
-var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
 var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
 	function (a, b, c, d, e) {
 		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
@@ -15187,6 +15584,7 @@ var $mdgriffith$elm_ui$Element$padding = function (x) {
 			x,
 			x));
 };
+var $author$project$Constants$paletteSand = A3($mdgriffith$elm_ui$Element$rgb255, 193, 148, 106);
 var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
 	return {$: 'Describe', a: a};
 };
@@ -15283,47 +15681,70 @@ var $mdgriffith$elm_ui$Element$Border$width = function (v) {
 var $author$project$TrainingMode$explanatoryText = F2(
 	function (model, uiComponent) {
 		var uiComponentDescription = $author$project$TrainingMode$lookupUiExplanation(uiComponent);
-		return _List_fromArray(
+		var isTutorialSubject = function () {
+			var _v1 = model.tutorialScenario;
+			if (_v1.$ === 'Just') {
+				var scenarioId = _v1.a;
+				var tutorialStep = A3($author$project$TrainingMode$findMatchingStep, scenarioId, model.tutorialStage, uiComponent);
+				if (tutorialStep.$ === 'Just') {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}();
+		return isTutorialSubject ? _List_fromArray(
 			[
-				$mdgriffith$elm_ui$Element$inFront(
-				function () {
-					var _v0 = _Utils_Tuple2(model.explainMode, uiComponentDescription);
-					if (_v0.a && (_v0.b.$ === 'Just')) {
-						var txt = _v0.b.a;
-						return A2(
-							$mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Element$centerX,
-									$mdgriffith$elm_ui$Element$centerY,
-									$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
-									$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-									$mdgriffith$elm_ui$Element$Border$width(1),
-									$mdgriffith$elm_ui$Element$Border$rounded(5)
-								]),
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
+				$mdgriffith$elm_ui$Element$Border$width(2),
+				A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Constants$paletteSand, 2.0),
+				A2($mdgriffith$elm_ui$Element$Border$innerGlow, $author$project$Constants$paletteSand, 2.0),
+				$mdgriffith$elm_ui$Element$Border$rounded(5)
+			]) : _Utils_ap(
+			_List_Nil,
+			function () {
+				var _v0 = _Utils_Tuple2(model.explainMode, uiComponentDescription);
+				if (_v0.a && (_v0.b.$ === 'Just')) {
+					var txt = _v0.b.a;
+					return _List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$inFront(
 							A2(
-								$mdgriffith$elm_ui$Element$paragraph,
+								$mdgriffith$elm_ui$Element$el,
 								_List_fromArray(
 									[
-										$mdgriffith$elm_ui$Element$spacing(1),
-										$mdgriffith$elm_ui$Element$Font$size(16),
-										$mdgriffith$elm_ui$Element$Font$family(
-										_List_fromArray(
-											[
-												$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
-											])),
-										$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
-										$mdgriffith$elm_ui$Element$padding(5)
+										$mdgriffith$elm_ui$Element$centerX,
+										$mdgriffith$elm_ui$Element$centerY,
+										$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
+										$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+										$mdgriffith$elm_ui$Element$Border$width(1),
+										$mdgriffith$elm_ui$Element$Border$rounded(5)
 									]),
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$text(txt)
-									])));
-					} else {
-						return $mdgriffith$elm_ui$Element$none;
-					}
-				}())
-			]);
+								A2(
+									$mdgriffith$elm_ui$Element$paragraph,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$spacing(1),
+											$mdgriffith$elm_ui$Element$Font$size(16),
+											$mdgriffith$elm_ui$Element$Font$family(
+											_List_fromArray(
+												[
+													$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
+												])),
+											$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+											$mdgriffith$elm_ui$Element$padding(5)
+										]),
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$text(txt)
+										]))))
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}());
 	});
 var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
@@ -15347,40 +15768,6 @@ var $author$project$Utils$disableSelection = _List_fromArray(
 		A2($elm$html$Html$Attributes$style, '-webkit-touch-callout', 'none'))
 	]);
 var $author$project$Constants$flatWetAsphalt = A3($mdgriffith$elm_ui$Element$rgb255, 52, 73, 94);
-var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
-	return $elm$core$String$concat(
-		_List_fromArray(
-			[
-				shadow.inset ? 'box-inset' : 'box-',
-				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.a) + 'px',
-				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.offset.b) + 'px',
-				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.blur) + 'px',
-				$mdgriffith$elm_ui$Internal$Model$floatClass(shadow.size) + 'px',
-				$mdgriffith$elm_ui$Internal$Model$formatColorClass(shadow.color)
-			]));
-};
-var $mdgriffith$elm_ui$Internal$Flag$shadows = $mdgriffith$elm_ui$Internal$Flag$flag(19);
-var $mdgriffith$elm_ui$Element$Border$shadow = function (almostShade) {
-	var shade = {blur: almostShade.blur, color: almostShade.color, inset: false, offset: almostShade.offset, size: almostShade.size};
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$shadows,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Single,
-			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
-			'box-shadow',
-			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
-};
-var $mdgriffith$elm_ui$Element$Border$glow = F2(
-	function (clr, size) {
-		return $mdgriffith$elm_ui$Element$Border$shadow(
-			{
-				blur: size * 2,
-				color: clr,
-				offset: _Utils_Tuple2(0, 0),
-				size: size
-			});
-	});
 var $mdgriffith$elm_ui$Internal$Model$formatTextShadow = function (shadow) {
 	return A2(
 		$elm$core$String$join,
@@ -15420,27 +15807,6 @@ var $mdgriffith$elm_ui$Element$Font$glow = F2(
 				$mdgriffith$elm_ui$Internal$Model$textShadowClass(shade),
 				'text-shadow',
 				$mdgriffith$elm_ui$Internal$Model$formatTextShadow(shade)));
-	});
-var $mdgriffith$elm_ui$Element$Border$innerShadow = function (almostShade) {
-	var shade = {blur: almostShade.blur, color: almostShade.color, inset: true, offset: almostShade.offset, size: almostShade.size};
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$shadows,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Single,
-			$mdgriffith$elm_ui$Internal$Model$boxShadowClass(shade),
-			'box-shadow',
-			$mdgriffith$elm_ui$Internal$Model$formatBoxShadow(shade)));
-};
-var $mdgriffith$elm_ui$Element$Border$innerGlow = F2(
-	function (clr, size) {
-		return $mdgriffith$elm_ui$Element$Border$innerShadow(
-			{
-				blur: size * 2,
-				color: clr,
-				offset: _Utils_Tuple2(0, 0),
-				size: size
-			});
 	});
 var $mdgriffith$elm_ui$Internal$Model$paddingName = F4(
 	function (top, right, bottom, left) {
@@ -15743,6 +16109,8 @@ var $author$project$CalculatorDisplay$maybeBoolDisplay = F2(
 				A2($author$project$CalculatorDisplay$buttonStyle, theChosenOne, $author$project$Constants$raidStrengthIndicator)),
 			$mdgriffith$elm_ui$Element$text(label));
 	});
+var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
+var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
 var $author$project$Constants$vividGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
 var $author$project$CalculatorDisplay$digitDisplayLamp = F2(
 	function (maybeN, digit) {
@@ -16302,7 +16670,6 @@ var $mdgriffith$elm_ui$Element$paddingXY = F2(
 				x));
 	});
 var $author$project$Constants$paletteLightGreen = A3($mdgriffith$elm_ui$Element$rgb255, 130, 183, 75);
-var $author$project$Constants$paletteSand = A3($mdgriffith$elm_ui$Element$rgb255, 193, 148, 106);
 var $author$project$Attr$greenButton = _List_fromArray(
 	[
 		$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$flatMidnightBlue),

@@ -503,8 +503,8 @@ tutorial2DifferentBearings =
         noStateActions
         [ tutorialBearingMode ]
         (static
-            """There's no point trying to find the height because we won't know
-            which aircraft it is. The gonio can only do bearing or height, not both.
+            """We don't try to find the height because we won't know which aircraft it is.
+            The gonio can do bearing or height, not both at the same time.
         """
         )
     , TutorialEntry
@@ -514,7 +514,7 @@ tutorial2DifferentBearings =
         noStateActions
         noExitActions
         (static
-            """Finally, the operator presses Raid Strength 1 because the plot is for one aircraft.
+            """The operator presses Raid Strength 1 because the plot is for one aircraft.
         """
         )
     , TutorialEntry
@@ -529,13 +529,20 @@ tutorial2DifferentBearings =
         UiGoniometer
         noEntryActions
         [ findBearingOfNumberedTarget True 1 ]
-        [ findBearingOfNumberedTarget False 1 ]
+        [ findBearingOfNumberedTarget False 1 , tutorialStoreBearing ]
         (static
-            """Then we find another bearing where the movement stops.
+            """We find another bearing where the movement stops.
             This means we have located the other the aircraft.
             The rest of the steps are the same.
         """
         )
+    , TutorialEntry
+        TutorialShowCalculator2
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        [ tutorialShowOperator ]
+        tutorialInterpretCalculator
     , TutorialEntry
         TutorialEnded
         UiDummy

@@ -97,6 +97,7 @@ type TutorialStep
     | TutorialStoreRange2 -- relates to height
     | TutorialStoreStrength
     | TutorialShowCalculator
+    | TutorialShowCalculator2
     | TutorialEnded -- last thing we show
     | TutorialDummy -- not shown, if it occurs.
 
