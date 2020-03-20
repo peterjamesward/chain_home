@@ -1,6 +1,6 @@
 module TrainingMode exposing (..)
 
-import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3)
+import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3, trainingMode3to6)
 import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
@@ -120,8 +120,8 @@ tutorialFromId id =
         ScenarioTwoSeparate ->
             tutorial2DifferentBearings
 
-        ScenarioThreeOrMore ->
-            tutorialTBD
+        ScenarioThreeToSix ->
+            tutorial3to6
 
         ScenarioFriendly ->
             tutorialTBD
@@ -529,7 +529,7 @@ tutorial2DifferentBearings =
         UiGoniometer
         noEntryActions
         [ findBearingOfNumberedTarget True 1 ]
-        [ findBearingOfNumberedTarget False 1 , tutorialStoreBearing ]
+        [ findBearingOfNumberedTarget False 1, tutorialStoreBearing ]
         (static
             """We find another bearing where the movement stops.
             This means we have located the other the aircraft.
@@ -550,6 +550,151 @@ tutorial2DifferentBearings =
         noStateActions
         [ stopTutorialRaid ]
         --, clearCalculator ]
+        (static """Choose more training or click on Operate.
+        """)
+    , tutorialCloseStep
+    ]
+
+
+tutorial3to6 : Tutorial
+tutorial3to6 =
+    [ TutorialEntry
+        TutorialWelcome
+        UiGoniometer
+        [ tutorialBearingMode, clearCalculator ]
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """The operator is turning the gonio, looking for any sign of a signal.
+        Click ► to begin.
+        """
+        )
+    , TutorialEntry
+        TutorialIncomingRaid
+        UiCRT
+        [ setupTutorialRaid3to6 ]
+        noStateActions
+        noExitActions
+        (static
+            """The white V shape under the 100 on the 'tube' is a new raid.
+        Note how it dances with a complex pattern.
+        This is typical of from 3 to 6 aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRange
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """The operator turns the range knob until the pointer
+        lines up with the left edge of the raid on the CRT.
+        """
+        )
+    , TutorialEntry
+        TutorialFindBearing
+        UiGoniometer
+        noEntryActions
+        [ findBearingOfNumberedTarget True 0 ]
+        [ findBearingOfNumberedTarget False 0 ]
+        (static
+            """This is a close formation of aircraft so it will still D/F out.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreBearing
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreBearing ]
+        (static
+            """Pressing the GONIO button stores the bearing in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange1
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialHeightMode
+        UiHeight
+        [ tutorialHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """The operator will now try to work out the height.
+        """
+        )
+    , TutorialEntry
+        TutorialFindElevation
+        UiGoniometer
+        noEntryActions
+        [ tutorialSeekElevation True ]
+        [ tutorialSeekElevation False ]
+        (static
+            """The operator swings the gonio again, to minimise the V.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreElevation
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreElevation ]
+        (static
+            """The GONIO setting is stored, this gives the elevation.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRangeForHeight
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """Adjust the range pointer because the raid has moved.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange2
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreStrength
+        UiRaidStrength
+        [ tutorialStoreStrength 3, tutorialStorePlus ]
+        noStateActions
+        noExitActions
+        (static
+            """The operator presses Raid Strength 3 and the + sign.
+        """
+        )
+    , TutorialEntry
+        TutorialShowCalculator
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        [ tutorialShowOperator ]
+        tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialEnded
+        UiDummy
+        noEntryActions
+        noStateActions
+        [ stopTutorialRaid ]
         (static """Choose more training or click on Operate.
         """)
     , tutorialCloseStep
@@ -773,6 +918,11 @@ setupTutorialRaid2DifferentBearings model =
     { model | targets = trainingMode3 }
 
 
+setupTutorialRaid3to6 : TutorialAction
+setupTutorialRaid3to6 model =
+    { model | targets = trainingMode3to6 }
+
+
 stopTutorialRaid model =
     { model | targets = [] }
 
@@ -809,6 +959,11 @@ tutorialStoreElevation model =
 tutorialStoreStrength : Int -> TutorialAction
 tutorialStoreStrength strength model =
     { model | storedStrength = Just strength }
+
+
+tutorialStorePlus : TutorialAction
+tutorialStorePlus model =
+    { model | storedStrengthPlus = Just True }
 
 
 tutorialStoreRange1 : TutorialAction

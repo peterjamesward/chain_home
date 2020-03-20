@@ -572,7 +572,7 @@ learningMenu =
         [ navItem "Basic operation" (DisplayTraining ScenarioBasic)
         , navItem "2 aircraft together" (DisplayTraining ScenarioTwoTogether)
         , navItem "2 aircraft apart" (DisplayTraining ScenarioTwoSeparate)
-        , navItem "3 to 6 strong raid" (DisplayTraining ScenarioThreeOrMore)
+        , navItem "3 to 6 strong raid" (DisplayTraining ScenarioThreeToSix)
         , navItem "Friendly (IFF)" (DisplayTraining ScenarioFriendly)
         ]
 

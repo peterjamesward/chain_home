@@ -78,7 +78,7 @@ type TutorialScenario
     = ScenarioBasic
     | ScenarioTwoTogether
     | ScenarioTwoSeparate
-    | ScenarioThreeOrMore
+    | ScenarioThreeToSix
     | ScenarioFriendly
 
 type TutorialStep

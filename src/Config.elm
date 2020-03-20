@@ -129,7 +129,7 @@ fighter1 =
     }
 
 
-tenAbreast =
+severalAbreast n =
     List.map
         (\i ->
             { longitude = bawdsey.longitude + degrees 1.17
@@ -143,10 +143,10 @@ tenAbreast =
             }
         )
     <|
-        List.range 1 10
+        List.range 1 n
 
 
-tenAligned =
+severalAligned n =
     List.map
         (\i ->
             { longitude = bawdsey.longitude + degrees 1.17 + (degrees (toFloat i - 5) * 0.001)
@@ -160,7 +160,7 @@ tenAligned =
             }
         )
     <|
-        List.range 1 10
+        List.range 1 n
 
 
 
@@ -188,11 +188,11 @@ twoDistantTargets =
 
 
 tenWide =
-    TargetSelector 5 "Ten targets, line abreast" tenAbreast False
+    TargetSelector 5 "Ten targets, line abreast" (severalAbreast 10) False
 
 
 tenDeep =
-    TargetSelector 6 "Ten targets, line astern" tenAligned False
+    TargetSelector 6 "Ten targets, line astern" (severalAligned 10) False
 
 
 behindYou =
@@ -229,6 +229,17 @@ trainingMode3 =
     [ { bomber3 | tutorial = True }
     , { bomber4 | tutorial = True }
     ]
+
+
+trainingMode3to6 : List Target
+trainingMode3to6 =
+    let
+        placeInTutorialMode t =
+            { t | tutorial = True }
+    in
+    -- Four aircraft close together
+    -- Wonder if it will work using them twice!
+    List.map placeInTutorialMode <| severalAbreast 5
 
 
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector
