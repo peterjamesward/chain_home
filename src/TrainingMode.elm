@@ -567,6 +567,8 @@ tutorialStartScenario id model =
                 , tutorialStage = Just s.tutorialStep
                 , currPage = OperatorPage
                 , isMenuOpen = False
+                , startTime = model.modelTime
+                , webGLtime = 0.0
             }
     in
     case firstStep of
