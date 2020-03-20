@@ -215,6 +215,13 @@ trainingMode =
     [ { bomber1 | tutorial = True } ]
 
 
+trainingMode2 : List Target
+trainingMode2 =
+    [ { bomber2 | tutorial = True }
+    , { bomber2A | tutorial = True }
+    ]
+
+
 updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector
 updateConfig activeConfigurations idx newState =
     let

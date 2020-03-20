@@ -154,7 +154,9 @@ deriveModelAtTime model timeNow =
 
         convertedTargets =
             -- Easier to work in polar coordinates here on.
-            List.map (mapToPolar bawdsey) targetsNow
+            -- Filter removes raid beyond our range.
+            List.filter (\tgt -> tgt.r < 100 * 1600) <|
+                List.map (mapToPolar bawdsey) targetsNow
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.

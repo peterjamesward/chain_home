@@ -8996,9 +8996,14 @@ var $author$project$Main$deriveModelAtTime = F2(
 		var newRangeSliderPosition = A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys);
 		var newRangeKnobPosition = ((newRangeSliderPosition - 50) * $elm$core$Basics$pi) / 50;
 		var convertedTargets = A2(
-			$elm$core$List$map,
-			$author$project$Target$mapToPolar($author$project$Config$bawdsey),
-			targetsNow);
+			$elm$core$List$filter,
+			function (tgt) {
+				return _Utils_cmp(tgt.r, 100 * 1600) < 0;
+			},
+			A2(
+				$elm$core$List$map,
+				$author$project$Target$mapToPolar($author$project$Config$bawdsey),
+				targetsNow));
 		var echoSignals = A2($author$project$Echo$deriveEchoes, convertedTargets, model.transmitAntenna);
 		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var heightMode_B_Outputs = A2($author$project$ElevationCurves$bElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
@@ -9253,7 +9258,10 @@ var $author$project$TrainingMode$tutorialStartScenario = F2(
 			return A2(
 				setActiveTutorial,
 				step,
-				A2($author$project$TrainingMode$applyActions, step.entryActions, model));
+				A2(
+					$author$project$TrainingMode$applyActions,
+					step.entryActions,
+					$author$project$TrainingMode$exitTutorial(model)));
 		}
 	});
 var $author$project$Config$updateConfig = F3(
@@ -9599,9 +9607,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'ResetInputState':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{goniometerMode: $author$project$Types$Azimuth, inputState: $author$project$Types$BearingInput, storedAzimuth: $elm$core$Maybe$Nothing, storedAzimuthRange: $elm$core$Maybe$Nothing, storedElevation: $elm$core$Maybe$Nothing, storedElevationRange: $elm$core$Maybe$Nothing}),
+					$author$project$TrainingMode$clearCalculator(model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -14987,18 +14993,17 @@ var $mdgriffith$elm_ui$Element$column = F2(
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
 var $author$project$Utils$edges = {bottom: 0, left: 0, right: 0, top: 0};
-var $author$project$Types$UiCalcHeight = {$: 'UiCalcHeight'};
-var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
-var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
-var $mdgriffith$elm_ui$Internal$Model$Class = F2(
-	function (a, b) {
-		return {$: 'Class', a: a, b: b};
+var $mdgriffith$elm_ui$Internal$Model$Rgba = F4(
+	function (a, b, c, d) {
+		return {$: 'Rgba', a: a, b: b, c: c, d: d};
 	});
-var $mdgriffith$elm_ui$Internal$Flag$fontWeight = $mdgriffith$elm_ui$Internal$Flag$flag(13);
-var $mdgriffith$elm_ui$Element$Font$bold = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontWeight, $mdgriffith$elm_ui$Internal$Style$classes.bold);
-var $author$project$CalculatorDisplay$bulbSize = 40;
-var $mdgriffith$elm_ui$Internal$Flag$fontAlignment = $mdgriffith$elm_ui$Internal$Flag$flag(12);
-var $mdgriffith$elm_ui$Element$Font$center = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontAlignment, $mdgriffith$elm_ui$Internal$Style$classes.textCenter);
+var $mdgriffith$elm_ui$Element$rgb255 = F3(
+	function (red, green, blue) {
+		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
+	});
+var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
+var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
 var $mdgriffith$elm_ui$Internal$Model$Colored = F3(
 	function (a, b, c) {
 		return {$: 'Colored', a: a, b: b, c: c};
@@ -15007,7 +15012,7 @@ var $mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
 	function (a, b) {
 		return {$: 'StyleClass', a: a, b: b};
 	});
-var $mdgriffith$elm_ui$Internal$Flag$fontColor = $mdgriffith$elm_ui$Internal$Flag$flag(14);
+var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
 var $mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_v0) {
 	var red = _v0.a;
 	var green = _v0.b;
@@ -15015,6 +15020,28 @@ var $mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_v0) {
 	var alpha = _v0.d;
 	return $mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + $mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
 };
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
+var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
+var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'border-color',
+			clr));
+};
+var $mdgriffith$elm_ui$Internal$Flag$fontColor = $mdgriffith$elm_ui$Internal$Flag$flag(14);
 var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -15025,16 +15052,23 @@ var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 			'color',
 			fontColor));
 };
-var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Utils$disableSelection = _List_fromArray(
-	[
-		$mdgriffith$elm_ui$Element$htmlAttribute(
-		A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none')),
-		$mdgriffith$elm_ui$Element$htmlAttribute(
-		A2($elm$html$Html$Attributes$style, '-webkit-touch-callout', 'none'))
-	]);
+var $mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
 var $mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 	function (a, b) {
 		return {$: 'FontFamily', a: a, b: b};
@@ -15088,14 +15122,230 @@ var $mdgriffith$elm_ui$Element$Font$family = function (families) {
 			A3($elm$core$List$foldl, $mdgriffith$elm_ui$Internal$Model$renderFontClassName, 'ff-', families),
 			families));
 };
-var $mdgriffith$elm_ui$Internal$Model$Rgba = F4(
-	function (a, b, c, d) {
-		return {$: 'Rgba', a: a, b: b, c: c, d: d};
+var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
+var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
+	function (a, b) {
+		return {$: 'Nearby', a: a, b: b};
 	});
-var $mdgriffith$elm_ui$Element$rgb255 = F3(
-	function (red, green, blue) {
-		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, red / 255, green / 255, blue / 255, 1);
+var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
+var $mdgriffith$elm_ui$Element$createNearby = F2(
+	function (loc, element) {
+		if (element.$ === 'Empty') {
+			return $mdgriffith$elm_ui$Internal$Model$NoAttribute;
+		} else {
+			return A2($mdgriffith$elm_ui$Internal$Model$Nearby, loc, element);
+		}
 	});
+var $mdgriffith$elm_ui$Element$inFront = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
+};
+var $author$project$Types$UiCalcGrid = {$: 'UiCalcGrid'};
+var $author$project$Types$UiCalcHeight = {$: 'UiCalcHeight'};
+var $author$project$Types$UiCalcStrength = {$: 'UiCalcStrength'};
+var $author$project$Types$UiRangeScale = {$: 'UiRangeScale'};
+var $author$project$Types$UiSwitchPanel = {$: 'UiSwitchPanel'};
+var $author$project$TrainingMode$uiExplanations = _List_fromArray(
+	[
+		_Utils_Tuple2($author$project$Types$UiCRT, 'The operators screen, or CRT'),
+		_Utils_Tuple2($author$project$Types$UiGoniometer, 'Goniometer'),
+		_Utils_Tuple2($author$project$Types$UiRangeKnob, 'Range knob'),
+		_Utils_Tuple2($author$project$Types$UiRangeScale, 'Range scale (miles) and range indicator'),
+		_Utils_Tuple2($author$project$Types$UiSwitchPanel, 'Mode switches'),
+		_Utils_Tuple2($author$project$Types$UiRaidStrength, 'Raid strength entry buttons'),
+		_Utils_Tuple2($author$project$Types$UiCalcStrength, 'Estimate of number of planes in raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcGrid, 'The 100km map grid square containing the raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcHeight, 'The approximate height of the raid'),
+		_Utils_Tuple2($author$project$Types$UiCalcOffset, 'The approximate position within the grid square')
+	]);
+var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
+	return $elm$core$List$head(
+		A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var i = _v0.a;
+				var s = _v0.b;
+				return _Utils_eq(i, ui) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
+			},
+			$author$project$TrainingMode$uiExplanations));
+};
+var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
+var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
+var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
+var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
+	return {$: 'Describe', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Paragraph = {$: 'Paragraph'};
+var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
+var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
+	function (a, b, c) {
+		return {$: 'SpacingStyle', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
+var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
+	function (x, y) {
+		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
+	});
+var $mdgriffith$elm_ui$Element$spacing = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$spacing,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
+			x,
+			x));
+};
+var $mdgriffith$elm_ui$Element$paragraph = F2(
+	function (attrs, children) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asParagraph,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$Describe($mdgriffith$elm_ui$Internal$Model$Paragraph),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$spacing(5),
+						attrs))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+	});
+var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
+var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + $elm$core$String$fromInt(radius),
+			'border-radius',
+			$elm$core$String$fromInt(radius) + 'px'));
+};
+var $mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
+	return {$: 'FontSize', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Flag$fontSize = $mdgriffith$elm_ui$Internal$Flag$flag(4);
+var $mdgriffith$elm_ui$Element$Font$size = function (i) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontSize,
+		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
+	return {$: 'Text', a: a};
+};
+var $mdgriffith$elm_ui$Element$text = function (content) {
+	return $mdgriffith$elm_ui$Internal$Model$Text(content);
+};
+var $mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
+	return {$: 'Typeface', a: a};
+};
+var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
+var $author$project$Constants$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
+var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
+	function (a, b, c, d, e) {
+		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + $elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
+var $author$project$TrainingMode$explanatoryText = F2(
+	function (model, uiComponent) {
+		var uiComponentDescription = $author$project$TrainingMode$lookupUiExplanation(uiComponent);
+		return _List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$inFront(
+				function () {
+					var _v0 = _Utils_Tuple2(model.explainMode, uiComponentDescription);
+					if (_v0.a && (_v0.b.$ === 'Just')) {
+						var txt = _v0.b.a;
+						return A2(
+							$mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$centerX,
+									$mdgriffith$elm_ui$Element$centerY,
+									$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
+									$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+									$mdgriffith$elm_ui$Element$Border$width(1),
+									$mdgriffith$elm_ui$Element$Border$rounded(5)
+								]),
+							A2(
+								$mdgriffith$elm_ui$Element$paragraph,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$spacing(1),
+										$mdgriffith$elm_ui$Element$Font$size(16),
+										$mdgriffith$elm_ui$Element$Font$family(
+										_List_fromArray(
+											[
+												$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
+											])),
+										$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+										$mdgriffith$elm_ui$Element$padding(5)
+									]),
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$text(txt)
+									])));
+					} else {
+						return $mdgriffith$elm_ui$Element$none;
+					}
+				}())
+			]);
+	});
+var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
+var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
+var $mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$fontWeight = $mdgriffith$elm_ui$Internal$Flag$flag(13);
+var $mdgriffith$elm_ui$Element$Font$bold = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontWeight, $mdgriffith$elm_ui$Internal$Style$classes.bold);
+var $author$project$CalculatorDisplay$bulbSize = 40;
+var $mdgriffith$elm_ui$Internal$Flag$fontAlignment = $mdgriffith$elm_ui$Internal$Flag$flag(12);
+var $mdgriffith$elm_ui$Element$Font$center = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontAlignment, $mdgriffith$elm_ui$Internal$Style$classes.textCenter);
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Utils$disableSelection = _List_fromArray(
+	[
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none')),
+		$mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, '-webkit-touch-callout', 'none'))
+	]);
 var $author$project$Constants$flatWetAsphalt = A3($mdgriffith$elm_ui$Element$rgb255, 52, 73, 94);
 var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
 	return $elm$core$String$concat(
@@ -15192,11 +15442,6 @@ var $mdgriffith$elm_ui$Element$Border$innerGlow = F2(
 				size: size
 			});
 	});
-var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
 var $mdgriffith$elm_ui$Internal$Model$paddingName = F4(
 	function (top, right, bottom, left) {
 		return 'pad-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left)))))));
@@ -15230,23 +15475,8 @@ var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
 	return {$: 'Px', a: a};
 };
 var $mdgriffith$elm_ui$Element$px = $mdgriffith$elm_ui$Internal$Model$Px;
-var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
-var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderRound,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Single,
-			'br-' + $elm$core$String$fromInt(radius),
-			'border-radius',
-			$elm$core$String$fromInt(radius) + 'px'));
-};
 var $mdgriffith$elm_ui$Internal$Model$SansSerif = {$: 'SansSerif'};
 var $mdgriffith$elm_ui$Element$Font$sansSerif = $mdgriffith$elm_ui$Internal$Model$SansSerif;
-var $mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
-	return {$: 'Typeface', a: a};
-};
-var $mdgriffith$elm_ui$Element$Font$typeface = $mdgriffith$elm_ui$Internal$Model$Typeface;
 var $author$project$CalculatorDisplay$buttonStyle = F2(
 	function (enabled, colour) {
 		return _Utils_ap(
@@ -15286,27 +15516,6 @@ var $author$project$CalculatorDisplay$buttonStyle = F2(
 				]),
 			$author$project$Utils$disableSelection);
 	});
-var $mdgriffith$elm_ui$Element$el = F2(
-	function (attrs, child) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asEl,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-					attrs)),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[child])));
-	});
-var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
-	return {$: 'Fill', a: a};
-};
-var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
 var $author$project$Constants$flatSunflower = A3($mdgriffith$elm_ui$Element$rgb255, 241, 196, 15);
 var $elm$core$List$map3 = _List_map3;
 var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
@@ -15329,26 +15538,7 @@ var $mdgriffith$elm_ui$Element$row = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var $mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
-	return {$: 'FontSize', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Flag$fontSize = $mdgriffith$elm_ui$Internal$Flag$flag(4);
-var $mdgriffith$elm_ui$Element$Font$size = function (i) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$fontSize,
-		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
-};
-var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
 var $mdgriffith$elm_ui$Element$spaceEvenly = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$spacing, $mdgriffith$elm_ui$Internal$Style$classes.spaceEvenly);
-var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
-	function (a, b, c) {
-		return {$: 'SpacingStyle', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
-	function (x, y) {
-		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
-	});
 var $mdgriffith$elm_ui$Element$spacingXY = F2(
 	function (x, y) {
 		return A2(
@@ -15359,266 +15549,6 @@ var $mdgriffith$elm_ui$Element$spacingXY = F2(
 				A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, y),
 				x,
 				y));
-	});
-var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
-	return {$: 'Text', a: a};
-};
-var $mdgriffith$elm_ui$Element$text = function (content) {
-	return $mdgriffith$elm_ui$Internal$Model$Text(content);
-};
-var $mdgriffith$elm_ui$Internal$Model$Transparency = F2(
-	function (a, b) {
-		return {$: 'Transparency', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$transparency = $mdgriffith$elm_ui$Internal$Flag$flag(0);
-var $mdgriffith$elm_ui$Element$alpha = function (o) {
-	var transparency = function (x) {
-		return 1 - x;
-	}(
-		A2(
-			$elm$core$Basics$min,
-			1.0,
-			A2($elm$core$Basics$max, 0.0, o)));
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$transparency,
-		A2(
-			$mdgriffith$elm_ui$Internal$Model$Transparency,
-			'transparency-' + $mdgriffith$elm_ui$Internal$Model$floatClass(transparency),
-			transparency));
-};
-var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
-var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'border-color',
-			clr));
-};
-var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
-var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
-var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
-var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
-var $author$project$Types$UiCalcGrid = {$: 'UiCalcGrid'};
-var $author$project$Types$UiCalcStrength = {$: 'UiCalcStrength'};
-var $author$project$Types$UiRangeScale = {$: 'UiRangeScale'};
-var $author$project$Types$UiSwitchPanel = {$: 'UiSwitchPanel'};
-var $author$project$TrainingMode$uiExplanations = _List_fromArray(
-	[
-		_Utils_Tuple2($author$project$Types$UiCRT, 'The operators screen, or CRT'),
-		_Utils_Tuple2($author$project$Types$UiGoniometer, 'Goniometer'),
-		_Utils_Tuple2($author$project$Types$UiRangeKnob, 'Range knob'),
-		_Utils_Tuple2($author$project$Types$UiRangeScale, 'Range scale (miles) and range indicator'),
-		_Utils_Tuple2($author$project$Types$UiSwitchPanel, 'Mode switches'),
-		_Utils_Tuple2($author$project$Types$UiRaidStrength, 'Raid strength entry buttons'),
-		_Utils_Tuple2($author$project$Types$UiCalcStrength, 'Estimate of number of planes in raid'),
-		_Utils_Tuple2($author$project$Types$UiCalcGrid, 'The 100km map grid square containing the raid'),
-		_Utils_Tuple2($author$project$Types$UiCalcHeight, 'The approximate height of the raid'),
-		_Utils_Tuple2($author$project$Types$UiCalcOffset, 'The approximate position within the grid square')
-	]);
-var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
-	return $elm$core$List$head(
-		A2(
-			$elm$core$List$filterMap,
-			function (_v0) {
-				var i = _v0.a;
-				var s = _v0.b;
-				return _Utils_eq(i, ui) ? $elm$core$Maybe$Just(s) : $elm$core$Maybe$Nothing;
-			},
-			$author$project$TrainingMode$uiExplanations));
-};
-var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
-var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
-var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
-	return {$: 'Describe', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$Paragraph = {$: 'Paragraph'};
-var $mdgriffith$elm_ui$Element$spacing = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$spacing,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
-			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
-			x,
-			x));
-};
-var $mdgriffith$elm_ui$Element$paragraph = F2(
-	function (attrs, children) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asParagraph,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$Describe($mdgriffith$elm_ui$Internal$Model$Paragraph),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-					A2(
-						$elm$core$List$cons,
-						$mdgriffith$elm_ui$Element$spacing(5),
-						attrs))),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
-var $author$project$Constants$white = A3($mdgriffith$elm_ui$Element$rgb255, 200, 200, 200);
-var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
-	function (a, b, c, d, e) {
-		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Element$Border$width = function (v) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + $elm$core$String$fromInt(v),
-			v,
-			v,
-			v,
-			v));
-};
-var $author$project$TrainingMode$explanatoryText = function (uiComponent) {
-	var uiComponentDescription = $author$project$TrainingMode$lookupUiExplanation(uiComponent);
-	if (uiComponentDescription.$ === 'Just') {
-		var txt = uiComponentDescription.a;
-		return A2(
-			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY,
-					$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
-					$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-					$mdgriffith$elm_ui$Element$Border$width(1),
-					$mdgriffith$elm_ui$Element$Border$rounded(5)
-				]),
-			A2(
-				$mdgriffith$elm_ui$Element$paragraph,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$spacing(1),
-						$mdgriffith$elm_ui$Element$Font$size(16),
-						$mdgriffith$elm_ui$Element$Font$family(
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
-							])),
-						$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
-						$mdgriffith$elm_ui$Element$padding(5)
-					]),
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$text(txt)
-					])));
-	} else {
-		return $mdgriffith$elm_ui$Element$none;
-	}
-};
-var $author$project$TrainingMode$findMatchingStep = F3(
-	function (tutorialId, tutorialStep, uiComponent) {
-		var findHelper = function (steps) {
-			findHelper:
-			while (true) {
-				if (!steps.b) {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					var step1 = steps.a;
-					var more = steps.b;
-					if (_Utils_eq(
-						$elm$core$Maybe$Just(step1.tutorialStep),
-						tutorialStep) && _Utils_eq(step1.uiComponent, uiComponent)) {
-						return $elm$core$Maybe$Just(step1);
-					} else {
-						var $temp$steps = more;
-						steps = $temp$steps;
-						continue findHelper;
-					}
-				}
-			}
-		};
-		return findHelper(
-			$author$project$TrainingMode$tutorialFromId(tutorialId));
-	});
-var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
-var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
-	function (a, b) {
-		return {$: 'Nearby', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
-var $mdgriffith$elm_ui$Element$createNearby = F2(
-	function (loc, element) {
-		if (element.$ === 'Empty') {
-			return $mdgriffith$elm_ui$Internal$Model$NoAttribute;
-		} else {
-			return A2($mdgriffith$elm_ui$Internal$Model$Nearby, loc, element);
-		}
-	});
-var $mdgriffith$elm_ui$Element$inFront = function (element) {
-	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
-};
-var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
-var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
-var $author$project$TrainingMode$tutorialHighlighting = F2(
-	function (model, uiComponent) {
-		var _v0 = model.tutorialScenario;
-		if (_v0.$ === 'Just') {
-			var tutId = _v0.a;
-			var _v1 = _Utils_Tuple2(
-				A3($author$project$TrainingMode$findMatchingStep, tutId, model.tutorialStage, uiComponent),
-				model.explainMode);
-			if (_v1.a.$ === 'Just') {
-				return _List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$flatSunflower),
-						$mdgriffith$elm_ui$Element$Border$rounded(10),
-						$mdgriffith$elm_ui$Element$Border$width(1),
-						A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Constants$flatSunflower, 2.0),
-						A2($mdgriffith$elm_ui$Element$Border$innerGlow, $author$project$Constants$flatSunflower, 2.0),
-						$mdgriffith$elm_ui$Element$alpha(0.8),
-						$mdgriffith$elm_ui$Element$pointer
-					]);
-			} else {
-				if (!_v1.b) {
-					var _v2 = _v1.a;
-					return _List_Nil;
-				} else {
-					var _v3 = _v1.a;
-					return _List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$inFront(
-							$author$project$TrainingMode$explanatoryText(uiComponent))
-						]);
-				}
-			}
-		} else {
-			return _List_Nil;
-		}
 	});
 var $author$project$CalculatorDisplay$heightGrid = F2(
 	function (model, storedHeight) {
@@ -15654,7 +15584,7 @@ var $author$project$CalculatorDisplay$heightGrid = F2(
 					[
 						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcHeight)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcHeight)),
 			_List_fromArray(
 				[
 					A2(
@@ -15767,6 +15697,8 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
 var $author$project$Constants$paletteDarkGreen = A3($mdgriffith$elm_ui$Element$rgb255, 64, 93, 39);
+var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
+var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
 var $author$project$Utils$helpButton = A2(
 	$mdgriffith$elm_ui$Element$el,
 	_List_fromArray(
@@ -15926,7 +15858,7 @@ var $author$project$CalculatorDisplay$positionGridDisplay = F2(
 						$mdgriffith$elm_ui$Element$padding(10),
 						A2($mdgriffith$elm_ui$Element$spacingXY, 5, 5)
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcGrid)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcGrid)),
 			A3(
 				$elm$core$List$map2,
 				displayGridRow,
@@ -15968,7 +15900,7 @@ var $author$project$CalculatorDisplay$strengthDisplay = F2(
 							$author$project$Utils$edges,
 							{left: 10}))
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcStrength)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcStrength)),
 			A3(
 				$elm$core$List$map2,
 				makeIt,
@@ -16081,7 +16013,7 @@ var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 					_List_fromArray(
 						[$mdgriffith$elm_ui$Element$alignTop, $mdgriffith$elm_ui$Element$centerX]))
 				]),
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalculator)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalculator)),
 		_List_fromArray(
 			[
 				A2(
@@ -16129,7 +16061,7 @@ var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcOffset),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcOffset),
 				_List_fromArray(
 					[
 						$author$project$CalculatorDisplay$offsetDisplay(
@@ -16170,7 +16102,7 @@ var $author$project$CalculatorDisplay$calculatorPortrait = function (model) {
 					_List_fromArray(
 						[$mdgriffith$elm_ui$Element$alignTop, $mdgriffith$elm_ui$Element$centerX]))
 				]),
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalculator)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalculator)),
 		_List_fromArray(
 			[
 				A2(
@@ -16185,7 +16117,7 @@ var $author$project$CalculatorDisplay$calculatorPortrait = function (model) {
 				A2(
 				$mdgriffith$elm_ui$Element$column,
 				_Utils_ap(
-					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCalcOffset),
+					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcOffset),
 					_List_fromArray(
 						[$mdgriffith$elm_ui$Element$centerX])),
 				_List_fromArray(
@@ -17528,7 +17460,7 @@ var $author$project$OperatorPage$clickableGonioImage = F2(
 						$mdgriffith$elm_ui$Element$px(300)),
 						$mdgriffith$elm_ui$Element$pointer
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiGoniometer)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiGoniometer)),
 			$mdgriffith$elm_ui$Element$html(
 				$author$project$Goniometer$drawGoniometer(theta)));
 	});
@@ -17613,7 +17545,7 @@ var $author$project$OperatorPage$clickableRangeKnob = F2(
 						$mdgriffith$elm_ui$Element$px(200)),
 						$mdgriffith$elm_ui$Element$pointer
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRangeKnob)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRangeKnob)),
 			$mdgriffith$elm_ui$Element$html(
 				$author$project$Range$drawRangeKnob(model.rangeKnobAngle)));
 	});
@@ -17809,14 +17741,14 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 		$mdgriffith$elm_ui$Element$column,
 		_Utils_ap(
 			$author$project$Utils$commonStyles,
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiSwitchPanel)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiSwitchPanel)),
 		_List_fromArray(
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$row,
 				_Utils_ap(
 					$author$project$Utils$commonStyles,
-					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiClear)),
+					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiClear)),
 				_List_fromArray(
 					[
 						A2($author$project$PushButtons$actionButtonLabelAbove, 'CLEAR', $author$project$Messages$ResetInputState)
@@ -17831,7 +17763,7 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 							{left: 1, right: 1, top: 1})),
 					_Utils_ap(
 						$author$project$Utils$commonStyles,
-						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiAB))),
+						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiAB))),
 				_List_fromArray(
 					[
 						A2(
@@ -17917,7 +17849,7 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 									$mdgriffith$elm_ui$Element$width(
 									$mdgriffith$elm_ui$Element$fillPortion(1))
 								]),
-							A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiSense)),
+							A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiSense)),
 						A3(
 							$author$project$PushButtons$actionButtonLabelAboveWithIndicator,
 							'SENSE',
@@ -17932,7 +17864,7 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 									$mdgriffith$elm_ui$Element$width(
 									$mdgriffith$elm_ui$Element$fillPortion(1))
 								]),
-							A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiHeight)),
+							A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiHeight)),
 						A2(
 							$author$project$PushButtons$actionButtonLabelAbove,
 							'HEIGHT',
@@ -17943,7 +17875,7 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 				$mdgriffith$elm_ui$Element$row,
 				_Utils_ap(
 					$author$project$Utils$commonStyles,
-					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPrompts)),
+					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiOperatorPrompts)),
 				_List_fromArray(
 					[
 						A2(
@@ -18092,7 +18024,7 @@ var $author$project$OperatorPage$raidStrengthPanel = function (model) {
 						{left: 20, right: 20})),
 				_Utils_ap(
 					$author$project$Utils$commonStyles,
-					A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRaidStrength)))),
+					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRaidStrength)))),
 		_List_fromArray(
 			[
 				A2(
@@ -18590,7 +18522,7 @@ var $author$project$OperatorPage$rangeScale = function (model) {
 							$mdgriffith$elm_ui$Element$Font$sansSerif
 						]))
 				]),
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiRangeScale)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRangeScale)),
 		A2(
 			$elm$core$List$map,
 			function (i) {
@@ -19133,7 +19065,7 @@ var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 					[
 						$mdgriffith$elm_ui$Element$padding(5)
 					]),
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiCRT)),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCRT)),
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$none,
@@ -19198,7 +19130,7 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 							$mdgriffith$elm_ui$Element$centerY
 						]))
 				]),
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPage)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiOperatorPage)),
 		_List_fromArray(
 			[
 				A2(
@@ -19226,18 +19158,18 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 							])),
 						A2(
 						$mdgriffith$elm_ui$Element$row,
-						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiBothKnobs),
+						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiBothKnobs),
 						_List_fromArray(
 							[
 								A2($author$project$OperatorPage$clickableGonioImage, model, $author$project$Types$UiRangeKnob),
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiGonioButton),
+								A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiGonioButton),
 								A2($author$project$PushButtons$actionButtonLabelAbove, 'GONIO', $author$project$Messages$StoreGoniometerSetting)),
 								A2($author$project$OperatorPage$clickableRangeKnob, model, $author$project$Types$UiGoniometer),
 								A2(
 								$mdgriffith$elm_ui$Element$el,
-								A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UIRangeButton),
+								A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UIRangeButton),
 								A2($author$project$PushButtons$actionButtonLabelAbove, 'RANGE', $author$project$Messages$StoreRangeSetting))
 							]))
 					])),
@@ -19277,7 +19209,7 @@ var $author$project$OperatorPage$operatorPagePortrait = function (model) {
 							$mdgriffith$elm_ui$Element$centerY
 						]))
 				]),
-			A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiOperatorPage)),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiOperatorPage)),
 		_List_fromArray(
 			[
 				A2(
@@ -19295,18 +19227,18 @@ var $author$project$OperatorPage$operatorPagePortrait = function (model) {
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiBothKnobs),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiBothKnobs),
 				_List_fromArray(
 					[
 						A2($author$project$OperatorPage$clickableGonioImage, model, $author$project$Types$UiRangeKnob),
 						A2(
 						$mdgriffith$elm_ui$Element$el,
-						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UiGonioButton),
+						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiGonioButton),
 						A2($author$project$PushButtons$actionButtonLabelAbove, 'GONIO', $author$project$Messages$StoreGoniometerSetting)),
 						A2($author$project$OperatorPage$clickableRangeKnob, model, $author$project$Types$UiGoniometer),
 						A2(
 						$mdgriffith$elm_ui$Element$el,
-						A2($author$project$TrainingMode$tutorialHighlighting, model, $author$project$Types$UIRangeButton),
+						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UIRangeButton),
 						A2($author$project$PushButtons$actionButtonLabelAbove, 'RANGE', $author$project$Messages$StoreRangeSetting)),
 						A2(
 						$mdgriffith$elm_ui$Element$el,

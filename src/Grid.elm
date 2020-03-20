@@ -108,7 +108,7 @@ tutorialInterpretCalculator model =
         ++ ", height "
         ++ (case model.storedElevation of
                 Just h ->
-                    String.fromFloat h
+                    (String.fromInt <| truncate h)
                         ++ ",000 ft"
 
                 Nothing ->

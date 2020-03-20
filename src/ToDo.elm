@@ -32,8 +32,9 @@
 --TODO: 3-6 scenario
 --TODO: IFF scenario
 --TODO: Operate mode to only use learnt raid types.
---TODO: Drop any targets moved beyond 100 miles range.
+--DONE: Drop any targets moved beyond 100 miles range.
 --TODO: Test on Android tablet !!
+--TODO: Installable on iOS. -- Probbly means getting to grips with Cordova/PhoneGap.
 --NOPE: Raspberry Pi with touch screen ??
 --NOPE: Physical knobs -- UI app gets gonio setting from server app.
 --NOPE: Improve that by using WebSockets -> JS -> Subscription -> Msg.

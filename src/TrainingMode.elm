@@ -1,7 +1,7 @@
-module TrainingMode exposing (advanceTutorial, clearCalculator, exitTutorial, explanatoryText, goBackInTutorial, tutorialAutomation, tutorialStartScenario, tutorialTextBox)
+module TrainingMode exposing (..)
 
-import Config exposing (targetConfigurations, trainingMode)
-import Constants exposing (blue, flatSunflower, white)
+import Config exposing (targetConfigurations, trainingMode, trainingMode2)
+import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -71,11 +71,67 @@ tutorialTBD =
     ]
 
 
-tutorialBasic : List TutorialEntry
+uiExplanations : List ( UiComponent, String )
+uiExplanations =
+    [ ( UiCRT, """The operators screen, or CRT""" )
+    , ( UiGoniometer, """Goniometer""" )
+    , ( UiRangeKnob, """Range knob""" )
+    , ( UiRangeScale, """Range scale (miles) and range indicator""" )
+    , ( UiSwitchPanel, """Mode switches""" )
+    , ( UiRaidStrength, """Raid strength entry buttons""" )
+    , ( UiCalcStrength, """Estimate of number of planes in raid""" )
+    , ( UiCalcGrid, """The 100km map grid square containing the raid""" )
+    , ( UiCalcHeight, """The approximate height of the raid""" )
+    , ( UiCalcOffset, """The approximate position within the grid square""" )
+    ]
+
+
+type alias TutorialAction =
+    Model -> Model
+
+
+type alias TutorialActionList =
+    List TutorialAction
+
+
+noEntryActions : TutorialActionList
+noEntryActions =
+    []
+
+
+noExitActions : TutorialActionList
+noExitActions =
+    []
+
+
+noStateActions : TutorialActionList
+noStateActions =
+    []
+
+
+tutorialFromId id =
+    case id of
+        ScenarioBasic ->
+            tutorialBasic
+
+        ScenarioTwoTogether ->
+            tutorial2SameBearing
+
+        ScenarioTwoSeparate ->
+            tutorialTBD
+
+        ScenarioThreeOrMore ->
+            tutorialTBD
+
+        ScenarioFriendly ->
+            tutorialTBD
+
+
+tutorialBasic : Tutorial
 tutorialBasic =
     [ TutorialEntry
         TutorialWelcome
-        UiCRT
+        UiGoniometer
         [ tutorialBearingMode, clearCalculator ]
         [ tutorialGoniometerSwinging ]
         noExitActions
@@ -216,60 +272,150 @@ tutorialBasic =
     ]
 
 
-uiExplanations : List ( UiComponent, String )
-uiExplanations =
-    [ ( UiCRT, """The operators screen, or CRT""" )
-    , ( UiGoniometer, """Goniometer""" )
-    , ( UiRangeKnob, """Range knob""" )
-    , ( UiRangeScale, """Range scale (miles) and range indicator""" )
-    , ( UiSwitchPanel, """Mode switches""" )
-    , ( UiRaidStrength, """Raid strength entry buttons""" )
-    , ( UiCalcStrength, """Estimate of number of planes in raid""" )
-    , ( UiCalcGrid, """The 100km map grid square containing the raid""" )
-    , ( UiCalcHeight, """The approximate height of the raid""" )
-    , ( UiCalcOffset, """The approximate position within the grid square""" )
+tutorial2SameBearing : Tutorial
+tutorial2SameBearing =
+    [ TutorialEntry
+        TutorialWelcome
+        UiGoniometer
+        [ tutorialBearingMode, clearCalculator ]
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """The operator is turning the gonio, looking for any sign of a signal.
+        Click ► to begin.
+        """
+        )
+    , TutorialEntry
+        TutorialIncomingRaid
+        UiCRT
+        [ setupTutorialRaid2SameBearing ]
+        noStateActions
+        noExitActions
+        (static
+            """The white V shape under the 90 on the 'tube' is a new raid.
+        Note how it moves up and down. This is always two aircraft.
+        Let's find their bearing and height.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRange
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """The operator turns the range knob until the pointer
+        lines up with the left edge of the raid on the CRT.
+        """
+        )
+    , TutorialEntry
+        TutorialFindBearing
+        UiGoniometer
+        noEntryActions
+        [ swingThatGoniometer True ]
+        [ swingThatGoniometer False ]
+        (static
+            """The operator 'swings' the gonio until the V on the CRT vanishes.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreBearing
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreBearing ]
+        (static
+            """Pressing the GONIO button stores the bearing in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange1
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialHeightMode
+        UiHeight
+        [ tutorialHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """The operator will now try to work out the height.
+        """
+        )
+    , TutorialEntry
+        TutorialFindElevation
+        UiGoniometer
+        noEntryActions
+        [ tutorialSeekElevation True ]
+        [ tutorialSeekElevation False ]
+        (static
+            """The operator swings the gonio again, to minimise the V.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreElevation
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreElevation ]
+        (static
+            """The GONIO setting is stored, this gives the elevation.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRangeForHeight
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """Adjust the range pointer because the raid has moved.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange2
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreStrength
+        UiRaidStrength
+        [ tutorialStoreStrength 2 ]
+        noStateActions
+        noExitActions
+        (static
+            """Finally, the operator presses Raid Strength 2, because this bouncing signal is two aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialShowCalculator
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        [ tutorialShowOperator ]
+        tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialEnded
+        UiDummy
+        noEntryActions
+        noStateActions
+        [ stopTutorialRaid ]
+        --, clearCalculator ]
+        (static """Choose more training or click on Operate.
+        """)
+    , tutorialCloseStep
     ]
-
-
-type alias TutorialAction =
-    Model -> Model
-
-
-type alias TutorialActionList =
-    List TutorialAction
-
-
-noEntryActions : TutorialActionList
-noEntryActions =
-    []
-
-
-noExitActions : TutorialActionList
-noExitActions =
-    []
-
-
-noStateActions : TutorialActionList
-noStateActions =
-    []
-
-
-tutorialFromId id =
-    case id of
-        ScenarioBasic ->
-            tutorialBasic
-
-        ScenarioTwoTogether ->
-            tutorialTBD
-
-        ScenarioTwoSeparate ->
-            tutorialTBD
-
-        ScenarioThreeOrMore ->
-            tutorialTBD
-
-        ScenarioFriendly ->
-            tutorialTBD
 
 
 tutorialStartScenario id model =
@@ -475,6 +621,11 @@ tutorialAutomation model =
 setupTutorialRaid : TutorialAction
 setupTutorialRaid model =
     { model | targets = trainingMode }
+
+
+setupTutorialRaid2SameBearing : TutorialAction
+setupTutorialRaid2SameBearing model =
+    { model | targets = trainingMode2 }
 
 
 stopTutorialRaid model =
@@ -688,34 +839,64 @@ findStep currentTutorial tutorialStep =
 
 explanatoryText : Model -> UiComponent -> List (Attribute Msg)
 explanatoryText model uiComponent =
+    -- Show the text for components in explain mode.
+    -- Highlight the control when this control pertains to current state of active tutorial.
     let
         uiComponentDescription =
             lookupUiExplanation uiComponent
-    in
-    [ inFront <|
-        case ( model.explainMode, uiComponentDescription ) of
-            ( True, Just txt ) ->
-                el
-                    [ centerX
-                    , centerY
-                    , Background.color blue
-                    , Border.color white
-                    , Border.width 1
-                    , Border.rounded 5
-                    ]
-                <|
-                    paragraph
-                        [ spacing 1
-                        , Font.size 16
-                        , Font.family [ Font.typeface "Helvetica" ]
-                        , Font.color white
-                        , padding 5
-                        ]
-                        [ text txt ]
 
-            _ ->
-                none
-    ]
+        isTutorialSubject =
+            case model.tutorialScenario of
+                Just scenarioId ->
+                    let
+                        tutorialStep =
+                            findMatchingStep scenarioId model.tutorialStage uiComponent
+                    in
+                    case tutorialStep of
+                        Just _ ->
+                            True
+
+                        _ ->
+                            False
+
+                _ ->
+                    False
+    in
+    if isTutorialSubject then
+        [ Border.color paletteSand
+        , Border.width 2
+        , Border.glow paletteSand 2.0
+        , Border.innerGlow paletteSand 2.0
+        , Border.rounded 5
+        ]
+
+    else
+        []
+            ++ (case ( model.explainMode, uiComponentDescription ) of
+                    ( True, Just txt ) ->
+                        [ inFront <|
+                            el
+                                [ centerX
+                                , centerY
+                                , Background.color blue
+                                , Border.color white
+                                , Border.width 1
+                                , Border.rounded 5
+                                ]
+                            <|
+                                paragraph
+                                    [ spacing 1
+                                    , Font.size 16
+                                    , Font.family [ Font.typeface "Helvetica" ]
+                                    , Font.color white
+                                    , padding 5
+                                    ]
+                                    [ text txt ]
+                        ]
+
+                    _ ->
+                        []
+               )
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg
