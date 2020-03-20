@@ -87,6 +87,7 @@ type TutorialStep
     | TutorialAdjustRange
     | TutorialFindBearing
     | TutorialFindBearingPlaneA
+    | TutorialFindBearingPlaneB
     | TutorialStoreBearing
     | TutorialStoreRange1 -- relates to bearing
     | TutorialHeightMode

@@ -166,8 +166,8 @@ tutorialBasic =
         TutorialFindBearing
         UiGoniometer
         noEntryActions
-        [ swingThatGoniometer True ]
-        [ swingThatGoniometer False ]
+        [ findBearingOfNumberedTarget True 0 ]
+        [ findBearingOfNumberedTarget False 0 ]
         (static
             """The operator 'swings' the gonio until the V on the CRT vanishes.
         """
@@ -312,8 +312,8 @@ tutorial2SameBearing =
         TutorialFindBearing
         UiGoniometer
         noEntryActions
-        [ swingThatGoniometer True ]
-        [ swingThatGoniometer False ]
+        [ findBearingOfNumberedTarget True 0 ]
+        [ findBearingOfNumberedTarget False 0 ]
         (static
             """The operator 'swings' the gonio until the V on the CRT vanishes.
         """
@@ -417,6 +417,7 @@ tutorial2SameBearing =
     , tutorialCloseStep
     ]
 
+
 tutorial2DifferentBearings : Tutorial
 tutorial2DifferentBearings =
     [ TutorialEntry
@@ -468,10 +469,10 @@ tutorial2DifferentBearings =
         TutorialFindBearingPlaneA
         UiGoniometer
         noEntryActions
-        [ tutorialGoniometerSwinging ]
-        noExitActions
+        [ findBearingOfNumberedTarget True 0 ]
+        [ findBearingOfNumberedTarget False 0 ]
         (static
-            """We can find the bearing where the V stopes going up and down.
+            """We can find the bearing where the V stops going up and down.
             This means we have located one of the aircraft.
         """
         )
@@ -500,13 +501,12 @@ tutorial2DifferentBearings =
         UiHeight
         [ tutorialHeightMode ]
         noStateActions
-        noExitActions
+        [ tutorialBearingMode ]
         (static
             """There's no point trying to find the height because we won't know
             which aircraft it is. The gonio can only do bearing or height, not both.
         """
         )
-
     , TutorialEntry
         TutorialStoreStrength
         UiRaidStrength
@@ -524,6 +524,18 @@ tutorial2DifferentBearings =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialFindBearingPlaneB
+        UiGoniometer
+        noEntryActions
+        [ findBearingOfNumberedTarget True 1 ]
+        [ findBearingOfNumberedTarget False 1 ]
+        (static
+            """Then we find another bearing where the movement stops.
+            This means we have located the other the aircraft.
+            The rest of the steps are the same.
+        """
+        )
     , TutorialEntry
         TutorialEnded
         UiDummy
@@ -746,6 +758,7 @@ setupTutorialRaid2SameBearing : TutorialAction
 setupTutorialRaid2SameBearing model =
     { model | targets = trainingMode2 }
 
+
 setupTutorialRaid2DifferentBearings : TutorialAction
 setupTutorialRaid2DifferentBearings model =
     { model | targets = trainingMode3 }
@@ -868,14 +881,16 @@ chaseTheRaidRange active model =
     }
 
 
-swingThatGoniometer : Bool -> Model -> Model
-swingThatGoniometer active model =
+findBearingOfNumberedTarget : Bool -> Int -> Model -> Model
+findBearingOfNumberedTarget active index model =
     -- Use simulated key presses to mimic the operator tracking the raid
+    -- Note index is zero based.
     let
         targetBearing =
             Maybe.withDefault 0.0 <|
                 List.head <|
-                    List.map .theta model.polarTargets
+                    List.drop index <|
+                        List.map .theta model.polarTargets
 
         currentKeys =
             model.keys
