@@ -4,6 +4,7 @@ import Config exposing (TargetSelector)
 import Echo exposing (Echo)
 import Element exposing (Device)
 import Keys exposing (Keys)
+import Set exposing (Set)
 import Station exposing (Station)
 import Target exposing (PolarTarget, Target)
 import Types exposing (..)
@@ -50,4 +51,5 @@ type alias Model =
     , tutorialScenario : Maybe TutorialScenario
     , tutorialStage : Maybe TutorialStep
     , explainMode : Bool
+    , tutorialsCompleted : List TutorialScenario -- would like to use Set but can't. Because Elm.
     }

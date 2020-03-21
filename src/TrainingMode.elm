@@ -11,6 +11,7 @@ import Grid exposing (tutorialInterpretCalculator)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
+import Set
 import Target exposing (findTargetElevation)
 import Types exposing (..)
 
@@ -37,15 +38,15 @@ type alias Tutorial =
     List TutorialEntry
 
 
-tutorialCloseStep : TutorialEntry
-tutorialCloseStep =
+tutorialCloseStep : TutorialScenario -> TutorialEntry
+tutorialCloseStep secnario =
     -- Intended to be final step in any tutorial.
     TutorialEntry
         TutorialDummy
         UiDummy
         [ tutorialExitAction ]
         noStateActions
-        [ clearCalculator ]
+        [ clearCalculator, recordScenarioDone scenario ]
         (static "No text.")
 
 
@@ -268,7 +269,7 @@ tutorialBasic =
         --, clearCalculator ]
         (static """Choose more training or click on Operate.
         """)
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioBasic
     ]
 
 
@@ -414,7 +415,7 @@ tutorial2SameBearing =
         --, clearCalculator ]
         (static """Choose more training or click on Operate.
         """)
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioTwoTogether
     ]
 
 
@@ -552,7 +553,7 @@ tutorial2DifferentBearings =
         --, clearCalculator ]
         (static """Choose more training or click on Operate.
         """)
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioTwoSeparate
     ]
 
 
@@ -697,8 +698,9 @@ tutorial3to6 =
         [ stopTutorialRaid ]
         (static """Choose more training or click on Operate.
         """)
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioThreeToSix
     ]
+
 
 tutorialIFF : Tutorial
 tutorialIFF =
@@ -842,7 +844,7 @@ tutorialIFF =
         [ stopTutorialRaid ]
         (static """Choose more training or click on Operate.
         """)
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioFriendly
     ]
 
 
@@ -1067,6 +1069,7 @@ setupTutorialRaid3to6 : TutorialAction
 setupTutorialRaid3to6 model =
     { model | targets = trainingMode3to6 }
 
+
 setupTutorialRaidFriendlyOutbound : TutorialAction
 setupTutorialRaidFriendlyOutbound model =
     { model | targets = trainingModeFriendlyOutbound }
@@ -1086,6 +1089,13 @@ clearCalculator model =
         , storedFriendly = Nothing
         , storedStrengthPlus = Nothing
     }
+
+
+recordScenarioDone : TutorialScenario -> Model -> Model
+recordScenarioDone scenario model =
+    -- Needs to be Set but defined classes not Comparable.
+    -- Minor problem, in the scheme of things.
+    { model | tutorialsCompleted = scenario :: model.tutorialsCompleted }
 
 
 tutorialStoreBearing : TutorialAction
@@ -1113,6 +1123,7 @@ tutorialStoreStrength strength model =
 tutorialStorePlus : TutorialAction
 tutorialStorePlus model =
     { model | storedStrengthPlus = Just True }
+
 
 tutorialStoreFriendly : TutorialAction
 tutorialStoreFriendly model =

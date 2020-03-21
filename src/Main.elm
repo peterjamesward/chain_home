@@ -80,6 +80,7 @@ init _ =
       , tutorialStage = Nothing
       , tutorialScenario = Nothing
       , explainMode = False
+      , tutorialsCompleted = []
       }
     , Task.perform SetStartTime Time.now
     )

@@ -28,10 +28,11 @@
 --DONE: Possibly, explain button in calc display not working. -- BECAUSE lookup now expects a tutorial!
 --DONE: Learning menu of raid types (one, two, 3-6, IFF).
 --DONE: Two planes same bearing scenario
---TODO: Two planes different bearings
---TODO: 3-6 scenario
---TODO: IFF scenario
---TODO: Operate mode to only use learnt raid types.
+--DONE: Two planes different bearings
+--DONE: 3-6 scenario
+--DONE: IFF scenario
+--TODO: Operate mode to generate a sequence of incoming raids from various bearings & heights.
+--TODO: Operate mode to (default to) only use learnt raid types.
 --DONE: Drop any targets moved beyond 100 miles range.
 --TODO: Test on Android tablet !!
 --TODO: Installable on iOS. -- Probbly means getting to grips with Cordova/PhoneGap.
