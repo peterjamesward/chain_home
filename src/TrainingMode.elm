@@ -1,6 +1,6 @@
 module TrainingMode exposing (..)
 
-import Config exposing ( trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
+import Config exposing (trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
 import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
@@ -11,7 +11,6 @@ import Grid exposing (tutorialInterpretCalculator)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
-import Set
 import Target exposing (findTargetElevation)
 import Types exposing (..)
 
@@ -44,9 +43,12 @@ tutorialCloseStep scenario =
     TutorialEntry
         TutorialDummy
         UiDummy
-        [ tutorialExitAction ]
+        [ tutorialExitAction
+        , clearCalculator
+        , recordScenarioDone scenario
+        ]
         noStateActions
-        [ clearCalculator, recordScenarioDone scenario ]
+        noExitActions
         (static "No text.")
 
 
@@ -54,22 +56,6 @@ static : String -> (Model -> String)
 static s =
     -- As we now allow derived tutorial strings, we need a way to declare a fixed string.
     \_ -> s
-
-
-tutorialTBD : List TutorialEntry
-tutorialTBD =
-    [ TutorialEntry
-        TutorialWelcome
-        UiDummy
-        noEntryActions
-        noStateActions
-        noExitActions
-        (static
-            """Ask Pete to write this tutorial.
-        """
-        )
-    , tutorialCloseStep ScenarioBasic
-    ]
 
 
 uiExplanations : List ( UiComponent, String )
@@ -895,15 +881,15 @@ findNextStep currentTutorial currentStep =
                 [] ->
                     Nothing
 
+                step1 :: [] ->
+                    Nothing
+
                 step1 :: step2 :: more ->
                     if Just step1.tutorialStep == currentStep then
                         Just step2.tutorialStep
 
                     else
                         findNextStepHelper (step2 :: more)
-
-                _ :: more ->
-                    findNextStepHelper more
     in
     case currentTutorial of
         Just t ->
@@ -941,6 +927,8 @@ findPrevStep currentutorial currentStep =
 
 advanceTutorial : Model -> Model
 advanceTutorial current =
+    -- This used only when user is clicking on the advance button,
+    -- should not be used when exiting in any other way.
     let
         nextStepId t =
             findNextStep t current.tutorialStage
@@ -1095,7 +1083,14 @@ recordScenarioDone : TutorialScenario -> Model -> Model
 recordScenarioDone scenario model =
     -- Needs to be Set but defined classes not Comparable.
     -- Minor problem, in the scheme of things.
-    { model | tutorialsCompleted = scenario :: model.tutorialsCompleted }
+    { model
+        | tutorialsCompleted =
+            if List.member scenario model.tutorialsCompleted then
+                model.tutorialsCompleted
+
+            else
+                scenario :: model.tutorialsCompleted
+    }
 
 
 tutorialStoreBearing : TutorialAction

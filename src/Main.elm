@@ -588,9 +588,19 @@ setConfig selector newState =
     SetConfigStateMsg selector.id newState
 
 
-targetSelector : List TargetSelector -> Element Msg
-targetSelector active =
+targetSelector : List TargetSelector -> List TutorialScenario -> Element Msg
+targetSelector availableRaidTypes tutorialsDone =
     let
+        tutorialScenarioDone scenario =
+            List.member scenario tutorialsDone
+
+        learnButtonTextColour scenario =
+            if tutorialScenarioDone scenario then
+                lightCharcoal
+
+            else
+                paletteLightGreen
+
         display : TargetSelector -> Element Msg
         display g =
             row [ width fill, spacing 10 ]
@@ -602,7 +612,7 @@ targetSelector active =
                     , padding 10
                     ]
                     { onChange = setConfig g
-                    , checked = g.active
+                    , checked = tutorialScenarioDone g.id
                     , label =
                         Input.labelRight
                             [ htmlAttribute <| style "-webkit-user-select" "none"
@@ -613,12 +623,12 @@ targetSelector active =
                     }
                 , Input.button
                     [ Background.color paletteDarkGreen
-                    , Border.color paletteLightGreen
+                    , Border.color (learnButtonTextColour g.id)
                     , Border.width 2
                     , Border.rounded 5
                     , padding 5
                     , alignRight
-                    , Font.color vividGreen
+                    , Font.color (learnButtonTextColour g.id)
                     ]
                     { onPress = Just <| DisplayTraining g.id
                     , label = text "Learn"
@@ -631,7 +641,7 @@ targetSelector active =
         , Font.color lightCharcoal
         ]
     <|
-        List.map display active
+        List.map display availableRaidTypes
 
 
 calculatorPage : Model -> Element Msg
@@ -646,7 +656,7 @@ inputPage model =
         [ E.width fill
         , Font.color lightCharcoal
         ]
-        [ targetSelector model.activeConfigurations
+        [ targetSelector model.activeConfigurations model.tutorialsCompleted
         , column [ centerX, spacingXY 0 20 ]
             [ Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
