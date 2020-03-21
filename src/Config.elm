@@ -163,52 +163,52 @@ severalAligned n =
         List.range 1 n
 
 
-
--- Some useful configurations for training.
-
-
-outboundFriendly =
-    TargetSelector 1 "One outbound friendly fighter" [ fighter1 ] False
-
-
-tutorialBomber =
-    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] False
-
-
-loneBomber =
-    TargetSelector 2 "One incoming" [ bomber1 ] False
-
-
-twoCloseTargets =
-    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] False
-
-
-twoDistantTargets =
-    TargetSelector 4 "Two targets, same range, different bearings" [ bomber3, bomber4 ] False
-
-
-tenWide =
-    TargetSelector 5 "Ten targets, line abreast" (severalAbreast 10) False
-
-
-tenDeep =
-    TargetSelector 6 "Ten targets, line astern" (severalAligned 10) False
-
-
-behindYou =
-    TargetSelector 9 "One behind station (use Sense)" [ behindStation ] False
-
-
-targetConfigurations =
-    [ outboundFriendly
-    , loneBomber
-    , twoCloseTargets
-    , twoDistantTargets
-    , tenWide
-    , tenDeep
-    , behindYou
-    ]
-
+--
+---- Some useful configurations for training.
+--
+--
+--outboundFriendly =
+--    TargetSelector 1 "One outbound friendly fighter" [ fighter1 ] False
+--
+--
+--tutorialBomber =
+--    TargetSelector 2 "One incoming" [ { bomber1 | tutorial = True } ] False
+--
+--
+--loneBomber =
+--    TargetSelector 2 "One incoming" [ bomber1 ] False
+--
+--
+--twoCloseTargets =
+--    TargetSelector 3 "Two targets in close formation" [ bomber2, bomber2A ] False
+--
+--
+--twoDistantTargets =
+--    TargetSelector 4 "Two targets, same range, different bearings" [ bomber3, bomber4 ] False
+--
+--
+--tenWide =
+--    TargetSelector 5 "Ten targets, line abreast" (severalAbreast 10) False
+--
+--
+--tenDeep =
+--    TargetSelector 6 "Ten targets, line astern" (severalAligned 10) False
+--
+--
+--behindYou =
+--    TargetSelector 9 "One behind station (use Sense)" [ behindStation ] False
+--
+--
+--targetConfigurations =
+--    [ outboundFriendly
+--    , loneBomber
+--    , twoCloseTargets
+--    , twoDistantTargets
+--    , tenWide
+--    , tenDeep
+--    , behindYou
+--    ]
+--
 
 trainingMode : List Target
 trainingMode =

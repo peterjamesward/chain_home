@@ -1,6 +1,6 @@
 module TrainingMode exposing (..)
 
-import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
+import Config exposing ( trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
 import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background

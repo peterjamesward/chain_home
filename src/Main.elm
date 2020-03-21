@@ -49,7 +49,7 @@ init _ =
       , elevation_A_trace = []
       , elevation_B_trace = []
       , station = bawdsey
-      , targets = getAllTargets targetConfigurations
+      , targets = []
       , movedTargets = []
       , polarTargets = []
       , echoes = []
@@ -58,7 +58,7 @@ init _ =
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
-      , activeConfigurations = targetConfigurations
+      , activeConfigurations = []
       , rangeSlider = 50.0
       , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
