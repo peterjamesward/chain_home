@@ -1,15 +1,23 @@
 module Config exposing (..)
 
 import Target exposing (Target)
+import Types exposing (TutorialScenario(..))
 
 
 type alias TargetSelector =
-    { id : Int
-    , description : String -- e.g. "mass raid"
-    , targets : List Target -- The planes to be active when this group selected
+    { id : TutorialScenario
     , active : Bool -- Whether this group is active (dynamic)
+    , description : String -- e.g. "mass raid"
     }
 
+availableTargetOptions : List TargetSelector
+availableTargetOptions =
+    [ TargetSelector ScenarioBasic False "One aircraft at a time"
+    , TargetSelector ScenarioTwoTogether False "Two aircraft in close formation"
+    , TargetSelector ScenarioTwoSeparate False "Two aircraft at the same range"
+    , TargetSelector ScenarioThreeToSix False "Three to six planes in close formation"
+    , TargetSelector ScenarioFriendly False "A solitary friendly aircraft"
+    ]
 
 groundRays =
     [ { sequence = 0
@@ -198,21 +206,3 @@ trainingMode3to6 =
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map placeInTutorialMode <| severalAligned 5
-
-
-updateConfig : List TargetSelector -> Int -> Bool -> List TargetSelector
-updateConfig activeConfigurations idx newState =
-    let
-        matchingIdx ts =
-            if ts.id == idx then
-                { ts | active = newState }
-
-            else
-                ts
-    in
-    List.map matchingIdx activeConfigurations
-
-
-getAllTargets : List TargetSelector -> List Target
-getAllTargets config =
-    List.concatMap .targets <| List.filter .active config

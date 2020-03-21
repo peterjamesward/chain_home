@@ -58,7 +58,7 @@ init _ =
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
-      , activeConfigurations = []
+      , activeConfigurations = availableTargetOptions
       , rangeSlider = 50.0
       , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
@@ -227,7 +227,7 @@ update msg model =
             ( { cleanModel
                 | startTime = model.modelTime
                 , webGLtime = 0.0
-                , targets = getAllTargets model.activeConfigurations
+                , targets = []
                 , currPage = OperatorPage
               }
             , Cmd.none
@@ -254,8 +254,7 @@ update msg model =
 
         SetConfigStateMsg index newState ->
             ( { model
-                | activeConfigurations =
-                    updateConfig model.activeConfigurations index newState
+                | activeConfigurations = []
               }
             , Cmd.none
             )
@@ -581,6 +580,7 @@ learningMenu =
 
 -- Show list of configurations with Checkboxes.
 -- This will now be on its own page with elm-ui.
+-- Entries will be pre-ticker if the relevant tutorial is done, but can be ticked (& un-ticked) manually.
 
 
 setConfig : TargetSelector -> Bool -> Msg
@@ -593,27 +593,40 @@ targetSelector active =
     let
         display : TargetSelector -> Element Msg
         display g =
-            Input.checkbox
-                [ E.height (px 40)
-                , Border.width 1
-                , Border.rounded 5
-                , Border.color lightCharcoal
-                , padding 10
+            row [ width fill, spacing 10 ]
+                [ Input.checkbox
+                    [ E.height (px 40)
+                    , Border.width 1
+                    , Border.rounded 5
+                    , Border.color lightCharcoal
+                    , padding 10
+                    ]
+                    { onChange = setConfig g
+                    , checked = g.active
+                    , label =
+                        Input.labelRight
+                            [ htmlAttribute <| style "-webkit-user-select" "none"
+                            ]
+                        <|
+                            E.text g.description
+                    , icon = Input.defaultCheckbox
+                    }
+                , Input.button
+                    [ Background.color paletteDarkGreen
+                    , Border.color paletteLightGreen
+                    , Border.width 2
+                    , Border.rounded 5
+                    , padding 5
+                    , alignRight
+                    , Font.color vividGreen
+                    ]
+                    { onPress = Just <| DisplayTraining g.id
+                    , label = text "Learn"
+                    }
                 ]
-                { onChange = setConfig g
-                , checked = g.active
-                , label =
-                    Input.labelRight
-                        [ htmlAttribute <| style "-webkit-user-select" "none"
-                        ]
-                    <|
-                        E.text g.description
-                , icon = Input.defaultCheckbox
-                }
     in
     column
-        [ E.width (px 550)
-        , spacingXY 0 10
+        [ spacingXY 0 10
         , paddingEach { edges | left = 100, top = 50 }
         , Font.color lightCharcoal
         ]

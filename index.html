@@ -8685,18 +8685,19 @@ var $author$project$TrainingMode$tutorial2SameBearing = _List_fromArray(
 		$author$project$TrainingMode$tutorialCloseStep($author$project$Types$ScenarioTwoTogether)
 	]);
 var $author$project$Types$ScenarioThreeToSix = {$: 'ScenarioThreeToSix'};
-var $author$project$Config$severalAbreast = function (n) {
+var $author$project$Config$severalAligned = function (n) {
 	return A2(
 		$elm$core$List$map,
 		function (i) {
 			return {
-				bearing: $elm$core$Basics$degrees(275),
-				height: 25,
+				bearing: $elm$core$Basics$degrees(265),
+				height: 25 + (A2($elm$core$Basics$modBy, 7, 100 * i) * 0.1),
 				iff: $elm$core$Maybe$Nothing,
 				iffActive: false,
-				latitude: ($author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
-				longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17),
-				speed: 200,
+				latitude: ($author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.2)) + $elm$core$Basics$degrees(
+					0.05 * $elm$core$Basics$cos(i)),
+				longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
+				speed: 250,
 				tutorial: false
 			};
 		},
@@ -8711,7 +8712,7 @@ var $author$project$Config$trainingMode3to6 = function () {
 	return A2(
 		$elm$core$List$map,
 		placeInTutorialMode,
-		$author$project$Config$severalAbreast(5));
+		$author$project$Config$severalAligned(5));
 }();
 var $author$project$TrainingMode$setupTutorialRaid3to6 = function (model) {
 	return _Utils_update(

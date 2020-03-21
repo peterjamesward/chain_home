@@ -10,7 +10,7 @@ type Msg
     | UpdateModel Time.Posix -- Time for model updates
     | SetStartTime Time.Posix
     | StartScenario
-    | SetConfigStateMsg Int Bool
+    | SetConfigStateMsg TutorialScenario Bool
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
