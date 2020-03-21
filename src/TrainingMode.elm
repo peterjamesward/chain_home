@@ -39,7 +39,7 @@ type alias Tutorial =
 
 
 tutorialCloseStep : TutorialScenario -> TutorialEntry
-tutorialCloseStep secnario =
+tutorialCloseStep scenario =
     -- Intended to be final step in any tutorial.
     TutorialEntry
         TutorialDummy
@@ -68,7 +68,7 @@ tutorialTBD =
             """Ask Pete to write this tutorial.
         """
         )
-    , tutorialCloseStep
+    , tutorialCloseStep ScenarioBasic
     ]
 
 
@@ -1404,5 +1404,5 @@ tutorialTextBox model adjustments =
                                     ]
                                     [ text (step.tutorialText model) ]
                                 , el [ onClick TutorialAdvance, alignRight, pointer ] <|
-                                    text "►"
+                                    text "▶︎"
                                 ]

@@ -31,7 +31,8 @@
 --DONE: Two planes different bearings
 --DONE: 3-6 scenario
 --DONE: IFF scenario
---TODO: Operate mode to generate a sequence of incoming raids from various bearings & heights.
+--DONE: Info bar on calculator to be below the display not overlaid.
+--TODO: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
 --TODO: Operate mode to (default to) only use learnt raid types.
 --DONE: Drop any targets moved beyond 100 miles range.
 --TODO: Test on Android tablet !!

@@ -51,17 +51,11 @@ calculatorLandscape model =
             model.storedFriendly
     in
     column
-        ([ centerX
-         , tutorialTextBox model
-            [ alignTop
-            , centerX
-            ]
-         ]
-            ++ explanatoryText model UiCalculator
-        )
-        [ row [ spacing 10, padding 5 ]
+        [ centerX
+        ]
+        [ row [ spacing 10, padding 5  ]
             [ positionGridDisplay model position
-            , column [ spacing 10 ]
+            , column [ spacing 10, alignLeft ]
                 [ row [ paddingEach { edges | left = 10, bottom = 10 }, spacing 10 ]
                     [ strengthDisplay model strength
                     , maybeBoolDisplay "+" plus
@@ -79,6 +73,7 @@ calculatorLandscape model =
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
+        , row [ tutorialTextBox model [  ] ] []
         ]
 
 
