@@ -251,8 +251,7 @@ operatorPageLandscape model =
                     []
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
-            , row
-                (explanatoryText model UiBothKnobs)
+            , row []
                 [ clickableGonioImage model UiRangeKnob
                 , el (explanatoryText model UiGonioButton) <|
                     actionButtonLabelAbove "GONIO" StoreGoniometerSetting
@@ -294,7 +293,7 @@ operatorPagePortrait model =
             , clickableRangeKnob model UiGoniometer
             , el (explanatoryText model UIRangeButton) <|
                 actionButtonLabelAbove "RANGE" StoreRangeSetting
-            , el [alignBottom] helpButton
+            , el [ alignBottom ] helpButton
             ]
         , row [ width <| fillPortion 2, centerX ]
             [ modeSwitchPanel model

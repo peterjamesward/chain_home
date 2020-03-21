@@ -70,6 +70,12 @@ uiExplanations =
     , ( UiCalcGrid, """The 100km map grid square containing the raid""" )
     , ( UiCalcHeight, """The approximate height of the raid""" )
     , ( UiCalcOffset, """The approximate position within the grid square""" )
+    , ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
+    As you complete each section, the box will be ticked and raids like
+    that will appear when you click "Go!".
+    You can click or unclick them anyway, if you like.""" )
+    , ( UiGoButton, """Test yourself with a series of incoming raids.
+                        This will only use the types of raid that are ticked.""" )
     ]
 
 

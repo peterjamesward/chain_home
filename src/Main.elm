@@ -655,15 +655,23 @@ inputPage model =
     row
         [ E.width fill
         , Font.color lightCharcoal
+        , padding 20
         ]
-        [ targetSelector model.activeConfigurations model.tutorialsCompleted
-        , column [ centerX, spacingXY 0 20 ]
+        [ el (explanatoryText model UiConfigOptions) <|
+            targetSelector model.activeConfigurations model.tutorialsCompleted
+        , column
+            ([ centerX
+             , spacingXY 0 20
+             ]
+                ++ explanatoryText model UiGoButton
+            )
             [ Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
                 { onPress = Just StartScenario
                 , label = el [ centerX ] <| text "Go!"
                 }
             ]
+        , helpButton
         ]
 
 

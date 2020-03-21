@@ -54,8 +54,6 @@ type UiComponent
     | UiCRT
     | UiGoniometer
     | UiRangeKnob
-    | UiLeftSide
-    | UiRightSide
     | UiBothKnobs
     | UiSwitchPanel
     | UiRaidStrength
@@ -71,6 +69,8 @@ type UiComponent
     | UiCalcHeight
     | UiCalcOffset
     | UiCalculator
+    | UiConfigOptions
+    | UiGoButton
     | UiDummy
 
 
