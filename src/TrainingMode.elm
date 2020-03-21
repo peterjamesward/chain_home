@@ -1,6 +1,6 @@
 module TrainingMode exposing (..)
 
-import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3, trainingMode3to6)
+import Config exposing (targetConfigurations, trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
 import Constants exposing (blue, flatSunflower, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
@@ -124,7 +124,7 @@ tutorialFromId id =
             tutorial3to6
 
         ScenarioFriendly ->
-            tutorialTBD
+            tutorialIFF
 
 
 tutorialBasic : Tutorial
@@ -700,6 +700,151 @@ tutorial3to6 =
     , tutorialCloseStep
     ]
 
+tutorialIFF : Tutorial
+tutorialIFF =
+    [ TutorialEntry
+        TutorialWelcome
+        UiGoniometer
+        [ tutorialBearingMode, clearCalculator ]
+        [ tutorialGoniometerSwinging ]
+        noExitActions
+        (static
+            """The operator is turning the gonio, looking for any sign of a signal.
+        Click ► to begin.
+        """
+        )
+    , TutorialEntry
+        TutorialIncomingRaid
+        UiCRT
+        [ setupTutorialRaidFriendlyOutbound ]
+        noStateActions
+        noExitActions
+        (static
+            """There's something closer than 10 miles, and is heading away from us.
+            Notice how the signal is bigger every 12 seconds.
+            This is the IFF (Information Friend or Foe) signal that identifies
+            a friendly aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRange
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """The operator turns the range knob until the pointer
+        lines up with the left edge of the raid on the CRT.
+        """
+        )
+    , TutorialEntry
+        TutorialFindBearing
+        UiGoniometer
+        noEntryActions
+        [ findBearingOfNumberedTarget True 0 ]
+        [ findBearingOfNumberedTarget False 0 ]
+        (static
+            """Find the bearing as usual.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreBearing
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreBearing ]
+        (static
+            """Pressing the GONIO button stores the bearing in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange1
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialHeightMode
+        UiHeight
+        [ tutorialHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """The operator will now try to work out the height.
+        """
+        )
+    , TutorialEntry
+        TutorialFindElevation
+        UiGoniometer
+        noEntryActions
+        [ tutorialSeekElevation True ]
+        [ tutorialSeekElevation False ]
+        (static
+            """The operator swings the gonio again, to minimise the V.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreElevation
+        UiGonioButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreElevation ]
+        (static
+            """The GONIO setting is stored, this gives the elevation.
+        """
+        )
+    , TutorialEntry
+        TutorialAdjustRangeForHeight
+        UiRangeKnob
+        noEntryActions
+        [ chaseTheRaidRange True ]
+        [ chaseTheRaidRange False ]
+        (static
+            """Adjust the range pointer because the raid has moved.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreRange2
+        UIRangeButton
+        noEntryActions
+        noStateActions
+        [ tutorialStoreRange1 ]
+        (static
+            """Pressing the RANGE button stores the range in the calculator.
+        """
+        )
+    , TutorialEntry
+        TutorialStoreStrength
+        UiRaidStrength
+        [ tutorialStoreStrength 1, tutorialStoreFriendly ]
+        noStateActions
+        noExitActions
+        (static
+            """The operator presses Raid Strength 1 and the F sign to show it's friendly.
+        """
+        )
+    , TutorialEntry
+        TutorialShowCalculator
+        UiCalculator
+        [ tutorialShowCalculator ]
+        noStateActions
+        [ tutorialShowOperator ]
+        tutorialInterpretCalculator
+    , TutorialEntry
+        TutorialEnded
+        UiDummy
+        noEntryActions
+        noStateActions
+        [ stopTutorialRaid ]
+        (static """Choose more training or click on Operate.
+        """)
+    , tutorialCloseStep
+    ]
+
 
 tutorialStartScenario id model =
     let
@@ -922,6 +1067,10 @@ setupTutorialRaid3to6 : TutorialAction
 setupTutorialRaid3to6 model =
     { model | targets = trainingMode3to6 }
 
+setupTutorialRaidFriendlyOutbound : TutorialAction
+setupTutorialRaidFriendlyOutbound model =
+    { model | targets = trainingModeFriendlyOutbound }
+
 
 stopTutorialRaid model =
     { model | targets = [] }
@@ -964,6 +1113,10 @@ tutorialStoreStrength strength model =
 tutorialStorePlus : TutorialAction
 tutorialStorePlus model =
     { model | storedStrengthPlus = Just True }
+
+tutorialStoreFriendly : TutorialAction
+tutorialStoreFriendly model =
+    { model | storedFriendly = Just True }
 
 
 tutorialStoreRange1 : TutorialAction

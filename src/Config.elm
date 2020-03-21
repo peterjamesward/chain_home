@@ -118,7 +118,7 @@ bomber4 =
 
 fighter1 =
     -- Starts behind and heads out pretty quick.
-    { longitude = bawdsey.longitude - degrees 0.01
+    { longitude = bawdsey.longitude + degrees 0.06
     , latitude = bawdsey.latitude + degrees 0.01
     , height = 10 -- ,000 ft
     , bearing = degrees 90
@@ -229,6 +229,11 @@ trainingMode3 =
     [ { bomber3 | tutorial = True }
     , { bomber4 | tutorial = True }
     ]
+
+
+trainingModeFriendlyOutbound : List Target
+trainingModeFriendlyOutbound =
+    [ { fighter1 | tutorial = True } ]
 
 
 trainingMode3to6 : List Target
