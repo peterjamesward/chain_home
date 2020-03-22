@@ -50,4 +50,5 @@ type alias Model =
     , tutorialStage : Maybe TutorialStep
     , explainMode : Bool
     , tutorialsCompleted : List TutorialScenario -- would like to use Set but can't. Because Elm.
+    , newRaid : Maybe Target
     }

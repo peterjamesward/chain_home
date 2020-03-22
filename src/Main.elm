@@ -82,6 +82,7 @@ init _ =
       , tutorialScenario = Nothing
       , explainMode = False
       , tutorialsCompleted = []
+      , newRaid = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -232,7 +233,7 @@ update msg model =
                 , currPage = OperatorPage
               }
             , Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -pi pi) (Random.float 0.0 3.0)
+                Random.pair (Random.float -1.0 1.0) (Random.float 0.0 0.1)
             )
 
         UpdateModel time ->
@@ -476,10 +477,17 @@ update msg model =
         --GenerateNewRandomRaid ->
         --    ( model
         --    , Random.generate RandomRaidGenerated <|
-        --        Random.pair (Random.float -pi pi) (Random.float 0.0 3.0)
+        --        Random.pair (Random.float -pi pi) (Random.float 0.0 0.3)
         --    )
         RandomRaidGenerated ( theta, alpha ) ->
-            ( model
+            ( let
+                raid =
+                    makeNewTarget model.station ( theta, alpha )
+              in
+              { model
+                | newRaid = Just raid
+                , targets = raid :: model.targets
+              }
             , Cmd.none
             )
 

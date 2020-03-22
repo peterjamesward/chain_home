@@ -259,6 +259,7 @@ operatorPageLandscape model =
                 , el (explanatoryText model UIRangeButton) <|
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
+            , debugShowNewRaid model
             ]
         , column [ width <| fillPortion 2, centerX ]
             [ helpButton
@@ -266,6 +267,19 @@ operatorPageLandscape model =
             , raidStrengthPanel model
             ]
         ]
+
+
+debugShowNewRaid model =
+    case model.newRaid of
+        Just raid ->
+            row [ spacing 10 ]
+                [ text <| String.fromFloat raid.latitude
+                , text <| String.fromFloat raid.longitude
+                , text <| String.fromFloat raid.height
+                ]
+
+        _ ->
+            none
 
 
 operatorPagePortrait model =
