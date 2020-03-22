@@ -1,8 +1,6 @@
 module ElevationCurves exposing (aElevationAdjustedEchoes, bElevationAdjustedEchoes, estimateEchoInElevationMode)
 
 import Echo exposing (Echo)
-import Target exposing (Target)
-
 
 type alias ElevationCurve =
     Float -> Float

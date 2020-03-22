@@ -1,7 +1,6 @@
 module Config exposing (..)
 
-import Target exposing (Target)
-import Types exposing (TutorialScenario(..))
+import Types exposing (Target, TutorialScenario(..))
 
 
 type alias TargetSelector =
@@ -206,3 +205,4 @@ trainingMode3to6 =
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map placeInTutorialMode <| severalAligned 5
+

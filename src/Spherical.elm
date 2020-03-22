@@ -1,4 +1,4 @@
-module Spherical exposing (range, bearing, newPosition, approximateElevation, meanRadius)
+module Spherical exposing (..)
 
 -- Need some coordinate mangling
 -- https://www.movable-type.co.uk/scripts/latlong.html
@@ -36,3 +36,23 @@ approximateElevation r h =
         b = r / (meanRadius + h)
     in
         a - b |> sqrt |> acos |> ((-) (pi/2))
+
+
+cartesianTargetPosition : (Float, Float) -> Float -> Float -> (Float, Float)
+cartesianTargetPosition (λ1, φ1) r θ =
+    --Find lat and long given range and bearing from a known point.
+    --Uses range in meters!
+    --where φ is latitude, λ is longitude,
+    --θ is the bearing (clockwise from north),
+    --δ is the angular distance d/R;
+    --d being the distance travelled, R the earth’s radius
+    let δ =
+            r / meanRadius
+        φ2 =
+            asin ( sin φ1 * cos δ + cos φ1 * sin δ * cos θ )
+        λ2 =
+            λ1 + atan2
+                    ((sin θ) * (sin δ) * (cos φ1))
+                    ((cos δ) - (sin φ1) * (sin φ2))
+    in
+        (λ2, φ2)

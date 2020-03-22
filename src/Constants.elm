@@ -12,6 +12,7 @@ pulseDuration = 20.0 -- microseconds
 pulseWidth = lightSpeed * pulseDuration / 10000000.0
 
 scaleWidthKilometers = 160
+kmToFeet = 3280
 
 rangeToXFactor = (scaleWidthKilometers * 1000.0)
 

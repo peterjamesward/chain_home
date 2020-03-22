@@ -3,28 +3,34 @@ module Target exposing (..)
 import Html exposing (..)
 import Spherical exposing (..)
 import Station exposing (Station)
-import Time
+import Types exposing (PolarTarget, Target)
 
 
-type alias Target =
-    { latitude : Float
-    , longitude : Float
-    , height : Float -- in thousands of feet
-    , bearing : Float -- in degrees from North
-    , speed : Float -- miles per hour (!)
-    , iff : Maybe Int -- the value at which t mod 12 triggers a return
-    , iffActive : Bool -- pulsing now.
-    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
-    }
+makeNewTarget : Station -> ( Float, Float ) -> Target
+makeNewTarget station ( theta, alpha ) =
+    -- Convert generated bearing and height to cartesian, as that's
+    -- the space in which we work out motion.
+    let
+        baseLong =
+            station.longitude
 
+        baseLat =
+            station.latitude
 
-type alias PolarTarget =
-    { r : Float -- metres
-    , theta : Float -- radians
-    , alpha : Float -- radians, ignoring curvature for now
-    , iff : Maybe Int -- pulsing; time when pulse started
-    , iffActive : Bool -- pulsing now.
-    , tutorial : Bool
+        height =
+            150 * asin alpha * 3280 / 1000
+
+        ( newLong, newLat ) =
+            cartesianTargetPosition ( baseLong, baseLat ) 150 theta
+    in
+    { latitude = newLat
+    , longitude = newLong
+    , height = height
+    , bearing = degrees 270
+    , speed = 210
+    , iff = Nothing
+    , iffActive = False
+    , tutorial = False
     }
 
 

@@ -2,9 +2,7 @@ module Echo exposing (Echo, deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, wavelength)
 import Html exposing (..)
-import Target exposing (PolarTarget)
-import Types exposing (Antenna)
-import Utils exposing (choose, noise, notNearlyEqual, triangleWave)
+import Types exposing (..)
 
 
 type alias Echo =

@@ -39,6 +39,28 @@ type alias Antenna =
     }
 
 
+type alias Target =
+    { latitude : Float
+    , longitude : Float
+    , height : Float -- in thousands of feet
+    , bearing : Float -- in degrees from North
+    , speed : Float -- miles per hour (!)
+    , iff : Maybe Int -- the value at which t mod 12 triggers a return
+    , iffActive : Bool -- pulsing now.
+    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
+    }
+
+
+type alias PolarTarget =
+    { r : Float -- metres
+    , theta : Float -- radians
+    , alpha : Float -- radians, ignoring curvature for now
+    , iff : Maybe Int -- pulsing; time when pulse started
+    , iffActive : Bool -- pulsing now.
+    , tutorial : Bool
+    }
+
+
 type
     InputState
     -- Inferred sequence of operator actions
@@ -81,6 +103,7 @@ type TutorialScenario
     | ScenarioThreeToSix
     | ScenarioFriendly
 
+
 type TutorialStep
     = TutorialWelcome
     | TutorialIncomingRaid
@@ -100,4 +123,3 @@ type TutorialStep
     | TutorialShowCalculator2
     | TutorialEnded -- last thing we show
     | TutorialDummy -- not shown, if it occurs.
-

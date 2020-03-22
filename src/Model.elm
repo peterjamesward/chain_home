@@ -4,9 +4,7 @@ import Config exposing (TargetSelector)
 import Echo exposing (Echo)
 import Element exposing (Device)
 import Keys exposing (Keys)
-import Set exposing (Set)
 import Station exposing (Station)
-import Target exposing (PolarTarget, Target)
 import Types exposing (..)
 
 

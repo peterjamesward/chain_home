@@ -37,3 +37,5 @@ type Msg
     | TutorialAdvance
     | ExplainModeToggle
     | TutorialBack
+    | GenerateNewRandomRaid
+    | RandomRaidGenerated (Float, Float)

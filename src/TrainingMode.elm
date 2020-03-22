@@ -60,7 +60,7 @@ static s =
 
 uiExplanations : List ( UiComponent, String )
 uiExplanations =
-    [ ( UiCRT, """The operators screen, or CRT""" )
+    [ ( UiCRT, """The operators "tube", or CRT""" )
     , ( UiGoniometer, """Goniometer""" )
     , ( UiRangeKnob, """Range knob""" )
     , ( UiRangeScale, """Range scale (miles) and range indicator""" )
@@ -73,7 +73,7 @@ uiExplanations =
     , ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
     As you complete each section, the box will be ticked and raids like
     that will appear when you click "Go!".
-    You can click or unclick them anyway, if you like.""" )
+    You can tick or untick them anyway, if you like.""" )
     , ( UiGoButton, """Test yourself with a series of incoming raids.
                         This will only use the types of raid that are ticked.""" )
     ]

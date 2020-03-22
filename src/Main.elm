@@ -28,6 +28,7 @@ import Messages exposing (..)
 import Model exposing (..)
 import OperatorPage exposing (operatorPage)
 import Platform.Cmd exposing (Cmd)
+import Random
 import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
 import Station exposing (..)
@@ -230,7 +231,8 @@ update msg model =
                 , targets = []
                 , currPage = OperatorPage
               }
-            , Cmd.none
+            , Random.generate RandomRaidGenerated <|
+                Random.pair (Random.float -pi pi) (Random.float 0.0 3.0)
             )
 
         UpdateModel time ->
@@ -468,6 +470,16 @@ update msg model =
 
         ResetInputState ->
             ( clearCalculator model
+            , Cmd.none
+            )
+
+        --GenerateNewRandomRaid ->
+        --    ( model
+        --    , Random.generate RandomRaidGenerated <|
+        --        Random.pair (Random.float -pi pi) (Random.float 0.0 3.0)
+        --    )
+        RandomRaidGenerated ( theta, alpha ) ->
+            ( model
             , Cmd.none
             )
 
