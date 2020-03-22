@@ -233,7 +233,7 @@ update msg model =
                 , currPage = OperatorPage
               }
             , Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -1.0 1.0) (Random.float 0.0 0.1)
+                Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
             )
 
         UpdateModel time ->
