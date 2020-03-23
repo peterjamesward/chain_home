@@ -83,6 +83,7 @@ init _ =
       , explainMode = False
       , tutorialsCompleted = []
       , newRaid = Nothing
+      , timeForNextRaid = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -213,6 +214,10 @@ update msg model =
     let
         cleanModel =
             exitTutorial model
+
+        requestRandomRaid =
+            Random.generate RandomRaidGenerated <|
+                Random.pair (Random.float -(degrees 1.0) (degrees 1.0)) (Random.float 5 30)
     in
     case msg of
         TimeDelta dt ->
@@ -227,16 +232,37 @@ update msg model =
 
         StartScenario ->
             ( { cleanModel
-                |
-                currPage = OperatorPage
+                | currPage = OperatorPage
+
+                -- Pseudo randomness will suffice at least for now.
+                , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
               }
-            , Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -(degrees 0.6) (degrees 0.6)) (Random.float 5 30)
+            , requestRandomRaid
             )
 
         UpdateModel time ->
+            let
+                raidIsDue =
+                    case model.timeForNextRaid of
+                        Nothing ->
+                            False
+
+                        Just due ->
+                            Time.posixToMillis time > due
+            in
             ( deriveModelAtTime model (Time.posixToMillis time)
-            , Cmd.none
+                |> (\m ->
+                        if raidIsDue then
+                            { m | timeForNextRaid = Nothing }
+
+                        else
+                            m
+                   )
+            , if raidIsDue then
+                requestRandomRaid
+
+              else
+                Cmd.none
             )
 
         ToggleLearnMenu ->
@@ -478,8 +504,9 @@ update msg model =
                     makeNewTarget model.station ( latitude, height )
               in
               { model
-                | newRaid = Just { raid | startTime = model.modelTime }
+                | newRaid = Just { raid | startTime = model.modelTime } -- TODO: Debug.remove.
                 , targets = { raid | startTime = model.modelTime } :: model.targets
+                , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
               }
             , Cmd.none
             )
