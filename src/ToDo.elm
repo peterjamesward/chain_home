@@ -36,6 +36,7 @@
 --DONE: Created raids are appearing overlaid, not queued up, because of how timing works. Fix this.
 --DONE: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
 --DONE: Create the raids in a box 100m east of station.
+--TODO: Improve balance of config page; it's lopsided.
 --TODO: Operate mode to (default to) only use learnt raid types.
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Clean up navigation. Lose the Learn menu. Add About page (info, credits).
