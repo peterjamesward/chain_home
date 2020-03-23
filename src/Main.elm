@@ -5,6 +5,7 @@ module Main exposing (main)
    in his book "Practical Elm"".
 -}
 
+import AboutPage exposing (aboutPage)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
@@ -316,6 +317,11 @@ update msg model =
             , Cmd.none
             )
 
+        DisplayAboutPage  ->
+            ( { model | currPage = AboutPage }
+            , Cmd.none
+            )
+
         TutorialAdvance ->
             ( advanceTutorial model
             , Cmd.none
@@ -546,6 +552,9 @@ view model =
 
                 TrainingPage ->
                     operatorPage model
+
+                AboutPage ->
+                    aboutPage
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -583,17 +592,9 @@ navBar model =
         , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ el
-            (if model.isMenuOpen then
-                [ below learningMenu ]
-
-             else
-                []
-            )
-          <|
-            navItem "Learn" ToggleLearnMenu
-        , navItem "Configuration" DisplayConfiguration
-        , navItem "Operator" DisplayReceiver
+        [ navItem "About" DisplayAboutPage
+        , navItem "Learn & Play" DisplayConfiguration
+        , navItem "Receiver" DisplayReceiver
         , navItem "Calculator" DisplayCalculator
         ]
 

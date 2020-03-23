@@ -10,6 +10,7 @@ type Page
     | OperatorPage
     | OutputPage
     | TrainingPage
+    | AboutPage
 
 
 type alias Flags =

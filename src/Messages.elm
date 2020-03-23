@@ -15,6 +15,7 @@ type Msg
     | DisplayConfiguration
     | DisplayCalculator
     | DisplayTraining TutorialScenario
+    | DisplayAboutPage
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point
@@ -37,5 +38,4 @@ type Msg
     | TutorialAdvance
     | ExplainModeToggle
     | TutorialBack
-    | GenerateNewRandomRaid
     | RandomRaidGenerated (Float, Float)

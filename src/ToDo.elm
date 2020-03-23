@@ -31,14 +31,19 @@
 --DONE: Two planes different bearings
 --DONE: 3-6 scenario
 --DONE: IFF scenario
+--DONE: Drop any targets moved beyond 100 miles range.
 --DONE: Info bar on calculator to be below the display not overlaid.
---TODO: Created raids are appearing overlaid, not queued up, because of how timing works. Fix this.
---TODO: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
+--DONE: Created raids are appearing overlaid, not queued up, because of how timing works. Fix this.
+--DONE: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
 --DONE: Create the raids in a box 100m east of station.
 --TODO: Operate mode to (default to) only use learnt raid types.
---DONE: Drop any targets moved beyond 100 miles range.
+--TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
+--TODO: Clean up navigation. Lose the Learn menu. Add About page (info, credits).
 --TODO: Test on Android tablet !!
---TODO: Installable on iOS. -- Probbly means getting to grips with Cordova/PhoneGap.
+--TODO: Installable on iOS. -- Probably means getting to grips with Cordova/PhoneGap.
+--TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
+--TODO: Summary page that shows actual incoming tracks with user plots overlaid. Assesment??
+--TODO: Fit it on 800x600 screen?
 --NOPE: Raspberry Pi with touch screen ??
 --NOPE: Physical knobs -- UI app gets gonio setting from server app.
 --NOPE: Improve that by using WebSockets -> JS -> Subscription -> Msg.
