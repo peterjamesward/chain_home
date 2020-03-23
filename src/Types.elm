@@ -48,6 +48,7 @@ type alias Target =
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
     , iffActive : Bool -- pulsing now.
     , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
+    , startTime : Int -- Each target needs it own time baseline.
     }
 
 

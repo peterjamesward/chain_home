@@ -23,6 +23,7 @@ makeNewTarget station ( latitudeOffset, height ) =
     , iff = Just 1 -- Easier to see
     , iffActive = True
     , tutorial = True
+    , startTime = 0
     }
 
 
@@ -54,12 +55,14 @@ mapToPolar station target =
 
 
 targetAtTime : Int -> Target -> Target
-targetAtTime t target =
+targetAtTime timeNow target =
     -- Targets move! t in seconds to at least centisecond resolution please
     let
+        deltaT = timeNow - target.startTime
+
         distanceTravelled =
             -- switch from mph to km/s
-            toFloat t * target.speed * 1609 / 3600000
+            toFloat deltaT * target.speed * 1609 / 3600000
 
         ( newLat, newLong ) =
             -- Use the spherical stuff.
@@ -76,7 +79,7 @@ targetAtTime t target =
                     False
 
                 Just n ->
-                    modBy 12 (t // 1000) == n && modBy 1000 t > 0 && modBy 1000 t < 500
+                    modBy 12 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
     }
 
 

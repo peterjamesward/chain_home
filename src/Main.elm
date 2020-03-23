@@ -153,7 +153,7 @@ deriveModelAtTime model timeNow =
 
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
-            List.map (targetAtTime t) model.targets
+            List.map (targetAtTime timeNow) model.targets
 
         convertedTargets =
             -- Easier to work in polar coordinates here on.
@@ -227,10 +227,8 @@ update msg model =
 
         StartScenario ->
             ( { cleanModel
-                | startTime = model.modelTime
-                , webGLtime = 0.0
-                , targets = []
-                , currPage = OperatorPage
+                |
+                currPage = OperatorPage
               }
             , Random.generate RandomRaidGenerated <|
                 Random.pair (Random.float -(degrees 0.6) (degrees 0.6)) (Random.float 5 30)
@@ -480,8 +478,8 @@ update msg model =
                     makeNewTarget model.station ( latitude, height )
               in
               { model
-                | newRaid = Just raid
-                , targets = raid :: model.targets
+                | newRaid = Just { raid | startTime = model.modelTime }
+                , targets = { raid | startTime = model.modelTime } :: model.targets
               }
             , Cmd.none
             )

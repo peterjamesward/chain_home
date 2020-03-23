@@ -9,6 +9,7 @@ type alias TargetSelector =
     , description : String -- e.g. "mass raid"
     }
 
+
 availableTargetOptions : List TargetSelector
 availableTargetOptions =
     [ TargetSelector ScenarioBasic False "One aircraft at a time"
@@ -17,6 +18,7 @@ availableTargetOptions =
     , TargetSelector ScenarioThreeToSix False "Three to six planes in close formation"
     , TargetSelector ScenarioFriendly False "A solitary friendly aircraft"
     ]
+
 
 groundRays =
     [ { sequence = 0
@@ -58,6 +60,7 @@ behindStation =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -70,6 +73,7 @@ bomber1 =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -83,6 +87,7 @@ bomber2 =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -95,6 +100,7 @@ bomber2A =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -108,6 +114,7 @@ bomber3 =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -120,6 +127,7 @@ bomber4 =
     , iff = Nothing
     , iffActive = False
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -133,6 +141,7 @@ fighter1 =
     , iff = Just 1
     , iffActive = True
     , tutorial = False
+    , startTime = 0
     }
 
 
@@ -147,6 +156,7 @@ severalAbreast n =
             , iff = Nothing
             , iffActive = False
             , tutorial = False
+            , startTime = 0
             }
         )
     <|
@@ -164,45 +174,49 @@ severalAligned n =
             , iff = Nothing
             , iffActive = False
             , tutorial = False
+            , startTime = 0
             }
         )
     <|
         List.range 1 n
 
 
-trainingMode : List Target
-trainingMode =
-    [ { bomber1 | tutorial = True } ]
+trainingMode : Int -> List Target
+trainingMode timeNow =
+    [ { bomber1
+        | tutorial = True
+        , startTime = timeNow
+      }
+    ]
 
 
-trainingMode2 : List Target
-trainingMode2 =
+trainingMode2 : Int -> List Target
+trainingMode2 timeNow =
     -- Two planes same range same bearing
-    [ { bomber2 | tutorial = True }
-    , { bomber2A | tutorial = True }
+    [ { bomber2 | tutorial = True, startTime = timeNow }
+    , { bomber2A | tutorial = True, startTime = timeNow }
     ]
 
 
-trainingMode3 : List Target
-trainingMode3 =
+trainingMode3 : Int -> List Target
+trainingMode3 timeNow =
     -- Two planes same range different bearings
-    [ { bomber3 | tutorial = True }
-    , { bomber4 | tutorial = True }
+    [ { bomber3 | tutorial = True, startTime = timeNow }
+    , { bomber4 | tutorial = True, startTime = timeNow }
     ]
 
 
-trainingModeFriendlyOutbound : List Target
-trainingModeFriendlyOutbound =
-    [ { fighter1 | tutorial = True } ]
+trainingModeFriendlyOutbound : Int -> List Target
+trainingModeFriendlyOutbound timeNow =
+    [ { fighter1 | tutorial = True, startTime = timeNow } ]
 
 
-trainingMode3to6 : List Target
-trainingMode3to6 =
+trainingMode3to6 : Int -> List Target
+trainingMode3to6 timeNow =
     let
         placeInTutorialMode t =
-            { t | tutorial = True }
+            { t | tutorial = True, startTime = timeNow }
     in
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map placeInTutorialMode <| severalAligned 5
-

@@ -1046,27 +1046,27 @@ tutorialAutomation model =
 
 setupTutorialRaid : TutorialAction
 setupTutorialRaid model =
-    { model | targets = trainingMode }
+    { model | targets = trainingMode model.modelTime }
 
 
 setupTutorialRaid2SameBearing : TutorialAction
 setupTutorialRaid2SameBearing model =
-    { model | targets = trainingMode2 }
+    { model | targets = trainingMode2 model.modelTime }
 
 
 setupTutorialRaid2DifferentBearings : TutorialAction
 setupTutorialRaid2DifferentBearings model =
-    { model | targets = trainingMode3 }
+    { model | targets = trainingMode3 model.modelTime }
 
 
 setupTutorialRaid3to6 : TutorialAction
 setupTutorialRaid3to6 model =
-    { model | targets = trainingMode3to6 }
+    { model | targets = trainingMode3to6 model.modelTime }
 
 
 setupTutorialRaidFriendlyOutbound : TutorialAction
 setupTutorialRaidFriendlyOutbound model =
-    { model | targets = trainingModeFriendlyOutbound }
+    { model | targets = trainingModeFriendlyOutbound model.modelTime }
 
 
 stopTutorialRaid model =
