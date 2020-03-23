@@ -33,6 +33,7 @@
 --DONE: IFF scenario
 --DONE: Info bar on calculator to be below the display not overlaid.
 --TODO: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
+--TODO: Create the raids in a box 100m east of station.
 --TODO: Operate mode to (default to) only use learnt raid types.
 --DONE: Drop any targets moved beyond 100 miles range.
 --TODO: Test on Android tablet !!

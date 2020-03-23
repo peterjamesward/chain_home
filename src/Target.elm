@@ -7,25 +7,20 @@ import Types exposing (PolarTarget, Target)
 
 
 makeNewTarget : Station -> ( Float, Float ) -> Target
-makeNewTarget station ( theta, height ) =
+makeNewTarget station ( latitudeOffset, height ) =
     -- Convert generated bearing and height to cartesian, as that's
     -- the space in which we work out motion.
     let
-        baseLong =
-            station.longitude
-
-        baseLat =
-            station.latitude
-
-        ( newLong, newLat ) =
-            cartesianTargetPosition ( baseLong, baseLat ) 150000 (theta + degrees station.lineOfShoot)
+        newLong = station.longitude + degrees 1.2 --TODO: More generic
+        newLat = station.latitude + latitudeOffset
+        bearing = station.lineOfShoot + pi
     in
     { latitude = newLat
     , longitude = newLong
     , height = height
-    , bearing = theta - pi -- Make it come to us.
-    , speed = 500 -- !
-    , iff = Just 1
+    , bearing = bearing
+    , speed = 500 -- Quicker testing!
+    , iff = Just 1 -- Easier to see
     , iffActive = True
     , tutorial = True
     }

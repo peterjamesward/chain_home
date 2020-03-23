@@ -233,7 +233,7 @@ update msg model =
                 , currPage = OperatorPage
               }
             , Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
+                Random.pair (Random.float -(degrees 0.6) (degrees 0.6)) (Random.float 5 30)
             )
 
         UpdateModel time ->
@@ -474,15 +474,10 @@ update msg model =
             , Cmd.none
             )
 
-        --GenerateNewRandomRaid ->
-        --    ( model
-        --    , Random.generate RandomRaidGenerated <|
-        --        Random.pair (Random.float -pi pi) (Random.float 0.0 0.3)
-        --    )
-        RandomRaidGenerated ( theta, alpha ) ->
+        RandomRaidGenerated ( latitude, height ) ->
             ( let
                 raid =
-                    makeNewTarget model.station ( theta, alpha )
+                    makeNewTarget model.station ( latitude, height )
               in
               { model
                 | newRaid = Just raid
