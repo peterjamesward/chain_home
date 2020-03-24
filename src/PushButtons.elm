@@ -110,8 +110,8 @@ actionButtonLabelAboveWithIndicator label state msg =
         ]
 
 
-actionButtonLabelLeft : String -> Msg -> Element Msg
-actionButtonLabelLeft label msg =
+raidStrengthButtonLabelLeft : String -> Msg -> Bool -> Element Msg
+raidStrengthButtonLabelLeft label msg pressed =
     row [ alignRight, height <| minimum 30 <| fill ]
         [ el
             ([ paddingEach { edges | right = 10 }
@@ -121,18 +121,24 @@ actionButtonLabelLeft label msg =
           <|
             Element.text label
         , Input.button
-            (alignRight :: Background.color green :: buttonStyles)
+            (alignRight
+                :: Background.color (choose pressed flatMidnightBlue green)
+                :: buttonStyles
+            )
             { onPress = Just msg
             , label = none
             }
         ]
 
 
-actionButtonLabelRight : String -> Msg -> Element Msg
-actionButtonLabelRight label msg =
+raidStrengthButtonLabelRight : String -> Msg -> Bool -> Element Msg
+raidStrengthButtonLabelRight label msg pressed =
     row [ alignLeft, height <| minimum 30 <| fill ]
         [ Input.button
-            (alignLeft :: Background.color green :: buttonStyles)
+            (alignLeft
+                :: Background.color (choose pressed flatMidnightBlue green)
+                :: buttonStyles
+            )
             { onPress = Just msg
             , label = none
             }

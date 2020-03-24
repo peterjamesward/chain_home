@@ -207,24 +207,24 @@ raidStrengthPanel model =
                 [ Font.size 18
                 , Font.bold
                 ]
-                [ actionButtonLabelLeft "1" (RaidStrength 1)
-                , actionButtonLabelLeft "2" (RaidStrength 2)
-                , actionButtonLabelLeft "3" (RaidStrength 3)
-                , actionButtonLabelLeft "6" (RaidStrength 6)
-                , actionButtonLabelLeft "9" (RaidStrength 9)
-                , actionButtonLabelLeft "12" (RaidStrength 12)
+                [ raidStrengthButtonLabelLeft "1" (RaidStrength 1) (model.storedStrength == Just 1)
+                , raidStrengthButtonLabelLeft "2" (RaidStrength 2) (model.storedStrength == Just 2)
+                , raidStrengthButtonLabelLeft "3" (RaidStrength 3) (model.storedStrength == Just 3)
+                , raidStrengthButtonLabelLeft "6" (RaidStrength 6) (model.storedStrength == Just 6)
+                , raidStrengthButtonLabelLeft "9" (RaidStrength 9) (model.storedStrength == Just 9)
+                , raidStrengthButtonLabelLeft "12" (RaidStrength 12) (model.storedStrength == Just 12)
                 ]
             , el [ width (px 30) ] none
             , column
                 [ Font.size 18
                 , Font.bold
                 ]
-                [ actionButtonLabelRight "18" (RaidStrength 18)
+                [ raidStrengthButtonLabelRight "18" (RaidStrength 18) (model.storedStrength == Just 18)
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
-                , actionButtonLabelRight "+" RaidStrengthPlus
-                , actionButtonLabelRight "F" RaidFriendly
+                , raidStrengthButtonLabelRight "+" RaidStrengthPlus (model.storedStrengthPlus == Just True)
+                , raidStrengthButtonLabelRight "F" RaidFriendly (model.storedFriendly == Just True)
                 ]
             ]
         , row commonStyles
