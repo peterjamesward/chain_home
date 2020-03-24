@@ -37,13 +37,15 @@
 --DONE: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
 --DONE: Create the raids in a box 100m east of station.
 --TODO: Improve balance of config page; it's lopsided.
+--TODO: Highlight raid strength buttons according to tutorial.
+--TODO: Add "Clear" to tutorials.
 --TODO: Operate mode to (default to) only use learnt raid types.
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Clean up navigation. Lose the Learn menu. Add About page (info, credits).
 --TODO: Test on Android tablet !!
 --TODO: Installable on iOS. -- Probably means getting to grips with Cordova/PhoneGap.
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
---TODO: Summary page that shows actual incoming tracks with user plots overlaid. Assesment??
+--TODO: Summary page that shows actual incoming tracks with user plots overlaid. Assessment??
 --TODO: Fit it on 800x600 screen?
 --NOPE: Raspberry Pi with touch screen ??
 --NOPE: Physical knobs -- UI app gets gonio setting from server app.
