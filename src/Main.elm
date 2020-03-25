@@ -641,12 +641,25 @@ view model =
     }
 
 
-navItem label action =
+navItem model label action pageId =
+    let
+        activeStyles =
+            if model.currPage == pageId then
+                [ Background.color paletteSand
+                , Font.color paletteDarkGreen
+                ]
+
+            else
+                [ Font.color paletteLightGreen
+                ]
+    in
     el
         ([ pointer
          , Event.onClick action
+         , padding 5
          ]
             ++ disableSelection
+            ++ activeStyles
         )
     <|
         text label
@@ -659,32 +672,12 @@ navBar model =
         , paddingXY 60 10
         , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
         , Border.color paletteSand
-        , Font.color paletteLightGreen
         , spaceEvenly
         ]
-        [ navItem "About" DisplayAboutPage
-        , navItem "Learn & Play" DisplayConfiguration
-        , navItem "Receiver" DisplayReceiver
-        , navItem "Calculator" DisplayCalculator
-        ]
-
-
-learningMenu : Element Msg
-learningMenu =
-    column
-        [ spacing 20
-        , Background.color flatMidnightBlue
-        , Border.color paletteLightGreen
-        , Border.width 2
-        , moveDown 10
-        , padding 20
-        , Font.color white
-        ]
-        [ navItem "Basic operation" (DisplayTraining ScenarioBasic)
-        , navItem "2 aircraft together" (DisplayTraining ScenarioTwoTogether)
-        , navItem "2 aircraft apart" (DisplayTraining ScenarioTwoSeparate)
-        , navItem "3 to 6 strong raid" (DisplayTraining ScenarioThreeToSix)
-        , navItem "Friendly (IFF)" (DisplayTraining ScenarioFriendly)
+        [ navItem model "About" DisplayAboutPage AboutPage
+        , navItem model "Learn & Play" DisplayConfiguration InputPage
+        , navItem model "Receiver" DisplayReceiver OperatorPage
+        , navItem model "Calculator" DisplayCalculator OutputPage
         ]
 
 
