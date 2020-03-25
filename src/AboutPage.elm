@@ -36,7 +36,7 @@ To help, we have included the "Electrical Calculator" that works out the positio
 
 ## How should I use this?
 
-We have picked five distinctive patterns of incoming aircraft. You can learn about how each of these
+We have picked five distinctive patterns of incoming aircraft. From "Learn & Play", You can learn about how each of these
 would appear on the tube, and what the operator would do to try to find the bearing and the height
 so that this information can be passed on to Fighter Command.
 

@@ -404,7 +404,6 @@ tutorial2SameBearing =
         noEntryActions
         noStateActions
         [ stopTutorialRaid ]
-        --, clearCalculator ]
         (static """Choose more training or click on Operate.
         """)
     , tutorialCloseStep ScenarioTwoTogether

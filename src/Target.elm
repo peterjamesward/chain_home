@@ -6,26 +6,6 @@ import Station exposing (Station)
 import Types exposing (PolarTarget, Target)
 
 
-makeNewTarget : Station -> ( Float, Float ) -> Target
-makeNewTarget station ( latitudeOffset, height ) =
-    -- Convert generated bearing and height to cartesian, as that's
-    -- the space in which we work out motion.
-    let
-        newLong = station.longitude + degrees 1.2 --TODO: More generic
-        newLat = station.latitude + latitudeOffset
-        bearing = station.lineOfShoot + pi
-    in
-    { latitude = newLat
-    , longitude = newLong
-    , height = height
-    , bearing = bearing
-    , speed = 500 -- Quicker testing!
-    , iff = Just 1 -- Easier to see
-    , iffActive = True
-    , tutorial = True
-    , startTime = 0
-    }
-
 
 mapToPolar : Station -> Target -> PolarTarget
 mapToPolar station target =

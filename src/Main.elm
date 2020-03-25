@@ -43,7 +43,7 @@ import Utils exposing (..)
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { currPage = InputPage
+    ( { currPage = AboutPage
       , webGLtime = 0.0
       , modelTime = 0
       , startTime = 0
@@ -317,7 +317,7 @@ update msg model =
             , Cmd.none
             )
 
-        DisplayAboutPage  ->
+        DisplayAboutPage ->
             ( { model | currPage = AboutPage }
             , Cmd.none
             )
@@ -505,20 +505,52 @@ update msg model =
             )
 
         RandomRaidGenerated ( latitude, height ) ->
-            ( let
-                raid =
-                    makeNewTarget model.station ( latitude, height )
-              in
-              { model
-                | newRaid = Just { raid | startTime = model.modelTime } -- TODO: Debug.remove.
-                , targets = { raid | startTime = model.modelTime } :: model.targets
-                , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
-              }
+            ( model |> makeNewTarget ( latitude, height ) |> setNextRandomRaidTime
             , Cmd.none
             )
 
         _ ->
             ( model, Cmd.none )
+
+
+setNextRandomRaidTime : Model -> Model
+setNextRandomRaidTime model =
+    { model
+        | timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
+    }
+
+
+makeNewTarget : ( Float, Float ) -> Model -> Model
+makeNewTarget ( latitudeOffset, height ) model =
+    --TODO: More generic
+    -- Create raids along a line of longitude about 100 miles away.
+    -- This assumes 90degE line of shoot!
+    let
+        station =
+            model.station
+
+        newLong =
+            station.longitude + degrees 1.2
+
+        newLat =
+            station.latitude + latitudeOffset
+
+        bearing =
+            station.lineOfShoot + pi
+
+        raid =
+            { latitude = newLat
+            , longitude = newLong
+            , height = height
+            , bearing = bearing
+            , speed = 500 -- Quicker testing!
+            , iff = Just 1 -- Easier to see
+            , iffActive = True
+            , tutorial = True
+            , startTime = 0
+            }
+    in
+    { model | targets = { raid | startTime = model.modelTime } :: model.targets }
 
 
 selectTransmitAntenna ab reflect =
