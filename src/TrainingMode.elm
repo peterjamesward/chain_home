@@ -1177,6 +1177,7 @@ tutorialExitAction model =
     { model
         | tutorialStage = Nothing
         , tutorialScenario = Nothing
+        , currPage = InputPage
     }
 
 

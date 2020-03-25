@@ -6996,10 +6996,10 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
+var $author$project$Types$AboutPage = {$: 'AboutPage'};
 var $author$project$Types$Azimuth = {$: 'Azimuth'};
 var $author$project$Types$BearingInput = {$: 'BearingInput'};
 var $mdgriffith$elm_ui$Element$Desktop = {$: 'Desktop'};
-var $author$project$Types$InputPage = {$: 'InputPage'};
 var $mdgriffith$elm_ui$Element$Landscape = {$: 'Landscape'};
 var $author$project$Messages$SetStartTime = function (a) {
 	return {$: 'SetStartTime', a: a};
@@ -7096,7 +7096,7 @@ var $author$project$Main$init = function (_v0) {
 		{
 			activeConfigurations: $author$project$Config$availableTargetOptions,
 			azimuthModeTrace: _List_Nil,
-			currPage: $author$project$Types$InputPage,
+			currPage: $author$project$Types$AboutPage,
 			echoes: _List_Nil,
 			elevation_A_trace: _List_Nil,
 			elevation_B_trace: _List_Nil,
@@ -7896,7 +7896,7 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$subscriptions = function (model) {
+var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
@@ -7919,11 +7919,11 @@ var $author$project$Main$subscriptions = function (model) {
 					}))
 			]));
 };
-var $author$project$Types$AboutPage = {$: 'AboutPage'};
 var $author$project$Types$BearingRangeInput = {$: 'BearingRangeInput'};
 var $author$project$Types$Elevation = {$: 'Elevation'};
 var $author$project$Types$HeightInput = {$: 'HeightInput'};
 var $author$project$Types$HeightRangeInput = {$: 'HeightRangeInput'};
+var $author$project$Types$InputPage = {$: 'InputPage'};
 var $author$project$Types$OperatorPage = {$: 'OperatorPage'};
 var $author$project$Types$OutputPage = {$: 'OutputPage'};
 var $author$project$Messages$RandomRaidGenerated = function (a) {
@@ -7949,7 +7949,6 @@ var $author$project$TrainingMode$findNextStep = F2(
 					return $elm$core$Maybe$Nothing;
 				} else {
 					if (!steps.b.b) {
-						var step1 = steps.a;
 						return $elm$core$Maybe$Nothing;
 					} else {
 						var step1 = steps.a;
@@ -9738,7 +9737,6 @@ var $author$project$TrainingMode$tutorialAutomation = function (model) {
 	var _v0 = _Utils_Tuple2(model.tutorialScenario, model.tutorialStage);
 	if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
 		var scenario = _v0.a.a;
-		var stage = _v0.b.a;
 		var _v1 = currentStep(scenario);
 		if (_v1.$ === 'Just') {
 			var step = _v1.a;
@@ -9756,7 +9754,6 @@ var $author$project$Main$deriveModelAtTime = F2(
 			$elm$core$List$map,
 			$author$project$Target$targetAtTime(timeNow),
 			model.targets);
-		var t = timeNow - model.startTime;
 		var newRangeSliderPosition = A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys);
 		var newRangeKnobPosition = ((newRangeSliderPosition - 50) * $elm$core$Basics$pi) / 50;
 		var convertedTargets = A2(
@@ -9787,7 +9784,8 @@ var $author$project$Main$deriveModelAtTime = F2(
 					movedTargets: targetsNow,
 					polarTargets: convertedTargets,
 					rangeKnobAngle: newRangeKnobPosition,
-					rangeSlider: newRangeSliderPosition
+					rangeSlider: newRangeSliderPosition,
+					webGLtime: (_Utils_cmp(model.modelTime - model.startTime, (20 * 60) * 1000) > 0) ? 0 : model.webGLtime
 				}));
 	});
 var $elm$core$List$append = F2(
@@ -9807,21 +9805,29 @@ var $elm$core$List$concatMap = F2(
 			A2($elm$core$List$map, f, list));
 	});
 var $author$project$TrainingMode$exitTutorial = function (model) {
-	var _v0 = model.tutorialScenario;
-	if (_v0.$ === 'Just') {
-		var id = _v0.a;
-		return A2(
-			$author$project$TrainingMode$applyActions,
-			A2(
-				$elm$core$List$concatMap,
-				function ($) {
-					return $.exitActions;
-				},
-				$author$project$TrainingMode$tutorialFromId(id)),
-			model);
-	} else {
-		return $author$project$TrainingMode$tutorialExitAction(model);
-	}
+	var clearAnyCurrentTutorial = function (m) {
+		return _Utils_update(
+			m,
+			{tutorialScenario: $elm$core$Maybe$Nothing, tutorialStage: $elm$core$Maybe$Nothing});
+	};
+	return clearAnyCurrentTutorial(
+		function () {
+			var _v0 = model.tutorialScenario;
+			if (_v0.$ === 'Just') {
+				var id = _v0.a;
+				return A2(
+					$author$project$TrainingMode$applyActions,
+					A2(
+						$elm$core$List$concatMap,
+						function ($) {
+							return $.exitActions;
+						},
+						$author$project$TrainingMode$tutorialFromId(id)),
+					model);
+			} else {
+				return $author$project$TrainingMode$tutorialExitAction(model);
+			}
+		}());
 };
 var $elm$random$Random$Generator = function (a) {
 	return {$: 'Generator', a: a};
@@ -10051,24 +10057,80 @@ var $author$project$Goniometer$goniometerTurnAngle = F3(
 		var dragNowAngle = _v3.b;
 		return (startAngle + dragNowAngle) - dragStartAngle;
 	});
-var $author$project$Target$makeNewTarget = F2(
-	function (station, _v0) {
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Main$makeNewTarget = F2(
+	function (_v0, model) {
 		var latitudeOffset = _v0.a;
 		var height = _v0.b;
+		var station = model.station;
 		var newLong = station.longitude + $elm$core$Basics$degrees(1.2);
 		var newLat = station.latitude + latitudeOffset;
 		var bearing = station.lineOfShoot + $elm$core$Basics$pi;
-		return {
-			bearing: bearing,
-			height: height,
-			iff: $elm$core$Maybe$Just(1),
-			iffActive: true,
-			latitude: newLat,
-			longitude: newLong,
-			speed: 500,
-			startTime: 0,
-			tutorial: true
+		var hostileSingle = {bearing: bearing, height: height, iff: $elm$core$Maybe$Nothing, iffActive: false, latitude: newLat, longitude: newLong, speed: 300, startTime: model.modelTime, tutorial: false};
+		var friendlyRaid = _List_fromArray(
+			[
+				_Utils_update(
+				hostileSingle,
+				{
+					iff: $elm$core$Maybe$Just(
+						A2(
+							$elm$core$Basics$modBy,
+							$elm$core$Basics$round(model.webGLtime),
+							12))
+				})
+			]);
+		var hostileMultiple = function (n) {
+			return (n > 1) ? A2(
+				$elm$core$List$cons,
+				hostileSingle,
+				hostileMultiple(n - 1)) : _List_fromArray(
+				[hostileSingle]);
 		};
+		var raidIfSelected = F2(
+			function (scenario, raidType) {
+				return A2($elm$core$List$member, scenario, model.tutorialsCompleted) ? raidType : _List_fromArray(
+					[hostileSingle]);
+			});
+		var raidDistribution = function () {
+			var _v1 = A2($elm$core$Basics$modBy, model.modelTime, 10);
+			switch (_v1) {
+				case 0:
+					return A2(raidIfSelected, $author$project$Types$ScenarioFriendly, friendlyRaid);
+				case 1:
+					return A2(
+						raidIfSelected,
+						$author$project$Types$ScenarioTwoTogether,
+						hostileMultiple(2));
+				case 2:
+					return A2(
+						raidIfSelected,
+						$author$project$Types$ScenarioTwoTogether,
+						hostileMultiple(2));
+				case 3:
+					return A2(
+						raidIfSelected,
+						$author$project$Types$ScenarioThreeToSix,
+						hostileMultiple(3));
+				case 4:
+					return A2(
+						raidIfSelected,
+						$author$project$Types$ScenarioThreeToSix,
+						hostileMultiple(4));
+				case 5:
+					return A2(
+						raidIfSelected,
+						$author$project$Types$ScenarioThreeToSix,
+						hostileMultiple(5));
+				default:
+					return _List_fromArray(
+						[hostileSingle]);
+			}
+		}();
+		return _Utils_update(
+			model,
+			{
+				targets: _Utils_ap(raidDistribution, model.targets)
+			});
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -10173,6 +10235,57 @@ var $author$project$Main$selectTransmitAntenna = F2(
 				return $author$project$LobeFunctions$transmitBNoReflect;
 			}
 		}
+	});
+var $author$project$Main$setNextRandomRaidTime = function (model) {
+	return _Utils_update(
+		model,
+		{
+			timeForNextRaid: $elm$core$Maybe$Just(
+				model.modelTime + ((120000 * $elm$core$Basics$abs(
+					$elm$core$Basics$sin(model.modelTime))) | 0))
+		});
+};
+var $author$project$Utils$removeFromList = F2(
+	function (x, xs) {
+		if (!xs.b) {
+			return _List_Nil;
+		} else {
+			var a = xs.a;
+			var rest = xs.b;
+			return _Utils_eq(a, x) ? rest : A2(
+				$elm$core$List$cons,
+				a,
+				A2($author$project$Utils$removeFromList, x, rest));
+		}
+	});
+var $author$project$Main$setTutorialCompletedState = F3(
+	function (scenario, state, model) {
+		return _Utils_update(
+			model,
+			{
+				tutorialsCompleted: function () {
+					var _v0 = _Utils_Tuple2(
+						A2($elm$core$List$member, scenario, model.tutorialsCompleted),
+						state);
+					_v0$2:
+					while (true) {
+						if (_v0.a) {
+							if (!_v0.b) {
+								return A2($author$project$Utils$removeFromList, scenario, model.tutorialsCompleted);
+							} else {
+								break _v0$2;
+							}
+						} else {
+							if (_v0.b) {
+								return A2($elm$core$List$cons, scenario, model.tutorialsCompleted);
+							} else {
+								break _v0$2;
+							}
+						}
+					}
+					return model.tutorialsCompleted;
+				}()
+			});
 	});
 var $author$project$TrainingMode$tutorialStartScenario = F2(
 	function (id, model) {
@@ -10292,12 +10405,6 @@ var $author$project$Main$update = F2(
 							model,
 							$elm$time$Time$posixToMillis(time))),
 					raidIsDue ? requestRandomRaid : $elm$core$Platform$Cmd$none);
-			case 'ToggleLearnMenu':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{isMenuOpen: !model.isMenuOpen}),
-					$elm$core$Platform$Cmd$none);
 			case 'ExplainModeToggle':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -10308,9 +10415,7 @@ var $author$project$Main$update = F2(
 				var index = msg.a;
 				var newState = msg.b;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{activeConfigurations: _List_Nil}),
+					A3($author$project$Main$setTutorialCompletedState, index, newState, model),
 					$elm$core$Platform$Cmd$none);
 			case 'DisplayReceiver':
 				return _Utils_Tuple2(
@@ -10390,7 +10495,6 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				}
 			case 'GonioRelease':
-				var offset = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -10439,7 +10543,6 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				}
 			case 'RangeRelease':
-				var offset = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -10575,29 +10678,11 @@ var $author$project$Main$update = F2(
 				var latitude = _v8.a;
 				var height = _v8.b;
 				return _Utils_Tuple2(
-					function () {
-						var raid = A2(
-							$author$project$Target$makeNewTarget,
-							model.station,
-							_Utils_Tuple2(latitude, height));
-						return _Utils_update(
-							model,
-							{
-								newRaid: $elm$core$Maybe$Just(
-									_Utils_update(
-										raid,
-										{startTime: model.modelTime})),
-								targets: A2(
-									$elm$core$List$cons,
-									_Utils_update(
-										raid,
-										{startTime: model.modelTime}),
-									model.targets),
-								timeForNextRaid: $elm$core$Maybe$Just(
-									model.modelTime + ((60000 * $elm$core$Basics$abs(
-										$elm$core$Basics$sin(model.modelTime))) | 0))
-							});
-					}(),
+					$author$project$Main$setNextRandomRaidTime(
+						A2(
+							$author$project$Main$makeNewTarget,
+							_Utils_Tuple2(latitude, height),
+							model)),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -10622,7 +10707,6 @@ var $mdgriffith$elm_ui$Internal$Flag$flag = function (i) {
 	return (i > 31) ? $mdgriffith$elm_ui$Internal$Flag$Second(1 << (i - 32)) : $mdgriffith$elm_ui$Internal$Flag$Flag(1 << i);
 };
 var $mdgriffith$elm_ui$Internal$Flag$fontColor = $mdgriffith$elm_ui$Internal$Flag$flag(14);
-var $elm$core$Basics$round = _Basics_round;
 var $mdgriffith$elm_ui$Internal$Model$floatClass = function (x) {
 	return $elm$core$String$fromInt(
 		$elm$core$Basics$round(x * 255));
@@ -10677,7 +10761,7 @@ var $author$project$AboutPage$content = A3(
 		[
 			$elm$html$Html$Attributes$class('content')
 		]),
-	'\n\n## What is this?\n\nThis application is meant to give an impression of what it would have been like to be an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. You can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\nApplication code written by Peter Ward. Historical research by Sharon Ward.\nThe application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\n\n');
+	'\n\n## What is this?\n\nThis application aims to give an impression of being an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. From "Learn & Play", You can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\nApplication code written by Peter Ward. Historical research by Sharon Ward.\nThe application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\n\n');
 var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -17998,17 +18082,30 @@ var $author$project$Messages$DisplayAboutPage = {$: 'DisplayAboutPage'};
 var $author$project$Messages$DisplayCalculator = {$: 'DisplayCalculator'};
 var $author$project$Messages$DisplayConfiguration = {$: 'DisplayConfiguration'};
 var $author$project$Messages$DisplayReceiver = {$: 'DisplayReceiver'};
-var $author$project$Main$navItem = F2(
-	function (label, action) {
+var $author$project$Main$navItem = F4(
+	function (model, label, action, pageId) {
+		var activeStyles = _Utils_eq(model.currPage, pageId) ? _List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$paletteDarkGreen),
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
+				$mdgriffith$elm_ui$Element$Border$width(1),
+				$mdgriffith$elm_ui$Element$Border$rounded(3),
+				$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+				$mdgriffith$elm_ui$Element$Font$bold
+			]) : _List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteLightGreen)
+			]);
 		return A2(
 			$mdgriffith$elm_ui$Element$el,
 			_Utils_ap(
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$pointer,
-						$mdgriffith$elm_ui$Element$Events$onClick(action)
+						$mdgriffith$elm_ui$Element$Events$onClick(action),
+						$mdgriffith$elm_ui$Element$padding(5)
 					]),
-				$author$project$Utils$disableSelection),
+				_Utils_ap($author$project$Utils$disableSelection, activeStyles)),
 			$mdgriffith$elm_ui$Element$text(label));
 	});
 var $author$project$Main$navBar = function (model) {
@@ -18021,15 +18118,14 @@ var $author$project$Main$navBar = function (model) {
 				$mdgriffith$elm_ui$Element$Border$widthEach(
 				{bottom: 1, left: 0, right: 0, top: 0}),
 				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
-				$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteLightGreen),
 				$mdgriffith$elm_ui$Element$spaceEvenly
 			]),
 		_List_fromArray(
 			[
-				A2($author$project$Main$navItem, 'About', $author$project$Messages$DisplayAboutPage),
-				A2($author$project$Main$navItem, 'Learn & Play', $author$project$Messages$DisplayConfiguration),
-				A2($author$project$Main$navItem, 'Receiver', $author$project$Messages$DisplayReceiver),
-				A2($author$project$Main$navItem, 'Calculator', $author$project$Messages$DisplayCalculator)
+				A4($author$project$Main$navItem, model, 'About', $author$project$Messages$DisplayAboutPage, $author$project$Types$AboutPage),
+				A4($author$project$Main$navItem, model, 'Learn & Play', $author$project$Messages$DisplayConfiguration, $author$project$Types$InputPage),
+				A4($author$project$Main$navItem, model, 'Receiver', $author$project$Messages$DisplayReceiver, $author$project$Types$OperatorPage),
+				A4($author$project$Main$navItem, model, 'Calculator', $author$project$Messages$DisplayCalculator, $author$project$Types$OutputPage)
 			]));
 };
 var $author$project$Messages$StoreGoniometerSetting = {$: 'StoreGoniometerSetting'};
