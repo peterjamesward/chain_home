@@ -204,6 +204,13 @@ deriveModelAtTime model timeNow =
             , rangeKnobAngle = newRangeKnobPosition
             , elevation_A_trace = heightMode_A_Outputs
             , elevation_B_trace = heightMode_B_Outputs
+            , webGLtime =
+                if model.modelTime - model.startTime > 20 * 60 * 1000 then
+                    -- Try to stop noise degrading.
+                    0
+
+                else
+                    model.webGLtime
         }
 
 
@@ -622,6 +629,9 @@ navItem model label action pageId =
         activeStyles =
             if model.currPage == pageId then
                 [ Background.color paletteDarkGreen
+                , Border.color paletteSand
+                , Border.width 1
+                , Border.rounded 3
                 , Font.color white
                 , Font.bold
                 ]
