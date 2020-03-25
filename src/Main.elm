@@ -514,13 +514,13 @@ update msg model =
 setNextRandomRaidTime : Model -> Model
 setNextRandomRaidTime model =
     { model
-        | timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
+        | timeForNextRaid = Just <| model.modelTime + truncate (120000 * abs (sin <| toFloat model.modelTime))
     }
 
 
 makeNewTarget : ( Float, Float ) -> Model -> Model
 makeNewTarget ( latitudeOffset, height ) model =
-    --TODO: More generic
+    --TODO: More generic.
     -- Create raids along a line of longitude about 100 miles away.
     -- This assumes 90degE line of shoot!
     let
@@ -536,19 +536,59 @@ makeNewTarget ( latitudeOffset, height ) model =
         bearing =
             station.lineOfShoot + pi
 
-        raid =
+        hostileSingle =
             { latitude = newLat
             , longitude = newLong
             , height = height
             , bearing = bearing
-            , speed = 500 -- Quicker testing!
-            , iff = Just 1 -- Easier to see
-            , iffActive = True
+            , speed = 300 -- Quicker testing!
+            , iff = Nothing
+            , iffActive = False
             , tutorial = True
             , startTime = model.modelTime
             }
+
+        raidIfSelected scenario raidType =
+            if List.member scenario model.tutorialsCompleted then
+                raidType
+
+            else
+                [ hostileSingle ]
+
+        hostileMultiple n =
+            if n > 1 then
+                hostileSingle :: hostileMultiple (n - 1)
+
+            else
+                [ hostileSingle ]
+
+        friendlyRaid =
+            [ { hostileSingle | iff = Just (modBy (round model.webGLtime) 12) } ]
+
+        raidDistribution =
+            case modBy model.modelTime 10 of
+                0 ->
+                    raidIfSelected ScenarioFriendly friendlyRaid
+
+                1 ->
+                    raidIfSelected ScenarioTwoTogether (hostileMultiple 2)
+
+                2 ->
+                    raidIfSelected ScenarioTwoTogether (hostileMultiple 2)
+
+                3 ->
+                    raidIfSelected ScenarioThreeToSix (hostileMultiple 3)
+
+                4 ->
+                    raidIfSelected ScenarioThreeToSix (hostileMultiple 4)
+
+                5 ->
+                    raidIfSelected ScenarioThreeToSix (hostileMultiple 5)
+
+                _ ->
+                    [ hostileSingle ]
     in
-    { model | targets = raid :: model.targets }
+    { model | targets = raidDistribution ++ model.targets }
 
 
 selectTransmitAntenna ab reflect =
