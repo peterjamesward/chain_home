@@ -281,9 +281,7 @@ update msg model =
             )
 
         SetConfigStateMsg index newState ->
-            ( { model
-                | activeConfigurations = []
-              }
+            ( setTutorialCompletedState index newState model
             , Cmd.none
             )
 
@@ -547,10 +545,10 @@ makeNewTarget ( latitudeOffset, height ) model =
             , iff = Just 1 -- Easier to see
             , iffActive = True
             , tutorial = True
-            , startTime = 0
+            , startTime = model.modelTime
             }
     in
-    { model | targets = { raid | startTime = model.modelTime } :: model.targets }
+    { model | targets = raid :: model.targets }
 
 
 selectTransmitAntenna ab reflect =
@@ -659,6 +657,22 @@ learningMenu =
 setConfig : TargetSelector -> Bool -> Msg
 setConfig selector newState =
     SetConfigStateMsg selector.id newState
+
+
+setTutorialCompletedState : TutorialScenario -> Bool -> Model -> Model
+setTutorialCompletedState scenario state model =
+    { model
+        | tutorialsCompleted =
+            case ( List.member scenario model.tutorialsCompleted, state ) of
+                ( True, False ) ->
+                    removeFromList scenario model.tutorialsCompleted
+
+                ( False, True ) ->
+                    scenario :: model.tutorialsCompleted
+
+                _ ->
+                    model.tutorialsCompleted
+    }
 
 
 targetSelector : List TargetSelector -> List TutorialScenario -> Element Msg

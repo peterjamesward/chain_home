@@ -37,6 +37,7 @@
 --DONE: Operate mode to generate a sequence of incoming raids from various bearings & heights. (max 14 active!)
 --DONE: Create the raids in a box 100m east of station.
 --DONE: Highlight raid strength buttons according to tutorial.
+--DONE: Clicking any raid type checkbox clears the config display!
 --TODO: Operate mode to (default to) only use learnt raid types.
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Clean up navigation. Lose the Learn menu. Add About page (info, credits).

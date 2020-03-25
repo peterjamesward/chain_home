@@ -23,7 +23,7 @@ content =
 
 ## What is this?
 
-This application is meant to give an impression of what it would have been like to be an operator
+This application aims to give an impression of being an operator
 at a Chain Home station during the Battle of Britain in 1940.
 
 Scientists and engineers developed radio technology rapidly to prepare for the war, and were constantly

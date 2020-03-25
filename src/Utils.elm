@@ -32,6 +32,10 @@ choose b o1 o2 =
     else
         o2
 
+removeFromList x xs =
+    case xs of
+        [] -> []
+        a :: rest -> if a == x then rest else a :: removeFromList x rest
 
 edges =
     { top = 0, left = 0, right = 0, bottom = 0 }
