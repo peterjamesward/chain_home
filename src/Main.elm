@@ -645,8 +645,9 @@ navItem model label action pageId =
     let
         activeStyles =
             if model.currPage == pageId then
-                [ Background.color paletteSand
-                , Font.color paletteDarkGreen
+                [ Background.color paletteDarkGreen
+                , Font.color white
+                , Font.bold
                 ]
 
             else
