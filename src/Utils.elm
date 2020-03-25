@@ -10,19 +10,6 @@ import Element.Events exposing (onClick)
 import Element.Font as Font exposing (..)
 import Html.Attributes exposing (style)
 import Messages exposing (Msg(..))
-import Nixie exposing (nixieDisplay)
-
-epsilon = 0.01
-
-stringifyPoint ( x, y ) =
-    String.fromFloat x
-        ++ ","
-        ++ String.fromFloat y
-        ++ " "
-
-
-polyLineFromCoords coords =
-    List.foldr (++) "" (List.map stringifyPoint coords)
 
 
 choose b o1 o2 =
@@ -32,17 +19,22 @@ choose b o1 o2 =
     else
         o2
 
+
 removeFromList x xs =
     case xs of
-        [] -> []
-        a :: rest -> if a == x then rest else a :: removeFromList x rest
+        [] ->
+            []
+
+        a :: rest ->
+            if a == x then
+                rest
+
+            else
+                a :: removeFromList x rest
+
 
 edges =
     { top = 0, left = 0, right = 0, bottom = 0 }
-
-
-triangleWave t =
-    toFloat (abs (abs (modBy 2000 t - 1000) - 1000)) / 1000.0
 
 
 noise t =
@@ -52,33 +44,9 @@ noise t =
 fractional x =
     x - toFloat (truncate x)
 
+
 normalise theta =
-        atan2 (sin theta) (cos theta)
-
-
-notNearlyEqual x1 x2 =
-    (10 * abs x1 < abs x2) || (10 * abs x2 < abs x1)
-
-
-numericDisplay label maybeValue =
-    let
-        value =
-            truncate <| Maybe.withDefault 0.0 maybeValue
-    in
-    column commonStyles
-        [ nixieDisplay 3 value
-        , text label
-        ]
-
-
-bearingDisplay label maybeBearing =
-    numericDisplay label <|
-        case maybeBearing of
-            Just m ->
-                Just <| toFloat <| modBy 360 (truncate (m * 180 / pi))
-
-            _ ->
-                Nothing
+    atan2 (sin theta) (cos theta)
 
 
 disableSelection =
@@ -99,6 +67,7 @@ commonStyles =
         , Font.sansSerif
         ]
     ]
+
 
 helpButton : Element Msg
 helpButton =
@@ -121,4 +90,3 @@ helpButton =
         ]
     <|
         text "?"
-

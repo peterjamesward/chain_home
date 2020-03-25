@@ -124,7 +124,7 @@ slideRangeSlider range keys =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Time.every 40 UpdateModel
         , onAnimationFrameDelta TimeDelta
@@ -150,9 +150,6 @@ applyReceiver antenna rawEchoes =
 deriveModelAtTime : Model -> Int -> Model
 deriveModelAtTime model timeNow =
     let
-        t =
-            timeNow - model.startTime
-
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
             List.map (targetAtTime timeNow) model.targets
@@ -348,7 +345,7 @@ update msg model =
                     , Cmd.none
                     )
 
-        GonioRelease offset ->
+        GonioRelease _ ->
             ( { model | gonioDrag = Nothing }
             , Cmd.none
             )
@@ -390,7 +387,7 @@ update msg model =
                     , Cmd.none
                     )
 
-        RangeRelease offset ->
+        RangeRelease _ ->
             ( { model | rangeDrag = Nothing }
             , Cmd.none
             )
@@ -783,5 +780,3 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
-
-

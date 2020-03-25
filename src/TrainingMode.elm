@@ -886,7 +886,7 @@ findNextStep currentTutorial currentStep =
                 [] ->
                     Nothing
 
-                step1 :: [] ->
+                _ :: [] ->
                     Nothing
 
                 step1 :: step2 :: more ->
@@ -1031,7 +1031,7 @@ tutorialAutomation model =
             findStep (Just (tutorialFromId id)) model.tutorialStage
     in
     case ( model.tutorialScenario, model.tutorialStage ) of
-        ( Just scenario, Just stage ) ->
+        ( Just scenario, Just _ ) ->
             case currentStep scenario of
                 Just step ->
                     applyActions step.stateActions model
@@ -1135,14 +1135,6 @@ tutorialStoreRange1 model =
     { model
         | storedAzimuthRange = Just (1.6 * model.rangeSlider)
         , inputState = BearingInput
-    }
-
-
-tutorialStoreRange2 : TutorialAction
-tutorialStoreRange2 model =
-    { model
-        | storedElevationRange = Just (1.6 * model.rangeSlider)
-        , inputState = HeightInput
     }
 
 
