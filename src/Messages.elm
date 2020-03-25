@@ -28,7 +28,6 @@ type Msg
     | SelectReceiveAntenna Bool
     | EnableReflector Bool
     | SelectGoniometerMode Bool
-    | ToggleLearnMenu
     | StoreGoniometerSetting
     | StoreRangeSetting
     | ResetInputState

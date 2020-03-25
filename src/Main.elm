@@ -266,17 +266,8 @@ update msg model =
                 Cmd.none
             )
 
-        ToggleLearnMenu ->
-            ( { model
-                | isMenuOpen = not model.isMenuOpen
-              }
-            , Cmd.none
-            )
-
         ExplainModeToggle ->
-            ( { model
-                | explainMode = not model.explainMode
-              }
+            ( { model | explainMode = not model.explainMode }
             , Cmd.none
             )
 
@@ -336,9 +327,7 @@ update msg model =
             )
 
         GonioGrab offset ->
-            ( { model
-                | gonioDrag = Just ( model.goniometerAzimuth, offset )
-              }
+            ( { model | gonioDrag = Just ( model.goniometerAzimuth, offset ) }
             , Cmd.none
             )
 
@@ -360,16 +349,12 @@ update msg model =
                     )
 
         GonioRelease offset ->
-            ( { model
-                | gonioDrag = Nothing
-              }
+            ( { model | gonioDrag = Nothing }
             , Cmd.none
             )
 
         RangeGrab offset ->
-            ( { model
-                | rangeDrag = Just ( model.rangeKnobAngle, offset )
-              }
+            ( { model | rangeDrag = Just ( model.rangeKnobAngle, offset ) }
             , Cmd.none
             )
 
@@ -406,18 +391,12 @@ update msg model =
                     )
 
         RangeRelease offset ->
-            ( { model
-                | rangeDrag = Nothing
-
-                --, tutorialStage = rangeMayUpdateTutorial model
-              }
+            ( { model | rangeDrag = Nothing }
             , Cmd.none
             )
 
         AdjustRangeValue newRange ->
-            ( { model
-                | rangeSlider = newRange
-              }
+            ( { model | rangeSlider = newRange }
             , Cmd.none
             )
 
@@ -806,41 +785,3 @@ main =
         }
 
 
-menuPanel : Model -> Element Msg
-menuPanel model =
-    let
-        items =
-            [ E.el [ pointer, Event.onClick DisplayConfiguration ] <| text "Configuration"
-            , E.el [ pointer, Event.onClick DisplayReceiver ] <| text "Operator"
-            , E.el [ pointer, Event.onClick DisplayCalculator ] <| text "Outputs"
-            ]
-
-        panel =
-            column
-                [ Background.color lightCharcoal
-                , Border.widthEach { left = 1, right = 0, top = 0, bottom = 0 }
-                , Border.color flatMidnightBlue
-                , Border.shadow
-                    { offset = ( 0, 0 )
-                    , size = 1
-                    , blur = 10
-                    , color = flatWetAsphalt
-                    }
-                , Font.bold
-                , Font.color paletteDarkGreen
-                , Font.family [ Font.sansSerif ]
-                , width <| fillPortion 1
-                , height fill
-                , paddingXY 20 20
-                , spacingXY 0 40
-                ]
-                items
-
-        overlay =
-            el [ width <| fillPortion 4, height fill, Event.onClick ToggleLearnMenu ] none
-    in
-    if model.isMenuOpen then
-        row [ width fill, height fill ] [ overlay, panel ]
-
-    else
-        none
