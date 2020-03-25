@@ -973,13 +973,21 @@ exitTutorial : Model -> Model
 exitTutorial model =
     -- Maybe reliable way to exit cleanly is to fast forward
     -- so that all state exit actions are performed.
-    case model.tutorialScenario of
-        Just id ->
-            -- Apply all stage exit actions in correct order
-            applyActions (List.concatMap .exitActions <| tutorialFromId id) model
+    let
+        clearAnyCurrentTutorial m =
+            { m
+                | tutorialStage = Nothing
+                , tutorialScenario = Nothing
+            }
+    in
+    clearAnyCurrentTutorial <|
+        case model.tutorialScenario of
+            Just id ->
+                -- Apply all stage exit actions in correct order
+                applyActions (List.concatMap .exitActions <| tutorialFromId id) model
 
-        _ ->
-            tutorialExitAction model
+            _ ->
+                tutorialExitAction model
 
 
 applyActions : TutorialActionList -> Model -> Model

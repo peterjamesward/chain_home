@@ -39,6 +39,7 @@
 --DONE: Highlight raid strength buttons according to tutorial.
 --DONE: Clicking any raid type checkbox clears the config display!
 --DONE: Operate mode to (default to) only use learnt raid types.
+--DONE: Complete tutorial, click Receiver and raids are highlighted wrongly.
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --DONE: Clean up navigation. Lose the Learn menu. Add About page (info, credits).
 --TODO: Test on Android tablet !!

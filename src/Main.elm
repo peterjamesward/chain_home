@@ -520,7 +520,7 @@ makeNewTarget ( latitudeOffset, height ) model =
             , speed = 300 -- Quicker testing!
             , iff = Nothing
             , iffActive = False
-            , tutorial = True
+            , tutorial = False
             , startTime = model.modelTime
             }
 
