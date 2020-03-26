@@ -13,6 +13,7 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 
+squareSize = 83
 
 mapVisibleGrid : List (List String)
 mapVisibleGrid =
@@ -32,20 +33,22 @@ mapPage _ =
         html <|
             svg
                 [ viewBox "0 0 800 800"
-                , A.width "100%"
-                , A.height "100%"
+
+                --, A.width "100%"
+                --, A.height "100%"
                 ]
             <|
                 [ Svg.image
                     [ x "0"
                     , y "0"
-                    , A.width "400"
-                    , A.height "400"
+                    , A.width <| String.fromInt <| squareSize * 5
+                    , A.height <| String.fromInt <| squareSize * 5
                     , xlinkHref "../resources/east_anglia.png"
                     ]
                     []
                 ]
                     ++ gridLetters
+                    ++ gridLines
 
 
 gridLetters =
@@ -55,8 +58,8 @@ gridLetters =
 
         gridLetter yCoord letter xCoord =
             Svg.text_
-                [ x <| String.fromInt <| xCoord * 80 - 50
-                , y <| String.fromInt <| yCoord * 80 - 40
+                [ x <| String.fromInt <| xCoord * squareSize - 40
+                , y <| String.fromInt <| yCoord * squareSize - 35
                 , A.stroke "black"
                 , A.fill "none"
                 , textAnchor "middle"
@@ -68,3 +71,30 @@ gridLetters =
     in
     List.concat <|
         List.map2 gridLetterRow mapVisibleGrid [ 1, 2, 3, 4, 5 ]
+
+
+gridLines =
+    let
+        horizontalGridLine index =
+            Svg.line
+                [ x1 <| String.fromInt 0
+                , y1 <| String.fromInt <| index * squareSize
+                , x2 <| String.fromInt (squareSize * 5)
+                , y2 <| String.fromInt <| index * squareSize
+                , stroke "black"
+                , strokeWidth "1"
+                ]
+                []
+        verticalGridLine index =
+              Svg.line
+                  [ y1 <| String.fromInt 0
+                  , x1 <| String.fromInt <| index * squareSize
+                  , y2 <| String.fromInt (squareSize * 5)
+                  , x2 <| String.fromInt <| index * squareSize
+                  , stroke "black"
+                  , strokeWidth "1"
+                  ]
+                  []
+    in
+    List.map horizontalGridLine [ 1, 2, 3, 4 ]
+    ++ List.map verticalGridLine [ 1, 2, 3, 4 ]
