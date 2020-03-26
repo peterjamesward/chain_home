@@ -1,4 +1,10 @@
---TODO: Summary page showing actual incoming tracks with user plots overlaid. Assessment metric??
+--TODO: Summary page showing actual incoming tracks with user plots overlaid.
+--TODO: Store all target locations when user enters Bearing & Range. This may make correlation possible.
+--TODO: Store all target locations once a minute anyway.
+--TODO: Show tracks as yellow lines, maybe different colour for friendly.
+--TODO: Show plots as some kind of symbol.
+--TODO: Adjust map calibration for consistency with approx range.
+--TODO: Derive some average closeness metric.
 --TODO: Add some variation to direction of travel of each raid (they are all due West).
 --TODO: Add "more ..." on explanatory popups to display overlaid window with more information. (??)
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
