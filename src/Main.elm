@@ -25,6 +25,7 @@ import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
 import Keys exposing (Keys, noKeys, updateKeys)
 import LobeFunctions exposing (..)
+import MapPage exposing (mapPage)
 import Messages exposing (..)
 import Model exposing (..)
 import OperatorPage exposing (operatorPage)
@@ -298,6 +299,11 @@ update msg model =
 
         DisplayAboutPage ->
             ( { model | currPage = AboutPage }
+            , Cmd.none
+            )
+
+        DisplayMapPage ->
+            ( { model | currPage = MapPage }
             , Cmd.none
             )
 
@@ -594,6 +600,9 @@ view model =
 
                 AboutPage ->
                     aboutPage
+
+                MapPage ->
+                    mapPage model
     in
     { title = "Chain Home receiver emulation"
     , body =
@@ -651,6 +660,7 @@ navBar model =
         , navItem model "Learn & Play" DisplayConfiguration InputPage
         , navItem model "Receiver" DisplayReceiver OperatorPage
         , navItem model "Calculator" DisplayCalculator OutputPage
+        , navItem model "Map" DisplayMapPage MapPage
         ]
 
 

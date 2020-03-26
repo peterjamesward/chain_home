@@ -16,6 +16,7 @@ type Msg
     | DisplayCalculator
     | DisplayTraining TutorialScenario
     | DisplayAboutPage
+    | DisplayMapPage
     | KeyChanged Bool String
     | GonioGrab Point
     | GonioMove Point
