@@ -68,7 +68,6 @@ init _ =
       , goniometerMode = Azimuth
       , transmitAntenna = transmitANoReflect
       , reflector = False
-      , isMenuOpen = False
       , receiveAB = True
       , receiveAntenna = receiveHigh
       , inputState = BearingInput
@@ -157,8 +156,9 @@ deriveModelAtTime model timeNow =
         convertedTargets =
             -- Easier to work in polar coordinates here on.
             -- Filter removes raid beyond our range.
-            List.filter (\tgt -> tgt.r < 100 * 1600) <|
-                List.map (mapToPolar bawdsey) targetsNow
+            trackTargetPositionHistory timeNow <|
+                List.filter (\tgt -> tgt.r < 100 * 1600) <|
+                    List.map (mapToPolar bawdsey) targetsNow
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
@@ -204,13 +204,6 @@ deriveModelAtTime model timeNow =
             , rangeKnobAngle = newRangeKnobPosition
             , elevation_A_trace = heightMode_A_Outputs
             , elevation_B_trace = heightMode_B_Outputs
-            , webGLtime =
-                if model.modelTime - model.startTime > 20 * 60 * 1000 then
-                    -- Try to stop noise degrading.
-                    0
-
-                else
-                    model.webGLtime
         }
 
 
@@ -284,24 +277,17 @@ update msg model =
             ( { cleanModel
                 | currPage = OperatorPage
                 , tutorialStage = Nothing
-                , isMenuOpen = False
               }
             , Cmd.none
             )
 
         DisplayConfiguration ->
-            ( { cleanModel
-                | currPage = InputPage
-                , isMenuOpen = False
-              }
+            ( { cleanModel | currPage = InputPage }
             , Cmd.none
             )
 
         DisplayCalculator ->
-            ( { cleanModel
-                | currPage = OutputPage
-                , isMenuOpen = False
-              }
+            ( { cleanModel | currPage = OutputPage }
             , Cmd.none
             )
 
@@ -546,7 +532,7 @@ makeNewTarget ( latitudeOffset, height ) model =
                 [ hostileSingle ]
 
         friendlyRaid =
-            [ { hostileSingle | iff = Just (modBy (round model.webGLtime) 12) } ]
+            [ { hostileSingle | iff = Just (modBy 12 (round model.webGLtime)) } ]
 
         raidDistribution =
             case modBy model.modelTime 10 of

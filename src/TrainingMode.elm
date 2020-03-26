@@ -849,7 +849,6 @@ tutorialStartScenario id model =
                 | tutorialScenario = Just id
                 , tutorialStage = Just s.tutorialStep
                 , currPage = OperatorPage
-                , isMenuOpen = False
                 , startTime = model.modelTime
                 , webGLtime = 0.0
             }
@@ -1338,32 +1337,30 @@ explanatoryText model uiComponent =
         ]
 
     else
-        []
-            ++ (case ( model.explainMode, uiComponentDescription ) of
-                    ( True, Just txt ) ->
-                        [ inFront <|
-                            el
-                                [ centerX
-                                , centerY
-                                , Background.color blue
-                                , Border.color white
-                                , Border.width 1
-                                , Border.rounded 5
-                                ]
-                            <|
-                                paragraph
-                                    [ spacing 1
-                                    , Font.size 16
-                                    , Font.family [ Font.typeface "Helvetica" ]
-                                    , Font.color white
-                                    , padding 5
-                                    ]
-                                    [ text txt ]
+        case ( model.explainMode, uiComponentDescription ) of
+            ( True, Just txt ) ->
+                [ inFront <|
+                    el
+                        [ centerX
+                        , centerY
+                        , Background.color blue
+                        , Border.color white
+                        , Border.width 1
+                        , Border.rounded 5
                         ]
+                    <|
+                        paragraph
+                            [ spacing 1
+                            , Font.size 16
+                            , Font.family [ Font.typeface "Helvetica" ]
+                            , Font.color white
+                            , padding 5
+                            ]
+                            [ text txt ]
+                ]
 
-                    _ ->
-                        []
-               )
+            _ ->
+                []
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg

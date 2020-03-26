@@ -6,7 +6,6 @@ import Station exposing (Station)
 import Types exposing (PolarTarget, Target)
 
 
-
 mapToPolar : Station -> Target -> PolarTarget
 mapToPolar station target =
     -- Convert from Cartesian (and imperial) map coordinates to
@@ -31,14 +30,38 @@ mapToPolar station target =
     , iff = target.iff
     , iffActive = target.iffActive
     , tutorial = target.tutorial
+    , positionHistory = []
     }
+
+
+trackTargetPositionHistory : Int -> List PolarTarget -> List PolarTarget
+trackTargetPositionHistory timeNow targets =
+    let
+        trackHistory target =
+            case List.head target.positionHistory of
+                Just ( prevTime, _, _ ) ->
+                    if timeNow - prevTime > 60000 then
+                        { target
+                            | positionHistory = ( timeNow, target.r, target.theta ) :: target.positionHistory
+                        }
+
+                    else
+                        target
+
+                Nothing ->
+                    { target
+                        | positionHistory = [ ( timeNow, target.r, target.theta ) ]
+                    }
+    in
+    List.map trackHistory targets
 
 
 targetAtTime : Int -> Target -> Target
 targetAtTime timeNow target =
     -- Targets move! t in seconds to at least centisecond resolution please
     let
-        deltaT = timeNow - target.startTime
+        deltaT =
+            timeNow - target.startTime
 
         distanceTravelled =
             -- switch from mph to km/s

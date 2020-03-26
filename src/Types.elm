@@ -60,6 +60,7 @@ type alias PolarTarget =
     , iff : Maybe Int -- pulsing; time when pulse started
     , iffActive : Bool -- pulsing now.
     , tutorial : Bool
+    , positionHistory : List (Int, Float, Float) -- the actual track of the raid, minute by minute.
     }
 
 

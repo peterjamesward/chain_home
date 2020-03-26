@@ -12,7 +12,7 @@ import Types exposing (..)
 type alias Model =
     { currPage : Page
     , webGLtime : Float -- now updated by the WebGL animation control.
-    , modelTime : Int -- milliseconds
+    , modelTime : Int -- milliseconds of Posix time.
     , startTime : Int
     , azimuthModeTrace : List Echo
     , elevation_A_trace : List Echo
@@ -35,7 +35,6 @@ type alias Model =
     , goniometerMode : GoniometerMode
     , transmitAntenna : Antenna
     , reflector : Bool
-    , isMenuOpen : Bool -- use this for a dfropdown "Learn" menu.
     , receiveAB : Bool
     , receiveAntenna : Antenna
     , inputState : InputState
