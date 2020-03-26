@@ -57,7 +57,8 @@ gridLetters =
             Svg.text_
                 [ x <| String.fromInt <| xCoord * 80 - 50
                 , y <| String.fromInt <| yCoord * 80 - 40
-                , A.stroke "antiquewhite"
+                , A.stroke "black"
+                , A.fill "none"
                 , textAnchor "middle"
                 , fontFamily "monospace"
                 , fontSize "24"
