@@ -1,11 +1,15 @@
 --TODO: Summary page showing actual incoming tracks with user plots overlaid.
+
+--TODO: In middle of switching to target.theta being absolute not station-relative -- CHECK THIS!!
+
+--TODO: Now worried that all the craft are converging on the station -- is this real?
+--TODO: Map needs rotating or flipping and what about LOS?
 --TODO: Store all target locations when user enters Bearing & Range. This may make correlation possible.
---TODO: Store all target locations once a minute anyway.
 --TODO: Show tracks as yellow lines, maybe different colour for friendly.
 --TODO: Show plots as some kind of symbol.
 --TODO: Adjust map calibration for consistency with approx range.
 --TODO: Derive some average closeness metric.
---TODO: Add some variation to direction of travel of each raid (they are all due West).
+--TODO: Add some variation to direction of travel of each raid.
 --TODO: Add "more ..." on explanatory popups to display overlaid window with more information. (??)
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Test on Android tablet !! (Some webkit only CSS tags.)

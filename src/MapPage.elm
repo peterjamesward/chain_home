@@ -117,7 +117,7 @@ raidTracks model =
         plotArrow ( time, range, theta ) =
             Svg.circle
                 [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
-                , cy <| String.fromFloat <| range * cos theta * mapScale + 2.5 * squareSize
+                , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
                 , r "5"
                 , stroke "orange"
                 , strokeWidth "1"

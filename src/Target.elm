@@ -13,7 +13,7 @@ targetFromProforma  station timeNow proforma=
     , latitude = proforma.latitude
     , longitude = proforma.longitude
     , height = 0
-    , bearing = proforma.bearing
+    , bearing = degrees 270 --proforma.bearing
     , speed = proforma.speed
     , iff = proforma.iff
     , iffActive = False
@@ -54,10 +54,11 @@ targetAtTime station timeNow target =
             range stationPos targetPos
 
         heightInMetres =
+            -- Convert thousands of feet to metres.
             target.height * 304.8
 
         theta =
-            bearing stationPos targetPos - station.lineOfShoot
+            findBearingToTarget stationPos targetPos
     in
     { target
         | latitude = newLat
@@ -75,7 +76,7 @@ targetAtTime station timeNow target =
         , positionHistory =
             case List.head target.positionHistory of
                 Just ( prevTime, _, _ ) ->
-                    if timeNow - prevTime > 6000 then
+                    if timeNow - prevTime > 60000 then
                         ( timeNow, rng, theta ) :: target.positionHistory
 
                     else

@@ -160,7 +160,7 @@ deriveModelAtTime model timeNow =
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
-            deriveEchoes inRangeTargets model.transmitAntenna
+            deriveEchoes model.station  model.transmitAntenna inRangeTargets
 
         receiveSignals =
             -- Deduce inputs based on receiver characteristics.
@@ -180,7 +180,7 @@ deriveModelAtTime model timeNow =
 
         gonioOutput =
             -- 'Blend' X and Y inputs to find target's azimuth.
-            goniometerMix model.goniometerAzimuth receiveSignals
+            goniometerMix (model.goniometerAzimuth + model.station.lineOfShoot) receiveSignals
 
         newRangeSliderPosition =
             slideRangeSlider model.rangeSlider model.keys

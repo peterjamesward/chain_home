@@ -1222,12 +1222,14 @@ findBearingOfNumberedTarget active index model =
 
         currentKeys =
             model.keys
+
+        angleRelativeToLineOfShoot = model.goniometerAzimuth + model.station.lineOfShoot
     in
     { model
         | keys =
             { currentKeys
-                | gonioClock = active && model.goniometerAzimuth < targetBearing - degrees 1
-                , gonioAnti = active && model.goniometerAzimuth > targetBearing + degrees 1
+                | gonioClock = active && angleRelativeToLineOfShoot < targetBearing - degrees 1
+                , gonioAnti = active && angleRelativeToLineOfShoot > targetBearing + degrees 1
             }
     }
 

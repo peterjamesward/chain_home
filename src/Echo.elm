@@ -2,14 +2,17 @@ module Echo exposing (deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, wavelength)
 import Html exposing (..)
+import Station exposing (Station)
 import Types exposing (..)
 import Utils exposing (normalise)
 
 
-
-deriveEchoes : List Target -> Antenna -> List Echo
-deriveEchoes targets txAntenna =
+deriveEchoes : Station -> Antenna -> List Target -> List Echo
+deriveEchoes station txAntenna targets =
     let
+        angleFromLineOfSheet target =
+            target.theta - station.lineOfShoot
+
         echoFromDirectBeam target seq =
             { sequence = seq
             , r = target.rangeInMetres
@@ -26,7 +29,7 @@ deriveEchoes targets txAntenna =
                 else
                     abs <|
                         -- Combine the lobe functions
-                        txAntenna.horizontalLobeFunction target.theta
+                        txAntenna.horizontalLobeFunction (angleFromLineOfSheet target)
                             * txAntenna.verticalLobeFunction target.alpha
                             -- and ad-hoc adjustment for range
                             / logBase 10 (1 + target.rangeInMetres)

@@ -13,7 +13,7 @@ range (φ1, λ1) (φ2, λ2) =
   in 
       sqrt (x*x + y*y) * meanRadius
 
-bearing (φ1, λ1) (φ2, λ2) = 
+findBearingToTarget (φ1, λ1) (φ2, λ2) =
   let
     y = sin (λ2 - λ1) * cos φ2
     x = cos φ1 * sin φ2 - sin φ1 * cos φ2 * cos (λ2 - λ1)
