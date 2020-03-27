@@ -13,6 +13,7 @@ import Goniometer exposing (drawGoniometer)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
+import Model exposing (Model)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import TrainingMode exposing (explanatoryText, tutorialTextBox)
@@ -91,6 +92,7 @@ rangeSlider model =
         }
 
 
+traceDependingOnMode : Model -> List Echo
 traceDependingOnMode model =
     groundRays
         ++ (case ( model.goniometerMode, model.receiveAB ) of

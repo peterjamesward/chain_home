@@ -3,61 +3,32 @@ module Target exposing (..)
 import Html exposing (..)
 import Spherical exposing (..)
 import Station exposing (Station)
-import Types exposing (PolarTarget, Target)
+import Types exposing (Target, TargetProforma)
 
 
-mapToPolar : Station -> Target -> PolarTarget
-mapToPolar station target =
-    -- Convert from Cartesian (and imperial) map coordinates to
-    -- polar (and metric) relative to station position and line of shoot.
-    -- Note that target height are specified in '000 feet.
-    let
-        stationPos =
-            ( station.latitude, station.longitude )
-
-        targetPos =
-            ( target.latitude, target.longitude )
-
-        rng =
-            range stationPos targetPos
-
-        heightInMetres =
-            target.height * 304.8
-    in
-    { r = rng
-    , theta = bearing stationPos targetPos - station.lineOfShoot
-    , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
-    , iff = target.iff
-    , iffActive = target.iffActive
-    , tutorial = target.tutorial
+targetFromProforma : Station ->  Int -> TargetProforma -> Target
+targetFromProforma  station timeNow proforma=
+    { startLatitude = proforma.latitude
+    , startLongitude = proforma.longitude
+    , latitude = proforma.latitude
+    , longitude = proforma.longitude
+    , height = 0
+    , bearing = proforma.bearing
+    , speed = proforma.speed
+    , iff = proforma.iff
+    , iffActive = False
+    , tutorial = proforma.tutorial
+    , startTime = timeNow
+    , rangeInMetres = 0
+    , theta = 0
+    , alpha = 0
     , positionHistory = []
     }
+        |> targetAtTime station timeNow
 
 
-trackTargetPositionHistory : Int -> List PolarTarget -> List PolarTarget
-trackTargetPositionHistory timeNow targets =
-    let
-        trackHistory target =
-            case List.head target.positionHistory of
-                Just ( prevTime, _, _ ) ->
-                    if timeNow - prevTime > 60000 then
-                        { target
-                            | positionHistory = ( timeNow, target.r, target.theta ) :: target.positionHistory
-                        }
-
-                    else
-                        target
-
-                Nothing ->
-                    { target
-                        | positionHistory = [ ( timeNow, target.r, target.theta ) ]
-                    }
-    in
-    List.map trackHistory targets
-
-
-targetAtTime : Int -> Target -> Target
-targetAtTime timeNow target =
+targetAtTime : Station -> Int -> Target -> Target
+targetAtTime station timeNow target =
     -- Targets move! t in seconds to at least centisecond resolution please
     let
         deltaT =
@@ -69,9 +40,24 @@ targetAtTime timeNow target =
 
         ( newLat, newLong ) =
             -- Use the spherical stuff.
-            newPosition ( target.latitude, target.longitude )
+            newPosition ( target.startLatitude, target.startLongitude )
                 distanceTravelled
                 target.bearing
+
+        stationPos =
+            ( station.latitude, station.longitude )
+
+        targetPos =
+            ( target.latitude, target.longitude )
+
+        rng =
+            range stationPos targetPos
+
+        heightInMetres =
+            target.height * 304.8
+
+        theta =
+            bearing stationPos targetPos - station.lineOfShoot
     in
     { target
         | latitude = newLat
@@ -83,15 +69,29 @@ targetAtTime timeNow target =
 
                 Just n ->
                     modBy 12 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
+        , rangeInMetres = rng
+        , theta = theta
+        , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
+        , positionHistory =
+            case List.head target.positionHistory of
+                Just ( prevTime, _, _ ) ->
+                    if timeNow - prevTime > 6000 then
+                        ( timeNow, rng, theta ) :: target.positionHistory
+
+                    else
+                        target.positionHistory
+
+                Nothing ->
+                    [ ( timeNow, rng, theta ) ]
     }
 
 
-findTargetElevation : List Target -> List PolarTarget -> Float -> Maybe Float
+findTargetElevation : List Target -> List Target -> Float -> Maybe Float
 findTargetElevation targets polarTargets range =
     -- Find target nearest to range pointer
     let
         pairsOfRangeAndHeights =
-            List.map2 (\r1 p1 -> ( abs (p1.r - range * 1600), r1.height ))
+            List.map2 (\r1 p1 -> ( abs (p1.rangeInMetres - range * 1600), r1.height ))
                 targets
                 polarTargets
 

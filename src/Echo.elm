@@ -1,32 +1,21 @@
-module Echo exposing (Echo, deriveEchoes, viewEcho)
+module Echo exposing (deriveEchoes, viewEcho)
 
 import Constants exposing (pulseDuration, wavelength)
 import Html exposing (..)
 import Types exposing (..)
-
-
-type alias Echo =
-    { sequence : Int
-    , r : Float
-    , theta : Float
-    , alpha : Float
-    , phase : Float
-    , duration : Float
-    , amplitude : Float
-    , tutorial : Bool -- this raid needs to be highlighting in a tutorial.
-    }
+import Utils exposing (normalise)
 
 
 
-deriveEchoes : List PolarTarget -> Antenna -> List Echo
+deriveEchoes : List Target -> Antenna -> List Echo
 deriveEchoes targets txAntenna =
     let
         echoFromDirectBeam target seq =
             { sequence = seq
-            , r = target.r
+            , r = target.rangeInMetres
             , theta = target.theta
             , alpha = target.alpha
-            , phase = asin <| sin <| target.r / wavelength
+            , phase = normalise (target.rangeInMetres / wavelength)
             , duration = pulseDuration
             , amplitude =
                 if target.iffActive then
@@ -40,7 +29,8 @@ deriveEchoes targets txAntenna =
                         txAntenna.horizontalLobeFunction target.theta
                             * txAntenna.verticalLobeFunction target.alpha
                             -- and ad-hoc adjustment for range
-                            / (logBase 10 (1 + target.r))^1.2
+                            / logBase 10 (1 + target.rangeInMetres)
+                            ^ 1.2
             , tutorial = target.tutorial
             }
     in

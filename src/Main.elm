@@ -53,8 +53,7 @@ init _ =
       , elevation_B_trace = []
       , station = bawdsey
       , targets = []
-      , movedTargets = []
-      , polarTargets = []
+      , inRangeTargets = []
       , echoes = []
       , skyline = []
       , goniometerAzimuth = degrees 40 -- relative to Line Of Shoot.
@@ -152,18 +151,16 @@ deriveModelAtTime model timeNow =
     let
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
-            List.map (targetAtTime timeNow) model.targets
+            List.map (targetAtTime model.station timeNow) model.targets
 
-        convertedTargets =
+        inRangeTargets =
             -- Easier to work in polar coordinates here on.
             -- Filter removes raid beyond our range.
-            trackTargetPositionHistory timeNow <|
-                List.filter (\tgt -> tgt.r < 100 * 1600) <|
-                    List.map (mapToPolar bawdsey) targetsNow
+            List.filter (\tgt -> tgt.rangeInMetres < 100 * 1600) targetsNow
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
-            deriveEchoes convertedTargets model.transmitAntenna
+            deriveEchoes inRangeTargets model.transmitAntenna
 
         receiveSignals =
             -- Deduce inputs based on receiver characteristics.
@@ -195,8 +192,8 @@ deriveModelAtTime model timeNow =
     tutorialAutomation
         { model
             | modelTime = timeNow
-            , movedTargets = targetsNow
-            , polarTargets = convertedTargets
+            , targets = targetsNow
+            , inRangeTargets = inRangeTargets
             , echoes = echoSignals
             , gonioOutput = gonioOutput
             , azimuthModeTrace = gonioOutput
@@ -435,7 +432,7 @@ update msg model =
 
                 HeightInput ->
                     { model
-                        | storedElevation = findTargetElevation model.targets model.polarTargets model.rangeSlider
+                        | storedElevation = findTargetElevation model.targets model.targets model.rangeSlider
                         , inputState = HeightRangeInput
                     }
 
@@ -511,6 +508,7 @@ makeNewTarget ( latitudeOffset, height ) model =
         bearing =
             station.lineOfShoot + pi
 
+        hostileSingle : TargetProforma
         hostileSingle =
             { latitude = newLat
             , longitude = newLong
@@ -518,9 +516,7 @@ makeNewTarget ( latitudeOffset, height ) model =
             , bearing = bearing
             , speed = 300 -- Quicker testing!
             , iff = Nothing
-            , iffActive = False
             , tutorial = False
-            , startTime = model.modelTime
             }
 
         raidIfSelected scenario raidType =
@@ -563,7 +559,16 @@ makeNewTarget ( latitudeOffset, height ) model =
                 _ ->
                     [ hostileSingle ]
     in
-    { model | targets = raidDistribution ++ model.targets }
+    { model
+        | targets =
+            List.map
+                (targetFromProforma
+                    model.station
+                    model.modelTime
+                )
+                raidDistribution
+                ++ model.targets
+    }
 
 
 selectTransmitAntenna ab reflect =

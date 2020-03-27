@@ -1,13 +1,12 @@
 module CRT_WebGL exposing (..)
 
 import Array exposing (Array)
-import Echo exposing (Echo)
 import Html exposing (Html)
 import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
 import Messages exposing (Msg)
-import Types exposing (Point)
+import Types exposing (Echo, Point)
 import Utils exposing (choose)
 import WebGL exposing (clearColor)
 

@@ -40,28 +40,48 @@ type alias Antenna =
     , horizontalLobeFunction : Float -> Float
     }
 
+-- DEEP BREATH: moving to single Target type.
 
-type alias Target =
+type alias TargetProforma =
+    -- Use this in config / tutorials; not actual targets.
     { latitude : Float
     , longitude : Float
     , height : Float -- in thousands of feet
     , bearing : Float -- in degrees from North
     , speed : Float -- miles per hour (!)
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
-    , iffActive : Bool -- pulsing now.
-    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
-    , startTime : Int -- Each target needs it own time baseline.
+    , tutorial : Bool
     }
 
 
-type alias PolarTarget =
-    { r : Float -- metres
+type alias Target =
+    { startLatitude : Float
+    , startLongitude : Float
+    , latitude : Float -- position after movement
+    , longitude : Float
+    , height : Float -- in thousands of feet
+    , bearing : Float -- in radians from North
+    , speed : Float -- miles per hour (!)
+    , iff : Maybe Int -- the value at which t mod 12 triggers a return
+    , iffActive : Bool -- pulsing now.
+    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
+    , startTime : Int -- Each target needs it own time baseline.
+    , rangeInMetres : Float -- metres
     , theta : Float -- radians
     , alpha : Float -- radians, ignoring curvature for now
-    , iff : Maybe Int -- pulsing; time when pulse started
-    , iffActive : Bool -- pulsing now.
-    , tutorial : Bool
-    , positionHistory : List (Int, Float, Float) -- the actual track of the raid, minute by minute.
+    , positionHistory : List ( Int, Float, Float ) -- the actual track of the raid, minute by minute.
+    }
+
+
+type alias Echo =
+    { sequence : Int
+    , r : Float
+    , theta : Float
+    , alpha : Float
+    , phase : Float
+    , duration : Float
+    , amplitude : Float
+    , tutorial : Bool -- this raid needs to be highlighting in a tutorial.
     }
 
 

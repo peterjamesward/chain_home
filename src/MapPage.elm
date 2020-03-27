@@ -13,7 +13,10 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 
-squareSize = 83
+
+squareSize =
+    83
+
 
 mapVisibleGrid : List (List String)
 mapVisibleGrid =
@@ -28,15 +31,11 @@ mapVisibleGrid =
 
 
 mapPage : Model -> Element Msg
-mapPage _ =
+mapPage model =
     el [ centerX, centerY, Element.width Element.fill ] <|
         html <|
             svg
-                [ viewBox "0 0 800 800"
-
-                --, A.width "100%"
-                --, A.height "100%"
-                ]
+                [ viewBox "0 0 800 800" ]
             <|
                 [ Svg.image
                     [ x "0"
@@ -49,6 +48,7 @@ mapPage _ =
                 ]
                     ++ gridLetters
                     ++ gridLines
+                    ++ raidTracks model
 
 
 gridLetters =
@@ -85,16 +85,44 @@ gridLines =
                 , strokeWidth "1"
                 ]
                 []
+
         verticalGridLine index =
-              Svg.line
-                  [ y1 <| String.fromInt 0
-                  , x1 <| String.fromInt <| index * squareSize
-                  , y2 <| String.fromInt (squareSize * 5)
-                  , x2 <| String.fromInt <| index * squareSize
-                  , stroke "black"
-                  , strokeWidth "1"
-                  ]
-                  []
+            Svg.line
+                [ y1 <| String.fromInt 0
+                , x1 <| String.fromInt <| index * squareSize
+                , y2 <| String.fromInt (squareSize * 5)
+                , x2 <| String.fromInt <| index * squareSize
+                , stroke "black"
+                , strokeWidth "1"
+                ]
+                []
     in
     List.map horizontalGridLine [ 1, 2, 3, 4 ]
-    ++ List.map verticalGridLine [ 1, 2, 3, 4 ]
+        ++ List.map verticalGridLine [ 1, 2, 3, 4 ]
+
+
+raidTracks model =
+    -- Note that the plots are associated with the polar targets.
+    -- We shall use the same conversion from range and bearing to map coordinates as we
+    -- do for the calculator grid so this should be fair.
+    -- Remember station is notionally in central square.
+    -- Scalewise, our map is made of 100km squares and they occupy 'squareSize' on the screen.
+    let
+        mapScale =
+            toFloat squareSize / 100000.0
+
+        raidTrack target =
+            List.map plotArrow target.positionHistory
+
+        plotArrow ( time, range, theta ) =
+            Svg.circle
+                [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
+                , cy <| String.fromFloat <| range * cos theta * mapScale + 2.5 * squareSize
+                , r "5"
+                , stroke "orange"
+                , strokeWidth "1"
+                , A.fill "navy"
+                ]
+                []
+    in
+    List.concatMap raidTrack model.targets

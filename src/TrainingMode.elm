@@ -1117,7 +1117,7 @@ tutorialStoreElevation : TutorialAction
 tutorialStoreElevation model =
     -- Use the actual known elevation for target near range setting.
     { model
-        | storedElevation = findTargetElevation model.targets model.polarTargets model.rangeSlider
+        | storedElevation = findTargetElevation model.targets model.targets model.rangeSlider
         , inputState = HeightRangeInput
     }
 
@@ -1192,7 +1192,7 @@ chaseTheRaidRange active model =
         rangeInMetres =
             Maybe.withDefault 50000 <|
                 List.head <|
-                    List.map .r model.polarTargets
+                    List.map .rangeInMetres model.targets
 
         rangeInMiles =
             toFloat <| floor <| rangeInMetres / 1600
@@ -1218,7 +1218,7 @@ findBearingOfNumberedTarget active index model =
             Maybe.withDefault 0.0 <|
                 List.head <|
                     List.drop index <|
-                        List.map .theta model.polarTargets
+                        List.map .theta model.targets
 
         currentKeys =
             model.keys

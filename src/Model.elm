@@ -1,12 +1,10 @@
 module Model exposing (Model)
 
 import Config exposing (TargetSelector)
-import Echo exposing (Echo)
 import Element exposing (Device)
 import Keys exposing (Keys)
 import Station exposing (Station)
 import Types exposing (..)
-
 
 
 type alias Model =
@@ -19,8 +17,7 @@ type alias Model =
     , elevation_B_trace : List Echo
     , station : Station
     , targets : List Target
-    , movedTargets : List Target
-    , polarTargets : List PolarTarget
+    , inRangeTargets : List Target
     , echoes : List Echo
     , skyline : List Line
     , goniometerAzimuth : Angle
