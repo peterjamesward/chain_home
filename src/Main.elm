@@ -160,7 +160,7 @@ deriveModelAtTime model timeNow =
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
-            deriveEchoes model.station  model.transmitAntenna inRangeTargets
+            deriveEchoes model.station model.transmitAntenna inRangeTargets
 
         receiveSignals =
             -- Deduce inputs based on receiver characteristics.
@@ -173,7 +173,7 @@ deriveModelAtTime model timeNow =
             -- systems (Supervisor's Handbook chap 12). We then know the goniometer setting that
             -- will make a target "D/F out" -- we only need a suitable function to make it appear
             -- that we are actually using a goniometer.
-            aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
+            aElevationAdjustedEchoes (model.goniometerAzimuth + model.station.lineOfShoot) echoSignals
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
@@ -558,16 +558,18 @@ makeNewTarget ( latitudeOffset, height ) model =
 
                 _ ->
                     [ hostileSingle ]
-    in
-    { model
-        | targets =
+
+        newTargets =
             List.map
                 (targetFromProforma
                     model.station
                     model.modelTime
                 )
                 raidDistribution
-                ++ model.targets
+    in
+    { model
+        | targets = newTargets ++ model.targets
+        , newRaid = List.head newTargets
     }
 
 
