@@ -151,8 +151,8 @@ rangeTicks =
                 ++ label i
     in
     svg
-        [ viewBox "-5 -10 2005 200"
-        , S.width "100%"
+        [ viewBox "-5 -10 2010 200"
+        , S.width "102%"
         , S.height "100%"
         ]
     <|
@@ -161,11 +161,13 @@ rangeTicks =
 
 rangeScale model =
     el
-        [ width fill
-        , centerX
-        , paddingEach { edges | left = 10, right = 30, top = 10 }
-        , E.above (rangeSlider model)
-        ]
+        ([ width fill
+         , centerX
+         , paddingEach { edges | left = 10, right = 30, top = 10 }
+         , E.above (rangeSlider model)
+         ]
+            ++ disableSelection
+        )
     <|
         html rangeTicks
 
@@ -177,8 +179,6 @@ rangeSliderAndCRT model trace =
             [ inFront <|
                 el
                     [ alignTop
-                    --, centerX
-                    , moveLeft 6
                     , width fill
                     , paddingEach { edges | left = 20 }
                     ]
