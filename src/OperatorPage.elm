@@ -6,7 +6,6 @@ import Constants exposing (..)
 import Element as E exposing (..)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events exposing (onClick, onMouseEnter)
 import Element.Font as Font
 import Element.Input as Input
 import Goniometer exposing (drawGoniometer)
@@ -16,9 +15,11 @@ import Messages exposing (..)
 import Model exposing (Model)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
+import Svg exposing (svg)
+import Svg.Attributes as S exposing (fontFamily, fontSize, stroke, strokeWidth, textAnchor, viewBox, x, x1, x2, y, y1, y2)
 import TrainingMode exposing (explanatoryText, tutorialTextBox)
 import Types exposing (..)
-import Utils exposing (choose, commonStyles, disableSelection, edges, helpButton)
+import Utils exposing (commonStyles, disableSelection, edges, helpButton)
 
 
 clickableRangeKnob model tutorial =
@@ -57,8 +58,6 @@ rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
         , E.width (E.px 600)
-        , moveRight 20
-        --, paddingEach { edges | left = 80 }
         , pointer
 
         -- Here is where we're creating/styling the "track"
@@ -108,24 +107,67 @@ traceDependingOnMode model =
            )
 
 
-rangeScale model =
-    row
-        [ width (px 590)
-        , spaceEvenly
-        , Font.color beamGreen
-        , Font.size 20
-        , Font.family
-            [ Font.typeface "Courier New"
-            , Font.sansSerif
+rangeTicks =
+    let
+        tickSize i =
+            case ( modBy 10 i, modBy 5 i ) of
+                ( 0, 0 ) ->
+                    40
+
+                ( _, 0 ) ->
+                    20
+
+                _ ->
+                    10
+
+        label i =
+            if modBy 10 i == 0 then
+                [ Svg.text_
+                    [ x (String.fromFloat <| max 5 (toFloat i * 19.7))
+                    , y "100"
+                    , S.fill "green"
+                    , textAnchor "middle"
+                    , fontFamily "monospace"
+                    , fontSize "60"
+                    ]
+                    [ Svg.text <| String.fromInt i
+                    ]
+                ]
+
+            else
+                []
+
+        tick i =
+            [ Svg.line
+                [ x1 <| String.fromInt (i * 20)
+                , y1 "0"
+                , x2 <| String.fromInt (i * 20)
+                , y2 <| String.fromInt <| tickSize i
+                , stroke "green"
+                , strokeWidth "6"
+                ]
+                []
             ]
+                ++ label i
+    in
+    svg
+        [ viewBox "0 -10 2050 200"
+        , S.width "105%"
+        , S.height "100%"
         ]
     <|
-        List.map
-            (\i ->
-                el disableSelection <|
-                    text (String.fromInt (10 * i))
-            )
-            (List.range 0 10)
+        List.concatMap tick (List.range 0 100)
+
+
+rangeScale model =
+    el
+        [ width fill
+        , centerX
+        , paddingEach { edges | left = 10, right = 30, top = 10 }
+        , E.above (rangeSlider model)
+        ]
+    <|
+        html rangeTicks
 
 
 rangeSliderAndCRT model trace =
@@ -137,7 +179,6 @@ rangeSliderAndCRT model trace =
                     [ alignTop
                     , centerX
                     , width fill
-                    , E.below (rangeSlider model)
                     , paddingEach { edges | left = 20 }
                     ]
                     (rangeScale model)
