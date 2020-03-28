@@ -48,4 +48,5 @@ type alias Model =
     , tutorialsCompleted : List TutorialScenario -- would like to use Set but can't. Because Elm.
     , newRaid : Maybe Target
     , timeForNextRaid : Maybe Int
+    , storedPlots : List (Int, Float, Float)
     }

@@ -49,6 +49,7 @@ mapPage model =
                     ++ gridLetters
                     ++ gridLines
                     ++ raidTracks model
+                    ++ userPlots model
 
 
 gridLetters =
@@ -64,7 +65,7 @@ gridLetters =
                 , A.fill "none"
                 , textAnchor "middle"
                 , fontFamily "monospace"
-                , fontSize "24"
+                , fontSize "32"
                 ]
                 [ Svg.text letter
                 ]
@@ -126,3 +127,26 @@ raidTracks model =
                 []
     in
     List.concatMap raidTrack model.targets
+
+userPlots model =
+    -- Note that the plots are associated with the polar targets.
+    -- We shall use the same conversion from range and bearing to map coordinates as we
+    -- do for the calculator grid so this should be fair.
+    -- Remember station is notionally in central square.
+    -- Scalewise, our map is made of 100km squares and they occupy 'squareSize' on the screen.
+    let
+        mapScale =
+            toFloat squareSize / 100000.0
+
+        plot ( time, range, theta ) =
+            Svg.circle
+                [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
+                , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
+                , r "3"
+                , stroke "navy"
+                , strokeWidth "1"
+                , A.fill "yellow"
+                ]
+                []
+    in
+    List.map plot model.storedPlots

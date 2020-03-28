@@ -84,6 +84,7 @@ init _ =
       , tutorialsCompleted = []
       , newRaid = Nothing
       , timeForNextRaid = Nothing
+      , storedPlots = []
       }
     , Task.perform SetStartTime Time.now
     )
@@ -213,7 +214,7 @@ update msg model =
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -(degrees 1.0) (degrees 1.0)) (Random.float 5 30)
+                Random.pair (Random.float -(degrees 1.5) (degrees 1.5)) (Random.float 5 30)
     in
     case msg of
         TimeDelta dt ->
@@ -442,7 +443,7 @@ update msg model =
             )
 
         StoreRangeSetting ->
-            ( case model.inputState of
+            ( (case model.inputState of
                 BearingRangeInput ->
                     { model
                         | storedAzimuthRange = Just (1.6 * model.rangeSlider)
@@ -457,6 +458,8 @@ update msg model =
 
                 _ ->
                     model
+              )
+                |> saveNewPlot
             , Cmd.none
             )
 
@@ -483,6 +486,18 @@ update msg model =
             ( model, Cmd.none )
 
 
+saveNewPlot : Model -> Model
+saveNewPlot model =
+    -- After RANGE is stored, if we have bearing and range, add to history.
+    -- Note that the stored value is in km, here we convert to meters.
+    case ( model.storedAzimuth, model.storedAzimuthRange ) of
+        ( Just theta, Just range ) ->
+            { model | storedPlots = ( model.modelTime, range * 1000, theta ) :: model.storedPlots }
+
+        _ ->
+            model
+
+
 setNextRandomRaidTime : Model -> Model
 setNextRandomRaidTime model =
     { model
@@ -500,14 +515,15 @@ makeNewTarget ( latitudeOffset, height ) model =
             model.station
 
         newLong =
-            station.longitude + degrees 1.2
+            station.longitude + degrees 2.2
 
         newLat =
             station.latitude + latitudeOffset
 
         heading =
-            degrees 270  -- so we should see Westerly tracks.
+            degrees 270
 
+        -- so we should see Westerly tracks.
         hostileSingle : TargetProforma
         hostileSingle =
             { latitude = newLat
