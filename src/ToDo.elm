@@ -1,9 +1,10 @@
---TODO: Summary page showing actual incoming tracks with user plots overlaid.
+--DONE: Summary page showing actual incoming tracks with user plots overlaid.
 --TODO: Checkbox to show actual tracks. Possibly protect that somehow during 'game turn'.
+--TODO: Explanatory notes on MapPage.
 --DONE: Now worried that all the craft are converging on the station -- is this real?
 --DONE: Map needs rotating or flipping and what about LOS?
 --TODO: Store all target locations when user enters Bearing & Range? This may make correlation possible.
---TODO: Show plots as some kind of symbol.
+--DONE: Show plots as some kind of symbol.
 --DONE: Adjust map calibration for consistency with approx range.
 --TODO: Derive some average closeness metric?
 --TODO: Add some variation to direction of travel of each raid.

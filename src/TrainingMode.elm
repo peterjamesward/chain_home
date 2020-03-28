@@ -76,6 +76,11 @@ uiExplanations =
     You can tick or untick them anyway, if you like.""" )
     , ( UiGoButton, """Test yourself with a series of incoming raids.
                         This will only use the types of raid that are ticked.""" )
+    , ( UiMapPage, """Your plots are relayed to the Filter Room where they are placed
+    on the map. The team there combines your plots with plots from other CH stations
+    and deduces the most likely position of the raids.
+    We have the advantage of being able to see exactly where the raids were!
+    """)
     ]
 
 

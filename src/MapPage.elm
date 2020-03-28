@@ -12,10 +12,14 @@ import Messages exposing (Msg)
 import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
+import TrainingMode exposing (explanatoryText)
+import Types exposing (UiComponent(..))
+import Utils exposing (helpButton)
 
 
 squareSize =
-    83
+    -- This is 'tuned' to suit the map image.
+    160
 
 
 mapVisibleGrid : List (List String)
@@ -32,10 +36,36 @@ mapVisibleGrid =
 
 mapPage : Model -> Element Msg
 mapPage model =
-    el [ centerX, centerY, Element.width Element.fill ] <|
-        html <|
+    row
+        [ centerX
+        , alignTop
+        , padding 10
+        , spaceEvenly
+        , Element.width Element.fill
+        , explain Debug.todo
+        ]
+        [ theMap model
+        , el
+            (explanatoryText model UiMapPage)
+            (Element.text "Hello world")
+        , helpButton
+        ]
+
+
+theMap : Model -> Element Msg
+theMap model =
+    -- Sizing this is a bit of a fiddle. Probably cause of stuff I don't know.
+    el
+        [ centerX
+        , centerY
+        ]
+    <|
+        Element.html <|
             svg
-                [ viewBox "0 0 800 800" ]
+                [ viewBox "0 0 800 800"
+                , A.width "100%"
+                , A.height "100%"
+                ]
             <|
                 [ Svg.image
                     [ x "0"

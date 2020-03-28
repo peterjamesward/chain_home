@@ -117,6 +117,7 @@ type UiComponent
     | UiCalculator
     | UiConfigOptions
     | UiGoButton
+    | UiMapPage
     | UiDummy
 
 
