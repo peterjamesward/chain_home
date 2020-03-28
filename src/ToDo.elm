@@ -14,3 +14,11 @@
 --TODO: Installable on iOS. -- Probably means getting to grips with Cordova/PhoneGap.
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
 --TODO: Fit it on 800x600 screen?
+
+--TODO: Invisible border around all objects.
+--TODO: Tutorial - alternate action and explain text.
+--TODO: Make range pointer in front
+--TODO: Calibration on range scale.
+--TODO: Lightweight lines around calculator zones.
+--TODO: Tutorial raid are on wrong range.
+--TODO: All raids now seem to be 500ft !!

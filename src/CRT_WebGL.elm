@@ -79,7 +79,7 @@ uniforms time echoes =
             (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
             (Mat4.makeRotate (2 * 0.0) (vec3 1 0 0))
     , perspective = Mat4.makePerspective 19 1 0.1 10
-    , camera = Mat4.makeLookAt (vec3 0 0 7) (vec3 0 -0.5 0) (vec3 0 1 0)
+    , camera = Mat4.makeLookAt (vec3 0 0 6.5) (vec3 0 -0.5 0) (vec3 0 1 0)
     , u_time = time
     , lineJiggle = 0.03 -- 0.03 is OK.
     , lineSpikes = 0.2 -- 1.0 is OK.

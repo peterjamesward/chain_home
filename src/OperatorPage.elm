@@ -56,8 +56,9 @@ clickableGonioImage model tutorial =
 rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
-        , E.width (E.px 560)
-        , paddingEach { edges | left = 80 }
+        , E.width (E.px 600)
+        , moveRight 20
+        --, paddingEach { edges | left = 80 }
         , pointer
 
         -- Here is where we're creating/styling the "track"
@@ -67,7 +68,7 @@ rangeSlider model =
                 , E.height (E.px 2)
                 , E.centerY
                 , E.centerX
-                , Background.color midGray
+                , Background.color black
                 , Border.rounded 2
                 ]
                 E.none
@@ -82,9 +83,9 @@ rangeSlider model =
         , value = model.rangeSlider
         , thumb =
             Input.thumb
-                [ E.width (E.px 16)
-                , E.height (E.px 50)
-                , Border.rounded 8
+                [ E.width (E.px 12)
+                , E.height (E.px 60)
+                , Border.rounded 6
                 , Border.width 4
                 , Border.color paletteDarkGreen
                 , Background.color white
@@ -109,18 +110,15 @@ traceDependingOnMode model =
 
 rangeScale model =
     row
-        ([ width (px 600)
-         , spaceEvenly
-         , paddingEach { edges | top = 10, left = 40 }
-         , Font.color beamGreen
-         , Font.size 20
-         , Font.family
+        [ width (px 590)
+        , spaceEvenly
+        , Font.color beamGreen
+        , Font.size 20
+        , Font.family
             [ Font.typeface "Courier New"
             , Font.sansSerif
             ]
-         ]
-            ++ explanatoryText model UiRangeScale
-        )
+        ]
     <|
         List.map
             (\i ->
@@ -133,14 +131,17 @@ rangeScale model =
 rangeSliderAndCRT model trace =
     column
         ([ padding 5 ] ++ explanatoryText model UiCRT)
-        [ none
-        , el
-            [ E.below (rangeScale model)
-            , paddingEach { edges | left = 40 }
+        [ el
+            [ inFront <|
+                el
+                    [ alignTop
+                    , centerX
+                    , width fill
+                    , E.below (rangeSlider model)
+                    , paddingEach { edges | left = 20 }
+                    ]
+                    (rangeScale model)
             ]
-            (rangeSlider model)
-        , el
-            []
             (E.html <| crt model.webGLtime trace)
         ]
 
@@ -151,9 +152,10 @@ modeSwitchPanel model =
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
         , row
-            (Border.widthEach { edges | left = 1, right = 1, top = 1 }
-                :: commonStyles
-                ++ explanatoryText model UiAB
+            ([ Border.widthEach { edges | left = 1, right = 1, top = 1 }
+             , Border.color paletteSand
+             ]
+                ++ commonStyles
             )
             [ column commonStyles
                 [ indicatorLabelAbove "A" (model.goniometerMode == Azimuth && model.receiveAB)
@@ -200,14 +202,16 @@ modeSwitchPanel model =
 
 raidStrengthPanel model =
     column
-        (Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
-            :: paddingEach { edges | left = 20, right = 20 }
-            :: (commonStyles ++ explanatoryText model UiRaidStrength)
-        )
-        [ row [ centerX ]
+        [ Border.color paletteSand
+        , Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
+        , paddingEach { edges | left = 20, right = 20 }
+        , centerX
+        ]
+        [ row (commonStyles ++ explanatoryText model UiRaidStrength)
             [ column
                 [ Font.size 18
                 , Font.bold
+                , alignRight
                 ]
                 [ raidStrengthButtonLabelLeft "1" (RaidStrength 1) (model.storedStrength == Just 1)
                 , raidStrengthButtonLabelLeft "2" (RaidStrength 2) (model.storedStrength == Just 2)

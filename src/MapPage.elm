@@ -42,12 +42,10 @@ mapPage model =
         , padding 10
         , spaceEvenly
         , Element.width Element.fill
-        , explain Debug.todo
+        --, explain Debug.todo
         ]
         [ theMap model
-        , el
-            (explanatoryText model UiMapPage)
-            (Element.text "Hello world")
+        , el [ Element.width (px 200) ] <| Element.text "Options to go here..."
         , helpButton
         ]
 
@@ -56,9 +54,12 @@ theMap : Model -> Element Msg
 theMap model =
     -- Sizing this is a bit of a fiddle. Probably cause of stuff I don't know.
     el
-        [ centerX
-        , centerY
-        ]
+        ([ centerX -- Needed!
+         , centerY
+         , Element.width (px 600)
+         ]
+            ++ explanatoryText model UiMapPage
+        )
     <|
         Element.html <|
             svg
@@ -89,13 +90,13 @@ gridLetters =
 
         gridLetter yCoord letter xCoord =
             Svg.text_
-                [ x <| String.fromInt <| xCoord * squareSize - 40
-                , y <| String.fromInt <| yCoord * squareSize - 35
+                [ x <| String.fromInt <| xCoord * squareSize - squareSize // 2
+                , y <| String.fromInt <| yCoord * squareSize - squareSize // 3
                 , A.stroke "black"
                 , A.fill "none"
                 , textAnchor "middle"
                 , fontFamily "monospace"
-                , fontSize "32"
+                , fontSize "64"
                 ]
                 [ Svg.text letter
                 ]
@@ -154,7 +155,7 @@ raidTracks model =
             Svg.circle
                 [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
                 , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
-                , r "3"
+                , r "5"
                 , stroke "orange"
                 , strokeWidth "1"
                 , A.fill "navy"
@@ -178,7 +179,7 @@ userPlots model =
             Svg.circle
                 [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
                 , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
-                , r "3"
+                , r "5"
                 , stroke "navy"
                 , strokeWidth "1"
                 , A.fill "yellow"

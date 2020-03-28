@@ -53,10 +53,15 @@ calculatorLandscape model =
     column
         [ centerX
         ]
-        [ row [ spacing 10, padding 5  ]
+        [ row [ spacing 10, padding 5 ]
             [ positionGridDisplay model position
             , column [ spacing 10, alignLeft ]
-                [ row [ paddingEach { edges | left = 10, bottom = 10 }, spacing 10 ]
+                [ row
+                    [ paddingEach { edges | left = 10, bottom = 10 }
+                    , spacing 10
+                    , Border.color lightCharcoal
+                    , Border.width 1
+                    ]
                     [ strengthDisplay model strength
                     , maybeBoolDisplay "+" plus
                     , maybeBoolDisplay "F" friendly
@@ -69,11 +74,16 @@ calculatorLandscape model =
                 ]
             , helpButton
             ]
-        , row (explanatoryText model UiCalcOffset)
+        , row
+            ([ Border.color lightCharcoal
+             , Border.width 1
+             ]
+                ++ explanatoryText model UiCalcOffset
+            )
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
-        , row [ tutorialTextBox model [  ] ] []
+        , row [ tutorialTextBox model [] ] []
         ]
 
 
@@ -181,7 +191,12 @@ positionGridDisplay model position =
                     letters
     in
     column
-        ([ centerX, padding 10, spacingXY 5 5 ]
+        ([ centerX
+         , padding 10
+         , spacingXY 5 5
+         , Border.color lightCharcoal
+         , Border.width 1
+         ]
             ++ explanatoryText model UiCalcGrid
         )
     <|
@@ -262,7 +277,13 @@ heightGrid model storedHeight =
                 (text label)
     in
     -- Height is in '000 feet, sourced from config data!
-    column ([ width fill ] ++ explanatoryText model UiCalcHeight)
+    column
+        ([ width fill
+         , Border.color lightCharcoal
+         , Border.width 1
+         ]
+            ++ explanatoryText model UiCalcHeight
+        )
         [ row [ width fill, spaceEvenly ] <|
             List.map3
                 (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
@@ -316,7 +337,11 @@ digitDisplayLamp maybeN digit =
 
 significantDigit : Maybe Int -> Element Msg
 significantDigit maybeN =
-    column []
+    column
+        [ Border.color lightCharcoal
+        , Border.widthEach { edges | right = 1, left = 1 }
+        , Border.dashed
+        ]
         [ row [] <| List.map (digitDisplayLamp maybeN) [ 1, 2, 3, 4, 5 ]
         , row [] <| List.map (digitDisplayLamp maybeN) [ 6, 7, 8, 9, 0 ]
         ]
@@ -324,7 +349,11 @@ significantDigit maybeN =
 
 offsetDisplay : Maybe Int -> Element Msg
 offsetDisplay offset =
-    row [ padding 5, spacing 10 ]
+    row
+        [ padding 5
+        , spacing 10
+        ]
         [ significantDigit <| Maybe.map (\n -> n // 10) offset
         , significantDigit <| Maybe.map (modBy 10) offset
         ]
+

@@ -1,7 +1,7 @@
 module TrainingMode exposing (..)
 
 import Config exposing (trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
-import Constants exposing (blue, flatSunflower, paletteSand, white)
+import Constants exposing (blue, flatMidnightBlue, flatSunflower, flatWetAsphalt, paletteSand, white)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -80,7 +80,7 @@ uiExplanations =
     on the map. The team there combines your plots with plots from other CH stations
     and deduces the most likely position of the raids.
     We have the advantage of being able to see exactly where the raids were!
-    """)
+    """ )
     ]
 
 
@@ -1228,7 +1228,8 @@ findBearingOfNumberedTarget active index model =
         currentKeys =
             model.keys
 
-        angleRelativeToLineOfShoot = model.goniometerAzimuth + model.station.lineOfShoot
+        angleRelativeToLineOfShoot =
+            model.goniometerAzimuth + model.station.lineOfShoot
     in
     { model
         | keys =
@@ -1344,30 +1345,37 @@ explanatoryText model uiComponent =
         ]
 
     else
-        case ( model.explainMode, uiComponentDescription ) of
-            ( True, Just txt ) ->
-                [ inFront <|
-                    el
-                        [ centerX
-                        , centerY
-                        , Background.color blue
-                        , Border.color white
-                        , Border.width 1
-                        , Border.rounded 5
+        [ Border.color flatMidnightBlue
+        , Border.width 2
+        , Border.glow flatMidnightBlue 2.0
+        , Border.innerGlow flatMidnightBlue 2.0
+        , Border.rounded 5
+        ]
+            ++ (case ( model.explainMode, uiComponentDescription ) of
+                    ( True, Just txt ) ->
+                        [ inFront <|
+                            el
+                                [ centerX
+                                , centerY
+                                , Background.color blue
+                                , Border.color white
+                                , Border.width 1
+                                , Border.rounded 5
+                                ]
+                            <|
+                                paragraph
+                                    [ spacing 1
+                                    , Font.size 16
+                                    , Font.family [ Font.typeface "Helvetica" ]
+                                    , Font.color white
+                                    , padding 5
+                                    ]
+                                    [ text txt ]
                         ]
-                    <|
-                        paragraph
-                            [ spacing 1
-                            , Font.size 16
-                            , Font.family [ Font.typeface "Helvetica" ]
-                            , Font.color white
-                            , padding 5
-                            ]
-                            [ text txt ]
-                ]
 
-            _ ->
-                []
+                    _ ->
+                        []
+               )
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg
