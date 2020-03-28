@@ -118,7 +118,7 @@ raidTracks model =
             Svg.circle
                 [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
                 , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
-                , r "5"
+                , r "3"
                 , stroke "orange"
                 , strokeWidth "1"
                 , A.fill "navy"

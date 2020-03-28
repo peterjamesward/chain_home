@@ -13,7 +13,7 @@ targetFromProforma  station timeNow proforma=
     , latitude = proforma.latitude
     , longitude = proforma.longitude
     , height = 0
-    , bearing = degrees 270 --proforma.bearing
+    , heading = proforma.heading
     , speed = proforma.speed
     , iff = proforma.iff
     , iffActive = False
@@ -42,7 +42,7 @@ targetAtTime station timeNow target =
             -- Use the spherical stuff.
             newPosition ( target.startLatitude, target.startLongitude )
                 distanceTravelled
-                target.bearing
+                target.heading
 
         stationPos =
             ( station.latitude, station.longitude )

@@ -47,7 +47,7 @@ type alias TargetProforma =
     { latitude : Float
     , longitude : Float
     , height : Float -- in thousands of feet
-    , bearing : Float -- in degrees from North
+    , heading : Float -- in degrees from North
     , speed : Float -- miles per hour (!)
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
     , tutorial : Bool
@@ -60,15 +60,15 @@ type alias Target =
     , latitude : Float -- position after movement
     , longitude : Float
     , height : Float -- in thousands of feet
-    , bearing : Float -- in radians from North
+    , heading : Float -- in radians from North
     , speed : Float -- miles per hour (!)
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
     , iffActive : Bool -- pulsing now.
     , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
     , startTime : Int -- Each target needs it own time baseline.
     , rangeInMetres : Float -- metres
-    , theta : Float -- radians
-    , alpha : Float -- radians, ignoring curvature for now
+    , theta : Float -- azimuth radians 0 is North.
+    , alpha : Float -- elevation in radians, ignoring curvature for now
     , positionHistory : List ( Int, Float, Float ) -- the actual track of the raid, minute by minute.
     }
 

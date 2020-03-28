@@ -64,7 +64,7 @@ behindStation =
     { longitude = bawdsey.longitude - degrees 0.9
     , latitude = bawdsey.latitude + degrees 0.01
     , height = 30 -- ,000 ft
-    , bearing = degrees 180
+    , heading = degrees 180
     , speed = 200.0 -- mph
     , iff = Nothing
     , tutorial = False
@@ -76,7 +76,7 @@ bomber1 =
     { longitude = bawdsey.longitude + degrees 1.2
     , latitude = bawdsey.latitude + degrees 0.5
     , height = 20 -- ,000 ft
-    , bearing = degrees 250
+    , heading = degrees 250
     , speed = 200.0 -- mph
     , iff = Nothing
     , tutorial = False
@@ -89,7 +89,7 @@ bomber2 =
     { longitude = degrees 2.5
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
-    , bearing = degrees 280
+    , heading = degrees 280
     , speed = 200.0 -- mph
     , iff = Nothing
     , tutorial = False
@@ -101,7 +101,7 @@ bomber2A =
     { longitude = degrees 2.5
     , latitude = degrees 52.04
     , height = 30.2 -- ,000 ft
-    , bearing = degrees 280
+    , heading = degrees 280
     , speed = 200.0 -- mph
     , iff = Nothing
     , tutorial = False
@@ -114,7 +114,7 @@ bomber3 =
     { longitude = bawdsey.longitude + degrees 1.1
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
-    , bearing = degrees 270
+    , heading = degrees 270
     , speed = 200 -- mph
     , iff = Nothing
     , tutorial = False
@@ -126,7 +126,7 @@ bomber4 =
     { longitude = bawdsey.longitude + degrees 1.1
     , latitude = bawdsey.latitude - degrees 0.3
     , height = 40 -- ,000 ft
-    , bearing = degrees 270
+    , heading = degrees 270
     , speed = 200 -- mph
     , iff = Nothing
     , tutorial = False
@@ -139,7 +139,7 @@ fighter1 =
     { longitude = bawdsey.longitude + degrees 0.06
     , latitude = bawdsey.latitude + degrees 0.01
     , height = 10 -- ,000 ft
-    , bearing = degrees 90
+    , heading = degrees 90
     , speed = 300 -- mph
     , iff = Just 1
     , tutorial = False
@@ -152,7 +152,7 @@ severalAbreast n =
             { longitude = bawdsey.longitude + degrees 1.17
             , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
             , height = 25
-            , bearing = degrees 275
+            , heading = degrees 275
             , speed = 200
             , iff = Nothing
             , tutorial = False
@@ -168,7 +168,7 @@ severalAligned n =
             { longitude = bawdsey.longitude + degrees 1.17 + (degrees (toFloat i - 5) * 0.001)
             , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
             , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
-            , bearing = degrees 265
+            , heading = degrees 265
             , speed = 250
             , iff = Nothing
             , tutorial = False
@@ -186,7 +186,7 @@ trainingMode timeNow =
 
 trainingMode2 : Int -> List Target
 trainingMode2 timeNow =
-    -- Two planes same range same bearing
+    -- Two planes same range same heading
     List.map (targetFromProforma station timeNow)
         [ { bomber2 | tutorial = True }
         , { bomber2A | tutorial = True }
@@ -195,7 +195,7 @@ trainingMode2 timeNow =
 
 trainingMode3 : Int -> List Target
 trainingMode3 timeNow =
-    -- Two planes same range different bearings
+    -- Two planes same range different headings
     List.map (targetFromProforma station timeNow)
         [ { bomber3 | tutorial = True }
         , { bomber4 | tutorial = True }

@@ -505,15 +505,15 @@ makeNewTarget ( latitudeOffset, height ) model =
         newLat =
             station.latitude + latitudeOffset
 
-        bearing =
-            station.lineOfShoot + pi
+        heading =
+            degrees 270  -- so we should see Westerly tracks.
 
         hostileSingle : TargetProforma
         hostileSingle =
             { latitude = newLat
             , longitude = newLong
             , height = height
-            , bearing = bearing
+            , heading = heading
             , speed = 300 -- Quicker testing!
             , iff = Nothing
             , tutorial = False

@@ -1,11 +1,12 @@
 --TODO: Summary page showing actual incoming tracks with user plots overlaid.
 
---TODO: In middle of switching to target.theta being absolute not station-relative -- CHECK THIS!!
-
+--TODO: ******
 --TODO: Now worried that all the craft are converging on the station -- is this real?
---TODO: Map needs rotating or flipping and what about LOS?
+--TODO: ******
+
+--DONE: Map needs rotating or flipping and what about LOS?
 --TODO: Store all target locations when user enters Bearing & Range. This may make correlation possible.
---TODO: Show tracks as yellow lines, maybe different colour for friendly.
+--TODO: Show tracks as dotted lines, maybe different colour for friendly.
 --TODO: Show plots as some kind of symbol.
 --TODO: Adjust map calibration for consistency with approx range.
 --TODO: Derive some average closeness metric.

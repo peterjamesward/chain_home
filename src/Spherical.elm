@@ -9,7 +9,7 @@ meanRadius = 6371000
 range (φ1, λ1) (φ2, λ2) = 
   let 
       x = (λ2 - λ1) * cos ((φ1 + φ2)/2)
-      y = (λ2 - λ1) 
+      y = (φ2 - φ1)
   in 
       sqrt (x*x + y*y) * meanRadius
 
