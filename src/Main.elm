@@ -214,7 +214,7 @@ update msg model =
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -(degrees 1.5) (degrees 1.5)) (Random.float 5 30)
+                Random.pair (Random.float -(degrees 1.1) (degrees 1.1)) (Random.float 5 30)
     in
     case msg of
         TimeDelta dt ->

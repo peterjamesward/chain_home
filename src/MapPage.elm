@@ -112,8 +112,13 @@ raidTracks model =
         mapScale =
             toFloat squareSize / 100000.0
 
+        noMoreThan100Miles ( _, r, _ ) =
+            r <= 160000
+
         raidTrack target =
-            List.map plotArrow target.positionHistory
+            List.map plotArrow <|
+                List.filter noMoreThan100Miles
+                    target.positionHistory
 
         plotArrow ( time, range, theta ) =
             Svg.circle
@@ -127,6 +132,7 @@ raidTracks model =
                 []
     in
     List.concatMap raidTrack model.targets
+
 
 userPlots model =
     -- Note that the plots are associated with the polar targets.
