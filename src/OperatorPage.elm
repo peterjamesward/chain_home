@@ -123,7 +123,7 @@ rangeTicks =
         label i =
             if modBy 10 i == 0 then
                 [ Svg.text_
-                    [ x (String.fromFloat <| max 5 (toFloat i * 19.7))
+                    [ x (String.fromFloat <| min 1950 <| max 15 (toFloat i * 19.7))
                     , y "100"
                     , S.fill "green"
                     , textAnchor "middle"
@@ -144,15 +144,15 @@ rangeTicks =
                 , x2 <| String.fromInt (i * 20)
                 , y2 <| String.fromInt <| tickSize i
                 , stroke "green"
-                , strokeWidth "6"
+                , strokeWidth "8"
                 ]
                 []
             ]
                 ++ label i
     in
     svg
-        [ viewBox "0 -10 2050 200"
-        , S.width "105%"
+        [ viewBox "-5 -10 2005 200"
+        , S.width "100%"
         , S.height "100%"
         ]
     <|
@@ -177,7 +177,8 @@ rangeSliderAndCRT model trace =
             [ inFront <|
                 el
                     [ alignTop
-                    , centerX
+                    --, centerX
+                    , moveLeft 6
                     , width fill
                     , paddingEach { edges | left = 20 }
                     ]
