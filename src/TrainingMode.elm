@@ -45,6 +45,7 @@ tutorialCloseStep scenario =
         UiDummy
         [ tutorialExitAction
         , clearCalculator
+        , clearTargets
         , recordScenarioDone scenario
         ]
         noStateActions
@@ -133,8 +134,8 @@ tutorialBasic =
         [ centraliseKnobs, clearTargets ]
         noStateActions
         noExitActions
-        (static """Welcome to the Chain Home emulator. This tutorial will give a basic overview
-        of the features and their operation. Click the ► to go on, and the ◀︎ to go back.
+        (static """This tutorial will give a basic overview of the receiver and its operation.
+        Click the ► to go on, ◀︎ to go back.
         """)
     , TutorialEntry
         TutorialIntroduceTheTube
@@ -164,21 +165,21 @@ tutorialBasic =
         [ tutorialGoniometerSwinging ]
         noExitActions
         (static
-            """The goniometer ("gonio") is used to estimate the bearing of a incoming raid.
-            To spot new raids coming in, the operator must keep the gonio moving.
+            """The operator uses the goniometer ("gonio") to estimate the bearing of a incoming raid.
+            The operator must turn the gonio, not let it sit in one position, or new raids could be missed.
              """
         )
     , TutorialEntry
         TutorialIncomingRaid
         UiCRT
         [ setupTutorialRaid ]
-        noStateActions
+        [ stopGonioAwayFromRaidBearing ]
         noExitActions
         (static
             """The white V shape under the 100 on the 'tube' is a new raid.
             This simple and stable shape is always only one aircraft.
-            The operator will turn the Range knob so tha the Range Pointer points at the
-            raid (ideally at the left hand edge for an accurate range reading).
+            The operator turns the Range knob until the Range Pointer points at the
+            raid (ideally at the left hand edge) for an accurate range reading.
         """
         )
     , TutorialEntry
@@ -209,7 +210,8 @@ tutorialBasic =
         [ findBearingOfNumberedTarget False 0 ]
         (static
             """The operator 'swings' the gonio until the V on the CRT vanishes.
-            The next step is to load information into the calculator.
+            The next step is to load information into the calculator. The lights
+            over to the right remind the operator which button to press.
         """
         )
     , TutorialEntry
@@ -1230,13 +1232,24 @@ tutorialExitAction model =
         , currPage = InputPage
     }
 
+
 clearTargets : TutorialAction
 clearTargets model =
     { model | targets = [] }
 
+
 tutorialGoniometerSwinging : TutorialAction
 tutorialGoniometerSwinging model =
     { model | goniometerAzimuth = 1.2 * sin (toFloat model.modelTime / 1000) }
+
+
+stopGonioAwayFromRaidBearing : TutorialAction
+stopGonioAwayFromRaidBearing model =
+    if model.goniometerAzimuth >= degrees -50 && model.goniometerAzimuth <=  degrees 0 then
+        tutorialGoniometerSwinging model -- keep turning.
+
+    else
+        model -- stop swinging, we are away from the target.
 
 
 chaseTheRaidRange : Bool -> Model -> Model
