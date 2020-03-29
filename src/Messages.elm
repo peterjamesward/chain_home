@@ -39,3 +39,4 @@ type Msg
     | ExplainModeToggle
     | TutorialBack
     | RandomRaidGenerated (Float, Float)
+    | SetActualTraceVisible Bool

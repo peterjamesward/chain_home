@@ -49,4 +49,5 @@ type alias Model =
     , newRaid : Maybe Target
     , timeForNextRaid : Maybe Int
     , storedPlots : List (Int, Float, Float)
+    , actualTraceVisibleOnMap : Bool
     }

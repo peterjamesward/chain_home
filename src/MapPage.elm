@@ -6,15 +6,19 @@ module MapPage exposing (..)
    Note that we do not try to correlate. In general we may not know which raid the user is plotting.
 -}
 
+import Constants exposing (lightCharcoal)
 import Element exposing (..)
+import Element.Border as Border
+import Element.Input as Input
 import Grid exposing (mapGridLettersList)
-import Messages exposing (Msg)
+import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import TrainingMode exposing (explanatoryText)
 import Types exposing (UiComponent(..))
 import Utils exposing (edges, helpButton)
+import Html.Attributes as H exposing (style)
 
 
 squareSize =
@@ -50,9 +54,29 @@ mapPage model =
                 :: explanatoryText model UiMapPage
             )
           <|
-            Element.none
+            checkBoxShowActualTrace model.actualTraceVisibleOnMap
         , helpButton
         ]
+
+
+checkBoxShowActualTrace visible =
+    Input.checkbox
+        [ Element.height (px 40)
+        , Border.width 1
+        , Border.rounded 5
+        , Border.color lightCharcoal
+        , padding 10
+        ]
+        { onChange = SetActualTraceVisible
+        , checked = visible
+        , label =
+            Input.labelRight
+                [ htmlAttribute <| H.style "-webkit-user-select" "none"
+                ]
+            <|
+                Element.text "Show the actual locations"
+        , icon = Input.defaultCheckbox
+        }
 
 
 theMap : Model -> Element Msg
@@ -165,7 +189,11 @@ raidTracks model =
                 ]
                 []
     in
-    List.concatMap raidTrack model.targets
+    if model.actualTraceVisibleOnMap then
+        List.concatMap raidTrack model.targets
+
+    else
+        []
 
 
 userPlots model =

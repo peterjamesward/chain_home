@@ -85,6 +85,7 @@ init _ =
       , newRaid = Nothing
       , timeForNextRaid = Nothing
       , storedPlots = []
+      , actualTraceVisibleOnMap = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -481,6 +482,11 @@ update msg model =
 
         RandomRaidGenerated ( latitude, height ) ->
             ( model |> makeNewTarget ( latitude, height ) |> setNextRandomRaidTime
+            , Cmd.none
+            )
+
+        SetActualTraceVisible visible ->
+            ( { model | actualTraceVisibleOnMap = visible }
             , Cmd.none
             )
 
