@@ -148,3 +148,7 @@ type TutorialStep
     | TutorialShowCalculator2
     | TutorialEnded -- last thing we show
     | TutorialDummy -- not shown, if it occurs.
+    | TutorialIntroduceTheTube
+    | TutorialJustSwinging
+    | TutorialIntroduceTheTube2
+    | TutorialIntroduceGonio

@@ -129,14 +129,44 @@ tutorialBasic : Tutorial
 tutorialBasic =
     [ TutorialEntry
         TutorialWelcome
+        UiDummy
+        [ centraliseKnobs, clearTargets ]
+        noStateActions
+        noExitActions
+        (static """Welcome to the Chain Home emulator. This tutorial will give a basic overview
+        of the features and their operation. Click the ► to go on, and the ◀︎ to go back.
+        """)
+    , TutorialEntry
+        TutorialIntroduceTheTube
+        UiCRT
+        noEntryActions
+        noStateActions
+        noExitActions
+        (static """The most obvious and most important feature is the "tube" or CRT, behind this text.
+        It shows radio signals returned from aircraft within our 100 mile range over the North Sea.
+        (We can also see 100 miles over land behind, but we'll not worry about that for now.)
+        """)
+    , TutorialEntry
+        TutorialIntroduceTheTube2
+        UiCRT
+        noEntryActions
+        noStateActions
+        noExitActions
+        (static """A returned signal will be a V-shaped dip in the line that we see jiggling across the tube.
+        The more to the right, the further away the aircraft, with the scale in miles across the top.
+        The two large dips near the left are caused by local features such as buildings or hills.
+        The constant jiggling is just electrical noise - these are very sensitive receivers.
+        """)
+    , TutorialEntry
+        TutorialJustSwinging
         UiGoniometer
-        [ tutorialBearingMode, clearCalculator ]
+        [ tutorialBearingMode, clearCalculator, clearTargets ]
         [ tutorialGoniometerSwinging ]
         noExitActions
         (static
-            """The operator is turning the gonio, looking for any sign of a signal.
-        Click ► to begin.
-        """
+            """The goniometer ("gonio") is used to estimate the bearing of a incoming raid.
+            To spot new raids coming in, the operator must keep the gonio moving.
+             """
         )
     , TutorialEntry
         TutorialIncomingRaid
@@ -146,7 +176,9 @@ tutorialBasic =
         noExitActions
         (static
             """The white V shape under the 100 on the 'tube' is a new raid.
-        Click ► to see the operator start to examine the raid.
+            This simple and stable shape is always only one aircraft.
+            The operator will turn the Range knob so tha the Range Pointer points at the
+            raid (ideally at the left hand edge for an accurate range reading).
         """
         )
     , TutorialEntry
@@ -161,6 +193,15 @@ tutorialBasic =
         """
         )
     , TutorialEntry
+        TutorialIntroduceGonio
+        UiGoniometer
+        noEntryActions
+        noStateActions
+        noExitActions
+        (static """The raid will keep moving, so the operator works quickly.
+        The operator will turn the Gonio to make the V as small as possible.
+        """)
+    , TutorialEntry
         TutorialFindBearing
         UiGoniometer
         noEntryActions
@@ -168,6 +209,7 @@ tutorialBasic =
         [ findBearingOfNumberedTarget False 0 ]
         (static
             """The operator 'swings' the gonio until the V on the CRT vanishes.
+            The next step is to load information into the calculator.
         """
         )
     , TutorialEntry
@@ -198,6 +240,8 @@ tutorialBasic =
         noExitActions
         (static
             """The operator will now try to work out the height.
+            This will use the goniometer to compare signals received at aerials
+            placed at different heights. Height finding is at best approximate and often impossible.
         """
         )
     , TutorialEntry
@@ -208,6 +252,7 @@ tutorialBasic =
         [ tutorialSeekElevation False ]
         (static
             """The operator swings the gonio again, to minimise the V.
+            The reading on the goniometer scale has no direct meaning, it is just input to the calculator.
         """
         )
     , TutorialEntry
@@ -217,7 +262,7 @@ tutorialBasic =
         noStateActions
         [ tutorialStoreElevation ]
         (static
-            """The GONIO setting is stored, this gives the elevation.
+            """The GONIO setting is stored, this allows the calculator to work out the elevation.
         """
         )
     , TutorialEntry
@@ -227,7 +272,7 @@ tutorialBasic =
         [ chaseTheRaidRange True ]
         [ chaseTheRaidRange False ]
         (static
-            """Adjust the range pointer because the raid has moved.
+            """The operator adjusts the range pointer because the raid has moved.
         """
         )
     , TutorialEntry
@@ -257,15 +302,6 @@ tutorialBasic =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
-    , TutorialEntry
-        TutorialEnded
-        UiDummy
-        noEntryActions
-        noStateActions
-        [ stopTutorialRaid ]
-        --, clearCalculator ]
-        (static """Choose more training or click on Operate.
-        """)
     , tutorialCloseStep ScenarioBasic
     ]
 
@@ -1057,7 +1093,17 @@ tutorialAutomation model =
 
 setupTutorialRaid : TutorialAction
 setupTutorialRaid model =
-    { model | targets = trainingMode model.modelTime }
+    { model
+        | targets = trainingMode model.modelTime
+    }
+
+
+centraliseKnobs : TutorialAction
+centraliseKnobs model =
+    { model
+        | goniometerAzimuth = 0
+        , rangeSlider = 50
+    }
 
 
 setupTutorialRaid2SameBearing : TutorialAction
@@ -1184,6 +1230,9 @@ tutorialExitAction model =
         , currPage = InputPage
     }
 
+clearTargets : TutorialAction
+clearTargets model =
+    { model | targets = [] }
 
 tutorialGoniometerSwinging : TutorialAction
 tutorialGoniometerSwinging model =

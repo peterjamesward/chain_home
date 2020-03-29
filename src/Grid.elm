@@ -106,7 +106,7 @@ tutorialInterpretCalculator model =
         twoDigits x =
             String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
     in
-    "Raid at grid position "
+    "The calculator display tells us the raid is at grid position "
         ++ (case ( gridPos, letter ) of
                 ( Just grid, Just g ) ->
                     g
@@ -119,8 +119,9 @@ tutorialInterpretCalculator model =
         ++ ", height "
         ++ (case model.storedElevation of
                 Just h ->
+                    if h >= 1 then
                     (String.fromInt <| truncate h)
-                        ++ ",000 ft"
+                        ++ ",000 ft" else "below 1000 ft"
 
                 Nothing ->
                     "unknown"
