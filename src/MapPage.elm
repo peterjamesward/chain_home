@@ -7,7 +7,7 @@ module MapPage exposing (..)
 -}
 
 import Element exposing (..)
-import Grid exposing (gridLettersList)
+import Grid exposing (mapGridLettersList)
 import Messages exposing (Msg)
 import Model exposing (Model)
 import Svg exposing (..)
@@ -29,7 +29,7 @@ mapVisibleGrid =
             List.drop 1 >> List.take 5
     in
     -- Only central 5x5 square of calculator grid is really in our range.
-    gridLettersList
+    mapGridLettersList
         |> takeMiddle
         |> List.map takeMiddle
 
