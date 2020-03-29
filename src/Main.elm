@@ -174,7 +174,7 @@ deriveModelAtTime model timeNow =
             -- systems (Supervisor's Handbook chap 12). We then know the goniometer setting that
             -- will make a target "D/F out" -- we only need a suitable function to make it appear
             -- that we are actually using a goniometer.
-            aElevationAdjustedEchoes (model.goniometerAzimuth) echoSignals
+            aElevationAdjustedEchoes model.goniometerAzimuth echoSignals
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals
@@ -188,7 +188,7 @@ deriveModelAtTime model timeNow =
 
         newRangeKnobPosition =
             -- Map 0..100 onto -pi..+pi
-            (newRangeSliderPosition - 50) * pi / 50
+            (newRangeSliderPosition - 50) * degrees 175 / 50
     in
     tutorialAutomation
         { model
@@ -360,7 +360,8 @@ update msg model =
                 Just ( startAngle, startXY ) ->
                     let
                         stopKnob =
-                            pi - 0.1
+                            -- Don't let the knob go down to 6 o'clock as that's ambiguous.
+                            degrees 175
 
                         -- Prevent complete rotation.
                         newAngle =
@@ -368,7 +369,8 @@ update msg model =
                                 rangeTurnAngle startAngle startXY offset
 
                         newSliderPosition =
-                            (pi + normalise newAngle) * 50 / pi
+                            -- Map accessible rotation ( -175 deg .. + 175 deg ) onto 0 .. 100
+                            normalise newAngle * 50 / stopKnob + 50
                     in
                     ( if abs (newSliderPosition - model.rangeSlider) < 50 then
                         -- Looks like a reasonable move

@@ -1,12 +1,10 @@
---DONE: Summary page showing actual incoming tracks with user plots overlaid.
+--TODO: Tutorial - alternate action and explain text.
+--TODO: Tutorials - make sure range slider can be seen to move (and knob).
+--TODO: Going back in tutorial should restart raid if necessary.
 --TODO: Checkbox to show actual tracks. Possibly protect that somehow during 'game turn'.
 --TODO: Explanatory notes on MapPage.
---DONE: Now worried that all the craft are converging on the station -- is this real?
---DONE: Map needs rotating or flipping and what about LOS?
 --TODO: Store all target locations when user enters Bearing & Range? This may make correlation possible.
---DONE: Show plots as some kind of symbol.
---DONE: Adjust map calibration for consistency with approx range.
---TODO: Derive some average closeness metric?
+--TODO: Derive some average closeness metric as a score?
 --TODO: Add some variation to direction of travel of each raid.
 --TODO: Add "more ..." on explanatory popups to display overlaid window with more information. (??)
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
@@ -16,11 +14,3 @@
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
 --TODO: Fit it on 800x600 screen?
 
---TODO: Range slider ends are inaccessible and alignment is poor.
---DONE: Invisible border around all objects.
---TODO: Tutorial - alternate action and explain text.
---DONE: Make range pointer in front
---DONE: Calibration on range scale.
---DONE: Lightweight lines around calculator zones.
---DONE: *** Tutorial raid are on wrong range. ?? Gonio pi/2 out?
---TODO: *** All raids now seem to be 500ft !!
