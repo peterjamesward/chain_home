@@ -46,10 +46,9 @@ track of all the raids is not easy.
 
 ## Credits
 
-Application code written by Peter Ward.
-Historical research by Sharon Ward.
-The application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.
-Image of Polsey Chain Home station from Wikipedia Commons (Public Domain).
-Satellite map image from USGS LandSat images.
+ * Application code written by Peter Ward.
+ * Historical research by Sharon Ward.
+ * The application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.
+ * Temporary map image from Google.
 
 """

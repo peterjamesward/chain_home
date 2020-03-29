@@ -15,8 +15,8 @@ import Messages exposing (..)
 import Model exposing (Model)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
-import Svg exposing (svg)
-import Svg.Attributes as S exposing (fontFamily, fontSize, stroke, strokeWidth, textAnchor, viewBox, x, x1, x2, y, y1, y2)
+import Svg exposing (polygon, svg)
+import Svg.Attributes as S exposing (cx, cy, fontFamily, fontSize, points, r, stroke, strokeWidth, textAnchor, viewBox, x, x1, x2, y, y1, y2)
 import TrainingMode exposing (explanatoryText, tutorialTextBox)
 import Types exposing (..)
 import Utils exposing (commonStyles, disableSelection, edges, helpButton)
@@ -83,12 +83,25 @@ rangeSlider model =
         , value = model.rangeSlider
         , thumb =
             Input.thumb
-                [ E.width (E.px 8)
-                , E.height (E.px 60)
-                , Border.rounded 4
-                , Border.width 2
+                [ width (px 20)
+                , height (px 80)
+                , Border.width 0
                 , Border.color white
-                , Background.color raidStrengthIndicator
+                , inFront <|
+                    html <|
+                        svg
+                            [ viewBox "0 0 8 20"
+                            , S.width "100%"
+                            , S.height "100%"
+                            ]
+                            [ polygon
+                                [ points "0,5 8,5 4,20 0,5"
+                                , stroke "honeydew"
+                                , strokeWidth "1"
+                                , S.fill "indianred"
+                                ]
+                                []
+                            ]
                 ]
         }
 

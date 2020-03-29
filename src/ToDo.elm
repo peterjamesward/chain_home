@@ -1,13 +1,13 @@
---DONE: Range slider and knob not horizontally aligned.
---DONE: Make range pointer pointy.
 --TODO: Tutorial - alternate action and explain text.
 --TODO: Tutorials - make sure range slider can be seen to move (and knob).
+--TODO: Use Sharon's map.
+--TODO: Targets to originate anywhere on Eastern side of 160 km semi-circle.
+--TODO: Add some variation to direction of travel of each raid.
 --TODO: Going back in tutorial should restart raid if necessary.
 --TODO: Checkbox to show actual tracks. Possibly protect that somehow during 'game turn'.
 --TODO: Explanatory notes on MapPage.
 --TODO: Store all target locations when user enters Bearing & Range? This may make correlation possible.
 --TODO: Derive some average closeness metric as a score?
---TODO: Add some variation to direction of travel of each raid.
 --TODO: Add "more ..." on explanatory popups to display overlaid window with more information. (??)
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Test on Android tablet !! (Currently using some webkit-only CSS tags to control touch actions.)
