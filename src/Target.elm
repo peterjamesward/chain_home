@@ -6,8 +6,8 @@ import Station exposing (Station)
 import Types exposing (Target, TargetProforma)
 
 
-targetFromProforma : Station ->  Int -> TargetProforma -> Target
-targetFromProforma  station timeNow proforma=
+targetFromProforma : Station -> Int -> TargetProforma -> Target
+targetFromProforma station timeNow proforma =
     { startLatitude = proforma.latitude
     , startLongitude = proforma.longitude
     , latitude = proforma.latitude
@@ -87,14 +87,13 @@ targetAtTime station timeNow target =
     }
 
 
-findTargetElevation : List Target -> List Target -> Float -> Maybe Float
-findTargetElevation targets polarTargets range =
+findTargetHeight : List Target -> Float -> Maybe Float
+findTargetHeight targets range =
     -- Find target nearest to range pointer
     let
         pairsOfRangeAndHeights =
-            List.map2 (\r1 p1 -> ( abs (p1.rangeInMetres - range * 1600), r1.height ))
+            List.map (\t -> ( abs (t.rangeInMetres - range * 1600), t.height ))
                 targets
-                polarTargets
 
         minByFst ( r1, h1 ) ( r2, h2 ) =
             if r1 < r2 then
@@ -103,14 +102,14 @@ findTargetElevation targets polarTargets range =
             else
                 ( r2, h2 )
     in
-    case ( targets, polarTargets ) of
-        ( [], [] ) ->
+    case targets of
+        [] ->
             Nothing
 
-        ( [ r1 ], [ _ ] ) ->
+        [ r1 ] ->
             Just r1.height
 
-        ( _, _ ) ->
+        _ ->
             Just <| Tuple.second <| List.foldl minByFst ( 1000000, 0 ) pairsOfRangeAndHeights
 
 

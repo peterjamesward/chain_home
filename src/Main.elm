@@ -433,7 +433,7 @@ update msg model =
 
                 HeightInput ->
                     { model
-                        | storedElevation = findTargetElevation model.targets model.targets model.rangeSlider
+                        | storedElevation = findTargetHeight model.targets model.rangeSlider
                         , inputState = HeightRangeInput
                     }
 

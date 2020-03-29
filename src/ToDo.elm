@@ -16,7 +16,7 @@
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
 --TODO: Fit it on 800x600 screen?
 
---DONE: Range slider ends are inaccessible.
+--TODO: Range slider ends are inaccessible and alignment is poor.
 --DONE: Invisible border around all objects.
 --TODO: Tutorial - alternate action and explain text.
 --DONE: Make range pointer in front

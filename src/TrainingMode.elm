@@ -11,7 +11,7 @@ import Grid exposing (tutorialInterpretCalculator)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
-import Target exposing (findTargetElevation)
+import Target exposing (findTargetHeight)
 import Types exposing (..)
 
 
@@ -1122,7 +1122,7 @@ tutorialStoreElevation : TutorialAction
 tutorialStoreElevation model =
     -- Use the actual known elevation for target near range setting.
     { model
-        | storedElevation = findTargetElevation model.targets model.targets model.rangeSlider
+        | storedElevation = findTargetHeight model.targets model.rangeSlider
         , inputState = HeightRangeInput
     }
 
