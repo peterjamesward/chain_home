@@ -14,7 +14,7 @@ import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import TrainingMode exposing (explanatoryText)
 import Types exposing (UiComponent(..))
-import Utils exposing (helpButton)
+import Utils exposing (edges, helpButton)
 
 
 squareSize =
@@ -39,13 +39,18 @@ mapPage model =
     row
         [ centerX
         , alignTop
-        , padding 10
-        , spaceEvenly
+        , paddingEach { edges | left = 50, right = 50 }
+        , Element.spacing 20
         , Element.width Element.fill
-        --, explain Debug.todo
         ]
         [ theMap model
-        , el [ Element.width (px 200) ] <| Element.text "Options to go here..."
+        , el
+            (Element.width Element.fill
+                :: alignLeft
+                :: explanatoryText model UiMapPage
+            )
+          <|
+            Element.none
         , helpButton
         ]
 
@@ -54,12 +59,10 @@ theMap : Model -> Element Msg
 theMap model =
     -- Sizing this is a bit of a fiddle. Probably cause of stuff I don't know.
     el
-        ([ centerX -- Needed!
-         , centerY
-         , Element.width (px 600)
-         ]
-            ++ explanatoryText model UiMapPage
-        )
+        [ centerX -- Needed!
+        , centerY
+        , Element.width (px 600)
+        ]
     <|
         Element.html <|
             svg
