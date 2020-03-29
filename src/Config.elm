@@ -73,7 +73,7 @@ behindStation =
 
 bomber1 : TargetProforma
 bomber1 =
-    { longitude = bawdsey.longitude + degrees 1.2
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = bawdsey.latitude + degrees 0.5
     , height = 20 -- ,000 ft
     , heading = degrees 250
@@ -86,7 +86,7 @@ bomber1 =
 bomber2 : TargetProforma
 bomber2 =
     -- 2 and 2A very close to look for "beating" effect.
-    { longitude = degrees 2.5
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
@@ -98,7 +98,7 @@ bomber2 =
 
 bomber2A : TargetProforma
 bomber2A =
-    { longitude = degrees 2.5
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = degrees 52.04
     , height = 30.2 -- ,000 ft
     , heading = degrees 280
@@ -111,7 +111,7 @@ bomber2A =
 bomber3 : TargetProforma
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 1.1
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
     , heading = degrees 270
@@ -123,7 +123,7 @@ bomber3 =
 
 bomber4 : TargetProforma
 bomber4 =
-    { longitude = bawdsey.longitude + degrees 1.1
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = bawdsey.latitude - degrees 0.3
     , height = 40 -- ,000 ft
     , heading = degrees 270
@@ -136,10 +136,10 @@ bomber4 =
 fighter1 : TargetProforma
 fighter1 =
     -- Starts behind and heads out pretty quick.
-    { longitude = bawdsey.longitude + degrees 0.06
+    { longitude = bawdsey.longitude + degrees 2.2
     , latitude = bawdsey.latitude + degrees 0.01
     , height = 10 -- ,000 ft
-    , heading = degrees 90
+    , heading = degrees 270
     , speed = 300 -- mph
     , iff = Just 1
     , tutorial = False
@@ -149,7 +149,7 @@ fighter1 =
 severalAbreast n =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.17
+            { longitude = bawdsey.longitude + degrees 2.2
             , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
             , height = 25
             , heading = degrees 275
@@ -165,7 +165,7 @@ severalAbreast n =
 severalAligned n =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 1.17 + (degrees (toFloat i - 5) * 0.001)
+            { longitude = bawdsey.longitude + degrees 2.2 + (degrees (toFloat i - 5) * 0.001)
             , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
             , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
             , heading = degrees 265

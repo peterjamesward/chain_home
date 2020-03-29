@@ -515,6 +515,7 @@ makeNewTarget ( latitudeOffset, height ) model =
             model.station
 
         newLong =
+            -- This is about 100 miles away, depending on latitude obvs.
             station.longitude + degrees 2.2
 
         newLat =

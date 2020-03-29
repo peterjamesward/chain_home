@@ -7105,13 +7105,12 @@ var $author$project$Main$init = function (_v0) {
 			gonioOutput: _List_Nil,
 			goniometerAzimuth: $elm$core$Basics$degrees(40),
 			goniometerMode: $author$project$Types$Azimuth,
+			inRangeTargets: _List_Nil,
 			inputState: $author$project$Types$BearingInput,
 			keys: $author$project$Keys$noKeys,
 			modelTime: 0,
-			movedTargets: _List_Nil,
 			newRaid: $elm$core$Maybe$Nothing,
 			outputDevice: {_class: $mdgriffith$elm_ui$Element$Desktop, orientation: $mdgriffith$elm_ui$Element$Landscape},
-			polarTargets: _List_Nil,
 			rangeDrag: $elm$core$Maybe$Nothing,
 			rangeKnobAngle: 0.0,
 			rangeSlider: 50.0,
@@ -7126,6 +7125,7 @@ var $author$project$Main$init = function (_v0) {
 			storedElevation: $elm$core$Maybe$Nothing,
 			storedElevationRange: $elm$core$Maybe$Nothing,
 			storedFriendly: $elm$core$Maybe$Nothing,
+			storedPlots: _List_Nil,
 			storedStrength: $elm$core$Maybe$Nothing,
 			storedStrengthPlus: $elm$core$Maybe$Nothing,
 			targets: _List_Nil,
@@ -8062,9 +8062,9 @@ var $author$project$TrainingMode$chaseTheRaidRange = F2(
 				A2(
 					$elm$core$List$map,
 					function ($) {
-						return $.r;
+						return $.rangeInMetres;
 					},
-					model.polarTargets)));
+					model.targets)));
 		var rangeInMiles = $elm$core$Basics$floor(rangeInMetres / 1600);
 		var currentKeys = model.keys;
 		return _Utils_update(
@@ -8118,8 +8118,9 @@ var $author$project$TrainingMode$findBearingOfNumberedTarget = F3(
 						function ($) {
 							return $.theta;
 						},
-						model.polarTargets))));
+						model.targets))));
 		var currentKeys = model.keys;
+		var angleRelativeToLineOfShoot = model.goniometerAzimuth + model.station.lineOfShoot;
 		return _Utils_update(
 			model,
 			{
@@ -8127,10 +8128,10 @@ var $author$project$TrainingMode$findBearingOfNumberedTarget = F3(
 					currentKeys,
 					{
 						gonioAnti: active && (_Utils_cmp(
-							model.goniometerAzimuth,
+							angleRelativeToLineOfShoot,
 							targetBearing + $elm$core$Basics$degrees(1)) > 0),
 						gonioClock: active && (_Utils_cmp(
-							model.goniometerAzimuth,
+							angleRelativeToLineOfShoot,
 							targetBearing - $elm$core$Basics$degrees(1)) < 0)
 					})
 			});
@@ -8139,37 +8140,137 @@ var $author$project$TrainingMode$noEntryActions = _List_Nil;
 var $author$project$TrainingMode$noExitActions = _List_Nil;
 var $author$project$TrainingMode$noStateActions = _List_Nil;
 var $author$project$Config$bomber3 = {
-	bearing: $elm$core$Basics$degrees(270),
+	heading: $elm$core$Basics$degrees(270),
 	height: 40,
 	iff: $elm$core$Maybe$Nothing,
-	iffActive: false,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
 	speed: 200,
-	startTime: 0,
 	tutorial: false
 };
 var $author$project$Config$bomber4 = {
-	bearing: $elm$core$Basics$degrees(270),
+	heading: $elm$core$Basics$degrees(270),
 	height: 40,
 	iff: $elm$core$Maybe$Nothing,
-	iffActive: false,
 	latitude: $author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.3),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
 	speed: 200,
-	startTime: 0,
 	tutorial: false
 };
+var $author$project$Config$station = $author$project$Config$bawdsey;
+var $elm$core$Basics$asin = _Basics_asin;
+var $elm$core$Basics$atan2 = _Basics_atan2;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Spherical$findBearingToTarget = F2(
+	function (_v0, _v1) {
+		var φ1 = _v0.a;
+		var λ1 = _v0.b;
+		var φ2 = _v1.a;
+		var λ2 = _v1.b;
+		var y = $elm$core$Basics$sin(λ2 - λ1) * $elm$core$Basics$cos(φ2);
+		var x = ($elm$core$Basics$cos(φ1) * $elm$core$Basics$sin(φ2)) - (($elm$core$Basics$sin(φ1) * $elm$core$Basics$cos(φ2)) * $elm$core$Basics$cos(λ2 - λ1));
+		return A2($elm$core$Basics$atan2, y, x);
+	});
+var $author$project$Spherical$meanRadius = 6371000;
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Spherical$newPosition = F3(
+	function (_v0, d, θ) {
+		var φ1 = _v0.a;
+		var λ1 = _v0.b;
+		var δ = d / $author$project$Spherical$meanRadius;
+		var φ2 = $elm$core$Basics$asin(
+			($elm$core$Basics$sin(φ1) * $elm$core$Basics$cos(δ)) + (($elm$core$Basics$cos(φ1) * $elm$core$Basics$sin(δ)) * $elm$core$Basics$cos(θ)));
+		var λ2 = λ1 + A2(
+			$elm$core$Basics$atan2,
+			($elm$core$Basics$sin(θ) * $elm$core$Basics$sin(δ)) * $elm$core$Basics$cos(φ1),
+			$elm$core$Basics$cos(δ) - ($elm$core$Basics$sin(φ1) * $elm$core$Basics$sin(φ2)));
+		return _Utils_Tuple2(φ2, λ2);
+	});
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$Spherical$range = F2(
+	function (_v0, _v1) {
+		var φ1 = _v0.a;
+		var λ1 = _v0.b;
+		var φ2 = _v1.a;
+		var λ2 = _v1.b;
+		var y = φ2 - φ1;
+		var x = (λ2 - λ1) * $elm$core$Basics$cos((φ1 + φ2) / 2);
+		return $elm$core$Basics$sqrt((x * x) + (y * y)) * $author$project$Spherical$meanRadius;
+	});
+var $author$project$Target$targetAtTime = F3(
+	function (station, timeNow, target) {
+		var targetPos = _Utils_Tuple2(target.latitude, target.longitude);
+		var stationPos = _Utils_Tuple2(station.latitude, station.longitude);
+		var theta = A2($author$project$Spherical$findBearingToTarget, stationPos, targetPos);
+		var rng = A2($author$project$Spherical$range, stationPos, targetPos);
+		var heightInMetres = target.height * 304.8;
+		var deltaT = timeNow - target.startTime;
+		var distanceTravelled = ((deltaT * target.speed) * 1609) / 3600000;
+		var _v0 = A3(
+			$author$project$Spherical$newPosition,
+			_Utils_Tuple2(target.startLatitude, target.startLongitude),
+			distanceTravelled,
+			target.heading);
+		var newLat = _v0.a;
+		var newLong = _v0.b;
+		return _Utils_update(
+			target,
+			{
+				alpha: A2($elm$core$Basics$atan2, heightInMetres, rng) - $elm$core$Basics$asin(heightInMetres / $author$project$Spherical$meanRadius),
+				iffActive: function () {
+					var _v1 = target.iff;
+					if (_v1.$ === 'Nothing') {
+						return false;
+					} else {
+						var n = _v1.a;
+						return _Utils_eq(
+							A2($elm$core$Basics$modBy, 12, (deltaT / 1000) | 0),
+							n) && ((A2($elm$core$Basics$modBy, 1000, deltaT) > 0) && (A2($elm$core$Basics$modBy, 1000, deltaT) < 500));
+					}
+				}(),
+				latitude: newLat,
+				longitude: newLong,
+				positionHistory: function () {
+					var _v2 = $elm$core$List$head(target.positionHistory);
+					if (_v2.$ === 'Just') {
+						var _v3 = _v2.a;
+						var prevTime = _v3.a;
+						return ((timeNow - prevTime) > 60000) ? A2(
+							$elm$core$List$cons,
+							_Utils_Tuple3(timeNow, rng, theta),
+							target.positionHistory) : target.positionHistory;
+					} else {
+						return _List_fromArray(
+							[
+								_Utils_Tuple3(timeNow, rng, theta)
+							]);
+					}
+				}(),
+				rangeInMetres: rng,
+				theta: theta
+			});
+	});
+var $author$project$Target$targetFromProforma = F3(
+	function (station, timeNow, proforma) {
+		return A3(
+			$author$project$Target$targetAtTime,
+			station,
+			timeNow,
+			{alpha: 0, heading: proforma.heading, height: 0, iff: proforma.iff, iffActive: false, latitude: proforma.latitude, longitude: proforma.longitude, positionHistory: _List_Nil, rangeInMetres: 0, speed: proforma.speed, startLatitude: proforma.latitude, startLongitude: proforma.longitude, startTime: timeNow, theta: 0, tutorial: proforma.tutorial});
+	});
 var $author$project$Config$trainingMode3 = function (timeNow) {
-	return _List_fromArray(
-		[
-			_Utils_update(
-			$author$project$Config$bomber3,
-			{startTime: timeNow, tutorial: true}),
-			_Utils_update(
-			$author$project$Config$bomber4,
-			{startTime: timeNow, tutorial: true})
-		]);
+	return A2(
+		$elm$core$List$map,
+		A2($author$project$Target$targetFromProforma, $author$project$Config$station, timeNow),
+		_List_fromArray(
+			[
+				_Utils_update(
+				$author$project$Config$bomber3,
+				{tutorial: true}),
+				_Utils_update(
+				$author$project$Config$bomber4,
+				{tutorial: true})
+			]));
 };
 var $author$project$TrainingMode$setupTutorialRaid2DifferentBearings = function (model) {
 	return _Utils_update(
@@ -8247,7 +8348,6 @@ var $author$project$TrainingMode$tutorialCloseStep = function (scenario) {
 		$author$project$TrainingMode$noExitActions,
 		$author$project$TrainingMode$static('No text.'));
 };
-var $elm$core$Basics$sin = _Basics_sin;
 var $author$project$TrainingMode$tutorialGoniometerSwinging = function (model) {
 	return _Utils_update(
 		model,
@@ -8333,7 +8433,6 @@ var $author$project$Grid$letterFromGrid = function (maybeGridPosition) {
 		return A2(gridLetter, gridPos.gridSquareEast, gridPos.gridSquareNorth);
 	}
 };
-var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 	var twoDigits = function (x) {
 		return _Utils_ap(
@@ -8570,37 +8669,36 @@ var $author$project$Types$TutorialFindElevation = {$: 'TutorialFindElevation'};
 var $author$project$Types$TutorialStoreElevation = {$: 'TutorialStoreElevation'};
 var $author$project$Types$TutorialStoreRange2 = {$: 'TutorialStoreRange2'};
 var $author$project$Config$bomber2 = {
-	bearing: $elm$core$Basics$degrees(280),
+	heading: $elm$core$Basics$degrees(280),
 	height: 30.1,
 	iff: $elm$core$Maybe$Nothing,
-	iffActive: false,
 	latitude: $elm$core$Basics$degrees(52.05),
 	longitude: $elm$core$Basics$degrees(2.5),
 	speed: 200.0,
-	startTime: 0,
 	tutorial: false
 };
 var $author$project$Config$bomber2A = {
-	bearing: $elm$core$Basics$degrees(280),
+	heading: $elm$core$Basics$degrees(280),
 	height: 30.2,
 	iff: $elm$core$Maybe$Nothing,
-	iffActive: false,
 	latitude: $elm$core$Basics$degrees(52.04),
 	longitude: $elm$core$Basics$degrees(2.5),
 	speed: 200.0,
-	startTime: 0,
 	tutorial: false
 };
 var $author$project$Config$trainingMode2 = function (timeNow) {
-	return _List_fromArray(
-		[
-			_Utils_update(
-			$author$project$Config$bomber2,
-			{startTime: timeNow, tutorial: true}),
-			_Utils_update(
-			$author$project$Config$bomber2A,
-			{startTime: timeNow, tutorial: true})
-		]);
+	return A2(
+		$elm$core$List$map,
+		A2($author$project$Target$targetFromProforma, $author$project$Config$station, timeNow),
+		_List_fromArray(
+			[
+				_Utils_update(
+				$author$project$Config$bomber2,
+				{tutorial: true}),
+				_Utils_update(
+				$author$project$Config$bomber2A,
+				{tutorial: true})
+			]));
 };
 var $author$project$TrainingMode$setupTutorialRaid2SameBearing = function (model) {
 	return _Utils_update(
@@ -8641,7 +8739,7 @@ var $author$project$Target$findTargetElevation = F3(
 			F2(
 				function (r1, p1) {
 					return _Utils_Tuple2(
-						$elm$core$Basics$abs(p1.r - (range * 1600)),
+						$elm$core$Basics$abs(p1.rangeInMetres - (range * 1600)),
 						r1.height);
 				}),
 			targets,
@@ -8686,7 +8784,7 @@ var $author$project$TrainingMode$tutorialStoreElevation = function (model) {
 		model,
 		{
 			inputState: $author$project$Types$HeightRangeInput,
-			storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.polarTargets, model.rangeSlider)
+			storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.targets, model.rangeSlider)
 		});
 };
 var $author$project$TrainingMode$tutorial2SameBearing = _List_fromArray(
@@ -8848,15 +8946,13 @@ var $author$project$Config$severalAligned = function (n) {
 		$elm$core$List$map,
 		function (i) {
 			return {
-				bearing: $elm$core$Basics$degrees(265),
+				heading: $elm$core$Basics$degrees(265),
 				height: 25 + (A2($elm$core$Basics$modBy, 7, 100 * i) * 0.1),
 				iff: $elm$core$Maybe$Nothing,
-				iffActive: false,
 				latitude: ($author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.2)) + $elm$core$Basics$degrees(
 					0.05 * $elm$core$Basics$cos(i)),
 				longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
 				speed: 250,
-				startTime: 0,
 				tutorial: false
 			};
 		},
@@ -8866,12 +8962,15 @@ var $author$project$Config$trainingMode3to6 = function (timeNow) {
 	var placeInTutorialMode = function (t) {
 		return _Utils_update(
 			t,
-			{startTime: timeNow, tutorial: true});
+			{tutorial: true});
 	};
 	return A2(
 		$elm$core$List$map,
-		placeInTutorialMode,
-		$author$project$Config$severalAligned(5));
+		A2($author$project$Target$targetFromProforma, $author$project$Config$station, timeNow),
+		A2(
+			$elm$core$List$map,
+			placeInTutorialMode,
+			$author$project$Config$severalAligned(5)));
 };
 var $author$project$TrainingMode$setupTutorialRaid3to6 = function (model) {
 	return _Utils_update(
@@ -9043,23 +9142,24 @@ var $author$project$TrainingMode$tutorial3to6 = _List_fromArray(
 		$author$project$TrainingMode$tutorialCloseStep($author$project$Types$ScenarioThreeToSix)
 	]);
 var $author$project$Config$bomber1 = {
-	bearing: $elm$core$Basics$degrees(250),
+	heading: $elm$core$Basics$degrees(250),
 	height: 20,
 	iff: $elm$core$Maybe$Nothing,
-	iffActive: false,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.5),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.2),
 	speed: 200.0,
-	startTime: 0,
 	tutorial: false
 };
 var $author$project$Config$trainingMode = function (timeNow) {
-	return _List_fromArray(
-		[
-			_Utils_update(
-			$author$project$Config$bomber1,
-			{startTime: timeNow, tutorial: true})
-		]);
+	return A2(
+		$elm$core$List$map,
+		A2($author$project$Target$targetFromProforma, $author$project$Config$station, timeNow),
+		_List_fromArray(
+			[
+				_Utils_update(
+				$author$project$Config$bomber1,
+				{tutorial: true})
+			]));
 };
 var $author$project$TrainingMode$setupTutorialRaid = function (model) {
 	return _Utils_update(
@@ -9223,23 +9323,24 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 		$author$project$TrainingMode$tutorialCloseStep($author$project$Types$ScenarioBasic)
 	]);
 var $author$project$Config$fighter1 = {
-	bearing: $elm$core$Basics$degrees(90),
+	heading: $elm$core$Basics$degrees(90),
 	height: 10,
 	iff: $elm$core$Maybe$Just(1),
-	iffActive: true,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.01),
 	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.06),
 	speed: 300,
-	startTime: 0,
 	tutorial: false
 };
 var $author$project$Config$trainingModeFriendlyOutbound = function (timeNow) {
-	return _List_fromArray(
-		[
-			_Utils_update(
-			$author$project$Config$fighter1,
-			{startTime: timeNow, tutorial: true})
-		]);
+	return A2(
+		$elm$core$List$map,
+		A2($author$project$Target$targetFromProforma, $author$project$Config$station, timeNow),
+		_List_fromArray(
+			[
+				_Utils_update(
+				$author$project$Config$fighter1,
+				{tutorial: true})
+			]));
 };
 var $author$project$TrainingMode$setupTutorialRaidFriendlyOutbound = function (model) {
 	return _Utils_update(
@@ -9551,26 +9652,34 @@ var $author$project$ElevationCurves$bElevationAdjustedEchoes = F2(
 			A2($author$project$ElevationCurves$estimateEchoInElevationMode, $author$project$ElevationCurves$bSystemElevationCurveBasic, goniometerSetting),
 			echoes);
 	});
-var $elm$core$Basics$asin = _Basics_asin;
+var $author$project$Utils$normalise = function (theta) {
+	return A2(
+		$elm$core$Basics$atan2,
+		$elm$core$Basics$sin(theta),
+		$elm$core$Basics$cos(theta));
+};
 var $author$project$Constants$pulseDuration = 20.0;
 var $author$project$Constants$frequency = 20000000.0;
 var $author$project$Constants$lightSpeed = 300000000.0;
 var $author$project$Constants$wavelength = $author$project$Constants$lightSpeed / $author$project$Constants$frequency;
-var $author$project$Echo$deriveEchoes = F2(
-	function (targets, txAntenna) {
+var $author$project$Echo$deriveEchoes = F3(
+	function (station, txAntenna, targets) {
+		var angleFromLineOfSheet = function (target) {
+			return target.theta - station.lineOfShoot;
+		};
 		var echoFromDirectBeam = F2(
 			function (target, seq) {
 				return {
 					alpha: target.alpha,
 					amplitude: target.iffActive ? 6 : $elm$core$Basics$abs(
-						(txAntenna.horizontalLobeFunction(target.theta) * txAntenna.verticalLobeFunction(target.alpha)) / A2(
+						(txAntenna.horizontalLobeFunction(
+							angleFromLineOfSheet(target)) * txAntenna.verticalLobeFunction(target.alpha)) / A2(
 							$elm$core$Basics$pow,
-							A2($elm$core$Basics$logBase, 10, 1 + target.r),
+							A2($elm$core$Basics$logBase, 10, 1 + target.rangeInMetres),
 							1.2)),
 					duration: $author$project$Constants$pulseDuration,
-					phase: $elm$core$Basics$asin(
-						$elm$core$Basics$sin(target.r / $author$project$Constants$wavelength)),
-					r: target.r,
+					phase: $author$project$Utils$normalise(target.rangeInMetres / $author$project$Constants$wavelength),
+					r: target.rangeInMetres,
 					sequence: seq,
 					theta: target.theta,
 					tutorial: target.tutorial
@@ -9612,45 +9721,6 @@ var $author$project$Receiver$goniometerMix = F2(
 			$author$project$Receiver$gonioMixEcho(angle),
 			echoes);
 	});
-var $elm$core$Basics$atan2 = _Basics_atan2;
-var $author$project$Spherical$bearing = F2(
-	function (_v0, _v1) {
-		var φ1 = _v0.a;
-		var λ1 = _v0.b;
-		var φ2 = _v1.a;
-		var λ2 = _v1.b;
-		var y = $elm$core$Basics$sin(λ2 - λ1) * $elm$core$Basics$cos(φ2);
-		var x = ($elm$core$Basics$cos(φ1) * $elm$core$Basics$sin(φ2)) - (($elm$core$Basics$sin(φ1) * $elm$core$Basics$cos(φ2)) * $elm$core$Basics$cos(λ2 - λ1));
-		return A2($elm$core$Basics$atan2, y, x);
-	});
-var $author$project$Spherical$meanRadius = 6371000;
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Spherical$range = F2(
-	function (_v0, _v1) {
-		var φ1 = _v0.a;
-		var λ1 = _v0.b;
-		var φ2 = _v1.a;
-		var λ2 = _v1.b;
-		var y = λ2 - λ1;
-		var x = (λ2 - λ1) * $elm$core$Basics$cos((φ1 + φ2) / 2);
-		return $elm$core$Basics$sqrt((x * x) + (y * y)) * $author$project$Spherical$meanRadius;
-	});
-var $author$project$Target$mapToPolar = F2(
-	function (station, target) {
-		var targetPos = _Utils_Tuple2(target.latitude, target.longitude);
-		var stationPos = _Utils_Tuple2(station.latitude, station.longitude);
-		var rng = A2($author$project$Spherical$range, stationPos, targetPos);
-		var heightInMetres = target.height * 304.8;
-		return {
-			alpha: A2($elm$core$Basics$atan2, heightInMetres, rng) - $elm$core$Basics$asin(heightInMetres / $author$project$Spherical$meanRadius),
-			iff: target.iff,
-			iffActive: target.iffActive,
-			positionHistory: _List_Nil,
-			r: rng,
-			theta: A2($author$project$Spherical$bearing, stationPos, targetPos) - station.lineOfShoot,
-			tutorial: target.tutorial
-		};
-	});
 var $author$project$Main$slideRangeSlider = F2(
 	function (range, keys) {
 		var _v0 = _Utils_Tuple2(keys.rangeLeft, keys.rangeRight);
@@ -9685,76 +9755,6 @@ var $author$project$Main$swingGoniometer = F2(
 			}
 		}
 	});
-var $author$project$Spherical$newPosition = F3(
-	function (_v0, d, θ) {
-		var φ1 = _v0.a;
-		var λ1 = _v0.b;
-		var δ = d / $author$project$Spherical$meanRadius;
-		var φ2 = $elm$core$Basics$asin(
-			($elm$core$Basics$sin(φ1) * $elm$core$Basics$cos(δ)) + (($elm$core$Basics$cos(φ1) * $elm$core$Basics$sin(δ)) * $elm$core$Basics$cos(θ)));
-		var λ2 = λ1 + A2(
-			$elm$core$Basics$atan2,
-			($elm$core$Basics$sin(θ) * $elm$core$Basics$sin(δ)) * $elm$core$Basics$cos(φ1),
-			$elm$core$Basics$cos(δ) - ($elm$core$Basics$sin(φ1) * $elm$core$Basics$sin(φ2)));
-		return _Utils_Tuple2(φ2, λ2);
-	});
-var $author$project$Target$targetAtTime = F2(
-	function (timeNow, target) {
-		var deltaT = timeNow - target.startTime;
-		var distanceTravelled = ((deltaT * target.speed) * 1609) / 3600000;
-		var _v0 = A3(
-			$author$project$Spherical$newPosition,
-			_Utils_Tuple2(target.latitude, target.longitude),
-			distanceTravelled,
-			target.bearing);
-		var newLat = _v0.a;
-		var newLong = _v0.b;
-		return _Utils_update(
-			target,
-			{
-				iffActive: function () {
-					var _v1 = target.iff;
-					if (_v1.$ === 'Nothing') {
-						return false;
-					} else {
-						var n = _v1.a;
-						return _Utils_eq(
-							A2($elm$core$Basics$modBy, 12, (deltaT / 1000) | 0),
-							n) && ((A2($elm$core$Basics$modBy, 1000, deltaT) > 0) && (A2($elm$core$Basics$modBy, 1000, deltaT) < 500));
-					}
-				}(),
-				latitude: newLat,
-				longitude: newLong
-			});
-	});
-var $author$project$Target$trackTargetPositionHistory = F2(
-	function (timeNow, targets) {
-		var trackHistory = function (target) {
-			var _v0 = $elm$core$List$head(target.positionHistory);
-			if (_v0.$ === 'Just') {
-				var _v1 = _v0.a;
-				var prevTime = _v1.a;
-				return ((timeNow - prevTime) > 60000) ? _Utils_update(
-					target,
-					{
-						positionHistory: A2(
-							$elm$core$List$cons,
-							_Utils_Tuple3(timeNow, target.r, target.theta),
-							target.positionHistory)
-					}) : target;
-			} else {
-				return _Utils_update(
-					target,
-					{
-						positionHistory: _List_fromArray(
-							[
-								_Utils_Tuple3(timeNow, target.r, target.theta)
-							])
-					});
-			}
-		};
-		return A2($elm$core$List$map, trackHistory, targets);
-	});
 var $author$project$TrainingMode$tutorialAutomation = function (model) {
 	var currentStep = function (id) {
 		return A2(
@@ -9781,27 +9781,21 @@ var $author$project$Main$deriveModelAtTime = F2(
 	function (model, timeNow) {
 		var targetsNow = A2(
 			$elm$core$List$map,
-			$author$project$Target$targetAtTime(timeNow),
+			A2($author$project$Target$targetAtTime, model.station, timeNow),
 			model.targets);
 		var newRangeSliderPosition = A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys);
 		var newRangeKnobPosition = ((newRangeSliderPosition - 50) * $elm$core$Basics$pi) / 50;
-		var convertedTargets = A2(
-			$author$project$Target$trackTargetPositionHistory,
-			timeNow,
-			A2(
-				$elm$core$List$filter,
-				function (tgt) {
-					return _Utils_cmp(tgt.r, 100 * 1600) < 0;
-				},
-				A2(
-					$elm$core$List$map,
-					$author$project$Target$mapToPolar($author$project$Config$bawdsey),
-					targetsNow)));
-		var echoSignals = A2($author$project$Echo$deriveEchoes, convertedTargets, model.transmitAntenna);
-		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
+		var inRangeTargets = A2(
+			$elm$core$List$filter,
+			function (tgt) {
+				return _Utils_cmp(tgt.rangeInMetres, 100 * 1600) < 0;
+			},
+			targetsNow);
+		var echoSignals = A3($author$project$Echo$deriveEchoes, model.station, model.transmitAntenna, inRangeTargets);
+		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth + model.station.lineOfShoot, echoSignals);
 		var heightMode_B_Outputs = A2($author$project$ElevationCurves$bElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var receiveSignals = A2($author$project$Main$applyReceiver, model.receiveAntenna, echoSignals);
-		var gonioOutput = A2($author$project$Receiver$goniometerMix, model.goniometerAzimuth, receiveSignals);
+		var gonioOutput = A2($author$project$Receiver$goniometerMix, model.goniometerAzimuth + model.station.lineOfShoot, receiveSignals);
 		return $author$project$TrainingMode$tutorialAutomation(
 			_Utils_update(
 				model,
@@ -9812,11 +9806,11 @@ var $author$project$Main$deriveModelAtTime = F2(
 					elevation_B_trace: heightMode_B_Outputs,
 					gonioOutput: gonioOutput,
 					goniometerAzimuth: A2($author$project$Main$swingGoniometer, model.goniometerAzimuth, model.keys),
+					inRangeTargets: inRangeTargets,
 					modelTime: timeNow,
-					movedTargets: targetsNow,
-					polarTargets: convertedTargets,
 					rangeKnobAngle: newRangeKnobPosition,
-					rangeSlider: newRangeSliderPosition
+					rangeSlider: newRangeSliderPosition,
+					targets: targetsNow
 				}));
 	});
 var $elm$core$List$append = F2(
@@ -10094,22 +10088,10 @@ var $author$project$Main$makeNewTarget = F2(
 		var latitudeOffset = _v0.a;
 		var height = _v0.b;
 		var station = model.station;
-		var newLong = station.longitude + $elm$core$Basics$degrees(1.2);
+		var newLong = station.longitude + $elm$core$Basics$degrees(2.2);
 		var newLat = station.latitude + latitudeOffset;
-		var bearing = station.lineOfShoot + $elm$core$Basics$pi;
-		var hostileSingle = {bearing: bearing, height: height, iff: $elm$core$Maybe$Nothing, iffActive: false, latitude: newLat, longitude: newLong, speed: 300, startTime: model.modelTime, tutorial: false};
-		var friendlyRaid = _List_fromArray(
-			[
-				_Utils_update(
-				hostileSingle,
-				{
-					iff: $elm$core$Maybe$Just(
-						A2(
-							$elm$core$Basics$modBy,
-							12,
-							$elm$core$Basics$round(model.webGLtime)))
-				})
-			]);
+		var heading = $elm$core$Basics$degrees(270);
+		var hostileSingle = {heading: heading, height: height, iff: $elm$core$Maybe$Nothing, latitude: newLat, longitude: newLong, speed: 300, tutorial: false};
 		var hostileMultiple = function (n) {
 			return (n > 1) ? A2(
 				$elm$core$List$cons,
@@ -10122,6 +10104,18 @@ var $author$project$Main$makeNewTarget = F2(
 				return A2($elm$core$List$member, scenario, model.tutorialsCompleted) ? raidType : _List_fromArray(
 					[hostileSingle]);
 			});
+		var friendlyRaid = _List_fromArray(
+			[
+				_Utils_update(
+				hostileSingle,
+				{
+					iff: $elm$core$Maybe$Just(
+						A2(
+							$elm$core$Basics$modBy,
+							12,
+							$elm$core$Basics$round(model.webGLtime)))
+				})
+			]);
 		var raidDistribution = function () {
 			var _v1 = A2($elm$core$Basics$modBy, model.modelTime, 10);
 			switch (_v1) {
@@ -10157,20 +10151,19 @@ var $author$project$Main$makeNewTarget = F2(
 						[hostileSingle]);
 			}
 		}();
+		var newTargets = A2(
+			$elm$core$List$map,
+			A2($author$project$Target$targetFromProforma, model.station, model.modelTime),
+			raidDistribution);
 		return _Utils_update(
 			model,
 			{
-				targets: _Utils_ap(raidDistribution, model.targets)
+				newRaid: $elm$core$List$head(newTargets),
+				targets: _Utils_ap(newTargets, model.targets)
 			});
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Utils$normalise = function (theta) {
-	return A2(
-		$elm$core$Basics$atan2,
-		$elm$core$Basics$sin(theta),
-		$elm$core$Basics$cos(theta));
-};
 var $elm$core$Basics$not = _Basics_not;
 var $elm$random$Random$map2 = F3(
 	function (func, _v0, _v1) {
@@ -10222,6 +10215,23 @@ var $author$project$LobeFunctions$rxLoVertLobe = function (α) {
 	return $elm$core$Basics$sin(7 * α);
 };
 var $author$project$LobeFunctions$receiveLow = A2($author$project$Types$Antenna, $author$project$LobeFunctions$rxLoVertLobe, $author$project$LobeFunctions$rxHorizLobe);
+var $author$project$Main$saveNewPlot = function (model) {
+	var _v0 = _Utils_Tuple2(model.storedAzimuth, model.storedAzimuthRange);
+	if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+		var theta = _v0.a.a;
+		var range = _v0.b.a;
+		return _Utils_update(
+			model,
+			{
+				storedPlots: A2(
+					$elm$core$List$cons,
+					_Utils_Tuple3(model.modelTime, range * 1000, theta),
+					model.storedPlots)
+			});
+	} else {
+		return model;
+	}
+};
 var $author$project$LobeFunctions$dipoleStackVerticalReflectedLobes = F2(
 	function (n, α) {
 		var coefficient = A3(
@@ -10379,8 +10389,8 @@ var $author$project$Main$update = F2(
 				$elm$random$Random$pair,
 				A2(
 					$elm$random$Random$float,
-					-$elm$core$Basics$degrees(1.0),
-					$elm$core$Basics$degrees(1.0)),
+					-$elm$core$Basics$degrees(1.1),
+					$elm$core$Basics$degrees(1.1)),
 				A2($elm$random$Random$float, 5, 30)));
 		var cleanModel = $author$project$TrainingMode$exitTutorial(model);
 		switch (msg.$) {
@@ -10649,7 +10659,7 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										inputState: $author$project$Types$HeightRangeInput,
-										storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.polarTargets, model.rangeSlider)
+										storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.targets, model.rangeSlider)
 									});
 							default:
 								return model;
@@ -10658,27 +10668,28 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'StoreRangeSetting':
 				return _Utils_Tuple2(
-					function () {
-						var _v7 = model.inputState;
-						switch (_v7.$) {
-							case 'BearingRangeInput':
-								return _Utils_update(
-									model,
-									{
-										inputState: $author$project$Types$BearingInput,
-										storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
-									});
-							case 'HeightRangeInput':
-								return _Utils_update(
-									model,
-									{
-										inputState: $author$project$Types$HeightInput,
-										storedElevationRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
-									});
-							default:
-								return model;
-						}
-					}(),
+					$author$project$Main$saveNewPlot(
+						function () {
+							var _v7 = model.inputState;
+							switch (_v7.$) {
+								case 'BearingRangeInput':
+									return _Utils_update(
+										model,
+										{
+											inputState: $author$project$Types$BearingInput,
+											storedAzimuthRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
+										});
+								case 'HeightRangeInput':
+									return _Utils_update(
+										model,
+										{
+											inputState: $author$project$Types$HeightInput,
+											storedElevationRange: $elm$core$Maybe$Just(1.6 * model.rangeSlider)
+										});
+								default:
+									return model;
+							}
+						}()),
 					$elm$core$Platform$Cmd$none);
 			case 'RaidStrength':
 				var strength = msg.a;
@@ -10797,7 +10808,7 @@ var $author$project$AboutPage$content = A3(
 		[
 			$elm$html$Html$Attributes$class('content')
 		]),
-	'\n\n## What is this?\n\nThis application aims to give an impression of being an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. Under "Learn & Play", you can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\nApplication code written by Peter Ward. Historical research by Sharon Ward.\nThe application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\n\n');
+	'\n\n## What is this?\n\nThis application aims to give an impression of being an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. Under "Learn & Play", you can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\nApplication code written by Peter Ward.\nHistorical research by Sharon Ward.\nThe application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\nImage of Polsey Chain Home station from Wikipedia Commons (Public Domain).\nSatellite map image from USGS LandSat images.\n\n');
 var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -16185,6 +16196,17 @@ var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
 var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
 var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
+var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
+var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'border-color',
+			clr));
+};
 var $mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
 var $mdgriffith$elm_ui$Internal$Model$asColumn = $mdgriffith$elm_ui$Internal$Model$AsColumn;
 var $mdgriffith$elm_ui$Internal$Model$Height = function (a) {
@@ -16219,34 +16241,6 @@ var $mdgriffith$elm_ui$Element$column = F2(
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
 var $author$project$Utils$edges = {bottom: 0, left: 0, right: 0, top: 0};
-var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
-var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
-var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
-var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
-var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
-var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'border-color',
-			clr));
-};
 var $mdgriffith$elm_ui$Element$el = F2(
 	function (attrs, child) {
 		return A4(
@@ -16264,6 +16258,23 @@ var $mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
+var $author$project$Constants$blue = A3($mdgriffith$elm_ui$Element$rgb255, 52, 101, 164);
+var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
 var $mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 	function (a, b) {
 		return {$: 'FontFamily', a: a, b: b};
@@ -16342,6 +16353,7 @@ var $author$project$TrainingMode$findMatchingStep = F3(
 		return findHelper(
 			$author$project$TrainingMode$tutorialFromId(tutorialId));
 	});
+var $author$project$Constants$flatMidnightBlue = A3($mdgriffith$elm_ui$Element$rgb255, 44, 62, 80);
 var $mdgriffith$elm_ui$Internal$Model$boxShadowClass = function (shadow) {
 	return $elm$core$String$concat(
 		_List_fromArray(
@@ -16419,6 +16431,7 @@ var $author$project$Types$UiCalcHeight = {$: 'UiCalcHeight'};
 var $author$project$Types$UiCalcStrength = {$: 'UiCalcStrength'};
 var $author$project$Types$UiConfigOptions = {$: 'UiConfigOptions'};
 var $author$project$Types$UiGoButton = {$: 'UiGoButton'};
+var $author$project$Types$UiMapPage = {$: 'UiMapPage'};
 var $author$project$Types$UiRangeScale = {$: 'UiRangeScale'};
 var $author$project$Types$UiSwitchPanel = {$: 'UiSwitchPanel'};
 var $author$project$TrainingMode$uiExplanations = _List_fromArray(
@@ -16434,7 +16447,8 @@ var $author$project$TrainingMode$uiExplanations = _List_fromArray(
 		_Utils_Tuple2($author$project$Types$UiCalcHeight, 'The approximate height of the raid'),
 		_Utils_Tuple2($author$project$Types$UiCalcOffset, 'The approximate position within the grid square'),
 		_Utils_Tuple2($author$project$Types$UiConfigOptions, 'Click "Learn" to understand each of the types of raid.\n    As you complete each section, the box will be ticked and raids like\n    that will appear when you click "Go!".\n    You can tick or untick them anyway, if you like.'),
-		_Utils_Tuple2($author$project$Types$UiGoButton, 'Test yourself with a series of incoming raids.\n                        This will only use the types of raid that are ticked.')
+		_Utils_Tuple2($author$project$Types$UiGoButton, 'Test yourself with a series of incoming raids.\n                        This will only use the types of raid that are ticked.'),
+		_Utils_Tuple2($author$project$Types$UiMapPage, 'Your plots are relayed to the Filter Room where they are placed\n    on the map. The team there combines your plots with plots from other CH stations\n    and deduces the most likely position of the raids.\n    We have the advantage of being able to see exactly where the raids were!\n    ')
 	]);
 var $author$project$TrainingMode$lookupUiExplanation = function (ui) {
 	return $elm$core$List$head(
@@ -16512,56 +16526,63 @@ var $author$project$TrainingMode$explanatoryText = F2(
 				return false;
 			}
 		}();
-		if (isTutorialSubject) {
-			return _List_fromArray(
+		return isTutorialSubject ? _List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
+				$mdgriffith$elm_ui$Element$Border$width(2),
+				A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Constants$paletteSand, 2.0),
+				A2($mdgriffith$elm_ui$Element$Border$innerGlow, $author$project$Constants$paletteSand, 2.0),
+				$mdgriffith$elm_ui$Element$Border$rounded(5)
+			]) : _Utils_ap(
+			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
+					$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$flatMidnightBlue),
 					$mdgriffith$elm_ui$Element$Border$width(2),
-					A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Constants$paletteSand, 2.0),
-					A2($mdgriffith$elm_ui$Element$Border$innerGlow, $author$project$Constants$paletteSand, 2.0),
+					A2($mdgriffith$elm_ui$Element$Border$glow, $author$project$Constants$flatMidnightBlue, 2.0),
+					A2($mdgriffith$elm_ui$Element$Border$innerGlow, $author$project$Constants$flatMidnightBlue, 2.0),
 					$mdgriffith$elm_ui$Element$Border$rounded(5)
-				]);
-		} else {
-			var _v0 = _Utils_Tuple2(model.explainMode, uiComponentDescription);
-			if (_v0.a && (_v0.b.$ === 'Just')) {
-				var txt = _v0.b.a;
-				return _List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$inFront(
-						A2(
-							$mdgriffith$elm_ui$Element$el,
-							_List_fromArray(
-								[
-									$mdgriffith$elm_ui$Element$centerX,
-									$mdgriffith$elm_ui$Element$centerY,
-									$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
-									$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
-									$mdgriffith$elm_ui$Element$Border$width(1),
-									$mdgriffith$elm_ui$Element$Border$rounded(5)
-								]),
+				]),
+			function () {
+				var _v0 = _Utils_Tuple2(model.explainMode, uiComponentDescription);
+				if (_v0.a && (_v0.b.$ === 'Just')) {
+					var txt = _v0.b.a;
+					return _List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$inFront(
 							A2(
-								$mdgriffith$elm_ui$Element$paragraph,
+								$mdgriffith$elm_ui$Element$el,
 								_List_fromArray(
 									[
-										$mdgriffith$elm_ui$Element$spacing(1),
-										$mdgriffith$elm_ui$Element$Font$size(16),
-										$mdgriffith$elm_ui$Element$Font$family(
-										_List_fromArray(
-											[
-												$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
-											])),
-										$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
-										$mdgriffith$elm_ui$Element$padding(5)
+										$mdgriffith$elm_ui$Element$centerX,
+										$mdgriffith$elm_ui$Element$centerY,
+										$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$blue),
+										$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+										$mdgriffith$elm_ui$Element$Border$width(1),
+										$mdgriffith$elm_ui$Element$Border$rounded(5)
 									]),
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$text(txt)
-									]))))
-					]);
-			} else {
-				return _List_Nil;
-			}
-		}
+								A2(
+									$mdgriffith$elm_ui$Element$paragraph,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$spacing(1),
+											$mdgriffith$elm_ui$Element$Font$size(16),
+											$mdgriffith$elm_ui$Element$Font$family(
+											_List_fromArray(
+												[
+													$mdgriffith$elm_ui$Element$Font$typeface('Helvetica')
+												])),
+											$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$white),
+											$mdgriffith$elm_ui$Element$padding(5)
+										]),
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$text(txt)
+										]))))
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}());
 	});
 var $mdgriffith$elm_ui$Internal$Model$Class = F2(
 	function (a, b) {
@@ -16698,6 +16719,7 @@ var $author$project$CalculatorDisplay$buttonStyle = F2(
 			$author$project$Utils$disableSelection);
 	});
 var $author$project$Constants$flatSunflower = A3($mdgriffith$elm_ui$Element$rgb255, 241, 196, 15);
+var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
 var $elm$core$List$map3 = _List_map3;
 var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
 var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
@@ -16745,7 +16767,7 @@ var $author$project$CalculatorDisplay$heightGrid = F2(
 		var lamp = F3(
 			function (label, low, high) {
 				return A2(
-					$mdgriffith$elm_ui$Element$el,
+					$mdgriffith$elm_ui$Element$paragraph,
 					A2(
 						$elm$core$List$cons,
 						$mdgriffith$elm_ui$Element$Font$size(24),
@@ -16756,105 +16778,116 @@ var $author$project$CalculatorDisplay$heightGrid = F2(
 								$author$project$CalculatorDisplay$buttonStyle,
 								A2(theRightHeight, low, high),
 								$author$project$Constants$flatSunflower))),
-					$mdgriffith$elm_ui$Element$text(label));
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$text(label)
+						]));
 			});
 		return A2(
-			$mdgriffith$elm_ui$Element$column,
-			_Utils_ap(
+			$mdgriffith$elm_ui$Element$el,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcHeight)),
+			A2(
+				$mdgriffith$elm_ui$Element$column,
 				_List_fromArray(
 					[
-						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+						$mdgriffith$elm_ui$Element$padding(20),
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+						$mdgriffith$elm_ui$Element$Border$width(1)
 					]),
-				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcHeight)),
-			_List_fromArray(
-				[
-					A2(
-					$mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$spaceEvenly
-						]),
-					A4(
-						$elm$core$List$map3,
-						F3(
-							function (label, low, high) {
-								return A3(lamp, label, low * 500, high * 500);
-							}),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
-							['.5-', '.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5']),
-						A2($elm$core$List$range, 0, 11),
-						A2($elm$core$List$range, 1, 12))),
-					A2(
-					$mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$spaceEvenly
-						]),
-					A4(
-						$elm$core$List$map3,
-						F3(
-							function (label, low, high) {
-								return A3(lamp, label, low * 500, high * 500);
-							}),
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$spaceEvenly
+							]),
+						A4(
+							$elm$core$List$map3,
+							F3(
+								function (label, low, high) {
+									return A3(lamp, label, low * 500, high * 500);
+								}),
+							_List_fromArray(
+								['.5-', '.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5']),
+							A2($elm$core$List$range, 0, 11),
+							A2($elm$core$List$range, 1, 12))),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
-							['6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10', '10.5', '11', '11.5']),
-						A2($elm$core$List$range, 12, 23),
-						A2($elm$core$List$range, 13, 24))),
-					A2(
-					$mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$spaceEvenly
-						]),
-					A4(
-						$elm$core$List$map3,
-						F3(
-							function (label, low, high) {
-								return A3(lamp, label, low * 500, high * 500);
-							}),
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$spaceEvenly
+							]),
+						A4(
+							$elm$core$List$map3,
+							F3(
+								function (label, low, high) {
+									return A3(lamp, label, low * 500, high * 500);
+								}),
+							_List_fromArray(
+								['6.0', '6.5', '7.0', '7.5', '8.0', '8.5', '9.0', '9.5', '10', '10.5', '11', '11.5']),
+							A2($elm$core$List$range, 12, 23),
+							A2($elm$core$List$range, 13, 24))),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
-							['12', '12.5', '13', '13.5', '14', '14.5', '15', '15.5', '16', '16.5', '17', '17.5']),
-						A2($elm$core$List$range, 24, 35),
-						A2($elm$core$List$range, 25, 36))),
-					A2(
-					$mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$spaceEvenly
-						]),
-					A4(
-						$elm$core$List$map3,
-						F3(
-							function (label, low, high) {
-								return A3(lamp, label, low * 500, high * 500);
-							}),
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$spaceEvenly
+							]),
+						A4(
+							$elm$core$List$map3,
+							F3(
+								function (label, low, high) {
+									return A3(lamp, label, low * 500, high * 500);
+								}),
+							_List_fromArray(
+								['12', '12.5', '13', '13.5', '14', '14.5', '15', '15.5', '16', '16.5', '17', '17.5']),
+							A2($elm$core$List$range, 24, 35),
+							A2($elm$core$List$range, 25, 36))),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
-							['18', '18.5', '19', '19.5', '20', '21', '22', '23', '24', '25', '26', '27']),
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$spaceEvenly
+							]),
+						A4(
+							$elm$core$List$map3,
+							F3(
+								function (label, low, high) {
+									return A3(lamp, label, low * 500, high * 500);
+								}),
+							_List_fromArray(
+								['18', '18.5', '19', '19.5', '20', '21', '22', '23', '24', '25', '26', '27']),
+							_List_fromArray(
+								[36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54]),
+							_List_fromArray(
+								[37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56]))),
+						A2(
+						$mdgriffith$elm_ui$Element$row,
 						_List_fromArray(
-							[36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54]),
-						_List_fromArray(
-							[37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56]))),
-					A2(
-					$mdgriffith$elm_ui$Element$row,
-					_List_fromArray(
-						[$mdgriffith$elm_ui$Element$alignLeft]),
-					A4(
-						$elm$core$List$map3,
-						F3(
-							function (label, low, high) {
-								return A3(lamp, label, low * 500, high * 500);
-							}),
-						_List_fromArray(
-							['28', '29', '30', '30+']),
-						_List_fromArray(
-							[56, 58, 60, 62]),
-						_List_fromArray(
-							[58, 60, 62, 9999])))
-				]));
+							[$mdgriffith$elm_ui$Element$alignLeft]),
+						A4(
+							$elm$core$List$map3,
+							F3(
+								function (label, low, high) {
+									return A3(lamp, label, low * 500, high * 500);
+								}),
+							_List_fromArray(
+								['28', '29', '30', '30+']),
+							_List_fromArray(
+								[56, 58, 60, 62]),
+							_List_fromArray(
+								[58, 60, 62, 9999])))
+					])));
 	});
 var $author$project$Messages$ExplainModeToggle = {$: 'ExplainModeToggle'};
 var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
@@ -16928,6 +16961,8 @@ var $author$project$CalculatorDisplay$maybeBoolDisplay = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
+var $mdgriffith$elm_ui$Internal$Flag$borderStyle = $mdgriffith$elm_ui$Internal$Flag$flag(11);
+var $mdgriffith$elm_ui$Element$Border$dashed = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$borderStyle, $mdgriffith$elm_ui$Internal$Style$classes.borderDashed);
 var $author$project$Constants$vividGreen = A3($mdgriffith$elm_ui$Element$rgb255, 36, 200, 33);
 var $author$project$CalculatorDisplay$digitDisplayLamp = F2(
 	function (maybeN, digit) {
@@ -16948,10 +16983,47 @@ var $author$project$CalculatorDisplay$digitDisplayLamp = F2(
 			$mdgriffith$elm_ui$Element$text(
 				$elm$core$String$fromInt(digit)));
 	});
+var $mdgriffith$elm_ui$Element$Border$widthXY = F2(
+	function (x, y) {
+		return A2(
+			$mdgriffith$elm_ui$Internal$Model$StyleClass,
+			$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+			A5(
+				$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+				'b-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y))),
+				y,
+				x,
+				y,
+				x));
+	});
+var $mdgriffith$elm_ui$Element$Border$widthEach = function (_v0) {
+	var bottom = _v0.bottom;
+	var top = _v0.top;
+	var left = _v0.left;
+	var right = _v0.right;
+	return (_Utils_eq(top, bottom) && _Utils_eq(left, right)) ? (_Utils_eq(top, right) ? $mdgriffith$elm_ui$Element$Border$width(top) : A2($mdgriffith$elm_ui$Element$Border$widthXY, left, top)) : A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left))))))),
+			top,
+			right,
+			bottom,
+			left));
+};
 var $author$project$CalculatorDisplay$significantDigit = function (maybeN) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+				$mdgriffith$elm_ui$Element$Border$widthEach(
+				_Utils_update(
+					$author$project$Utils$edges,
+					{left: 1, right: 1})),
+				$mdgriffith$elm_ui$Element$Border$dashed
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -17035,21 +17107,24 @@ var $author$project$CalculatorDisplay$positionGridDisplay = F2(
 						letters));
 			});
 		return A2(
-			$mdgriffith$elm_ui$Element$column,
-			_Utils_ap(
+			$mdgriffith$elm_ui$Element$el,
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcGrid),
+			A2(
+				$mdgriffith$elm_ui$Element$column,
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$centerX,
 						$mdgriffith$elm_ui$Element$padding(10),
-						A2($mdgriffith$elm_ui$Element$spacingXY, 5, 5)
+						A2($mdgriffith$elm_ui$Element$spacingXY, 5, 5),
+						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+						$mdgriffith$elm_ui$Element$Border$width(1)
 					]),
-				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcGrid)),
-			A3(
-				$elm$core$List$map2,
-				displayGridRow,
-				$elm$core$List$reverse(
-					A2($elm$core$List$range, -3, 3)),
-				$author$project$Grid$gridLettersList));
+				A3(
+					$elm$core$List$map2,
+					displayGridRow,
+					$elm$core$List$reverse(
+						A2($elm$core$List$range, -3, 3)),
+					$author$project$Grid$gridLettersList)));
 	});
 var $author$project$CalculatorDisplay$strengthDisplay = F2(
 	function (model, strength) {
@@ -17075,8 +17150,10 @@ var $author$project$CalculatorDisplay$strengthDisplay = F2(
 					$mdgriffith$elm_ui$Element$text(label));
 			});
 		return A2(
-			$mdgriffith$elm_ui$Element$row,
-			_Utils_ap(
+			$mdgriffith$elm_ui$Element$el,
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcStrength),
+			A2(
+				$mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$spacing(20),
@@ -17085,14 +17162,13 @@ var $author$project$CalculatorDisplay$strengthDisplay = F2(
 							$author$project$Utils$edges,
 							{left: 10}))
 					]),
-				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcStrength)),
-			A3(
-				$elm$core$List$map2,
-				makeIt,
-				_List_fromArray(
-					['1', '2', '3', '6', '9', '12', '18']),
-				_List_fromArray(
-					[1, 2, 3, 6, 9, 12, 18])));
+				A3(
+					$elm$core$List$map2,
+					makeIt,
+					_List_fromArray(
+						['1', '2', '3', '6', '9', '12', '18']),
+					_List_fromArray(
+						[1, 2, 3, 6, 9, 12, 18]))));
 	});
 var $author$project$Messages$TutorialAdvance = {$: 'TutorialAdvance'};
 var $author$project$Messages$TutorialBack = {$: 'TutorialBack'};
@@ -17178,6 +17254,16 @@ var $author$project$TrainingMode$tutorialTextBox = F2(
 				}
 			}());
 	});
+var $author$project$CalculatorDisplay$withBorders = function (widget) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+				$mdgriffith$elm_ui$Element$Border$width(1)
+			]),
+		widget);
+};
 var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 	var strength = model.storedStrength;
 	var range = model.storedAzimuthRange;
@@ -17197,7 +17283,8 @@ var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$spacing(10),
-						$mdgriffith$elm_ui$Element$padding(5)
+						$mdgriffith$elm_ui$Element$padding(5),
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 					]),
 				_List_fromArray(
 					[
@@ -17211,51 +17298,60 @@ var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 							]),
 						_List_fromArray(
 							[
+								$author$project$CalculatorDisplay$withBorders(
 								A2(
-								$mdgriffith$elm_ui$Element$row,
-								_List_fromArray(
-									[
-										$mdgriffith$elm_ui$Element$paddingEach(
-										_Utils_update(
-											$author$project$Utils$edges,
-											{bottom: 10, left: 10})),
-										$mdgriffith$elm_ui$Element$spacing(10)
-									]),
-								_List_fromArray(
-									[
-										A2($author$project$CalculatorDisplay$strengthDisplay, model, strength),
-										A2($author$project$CalculatorDisplay$maybeBoolDisplay, '+', plus),
-										A2($author$project$CalculatorDisplay$maybeBoolDisplay, 'F', friendly),
-										A2(
-										$mdgriffith$elm_ui$Element$column,
-										_List_Nil,
-										_List_fromArray(
-											[$mdgriffith$elm_ui$Element$none, $mdgriffith$elm_ui$Element$none]))
-									])),
+									$mdgriffith$elm_ui$Element$row,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$paddingEach(
+											_Utils_update(
+												$author$project$Utils$edges,
+												{bottom: 10, left: 10})),
+											$mdgriffith$elm_ui$Element$spacing(10),
+											$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+										]),
+									_List_fromArray(
+										[
+											A2($author$project$CalculatorDisplay$strengthDisplay, model, strength),
+											A2($author$project$CalculatorDisplay$maybeBoolDisplay, '+', plus),
+											A2($author$project$CalculatorDisplay$maybeBoolDisplay, 'F', friendly),
+											A2(
+											$mdgriffith$elm_ui$Element$column,
+											_List_Nil,
+											_List_fromArray(
+												[$mdgriffith$elm_ui$Element$none, $mdgriffith$elm_ui$Element$none]))
+										]))),
 								A2($author$project$CalculatorDisplay$heightGrid, model, height)
 							])),
 						$author$project$Utils$helpButton
 					])),
 				A2(
-				$mdgriffith$elm_ui$Element$row,
+				$mdgriffith$elm_ui$Element$el,
 				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCalcOffset),
-				_List_fromArray(
-					[
-						$author$project$CalculatorDisplay$offsetDisplay(
-						A2(
-							$elm$core$Maybe$map,
-							function ($) {
-								return $.gridSquareOffsetEast;
-							},
-							position)),
-						$author$project$CalculatorDisplay$offsetDisplay(
-						A2(
-							$elm$core$Maybe$map,
-							function ($) {
-								return $.gridSquareOffsetNorth;
-							},
-							position))
-					])),
+				A2(
+					$mdgriffith$elm_ui$Element$row,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+							$mdgriffith$elm_ui$Element$Border$width(1)
+						]),
+					_List_fromArray(
+						[
+							$author$project$CalculatorDisplay$offsetDisplay(
+							A2(
+								$elm$core$Maybe$map,
+								function ($) {
+									return $.gridSquareOffsetEast;
+								},
+								position)),
+							$author$project$CalculatorDisplay$offsetDisplay(
+							A2(
+								$elm$core$Maybe$map,
+								function ($) {
+									return $.gridSquareOffsetNorth;
+								},
+								position))
+						]))),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
@@ -17345,7 +17441,6 @@ var $author$project$CalculatorDisplay$calculator = function (model) {
 var $author$project$Main$calculatorPage = function (model) {
 	return $author$project$CalculatorDisplay$calculator(model);
 };
-var $author$project$Constants$flatMidnightBlue = A3($mdgriffith$elm_ui$Element$rgb255, 44, 62, 80);
 var $author$project$Messages$StartScenario = {$: 'StartScenario'};
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
 var $elm$json$Json$Encode$bool = _Json_wrap;
@@ -17496,7 +17591,6 @@ var $author$project$Attr$greenButton = _List_fromArray(
 		$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$paletteSand),
 		A2($mdgriffith$elm_ui$Element$paddingXY, 20, 6)
 	]);
-var $author$project$Constants$lightCharcoal = A3($mdgriffith$elm_ui$Element$rgb255, 136, 138, 133);
 var $author$project$Messages$DisplayTraining = function (a) {
 	return {$: 'DisplayTraining', a: a};
 };
@@ -17693,35 +17787,6 @@ var $mdgriffith$elm_ui$Element$rotate = function (angle) {
 			angle));
 };
 var $mdgriffith$elm_ui$Element$Input$white = A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1);
-var $mdgriffith$elm_ui$Element$Border$widthXY = F2(
-	function (x, y) {
-		return A2(
-			$mdgriffith$elm_ui$Internal$Model$StyleClass,
-			$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-			A5(
-				$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-				'b-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y))),
-				y,
-				x,
-				y,
-				x));
-	});
-var $mdgriffith$elm_ui$Element$Border$widthEach = function (_v0) {
-	var bottom = _v0.bottom;
-	var top = _v0.top;
-	var left = _v0.left;
-	var right = _v0.right;
-	return (_Utils_eq(top, bottom) && _Utils_eq(left, right)) ? (_Utils_eq(top, right) ? $mdgriffith$elm_ui$Element$Border$width(top) : A2($mdgriffith$elm_ui$Element$Border$widthXY, left, top)) : A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left))))))),
-			top,
-			right,
-			bottom,
-			left));
-};
 var $mdgriffith$elm_ui$Element$Input$defaultCheckbox = function (checked) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -18114,6 +18179,7 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$core$Basics$composeR = F3(
@@ -18257,6 +18323,7 @@ var $author$project$MapPage$mapVisibleGrid = function () {
 		takeMiddle,
 		takeMiddle($author$project$Grid$gridLettersList));
 }();
+var $author$project$MapPage$squareSize = 160;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
@@ -18272,13 +18339,14 @@ var $author$project$MapPage$gridLetters = function () {
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromInt((xCoord * 80) - 50)),
+						$elm$core$String$fromInt((xCoord * $author$project$MapPage$squareSize) - (($author$project$MapPage$squareSize / 2) | 0))),
 						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromInt((yCoord * 80) - 40)),
-						$elm$svg$Svg$Attributes$stroke('antiquewhite'),
+						$elm$core$String$fromInt((yCoord * $author$project$MapPage$squareSize) - (($author$project$MapPage$squareSize / 3) | 0))),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$fill('none'),
 						$elm$svg$Svg$Attributes$textAnchor('middle'),
 						$elm$svg$Svg$Attributes$fontFamily('monospace'),
-						$elm$svg$Svg$Attributes$fontSize('24')
+						$elm$svg$Svg$Attributes$fontSize('64')
 					]),
 				_List_fromArray(
 					[
@@ -18302,9 +18370,128 @@ var $author$project$MapPage$gridLetters = function () {
 			_List_fromArray(
 				[1, 2, 3, 4, 5])));
 }();
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $author$project$MapPage$gridLines = function () {
+	var verticalGridLine = function (index) {
+		return A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$y1(
+					$elm$core$String$fromInt(0)),
+					$elm$svg$Svg$Attributes$x1(
+					$elm$core$String$fromInt(index * $author$project$MapPage$squareSize)),
+					$elm$svg$Svg$Attributes$y2(
+					$elm$core$String$fromInt($author$project$MapPage$squareSize * 5)),
+					$elm$svg$Svg$Attributes$x2(
+					$elm$core$String$fromInt(index * $author$project$MapPage$squareSize)),
+					$elm$svg$Svg$Attributes$stroke('black'),
+					$elm$svg$Svg$Attributes$strokeWidth('1')
+				]),
+			_List_Nil);
+	};
+	var horizontalGridLine = function (index) {
+		return A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1(
+					$elm$core$String$fromInt(0)),
+					$elm$svg$Svg$Attributes$y1(
+					$elm$core$String$fromInt(index * $author$project$MapPage$squareSize)),
+					$elm$svg$Svg$Attributes$x2(
+					$elm$core$String$fromInt($author$project$MapPage$squareSize * 5)),
+					$elm$svg$Svg$Attributes$y2(
+					$elm$core$String$fromInt(index * $author$project$MapPage$squareSize)),
+					$elm$svg$Svg$Attributes$stroke('black'),
+					$elm$svg$Svg$Attributes$strokeWidth('1')
+				]),
+			_List_Nil);
+	};
+	return _Utils_ap(
+		A2(
+			$elm$core$List$map,
+			horizontalGridLine,
+			_List_fromArray(
+				[1, 2, 3, 4])),
+		A2(
+			$elm$core$List$map,
+			verticalGridLine,
+			_List_fromArray(
+				[1, 2, 3, 4])));
+}();
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $author$project$MapPage$raidTracks = function (model) {
+	var noMoreThan100Miles = function (_v1) {
+		var r = _v1.b;
+		return r <= 160000;
+	};
+	var mapScale = $author$project$MapPage$squareSize / 100000.0;
+	var plotArrow = function (_v0) {
+		var time = _v0.a;
+		var range = _v0.b;
+		var theta = _v0.c;
+		return A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx(
+					$elm$core$String$fromFloat(
+						((range * $elm$core$Basics$sin(theta)) * mapScale) + (2.5 * $author$project$MapPage$squareSize))),
+					$elm$svg$Svg$Attributes$cy(
+					$elm$core$String$fromFloat(
+						(2.5 * $author$project$MapPage$squareSize) - ((range * $elm$core$Basics$cos(theta)) * mapScale))),
+					$elm$svg$Svg$Attributes$r('5'),
+					$elm$svg$Svg$Attributes$stroke('orange'),
+					$elm$svg$Svg$Attributes$strokeWidth('1'),
+					$elm$svg$Svg$Attributes$fill('navy')
+				]),
+			_List_Nil);
+	};
+	var raidTrack = function (target) {
+		return A2(
+			$elm$core$List$map,
+			plotArrow,
+			A2($elm$core$List$filter, noMoreThan100Miles, target.positionHistory));
+	};
+	return A2($elm$core$List$concatMap, raidTrack, model.targets);
+};
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $author$project$MapPage$userPlots = function (model) {
+	var mapScale = $author$project$MapPage$squareSize / 100000.0;
+	var plot = function (_v0) {
+		var time = _v0.a;
+		var range = _v0.b;
+		var theta = _v0.c;
+		return A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx(
+					$elm$core$String$fromFloat(
+						((range * $elm$core$Basics$sin(theta)) * mapScale) + (2.5 * $author$project$MapPage$squareSize))),
+					$elm$svg$Svg$Attributes$cy(
+					$elm$core$String$fromFloat(
+						(2.5 * $author$project$MapPage$squareSize) - ((range * $elm$core$Basics$cos(theta)) * mapScale))),
+					$elm$svg$Svg$Attributes$r('5'),
+					$elm$svg$Svg$Attributes$stroke('navy'),
+					$elm$svg$Svg$Attributes$strokeWidth('1'),
+					$elm$svg$Svg$Attributes$fill('yellow')
+				]),
+			_List_Nil);
+	};
+	return A2($elm$core$List$map, plot, model.storedPlots);
+};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
@@ -18314,15 +18501,18 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 		'xlink:href',
 		_VirtualDom_noJavaScriptUri(value));
 };
-var $author$project$MapPage$mapPage = function (_v0) {
+var $author$project$MapPage$theMap = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$centerX,
-				$mdgriffith$elm_ui$Element$centerY,
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
-			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$centerY,
+					$mdgriffith$elm_ui$Element$width(
+					$mdgriffith$elm_ui$Element$px(600))
+				]),
+			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiMapPage)),
 		$mdgriffith$elm_ui$Element$html(
 			A2(
 				$elm$svg$Svg$svg,
@@ -18341,13 +18531,46 @@ var $author$project$MapPage$mapPage = function (_v0) {
 								[
 									$elm$svg$Svg$Attributes$x('0'),
 									$elm$svg$Svg$Attributes$y('0'),
-									$elm$svg$Svg$Attributes$width('400'),
-									$elm$svg$Svg$Attributes$height('400'),
+									$elm$svg$Svg$Attributes$width(
+									$elm$core$String$fromInt($author$project$MapPage$squareSize * 5)),
+									$elm$svg$Svg$Attributes$height(
+									$elm$core$String$fromInt($author$project$MapPage$squareSize * 5)),
 									$elm$svg$Svg$Attributes$xlinkHref('../resources/east_anglia.png')
 								]),
 							_List_Nil)
 						]),
-					$author$project$MapPage$gridLetters))));
+					_Utils_ap(
+						$author$project$MapPage$gridLetters,
+						_Utils_ap(
+							$author$project$MapPage$gridLines,
+							_Utils_ap(
+								$author$project$MapPage$raidTracks(model),
+								$author$project$MapPage$userPlots(model))))))));
+};
+var $author$project$MapPage$mapPage = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$row,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$alignTop,
+				$mdgriffith$elm_ui$Element$padding(10),
+				$mdgriffith$elm_ui$Element$spaceEvenly,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+			]),
+		_List_fromArray(
+			[
+				$author$project$MapPage$theMap(model),
+				A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$width(
+						$mdgriffith$elm_ui$Element$px(200))
+					]),
+				$mdgriffith$elm_ui$Element$text('Options to go here...')),
+				$author$project$Utils$helpButton
+			]));
 };
 var $author$project$Messages$DisplayAboutPage = {$: 'DisplayAboutPage'};
 var $author$project$Messages$DisplayCalculator = {$: 'DisplayCalculator'};
@@ -18606,18 +18829,7 @@ var $author$project$Messages$GonioMove = function (a) {
 var $author$project$Messages$GonioRelease = function (a) {
 	return {$: 'GonioRelease', a: a};
 };
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
-var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
-var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
-var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $author$project$Goniometer$drawGoniometerPointer = function (theta) {
 	var originY = 0;
 	var yPoint = $elm$core$String$fromFloat(
@@ -18977,7 +19189,6 @@ var $author$project$Messages$SelectGoniometerMode = function (a) {
 var $author$project$Messages$SelectReceiveAntenna = function (a) {
 	return {$: 'SelectReceiveAntenna', a: a};
 };
-var $author$project$Types$UiAB = {$: 'UiAB'};
 var $author$project$Types$UiClear = {$: 'UiClear'};
 var $author$project$Types$UiOperatorPrompts = {$: 'UiOperatorPrompts'};
 var $author$project$Types$UiSense = {$: 'UiSense'};
@@ -19176,15 +19387,16 @@ var $author$project$OperatorPage$modeSwitchPanel = function (model) {
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$Border$widthEach(
-						_Utils_update(
-							$author$project$Utils$edges,
-							{left: 1, right: 1, top: 1})),
-					_Utils_ap(
-						$author$project$Utils$commonStyles,
-						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiAB))),
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Border$widthEach(
+							_Utils_update(
+								$author$project$Utils$edges,
+								{left: 1, right: 1, top: 1})),
+							$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand)
+						]),
+					$author$project$Utils$commonStyles),
 				_List_fromArray(
 					[
 						A2(
@@ -19433,27 +19645,26 @@ var $author$project$PushButtons$raidStrengthButtonLabelRight = F3(
 var $author$project$OperatorPage$raidStrengthPanel = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$column,
-		A2(
-			$elm$core$List$cons,
-			$mdgriffith$elm_ui$Element$Border$widthEach(
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteSand),
+				$mdgriffith$elm_ui$Element$Border$widthEach(
 				_Utils_update(
 					$author$project$Utils$edges,
 					{bottom: 1, left: 1, right: 1, top: 1})),
-			A2(
-				$elm$core$List$cons,
 				$mdgriffith$elm_ui$Element$paddingEach(
-					_Utils_update(
-						$author$project$Utils$edges,
-						{left: 20, right: 20})),
-				_Utils_ap(
-					$author$project$Utils$commonStyles,
-					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRaidStrength)))),
+				_Utils_update(
+					$author$project$Utils$edges,
+					{left: 20, right: 20})),
+				$mdgriffith$elm_ui$Element$centerX
+			]),
 		_List_fromArray(
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$row,
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$centerX]),
+				_Utils_ap(
+					$author$project$Utils$commonStyles,
+					A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRaidStrength)),
 				_List_fromArray(
 					[
 						A2(
@@ -19461,7 +19672,8 @@ var $author$project$OperatorPage$raidStrengthPanel = function (model) {
 						_List_fromArray(
 							[
 								$mdgriffith$elm_ui$Element$Font$size(18),
-								$mdgriffith$elm_ui$Element$Font$bold
+								$mdgriffith$elm_ui$Element$Font$bold,
+								$mdgriffith$elm_ui$Element$alignRight
 							]),
 						_List_fromArray(
 							[
@@ -19879,7 +20091,7 @@ var $author$project$CRT_WebGL$uniforms = F2(
 		return {
 			camera: A3(
 				$elm_explorations$linear_algebra$Math$Matrix4$makeLookAt,
-				A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 0, 0, 7),
+				A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 0, 0, 6.5),
 				A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 0, -0.5, 0),
 				A3($elm_explorations$linear_algebra$Math$Vector3$vec3, 0, 1, 0)),
 			lineJiggle: 0.03,
@@ -19954,41 +20166,6 @@ var $author$project$CRT_WebGL$crt = F2(
 					A2($author$project$CRT_WebGL$uniforms, time, echoes))
 				]));
 	});
-var $author$project$Constants$beamGreen = A3($mdgriffith$elm_ui$Element$rgb255, 0, (0.7 * 255) | 0, 0);
-var $author$project$OperatorPage$rangeScale = function (model) {
-	return A2(
-		$mdgriffith$elm_ui$Element$row,
-		_Utils_ap(
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$width(
-					$mdgriffith$elm_ui$Element$px(600)),
-					$mdgriffith$elm_ui$Element$spaceEvenly,
-					$mdgriffith$elm_ui$Element$paddingEach(
-					_Utils_update(
-						$author$project$Utils$edges,
-						{left: 40, top: 10})),
-					$mdgriffith$elm_ui$Element$Font$color($author$project$Constants$beamGreen),
-					$mdgriffith$elm_ui$Element$Font$size(20),
-					$mdgriffith$elm_ui$Element$Font$family(
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$Font$typeface('Courier New'),
-							$mdgriffith$elm_ui$Element$Font$sansSerif
-						]))
-				]),
-			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiRangeScale)),
-		A2(
-			$elm$core$List$map,
-			function (i) {
-				return A2(
-					$mdgriffith$elm_ui$Element$el,
-					$author$project$Utils$disableSelection,
-					$mdgriffith$elm_ui$Element$text(
-						$elm$core$String$fromInt(10 * i)));
-			},
-			A2($elm$core$List$range, 0, 10)));
-};
 var $author$project$Messages$AdjustRangeValue = function (a) {
 	return {$: 'AdjustRangeValue', a: a};
 };
@@ -19996,11 +20173,11 @@ var $mdgriffith$elm_ui$Internal$Model$Behind = {$: 'Behind'};
 var $mdgriffith$elm_ui$Element$behindContent = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Behind, element);
 };
+var $author$project$Constants$black = A3($mdgriffith$elm_ui$Element$rgb255, 0, 0, 0);
 var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
 	return {$: 'HiddenLabel', a: a};
 };
 var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
-var $author$project$Constants$midGray = A3($mdgriffith$elm_ui$Element$rgb255, 80, 80, 80);
 var $mdgriffith$elm_ui$Internal$Flag$active = $mdgriffith$elm_ui$Internal$Flag$flag(32);
 var $mdgriffith$elm_ui$Internal$Model$getHeight = function (attrs) {
 	return A3(
@@ -20469,11 +20646,7 @@ var $author$project$OperatorPage$rangeSlider = function (model) {
 				$mdgriffith$elm_ui$Element$height(
 				$mdgriffith$elm_ui$Element$px(30)),
 				$mdgriffith$elm_ui$Element$width(
-				$mdgriffith$elm_ui$Element$px(560)),
-				$mdgriffith$elm_ui$Element$paddingEach(
-				_Utils_update(
-					$author$project$Utils$edges,
-					{left: 80})),
+				$mdgriffith$elm_ui$Element$px(600)),
 				$mdgriffith$elm_ui$Element$pointer,
 				$mdgriffith$elm_ui$Element$behindContent(
 				A2(
@@ -20485,7 +20658,7 @@ var $author$project$OperatorPage$rangeSlider = function (model) {
 							$mdgriffith$elm_ui$Element$px(2)),
 							$mdgriffith$elm_ui$Element$centerY,
 							$mdgriffith$elm_ui$Element$centerX,
-							$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$midGray),
+							$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$black),
 							$mdgriffith$elm_ui$Element$Border$rounded(2)
 						]),
 					$mdgriffith$elm_ui$Element$none))
@@ -20500,16 +20673,111 @@ var $author$project$OperatorPage$rangeSlider = function (model) {
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$px(16)),
+						$mdgriffith$elm_ui$Element$px(12)),
 						$mdgriffith$elm_ui$Element$height(
-						$mdgriffith$elm_ui$Element$px(50)),
-						$mdgriffith$elm_ui$Element$Border$rounded(8),
+						$mdgriffith$elm_ui$Element$px(60)),
+						$mdgriffith$elm_ui$Element$Border$rounded(6),
 						$mdgriffith$elm_ui$Element$Border$width(4),
 						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteDarkGreen),
 						$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$white)
 					])),
 			value: model.rangeSlider
 		});
+};
+var $author$project$OperatorPage$rangeTicks = function () {
+	var tickSize = function (i) {
+		var _v0 = _Utils_Tuple2(
+			A2($elm$core$Basics$modBy, 10, i),
+			A2($elm$core$Basics$modBy, 5, i));
+		if (!_v0.b) {
+			if (!_v0.a) {
+				return 40;
+			} else {
+				return 20;
+			}
+		} else {
+			return 10;
+		}
+	};
+	var label = function (i) {
+		return (!A2($elm$core$Basics$modBy, 10, i)) ? _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$text_,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(
+							A2(
+								$elm$core$Basics$min,
+								1950,
+								A2($elm$core$Basics$max, 15, i * 19.7)))),
+						$elm$svg$Svg$Attributes$y('100'),
+						$elm$svg$Svg$Attributes$fill('green'),
+						$elm$svg$Svg$Attributes$textAnchor('middle'),
+						$elm$svg$Svg$Attributes$fontFamily('monospace'),
+						$elm$svg$Svg$Attributes$fontSize('60')
+					]),
+				_List_fromArray(
+					[
+						$elm$svg$Svg$text(
+						$elm$core$String$fromInt(i))
+					]))
+			]) : _List_Nil;
+	};
+	var tick = function (i) {
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$line,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x1(
+							$elm$core$String$fromInt(i * 20)),
+							$elm$svg$Svg$Attributes$y1('0'),
+							$elm$svg$Svg$Attributes$x2(
+							$elm$core$String$fromInt(i * 20)),
+							$elm$svg$Svg$Attributes$y2(
+							$elm$core$String$fromInt(
+								tickSize(i))),
+							$elm$svg$Svg$Attributes$stroke('green'),
+							$elm$svg$Svg$Attributes$strokeWidth('8')
+						]),
+					_List_Nil)
+				]),
+			label(i));
+	};
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$viewBox('-5 -10 2010 200'),
+				$elm$svg$Svg$Attributes$width('102%'),
+				$elm$svg$Svg$Attributes$height('100%')
+			]),
+		A2(
+			$elm$core$List$concatMap,
+			tick,
+			A2($elm$core$List$range, 0, 100)));
+}();
+var $author$project$OperatorPage$rangeScale = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$paddingEach(
+					_Utils_update(
+						$author$project$Utils$edges,
+						{left: 10, right: 30, top: 10})),
+					$mdgriffith$elm_ui$Element$above(
+					$author$project$OperatorPage$rangeSlider(model))
+				]),
+			$author$project$Utils$disableSelection),
+		$mdgriffith$elm_ui$Element$html($author$project$OperatorPage$rangeTicks));
 };
 var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 	function (model, trace) {
@@ -20523,22 +20791,24 @@ var $author$project$OperatorPage$rangeSliderAndCRT = F2(
 				A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiCRT)),
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$none,
 					A2(
 					$mdgriffith$elm_ui$Element$el,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$below(
-							$author$project$OperatorPage$rangeScale(model)),
-							$mdgriffith$elm_ui$Element$paddingEach(
-							_Utils_update(
-								$author$project$Utils$edges,
-								{left: 40}))
+							$mdgriffith$elm_ui$Element$inFront(
+							A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$alignTop,
+										$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+										$mdgriffith$elm_ui$Element$paddingEach(
+										_Utils_update(
+											$author$project$Utils$edges,
+											{left: 20}))
+									]),
+								$author$project$OperatorPage$rangeScale(model)))
 						]),
-					$author$project$OperatorPage$rangeSlider(model)),
-					A2(
-					$mdgriffith$elm_ui$Element$el,
-					_List_Nil,
 					$mdgriffith$elm_ui$Element$html(
 						A2($author$project$CRT_WebGL$crt, model.webGLtime, trace)))
 				]));

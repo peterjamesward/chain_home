@@ -12,6 +12,7 @@
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 --TODO: Test on Android tablet !! (Currently using some webkit-only CSS tags to control touch actions.)
 --TODO: Installable on iOS. -- Probably means getting to grips with Cordova/PhoneGap.
+--TODO: Submit to App Store(s).
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
 --TODO: Fit it on 800x600 screen?
 
@@ -21,5 +22,5 @@
 --DONE: Make range pointer in front
 --DONE: Calibration on range scale.
 --DONE: Lightweight lines around calculator zones.
---TODO: Tutorial raid are on wrong range.
---TODO: All raids now seem to be 500ft !!
+--DONE: *** Tutorial raid are on wrong range. ?? Gonio pi/2 out?
+--TODO: *** All raids now seem to be 500ft !!
