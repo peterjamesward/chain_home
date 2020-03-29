@@ -90,7 +90,11 @@ calculatorLandscape model =
                 [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
                 , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
                 ]
-        , row [ tutorialTextBox model [] ] []
+        , row
+            [ centerX
+            , tutorialTextBox model [ centerX, moveDown 20 ]
+            ]
+            [ el [] none ]
         ]
 
 
@@ -279,13 +283,14 @@ heightGrid model storedHeight =
                     :: spacingXY 10 0
                     :: buttonStyle (theRightHeight low high) flatSunflower
                 )
-                [text label]
+                [ text label ]
     in
     -- Height is in '000 feet, sourced from config data!
     el (width fill :: explanatoryText model UiCalcHeight) <|
         column
             [ width fill
-            , padding 20, centerX
+            , padding 20
+            , centerX
             , Border.color lightCharcoal
             , Border.width 1
             ]
