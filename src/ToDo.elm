@@ -1,5 +1,5 @@
 --DONE: Range slider and knob not horizontally aligned.
---TODO: Make range pointer pointy.
+--DONE: Make range pointer pointy.
 --TODO: Tutorial - alternate action and explain text.
 --TODO: Tutorials - make sure range slider can be seen to move (and knob).
 --TODO: Going back in tutorial should restart raid if necessary.

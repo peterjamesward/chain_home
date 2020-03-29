@@ -83,12 +83,12 @@ rangeSlider model =
         , value = model.rangeSlider
         , thumb =
             Input.thumb
-                [ E.width (E.px 12)
+                [ E.width (E.px 8)
                 , E.height (E.px 60)
-                , Border.rounded 6
-                , Border.width 4
-                , Border.color paletteDarkGreen
-                , Background.color white
+                , Border.rounded 4
+                , Border.width 2
+                , Border.color white
+                , Background.color raidStrengthIndicator
                 ]
         }
 
