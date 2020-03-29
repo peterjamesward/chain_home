@@ -90,12 +90,12 @@ rangeSlider model =
                 , inFront <|
                     html <|
                         svg
-                            [ viewBox "0 0 8 25"
+                            [ viewBox "0 0 16 50"
                             , S.width "100%"
                             , S.height "100%"
                             ]
                             [ polygon
-                                [ points "1,5 7,5 4,25 1,5"
+                                [ points "2,20 14,20 8,48 2,20"
                                 , stroke "honeydew"
                                 , strokeWidth "1"
                                 , S.fill "indianred"
