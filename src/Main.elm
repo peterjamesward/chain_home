@@ -174,7 +174,7 @@ deriveModelAtTime model timeNow =
             -- systems (Supervisor's Handbook chap 12). We then know the goniometer setting that
             -- will make a target "D/F out" -- we only need a suitable function to make it appear
             -- that we are actually using a goniometer.
-            aElevationAdjustedEchoes (model.goniometerAzimuth + model.station.lineOfShoot) echoSignals
+            aElevationAdjustedEchoes (model.goniometerAzimuth) echoSignals
 
         heightMode_B_Outputs =
             bElevationAdjustedEchoes model.goniometerAzimuth echoSignals

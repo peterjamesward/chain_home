@@ -307,7 +307,7 @@ operatorPageLandscape model =
                 , el (explanatoryText model UIRangeButton) <|
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
-            , debugShowNewRaid model
+            , debugModel model
             ]
         , column [ width <| fillPortion 2, centerX ]
             [ helpButton
@@ -317,17 +317,16 @@ operatorPageLandscape model =
         ]
 
 
-debugShowNewRaid model =
-    case model.newRaid of
-        Just raid ->
-            row [ spacing 10 ]
-                [ text <| String.fromFloat raid.latitude
-                , text <| String.fromFloat raid.longitude
-                , text <| String.fromFloat raid.height
-                ]
+debugModel : Model -> Element Msg
+debugModel model =
+    case model.targets of
+        [] ->
+            text "No targets"
 
-        _ ->
-            none
+        t :: _ ->
+            row [ spacing 10 ]
+                [ text <| String.fromFloat t.height
+                ]
 
 
 operatorPagePortrait model =

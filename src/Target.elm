@@ -12,7 +12,7 @@ targetFromProforma station timeNow proforma =
     , startLongitude = proforma.longitude
     , latitude = proforma.latitude
     , longitude = proforma.longitude
-    , height = 0
+    , height = proforma.height
     , heading = proforma.heading
     , speed = proforma.speed
     , iff = proforma.iff
@@ -88,11 +88,11 @@ targetAtTime station timeNow target =
 
 
 findTargetHeight : List Target -> Float -> Maybe Float
-findTargetHeight targets range =
+findTargetHeight targets rangeSlider =
     -- Find target nearest to range pointer
     let
         pairsOfRangeAndHeights =
-            List.map (\t -> ( abs (t.rangeInMetres - range * 1600), t.height ))
+            List.map (\t -> ( abs (t.rangeInMetres - rangeSlider * 1600), t.height ))
                 targets
 
         minByFst ( r1, h1 ) ( r2, h2 ) =
