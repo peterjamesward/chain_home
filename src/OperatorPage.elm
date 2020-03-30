@@ -95,7 +95,7 @@ rangeSlider model =
                             , S.height "100%"
                             ]
                             [ polygon
-                                [ points "2,20 14,20 8,48 2,20"
+                                [ points "2,20 14,20 14,35 8,48 2,35 2,20"
                                 , stroke "honeydew"
                                 , strokeWidth "1"
                                 , S.fill "indianred"
