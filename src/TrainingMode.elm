@@ -145,7 +145,6 @@ tutorialBasic =
         noExitActions
         (static """The most obvious and most important feature is the "tube" or CRT, behind this text.
         It shows radio signals returned from aircraft within our 100 mile range over the North Sea.
-        (We can also see 100 miles over land behind, but we'll not worry about that for now.)
         """)
     , TutorialEntry
         TutorialIntroduceTheTube2

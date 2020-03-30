@@ -1,6 +1,5 @@
 --TODO: Tutorial - alternate action and explain text.
 --TODO: Range pointer more like a page marker (squared off chevron).
---TODO: Don't introduce unnecessary concepts (e.g. "behind").
 --TODO: Use Sharon's map.
 --TODO: Levels of play where you practice with fixed number of each raid type.
 --TODO: Targets to originate anywhere on Eastern side of 160 km semi-circle.
