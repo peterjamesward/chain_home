@@ -9,6 +9,7 @@ module MapPage exposing (..)
 import Constants exposing (lightCharcoal)
 import Element exposing (..)
 import Element.Border as Border
+import Element.Font as Font
 import Element.Input as Input
 import Grid exposing (mapGridLettersList)
 import Messages exposing (Msg(..))
@@ -65,6 +66,8 @@ checkBoxShowActualTrace visible =
         , Border.width 1
         , Border.rounded 5
         , Border.color lightCharcoal
+        , Font.color lightCharcoal
+        , centerY
         , padding 10
         ]
         { onChange = SetActualTraceVisible

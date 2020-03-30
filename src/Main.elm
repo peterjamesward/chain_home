@@ -33,6 +33,7 @@ import Platform.Cmd exposing (Cmd)
 import Random
 import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
+import Spherical exposing (newPosition)
 import Station exposing (..)
 import Target exposing (..)
 import Task
@@ -215,7 +216,7 @@ update msg model =
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
-                Random.pair (Random.float -(degrees 1.1) (degrees 1.1)) (Random.float 5 30)
+                Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
     in
     case msg of
         TimeDelta dt ->
@@ -480,8 +481,8 @@ update msg model =
             , Cmd.none
             )
 
-        RandomRaidGenerated ( latitude, height ) ->
-            ( model |> makeNewTarget ( latitude, height ) |> setNextRandomRaidTime
+        RandomRaidGenerated ( bearing, height ) ->
+            ( model |> makeNewTarget ( bearing, height ) |> setNextRandomRaidTime
             , Cmd.none
             )
 
@@ -514,23 +515,18 @@ setNextRandomRaidTime model =
 
 
 makeNewTarget : ( Float, Float ) -> Model -> Model
-makeNewTarget ( latitudeOffset, height ) model =
-    --TODO: More generic.
+makeNewTarget ( bearing, height ) model =
     -- Create raids along a line of longitude about 100 miles away.
     -- This assumes 90degE line of shoot!
     let
         station =
             model.station
 
-        newLong =
-            -- This is about 100 miles away, depending on latitude obvs.
-            station.longitude + degrees 2.2
-
-        newLat =
-            station.latitude + latitudeOffset
+        (newLat, newLong) =
+            newPosition (station.latitude, station.longitude) 160000 (bearing + station.lineOfShoot)
 
         heading =
-            degrees 270
+            degrees 240 + (degrees 60) * fractional (5000 * sin (toFloat model.modelTime))
 
         -- so we should see Westerly tracks.
         hostileSingle : TargetProforma
@@ -738,9 +734,10 @@ targetSelector availableRaidTypes tutorialsDone =
 
         display : TargetSelector -> Element Msg
         display g =
-            row [ width fill, spacing 10 ]
+            row [ spacing 10 ]
                 [ Input.checkbox
                     [ E.height (px 40)
+                    , E.width (px 400)
                     , Border.width 1
                     , Border.rounded 5
                     , Border.color lightCharcoal
