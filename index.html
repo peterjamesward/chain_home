@@ -7095,6 +7095,7 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			activeConfigurations: $author$project$Config$availableTargetOptions,
+			actualTraceVisibleOnMap: false,
 			azimuthModeTrace: _List_Nil,
 			currPage: $author$project$Types$AboutPage,
 			echoes: _List_Nil,
@@ -8144,7 +8145,7 @@ var $author$project$Config$bomber3 = {
 	height: 40,
 	iff: $elm$core$Maybe$Nothing,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.3),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 200,
 	tutorial: false
 };
@@ -8153,7 +8154,7 @@ var $author$project$Config$bomber4 = {
 	height: 40,
 	iff: $elm$core$Maybe$Nothing,
 	latitude: $author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.3),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.1),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 200,
 	tutorial: false
 };
@@ -8256,7 +8257,7 @@ var $author$project$Target$targetFromProforma = F3(
 			$author$project$Target$targetAtTime,
 			station,
 			timeNow,
-			{alpha: 0, heading: proforma.heading, height: 0, iff: proforma.iff, iffActive: false, latitude: proforma.latitude, longitude: proforma.longitude, positionHistory: _List_Nil, rangeInMetres: 0, speed: proforma.speed, startLatitude: proforma.latitude, startLongitude: proforma.longitude, startTime: timeNow, theta: 0, tutorial: proforma.tutorial});
+			{alpha: 0, heading: proforma.heading, height: proforma.height, iff: proforma.iff, iffActive: false, latitude: proforma.latitude, longitude: proforma.longitude, positionHistory: _List_Nil, rangeInMetres: 0, speed: proforma.speed, startLatitude: proforma.latitude, startLongitude: proforma.longitude, startTime: timeNow, theta: 0, tutorial: proforma.tutorial});
 	});
 var $author$project$Config$trainingMode3 = function (timeNow) {
 	return A2(
@@ -8295,6 +8296,11 @@ var $author$project$TrainingMode$tutorialBearingMode = function (model) {
 		{goniometerMode: $author$project$Types$Azimuth, inputState: $author$project$Types$BearingInput});
 };
 var $author$project$Types$TutorialDummy = {$: 'TutorialDummy'};
+var $author$project$TrainingMode$clearTargets = function (model) {
+	return _Utils_update(
+		model,
+		{targets: _List_Nil});
+};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -8342,6 +8348,7 @@ var $author$project$TrainingMode$tutorialCloseStep = function (scenario) {
 			[
 				$author$project$TrainingMode$tutorialExitAction,
 				$author$project$TrainingMode$clearCalculator,
+				$author$project$TrainingMode$clearTargets,
 				$author$project$TrainingMode$recordScenarioDone(scenario)
 			]),
 		$author$project$TrainingMode$noStateActions,
@@ -8360,6 +8367,7 @@ var $author$project$TrainingMode$tutorialHeightMode = function (model) {
 		model,
 		{goniometerMode: $author$project$Types$Elevation, inputState: $author$project$Types$HeightInput});
 };
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$truncate = _Basics_truncate;
 var $author$project$Grid$gridPosition = F2(
 	function (range, bearing) {
@@ -8442,7 +8450,7 @@ var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 	};
 	var gridPos = A2($author$project$Grid$gridPosition, model.storedAzimuthRange, model.storedAzimuth);
 	var letter = $author$project$Grid$letterFromGrid(gridPos);
-	return 'Raid at grid position ' + (function () {
+	return 'The calculator display tells us the raid is at grid position ' + (function () {
 		var _v0 = _Utils_Tuple2(gridPos, letter);
 		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
 			var grid = _v0.a.a;
@@ -8459,7 +8467,7 @@ var $author$project$Grid$tutorialInterpretCalculator = function (model) {
 		var _v1 = model.storedElevation;
 		if (_v1.$ === 'Just') {
 			var h = _v1.a;
-			return $elm$core$String$fromInt(h | 0) + ',000 ft';
+			return (h >= 1) ? ($elm$core$String$fromInt(h | 0) + ',000 ft') : 'below 1000 ft';
 		} else {
 			return 'unknown';
 		}
@@ -8673,7 +8681,7 @@ var $author$project$Config$bomber2 = {
 	height: 30.1,
 	iff: $elm$core$Maybe$Nothing,
 	latitude: $elm$core$Basics$degrees(52.05),
-	longitude: $elm$core$Basics$degrees(2.5),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 200.0,
 	tutorial: false
 };
@@ -8682,7 +8690,7 @@ var $author$project$Config$bomber2A = {
 	height: 30.2,
 	iff: $elm$core$Maybe$Nothing,
 	latitude: $elm$core$Basics$degrees(52.04),
-	longitude: $elm$core$Basics$degrees(2.5),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 200.0,
 	tutorial: false
 };
@@ -8732,59 +8740,46 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$Target$findTargetElevation = F3(
-	function (targets, polarTargets, range) {
-		var pairsOfRangeAndHeights = A3(
-			$elm$core$List$map2,
-			F2(
-				function (r1, p1) {
-					return _Utils_Tuple2(
-						$elm$core$Basics$abs(p1.rangeInMetres - (range * 1600)),
-						r1.height);
-				}),
-			targets,
-			polarTargets);
+var $author$project$Target$findTargetHeight = F2(
+	function (targets, rangeSlider) {
+		var pairsOfRangeAndHeights = A2(
+			$elm$core$List$map,
+			function (t) {
+				return _Utils_Tuple2(
+					$elm$core$Basics$abs(t.rangeInMetres - (rangeSlider * 1600)),
+					t.height);
+			},
+			targets);
 		var minByFst = F2(
-			function (_v3, _v4) {
-				var r1 = _v3.a;
-				var h1 = _v3.b;
-				var r2 = _v4.a;
-				var h2 = _v4.b;
+			function (_v1, _v2) {
+				var r1 = _v1.a;
+				var h1 = _v1.b;
+				var r2 = _v2.a;
+				var h2 = _v2.b;
 				return (_Utils_cmp(r1, r2) < 0) ? _Utils_Tuple2(r1, h1) : _Utils_Tuple2(r2, h2);
 			});
-		var _v0 = _Utils_Tuple2(targets, polarTargets);
-		_v0$2:
-		while (true) {
-			if (!_v0.a.b) {
-				if (!_v0.b.b) {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					break _v0$2;
-				}
+		if (!targets.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			if (!targets.b.b) {
+				var r1 = targets.a;
+				return $elm$core$Maybe$Just(r1.height);
 			} else {
-				if (((!_v0.a.b.b) && _v0.b.b) && (!_v0.b.b.b)) {
-					var _v1 = _v0.a;
-					var r1 = _v1.a;
-					var _v2 = _v0.b;
-					return $elm$core$Maybe$Just(r1.height);
-				} else {
-					break _v0$2;
-				}
+				return $elm$core$Maybe$Just(
+					A3(
+						$elm$core$List$foldl,
+						minByFst,
+						_Utils_Tuple2(1000000, 0),
+						pairsOfRangeAndHeights).b);
 			}
 		}
-		return $elm$core$Maybe$Just(
-			A3(
-				$elm$core$List$foldl,
-				minByFst,
-				_Utils_Tuple2(1000000, 0),
-				pairsOfRangeAndHeights).b);
 	});
 var $author$project$TrainingMode$tutorialStoreElevation = function (model) {
 	return _Utils_update(
 		model,
 		{
 			inputState: $author$project$Types$HeightRangeInput,
-			storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.targets, model.rangeSlider)
+			storedElevation: A2($author$project$Target$findTargetHeight, model.targets, model.rangeSlider)
 		});
 };
 var $author$project$TrainingMode$tutorial2SameBearing = _List_fromArray(
@@ -8951,7 +8946,7 @@ var $author$project$Config$severalAligned = function (n) {
 				iff: $elm$core$Maybe$Nothing,
 				latitude: ($author$project$Config$bawdsey.latitude - $elm$core$Basics$degrees(0.2)) + $elm$core$Basics$degrees(
 					0.05 * $elm$core$Basics$cos(i)),
-				longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.17)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
+				longitude: ($author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2)) + ($elm$core$Basics$degrees(i - 5) * 0.001),
 				speed: 250,
 				tutorial: false
 			};
@@ -9141,12 +9136,21 @@ var $author$project$TrainingMode$tutorial3to6 = _List_fromArray(
 		$author$project$TrainingMode$static('Choose more training or click on Operate.\n        ')),
 		$author$project$TrainingMode$tutorialCloseStep($author$project$Types$ScenarioThreeToSix)
 	]);
+var $author$project$Types$TutorialIntroduceGonio = {$: 'TutorialIntroduceGonio'};
+var $author$project$Types$TutorialIntroduceTheTube = {$: 'TutorialIntroduceTheTube'};
+var $author$project$Types$TutorialIntroduceTheTube2 = {$: 'TutorialIntroduceTheTube2'};
+var $author$project$Types$TutorialJustSwinging = {$: 'TutorialJustSwinging'};
+var $author$project$TrainingMode$centraliseKnobs = function (model) {
+	return _Utils_update(
+		model,
+		{goniometerAzimuth: 0, rangeSlider: 50});
+};
 var $author$project$Config$bomber1 = {
 	heading: $elm$core$Basics$degrees(250),
 	height: 20,
 	iff: $elm$core$Maybe$Nothing,
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.5),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(1.2),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 200.0,
 	tutorial: false
 };
@@ -9168,27 +9172,60 @@ var $author$project$TrainingMode$setupTutorialRaid = function (model) {
 			targets: $author$project$Config$trainingMode(model.modelTime)
 		});
 };
+var $author$project$TrainingMode$stopGonioAwayFromRaidBearing = function (model) {
+	return ((_Utils_cmp(
+		model.goniometerAzimuth,
+		$elm$core$Basics$degrees(-50)) > -1) && (_Utils_cmp(
+		model.goniometerAzimuth,
+		$elm$core$Basics$degrees(0)) < 1)) ? $author$project$TrainingMode$tutorialGoniometerSwinging(model) : model;
+};
 var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 	[
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialWelcome,
+		$author$project$Types$UiDummy,
+		_List_fromArray(
+			[$author$project$TrainingMode$centraliseKnobs, $author$project$TrainingMode$clearTargets]),
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('This tutorial will give a basic overview of the receiver and its operation.\n        Click the ► to go on, ◀︎ to go back.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIntroduceTheTube,
+		$author$project$Types$UiCRT,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The most obvious and most important feature is the "tube" or CRT, behind this text.\n        It shows radio signals returned from aircraft within our 100 mile range over the North Sea.\n        (We can also see 100 miles over land behind, but we\'ll not worry about that for now.)\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIntroduceTheTube2,
+		$author$project$Types$UiCRT,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('A returned signal will be a V-shaped dip in the line that we see jiggling across the tube.\n        The more to the right, the further away the aircraft, with the scale in miles across the top.\n        The two large dips near the left are caused by local features such as buildings or hills.\n        The constant jiggling is just electrical noise - these are very sensitive receivers.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialJustSwinging,
 		$author$project$Types$UiGoniometer,
 		_List_fromArray(
-			[$author$project$TrainingMode$tutorialBearingMode, $author$project$TrainingMode$clearCalculator]),
+			[$author$project$TrainingMode$tutorialBearingMode, $author$project$TrainingMode$clearCalculator, $author$project$TrainingMode$clearTargets]),
 		_List_fromArray(
 			[$author$project$TrainingMode$tutorialGoniometerSwinging]),
 		$author$project$TrainingMode$noExitActions,
-		$author$project$TrainingMode$static('The operator is turning the gonio, looking for any sign of a signal.\n        Click ► to begin.\n        ')),
+		$author$project$TrainingMode$static('The operator uses the goniometer ("gonio") to estimate the bearing of a incoming raid.\n            The operator must turn the gonio, not let it sit in one position, or new raids could be missed.\n             ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialIncomingRaid,
 		$author$project$Types$UiCRT,
 		_List_fromArray(
 			[$author$project$TrainingMode$setupTutorialRaid]),
-		$author$project$TrainingMode$noStateActions,
+		_List_fromArray(
+			[$author$project$TrainingMode$stopGonioAwayFromRaidBearing]),
 		$author$project$TrainingMode$noExitActions,
-		$author$project$TrainingMode$static('The white V shape under the 100 on the \'tube\' is a new raid.\n        Click ► to see the operator start to examine the raid.\n        ')),
+		$author$project$TrainingMode$static('The white V shape under the 100 on the \'tube\' is a new raid.\n            This simple and stable shape is always only one aircraft.\n            The operator turns the Range knob until the Range Pointer points at the\n            raid (ideally at the left hand edge) for an accurate range reading.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialAdjustRange,
@@ -9205,6 +9242,14 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 		$author$project$TrainingMode$static('The operator turns the range knob until the pointer\n        lines up with the left edge of the raid on the CRT.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
+		$author$project$Types$TutorialIntroduceGonio,
+		$author$project$Types$UiGoniometer,
+		$author$project$TrainingMode$noEntryActions,
+		$author$project$TrainingMode$noStateActions,
+		$author$project$TrainingMode$noExitActions,
+		$author$project$TrainingMode$static('The raid will keep moving, so the operator works quickly.\n        The operator will turn the Gonio to make the V as small as possible.\n        ')),
+		A6(
+		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialFindBearing,
 		$author$project$Types$UiGoniometer,
 		$author$project$TrainingMode$noEntryActions,
@@ -9216,7 +9261,7 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 			[
 				A2($author$project$TrainingMode$findBearingOfNumberedTarget, false, 0)
 			]),
-		$author$project$TrainingMode$static('The operator \'swings\' the gonio until the V on the CRT vanishes.\n        ')),
+		$author$project$TrainingMode$static('The operator \'swings\' the gonio until the V on the CRT vanishes.\n            The next step is to load information into the calculator. The lights\n            over to the right remind the operator which button to press.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialStoreBearing,
@@ -9243,7 +9288,7 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 			[$author$project$TrainingMode$tutorialHeightMode]),
 		$author$project$TrainingMode$noStateActions,
 		$author$project$TrainingMode$noExitActions,
-		$author$project$TrainingMode$static('The operator will now try to work out the height.\n        ')),
+		$author$project$TrainingMode$static('The operator will now try to work out the height.\n            This will use the goniometer to compare signals received at aerials\n            placed at different heights. Height finding is at best approximate and often impossible.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialFindElevation,
@@ -9257,7 +9302,7 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 			[
 				$author$project$TrainingMode$tutorialSeekElevation(false)
 			]),
-		$author$project$TrainingMode$static('The operator swings the gonio again, to minimise the V.\n        ')),
+		$author$project$TrainingMode$static('The operator swings the gonio again, to minimise the V.\n            The reading on the goniometer scale has no direct meaning, it is just input to the calculator.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialStoreElevation,
@@ -9266,7 +9311,7 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 		$author$project$TrainingMode$noStateActions,
 		_List_fromArray(
 			[$author$project$TrainingMode$tutorialStoreElevation]),
-		$author$project$TrainingMode$static('The GONIO setting is stored, this gives the elevation.\n        ')),
+		$author$project$TrainingMode$static('The GONIO setting is stored, this allows the calculator to work out the elevation.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialAdjustRangeForHeight,
@@ -9280,7 +9325,7 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 			[
 				$author$project$TrainingMode$chaseTheRaidRange(false)
 			]),
-		$author$project$TrainingMode$static('Adjust the range pointer because the raid has moved.\n        ')),
+		$author$project$TrainingMode$static('The operator adjusts the range pointer because the raid has moved.\n        ')),
 		A6(
 		$author$project$TrainingMode$TutorialEntry,
 		$author$project$Types$TutorialStoreRange2,
@@ -9311,23 +9356,14 @@ var $author$project$TrainingMode$tutorialBasic = _List_fromArray(
 		_List_fromArray(
 			[$author$project$TrainingMode$tutorialShowOperator]),
 		$author$project$Grid$tutorialInterpretCalculator),
-		A6(
-		$author$project$TrainingMode$TutorialEntry,
-		$author$project$Types$TutorialEnded,
-		$author$project$Types$UiDummy,
-		$author$project$TrainingMode$noEntryActions,
-		$author$project$TrainingMode$noStateActions,
-		_List_fromArray(
-			[$author$project$TrainingMode$stopTutorialRaid]),
-		$author$project$TrainingMode$static('Choose more training or click on Operate.\n        ')),
 		$author$project$TrainingMode$tutorialCloseStep($author$project$Types$ScenarioBasic)
 	]);
 var $author$project$Config$fighter1 = {
-	heading: $elm$core$Basics$degrees(90),
+	heading: $elm$core$Basics$degrees(270),
 	height: 10,
 	iff: $elm$core$Maybe$Just(1),
 	latitude: $author$project$Config$bawdsey.latitude + $elm$core$Basics$degrees(0.01),
-	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(0.06),
+	longitude: $author$project$Config$bawdsey.longitude + $elm$core$Basics$degrees(2.2),
 	speed: 300,
 	tutorial: false
 };
@@ -9600,7 +9636,6 @@ var $mdgriffith$elm_ui$Element$classifyDevice = function (window) {
 		orientation: (_Utils_cmp(window.width, window.height) < 0) ? $mdgriffith$elm_ui$Element$Portrait : $mdgriffith$elm_ui$Element$Landscape
 	};
 };
-var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$ElevationCurves$aSystemElevationCurveBasic = function (x) {
 	return ((x >= 0) && (x <= 10)) ? (1 - $elm$core$Basics$cos(
 		(A2($elm$core$Basics$pow, x, 2.5) / 60) - 0.5)) : 0.0;
@@ -9784,7 +9819,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 			A2($author$project$Target$targetAtTime, model.station, timeNow),
 			model.targets);
 		var newRangeSliderPosition = A2($author$project$Main$slideRangeSlider, model.rangeSlider, model.keys);
-		var newRangeKnobPosition = ((newRangeSliderPosition - 50) * $elm$core$Basics$pi) / 50;
+		var newRangeKnobPosition = ((newRangeSliderPosition - 50) * $elm$core$Basics$degrees(175)) / 50;
 		var inRangeTargets = A2(
 			$elm$core$List$filter,
 			function (tgt) {
@@ -9792,7 +9827,7 @@ var $author$project$Main$deriveModelAtTime = F2(
 			},
 			targetsNow);
 		var echoSignals = A3($author$project$Echo$deriveEchoes, model.station, model.transmitAntenna, inRangeTargets);
-		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth + model.station.lineOfShoot, echoSignals);
+		var heightMode_A_Outputs = A2($author$project$ElevationCurves$aElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var heightMode_B_Outputs = A2($author$project$ElevationCurves$bElevationAdjustedEchoes, model.goniometerAzimuth, echoSignals);
 		var receiveSignals = A2($author$project$Main$applyReceiver, model.receiveAntenna, echoSignals);
 		var gonioOutput = A2($author$project$Receiver$goniometerMix, model.goniometerAzimuth + model.station.lineOfShoot, receiveSignals);
@@ -10565,13 +10600,13 @@ var $author$project$Main$update = F2(
 					var _v5 = _v4.a;
 					var startAngle = _v5.a;
 					var startXY = _v5.b;
-					var stopKnob = $elm$core$Basics$pi - 0.1;
+					var stopKnob = $elm$core$Basics$degrees(175);
 					var newAngle = A3(
 						$elm$core$Basics$clamp,
 						0 - stopKnob,
 						stopKnob,
 						A3($author$project$Range$rangeTurnAngle, startAngle, startXY, offset));
-					var newSliderPosition = (($elm$core$Basics$pi + $author$project$Utils$normalise(newAngle)) * 50) / $elm$core$Basics$pi;
+					var newSliderPosition = (($author$project$Utils$normalise(newAngle) * 50) / stopKnob) + 50;
 					return _Utils_Tuple2(
 						($elm$core$Basics$abs(newSliderPosition - model.rangeSlider) < 50) ? _Utils_update(
 							model,
@@ -10659,7 +10694,7 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										inputState: $author$project$Types$HeightRangeInput,
-										storedElevation: A3($author$project$Target$findTargetElevation, model.targets, model.targets, model.rangeSlider)
+										storedElevation: A2($author$project$Target$findTargetHeight, model.targets, model.rangeSlider)
 									});
 							default:
 								return model;
@@ -10730,6 +10765,13 @@ var $author$project$Main$update = F2(
 							$author$project$Main$makeNewTarget,
 							_Utils_Tuple2(latitude, height),
 							model)),
+					$elm$core$Platform$Cmd$none);
+			case 'SetActualTraceVisible':
+				var visible = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{actualTraceVisibleOnMap: visible}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -10808,7 +10850,7 @@ var $author$project$AboutPage$content = A3(
 		[
 			$elm$html$Html$Attributes$class('content')
 		]),
-	'\n\n## What is this?\n\nThis application aims to give an impression of being an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. Under "Learn & Play", you can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\nApplication code written by Peter Ward.\nHistorical research by Sharon Ward.\nThe application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\nImage of Polsey Chain Home station from Wikipedia Commons (Public Domain).\nSatellite map image from USGS LandSat images.\n\n');
+	'\n\n## What is this?\n\nThis application aims to give an impression of being an operator\nat a Chain Home station during the Battle of Britain in 1940.\n\nScientists and engineers developed radio technology rapidly to prepare for the war, and were constantly\nimproving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft\nconveniently labelled, the operator would spend hours studying the "tube" looking for faint\nsignals amongst the noise.\n\nTo help, we have included the "Electrical Calculator" that works out the position and the height\n-- before that, some lengthy calculations were required.\n\n## How should I use this?\n\nWe have picked five distinctive patterns of incoming aircraft. Under "Learn & Play", you can learn about how each of these\nwould appear on the tube, and what the operator would do to try to find the bearing and the height\nso that this information can be passed on to Fighter Command.\n\nYou can then try to keep up with a series of incoming raids. The operator had to keep track of all\nthe raids and send frequent updates on their position to Fighter Command. Keeping\ntrack of all the raids is not easy.\n\n## Credits\n\n * Application code written by Peter Ward.\n * Historical research by Sharon Ward.\n * The application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.\n * Temporary map image from Google.\n\n');
 var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -16959,6 +17001,20 @@ var $author$project$CalculatorDisplay$maybeBoolDisplay = F2(
 				A2($author$project$CalculatorDisplay$buttonStyle, theChosenOne, $author$project$Constants$raidStrengthIndicator)),
 			$mdgriffith$elm_ui$Element$text(label));
 	});
+var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
+	return {$: 'MoveY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
+	function (a, b) {
+		return {$: 'TransformComponent', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$moveY = $mdgriffith$elm_ui$Internal$Flag$flag(26);
+var $mdgriffith$elm_ui$Element$moveDown = function (y) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveY,
+		$mdgriffith$elm_ui$Internal$Model$MoveY(y));
+};
 var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
 var $mdgriffith$elm_ui$Internal$Flag$borderStyle = $mdgriffith$elm_ui$Internal$Flag$flag(11);
@@ -17356,9 +17412,20 @@ var $author$project$CalculatorDisplay$calculatorLandscape = function (model) {
 				$mdgriffith$elm_ui$Element$row,
 				_List_fromArray(
 					[
-						A2($author$project$TrainingMode$tutorialTextBox, model, _List_Nil)
+						$mdgriffith$elm_ui$Element$centerX,
+						A2(
+						$author$project$TrainingMode$tutorialTextBox,
+						model,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$centerX,
+								$mdgriffith$elm_ui$Element$moveDown(20)
+							]))
 					]),
-				_List_Nil)
+				_List_fromArray(
+					[
+						A2($mdgriffith$elm_ui$Element$el, _List_Nil, $mdgriffith$elm_ui$Element$none)
+					]))
 			]));
 };
 var $author$project$CalculatorDisplay$calculatorPortrait = function (model) {
@@ -17753,14 +17820,6 @@ var $mdgriffith$elm_ui$Element$Input$checkbox = F2(
 							icon(checked)
 						]))));
 	});
-var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
-	return {$: 'MoveY', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
-	function (a, b) {
-		return {$: 'TransformComponent', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$moveY = $mdgriffith$elm_ui$Internal$Flag$flag(26);
 var $mdgriffith$elm_ui$Element$moveUp = function (y) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
@@ -18179,6 +18238,35 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
+var $author$project$Messages$SetActualTraceVisible = function (a) {
+	return {$: 'SetActualTraceVisible', a: a};
+};
+var $author$project$MapPage$checkBoxShowActualTrace = function (visible) {
+	return A2(
+		$mdgriffith$elm_ui$Element$Input$checkbox,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(40)),
+				$mdgriffith$elm_ui$Element$Border$width(1),
+				$mdgriffith$elm_ui$Element$Border$rounded(5),
+				$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$lightCharcoal),
+				$mdgriffith$elm_ui$Element$padding(10)
+			]),
+		{
+			checked: visible,
+			icon: $mdgriffith$elm_ui$Element$Input$defaultCheckbox,
+			label: A2(
+				$mdgriffith$elm_ui$Element$Input$labelRight,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						A2($elm$html$Html$Attributes$style, '-webkit-user-select', 'none'))
+					]),
+				$mdgriffith$elm_ui$Element$text('Show the actual locations')),
+			onChange: $author$project$Messages$SetActualTraceVisible
+		});
+};
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$fontFamily = _VirtualDom_attribute('font-family');
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
@@ -18187,6 +18275,23 @@ var $elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
+var $author$project$Grid$mapGridLettersList = _List_fromArray(
+	[
+		_List_fromArray(
+		['Y', 'Z', 'V', 'W', 'X', 'Y', 'Z']),
+		_List_fromArray(
+		['vD', 'vE', 'wA', 'wB', 'wC', 'wD', 'wE']),
+		_List_fromArray(
+		['vJ', 'vK', 'wF', 'wG', 'wH', 'wJ', 'wK']),
+		_List_fromArray(
+		['vO', 'vP', 'wL', 'wM', 'wN', 'wO', 'wP']),
+		_List_fromArray(
+		['vT', 'vU', 'wQ', 'wR', 'wS', 'wT', 'wU']),
+		_List_fromArray(
+		['vY', 'vZ', 'wV', 'wW', 'wX', 'wY', 'wZ']),
+		_List_fromArray(
+		['D', 'E', 'A', 'B', 'C', 'D', 'E'])
+	]);
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
 		takeReverse:
@@ -18321,7 +18426,7 @@ var $author$project$MapPage$mapVisibleGrid = function () {
 	return A2(
 		$elm$core$List$map,
 		takeMiddle,
-		takeMiddle($author$project$Grid$gridLettersList));
+		takeMiddle($author$project$Grid$mapGridLettersList));
 }();
 var $author$project$MapPage$squareSize = 160;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
@@ -18464,7 +18569,7 @@ var $author$project$MapPage$raidTracks = function (model) {
 			plotArrow,
 			A2($elm$core$List$filter, noMoreThan100Miles, target.positionHistory));
 	};
-	return A2($elm$core$List$concatMap, raidTrack, model.targets);
+	return model.actualTraceVisibleOnMap ? A2($elm$core$List$concatMap, raidTrack, model.targets) : _List_Nil;
 };
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $author$project$MapPage$userPlots = function (model) {
@@ -18504,15 +18609,13 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 var $author$project$MapPage$theMap = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
-		_Utils_ap(
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY,
-					$mdgriffith$elm_ui$Element$width(
-					$mdgriffith$elm_ui$Element$px(600))
-				]),
-			A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiMapPage)),
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$centerY,
+				$mdgriffith$elm_ui$Element$width(
+				$mdgriffith$elm_ui$Element$px(600))
+			]),
 		$mdgriffith$elm_ui$Element$html(
 			A2(
 				$elm$svg$Svg$svg,
@@ -18554,8 +18657,11 @@ var $author$project$MapPage$mapPage = function (model) {
 			[
 				$mdgriffith$elm_ui$Element$centerX,
 				$mdgriffith$elm_ui$Element$alignTop,
-				$mdgriffith$elm_ui$Element$padding(10),
-				$mdgriffith$elm_ui$Element$spaceEvenly,
+				$mdgriffith$elm_ui$Element$paddingEach(
+				_Utils_update(
+					$author$project$Utils$edges,
+					{left: 50, right: 50})),
+				$mdgriffith$elm_ui$Element$spacing(20),
 				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 			]),
 		_List_fromArray(
@@ -18563,12 +18669,14 @@ var $author$project$MapPage$mapPage = function (model) {
 				$author$project$MapPage$theMap(model),
 				A2(
 				$mdgriffith$elm_ui$Element$el,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$px(200))
-					]),
-				$mdgriffith$elm_ui$Element$text('Options to go here...')),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$alignLeft,
+						A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UiMapPage))),
+				$author$project$MapPage$checkBoxShowActualTrace(model.actualTraceVisibleOnMap)),
 				$author$project$Utils$helpButton
 			]));
 };
@@ -19155,10 +19263,12 @@ var $author$project$OperatorPage$clickableRangeKnob = F2(
 			$mdgriffith$elm_ui$Element$html(
 				$author$project$Range$drawRangeKnob(model.rangeKnobAngle)));
 	});
-var $author$project$OperatorPage$debugShowNewRaid = function (model) {
-	var _v0 = model.newRaid;
-	if (_v0.$ === 'Just') {
-		var raid = _v0.a;
+var $author$project$OperatorPage$debugModel = function (model) {
+	var _v0 = model.targets;
+	if (!_v0.b) {
+		return $mdgriffith$elm_ui$Element$text('No targets');
+	} else {
+		var t = _v0.a;
 		return A2(
 			$mdgriffith$elm_ui$Element$row,
 			_List_fromArray(
@@ -19168,14 +19278,8 @@ var $author$project$OperatorPage$debugShowNewRaid = function (model) {
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$text(
-					$elm$core$String$fromFloat(raid.latitude)),
-					$mdgriffith$elm_ui$Element$text(
-					$elm$core$String$fromFloat(raid.longitude)),
-					$mdgriffith$elm_ui$Element$text(
-					$elm$core$String$fromFloat(raid.height))
+					$elm$core$String$fromFloat(t.height))
 				]));
-	} else {
-		return $mdgriffith$elm_ui$Element$none;
 	}
 };
 var $mdgriffith$elm_ui$Element$fillPortion = $mdgriffith$elm_ui$Internal$Model$Fill;
@@ -20178,6 +20282,14 @@ var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
 	return {$: 'HiddenLabel', a: a};
 };
 var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
+var $mdgriffith$elm_ui$Element$moveRight = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$TransformComponent,
+		$mdgriffith$elm_ui$Internal$Flag$moveX,
+		$mdgriffith$elm_ui$Internal$Model$MoveX(x));
+};
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
 var $mdgriffith$elm_ui$Internal$Flag$active = $mdgriffith$elm_ui$Internal$Flag$flag(32);
 var $mdgriffith$elm_ui$Internal$Model$getHeight = function (attrs) {
 	return A3(
@@ -20647,6 +20759,7 @@ var $author$project$OperatorPage$rangeSlider = function (model) {
 				$mdgriffith$elm_ui$Element$px(30)),
 				$mdgriffith$elm_ui$Element$width(
 				$mdgriffith$elm_ui$Element$px(600)),
+				$mdgriffith$elm_ui$Element$moveRight(5),
 				$mdgriffith$elm_ui$Element$pointer,
 				$mdgriffith$elm_ui$Element$behindContent(
 				A2(
@@ -20673,13 +20786,34 @@ var $author$project$OperatorPage$rangeSlider = function (model) {
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$px(12)),
+						$mdgriffith$elm_ui$Element$px(20)),
 						$mdgriffith$elm_ui$Element$height(
-						$mdgriffith$elm_ui$Element$px(60)),
-						$mdgriffith$elm_ui$Element$Border$rounded(6),
-						$mdgriffith$elm_ui$Element$Border$width(4),
-						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$paletteDarkGreen),
-						$mdgriffith$elm_ui$Element$Background$color($author$project$Constants$white)
+						$mdgriffith$elm_ui$Element$px(80)),
+						$mdgriffith$elm_ui$Element$Border$width(0),
+						$mdgriffith$elm_ui$Element$Border$color($author$project$Constants$white),
+						$mdgriffith$elm_ui$Element$inFront(
+						$mdgriffith$elm_ui$Element$html(
+							A2(
+								$elm$svg$Svg$svg,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$viewBox('0 0 16 50'),
+										$elm$svg$Svg$Attributes$width('100%'),
+										$elm$svg$Svg$Attributes$height('100%')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$svg$Svg$polygon,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$points('2,20 14,20 8,48 2,20'),
+												$elm$svg$Svg$Attributes$stroke('honeydew'),
+												$elm$svg$Svg$Attributes$strokeWidth('1'),
+												$elm$svg$Svg$Attributes$fill('indianred')
+											]),
+										_List_Nil)
+									]))))
 					])),
 			value: model.rangeSlider
 		});
@@ -20897,7 +21031,7 @@ var $author$project$OperatorPage$operatorPageLandscape = function (model) {
 								A2($author$project$TrainingMode$explanatoryText, model, $author$project$Types$UIRangeButton),
 								A2($author$project$PushButtons$actionButtonLabelAbove, 'RANGE', $author$project$Messages$StoreRangeSetting))
 							])),
-						$author$project$OperatorPage$debugShowNewRaid(model)
+						$author$project$OperatorPage$debugModel(model)
 					])),
 				A2(
 				$mdgriffith$elm_ui$Element$column,

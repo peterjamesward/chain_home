@@ -1245,11 +1245,16 @@ tutorialGoniometerSwinging model =
 
 stopGonioAwayFromRaidBearing : TutorialAction
 stopGonioAwayFromRaidBearing model =
-    if model.goniometerAzimuth >= degrees -50 && model.goniometerAzimuth <=  degrees 0 then
-        tutorialGoniometerSwinging model -- keep turning.
+    if model.goniometerAzimuth >= degrees -50 && model.goniometerAzimuth <= degrees 0 then
+        tutorialGoniometerSwinging model
+        -- keep turning.
 
     else
-        model -- stop swinging, we are away from the target.
+        model
+
+
+
+-- stop swinging, we are away from the target.
 
 
 chaseTheRaidRange : Bool -> Model -> Model
@@ -1457,6 +1462,9 @@ tutorialTextBox model adjustments =
                     Just step ->
                         el
                             ([ width (px 500)
+                             , height (px 160)
+                             , centerY
+                             , Background.color blue
                              , Border.color flatSunflower
                              , Border.width 2
                              , Border.rounded 5
@@ -1469,7 +1477,7 @@ tutorialTextBox model adjustments =
                             )
                         <|
                             row
-                                [ width fill ]
+                                [ width fill, centerY ]
                                 [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
                                 , paragraph
                                     [ Background.color blue

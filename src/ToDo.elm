@@ -1,10 +1,10 @@
 --TODO: Tutorial - alternate action and explain text.
---TODO: Tutorials - make sure range slider can be seen to move (and knob).
+--TODO: Range pointer more like a page marker (squared off chevron).
+--TODO: Don't introduce unnecessary concepts (e.g. "behind").
 --TODO: Use Sharon's map.
+--TODO: Levels of play where you practice with fixed number of each raid type.
 --TODO: Targets to originate anywhere on Eastern side of 160 km semi-circle.
 --TODO: Add some variation to direction of travel of each raid.
---TODO: Going back in tutorial should restart raid if necessary.
---TODO: Checkbox to show actual tracks. Possibly protect that somehow during 'game turn'.
 --TODO: Explanatory notes on MapPage.
 --TODO: Store all target locations when user enters Bearing & Range? This may make correlation possible.
 --TODO: Derive some average closeness metric as a score?
