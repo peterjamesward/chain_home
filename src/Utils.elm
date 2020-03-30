@@ -2,7 +2,7 @@ module Utils exposing (..)
 
 -- SVG requires a line to be expressed as a space separated string of pairs.
 
-import Constants exposing (flatWetAsphalt, paletteDarkGreen, paletteSand, white)
+import Constants exposing (blue, flatWetAsphalt, paletteDarkGreen, paletteSand, white)
 import Element as E exposing (..)
 import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
@@ -90,3 +90,19 @@ helpButton =
         ]
     <|
         text "?"
+
+
+motorwaySign : String -> Element msg
+motorwaySign text =
+    paragraph
+        [ Background.color blue
+        , Font.color white
+        , Border.color white
+        , Border.width 2
+        , Border.rounded 5
+        , E.width (px 400)
+        , spacing 4
+        , padding 10
+        , Font.size 16
+        ]
+        [ E.text text ]

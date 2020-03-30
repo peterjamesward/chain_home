@@ -11,10 +11,9 @@ greenButton : List (Attribute msg)
 greenButton =
     [ Background.color flatMidnightBlue
     , Border.color paletteLightGreen
-    , Border.rounded 3
+    , Border.rounded 5
     , Border.width 2
-    , Font.bold
-    , Font.color paletteSand
+    , Font.color paletteLightGreen
     , paddingXY 20 6
     ]
 
@@ -22,9 +21,8 @@ greenButton =
 greyButton : List (Attribute msg)
 greyButton =
     [ Background.color paletteGrey
-    , Border.color paletteLightGreen
-    , Border.rounded 3
+    , Border.color paletteDarkGreen
+    , Border.rounded 5
     , Border.width 2
-    , Font.bold
     , Font.color paletteDarkGreen
     ]

@@ -12,14 +12,14 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Grid exposing (mapGridLettersList)
+import Html.Attributes as H exposing (style)
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import TrainingMode exposing (explanatoryText)
 import Types exposing (UiComponent(..))
-import Utils exposing (edges, helpButton)
-import Html.Attributes as H exposing (style)
+import Utils exposing (edges, helpButton, motorwaySign)
 
 
 squareSize =
@@ -49,15 +49,22 @@ mapPage model =
         , Element.width Element.fill
         ]
         [ theMap model
-        , el
-            (Element.width Element.fill
-                :: alignLeft
-                :: explanatoryText model UiMapPage
-            )
-          <|
-            checkBoxShowActualTrace model.actualTraceVisibleOnMap
-        , helpButton
+        , column [ Element.spacing 50 ]
+            [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
+            , motorwaySign explainMapPage
+            ]
+
+        --, helpButton
         ]
+
+
+explainMapPage =
+    """
+Your plots are relayed to the Filter Room where they are placed
+on the map. The team there combines your plots with plots from other CH stations
+and deduces the most likely position of the raids.
+We have the advantage of being able to see exactly where the raids were!
+       """
 
 
 checkBoxShowActualTrace visible =

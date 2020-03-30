@@ -522,11 +522,12 @@ makeNewTarget ( bearing, height ) model =
         station =
             model.station
 
-        (newLat, newLong) =
-            newPosition (station.latitude, station.longitude) 160000 (bearing + station.lineOfShoot)
+        ( newLat, newLong ) =
+            newPosition ( station.latitude, station.longitude ) 160000 (bearing + station.lineOfShoot)
 
         heading =
-            degrees 240 + (degrees 60) * fractional (5000 * sin (toFloat model.modelTime))
+            -- Som pseudo randomness in raid heading.
+            degrees 250 + degrees 40 * fractional (5000 * sin (toFloat model.modelTime))
 
         -- so we should see Westerly tracks.
         hostileSingle : TargetProforma
@@ -773,7 +774,8 @@ targetSelector availableRaidTypes tutorialsDone =
         , Font.color lightCharcoal
         ]
     <|
-        List.map display availableRaidTypes
+        motorwaySign explainRaidTypes
+            :: List.map display availableRaidTypes
 
 
 calculatorPage : Model -> Element Msg
@@ -789,21 +791,33 @@ inputPage model =
         , Font.color lightCharcoal
         , padding 20
         ]
-        [ el (explanatoryText model UiConfigOptions) <|
-            targetSelector model.activeConfigurations model.tutorialsCompleted
+        [ --el (explanatoryText model UiConfigOptions) <|
+          targetSelector model.activeConfigurations model.tutorialsCompleted
         , column
             ([ centerX
              , spacingXY 0 20
              ]
-                ++ explanatoryText model UiGoButton
+             --                ++ explanatoryText model UiGoButton
             )
-            [ Input.button
+            [ motorwaySign explainPlayLevels
+            , Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
                 { onPress = Just StartScenario
-                , label = el [ centerX ] <| text "Go!"
+                , label = el [ centerX ] <| text "One practice raid"
+                }
+            , Input.button
+                (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+                { onPress = Just StartScenario
+                , label = el [ centerX ] <| text "Three practice raids"
+                }
+            , Input.button
+                (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+                { onPress = Just StartScenario
+                , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
-        , helpButton
+
+        --    , helpButton
         ]
 
 
@@ -815,3 +829,17 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+explainRaidTypes =
+    """Work through each of these tutorials to learn how to recognise the common types of
+    raids and record their details so they can be passed to Fighter Command.
+    As you complete each tutorial, receive a tick and these raids will appear in your practice session.
+    """
+
+
+explainPlayLevels =
+    """Test yourself with one, three, or many incoming raids. This will only use the
+    raid types that you have worked through in the tutorial, or chosen yourself.
+    Raids will come from different directions, at different heights, and on different headings.
+    """
