@@ -774,7 +774,7 @@ targetSelector availableRaidTypes tutorialsDone =
         , Font.color lightCharcoal
         ]
     <|
-        motorwaySign explainRaidTypes
+        el [ width (px 480) ] (motorwaySign explainRaidTypes)
             :: List.map display availableRaidTypes
 
 
@@ -791,15 +791,12 @@ inputPage model =
         , Font.color lightCharcoal
         , padding 20
         ]
-        [ --el (explanatoryText model UiConfigOptions) <|
-          targetSelector model.activeConfigurations model.tutorialsCompleted
+        [ targetSelector model.activeConfigurations model.tutorialsCompleted
         , column
-            ([ centerX
-             , spacingXY 0 20
-             ]
-             --                ++ explanatoryText model UiGoButton
-            )
-            [ motorwaySign explainPlayLevels
+            [ centerX
+            , spacingXY 0 20
+            ]
+            [ el [ width (px 400) ] (motorwaySign explainPlayLevels)
             , Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
                 { onPress = Just StartScenario
@@ -816,8 +813,6 @@ inputPage model =
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
-
-        --    , helpButton
         ]
 
 
@@ -832,14 +827,19 @@ main =
 
 
 explainRaidTypes =
-    """Work through each of these tutorials to learn how to recognise the common types of
-    raids and record their details so they can be passed to Fighter Command.
-    As you complete each tutorial, receive a tick and these raids will appear in your practice session.
+    """
+Click the Learn buttons to work through these tutorials.
+You will learn how to recognise the common types of
+raids and record their details so they can be passed to Fighter Command.
+As you complete each tutorial, receive a tick and these raid types will appear in your practice session.
     """
 
 
 explainPlayLevels =
-    """Test yourself with one, three, or many incoming raids. This will only use the
-    raid types that you have worked through in the tutorial, or chosen yourself.
-    Raids will come from different directions, at different heights, and on different headings.
+    """
+Test yourself with one, three, or many incoming raids. This will only use the
+raid types that you have worked through in the tutorial, or chosen yourself.
+Raids will come from different directions, at different heights, and on different headings.
+You should make several entries for each raid so that Fighter Command can work out
+where the raid is heading. You will be able to see how you perform by looking at the Map.
     """

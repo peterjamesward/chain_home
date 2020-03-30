@@ -100,7 +100,6 @@ motorwaySign text =
         , Border.color white
         , Border.width 2
         , Border.rounded 5
-        , E.width (px 400)
         , spacing 4
         , padding 10
         , Font.size 16
