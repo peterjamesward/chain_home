@@ -24,29 +24,19 @@ squareSize =
     -- This is 'tuned' to suit the map image.
     150
 
+
 imageDimensions =
     String.fromInt <| squareSize * 4
 
+
 mapScale =
     -- As is this but it really should be a properly derived metric.
-    toFloat squareSize / 70000.0
+    toFloat squareSize / 100000.0
 
 
 stationPos model =
     -- Pin our station on the map.
     ( 1.74 * squareSize, 2.36 * squareSize )
-
-
-mapVisibleGrid : List (List String)
-mapVisibleGrid =
-    let
-        takeMiddle =
-            List.drop 1 >> List.take 5
-    in
-    -- Only central 5x5 square of calculator grid is really in our range.
-    mapGridLettersList
-        |> takeMiddle
-        |> List.map takeMiddle
 
 
 mapPage : Model -> Element Msg
@@ -125,61 +115,9 @@ theMap model =
                     ]
                     []
                 ]
-                    --++ gridLetters
-                    --++ gridLines
                     ++ raidTracks model
                     ++ userPlots model
                     ++ [ ourStation model, ourRange model ]
-
-
-gridLetters =
-    let
-        gridLetterRow letters yCoord =
-            List.map2 (gridLetter yCoord) letters [ 1, 2, 3, 4, 5 ]
-
-        gridLetter yCoord letter xCoord =
-            Svg.text_
-                [ x <| String.fromInt <| xCoord * squareSize - squareSize // 2
-                , y <| String.fromInt <| yCoord * squareSize - squareSize // 3
-                , A.stroke "black"
-                , A.fill "none"
-                , textAnchor "middle"
-                , fontFamily "monospace"
-                , fontSize "64"
-                ]
-                [ Svg.text letter
-                ]
-    in
-    List.concat <|
-        List.map2 gridLetterRow mapVisibleGrid [ 1, 2, 3, 4, 5 ]
-
-
-gridLines =
-    let
-        horizontalGridLine index =
-            Svg.line
-                [ x1 <| String.fromInt 0
-                , y1 <| String.fromInt <| index * squareSize
-                , x2 <| String.fromInt (squareSize * 5)
-                , y2 <| String.fromInt <| index * squareSize
-                , stroke "black"
-                , strokeWidth "1"
-                ]
-                []
-
-        verticalGridLine index =
-            Svg.line
-                [ y1 <| String.fromInt 0
-                , x1 <| String.fromInt <| index * squareSize
-                , y2 <| String.fromInt (squareSize * 5)
-                , x2 <| String.fromInt <| index * squareSize
-                , stroke "black"
-                , strokeWidth "1"
-                ]
-                []
-    in
-    List.map horizontalGridLine [ 1, 2, 3, 4 ]
-        ++ List.map verticalGridLine [ 1, 2, 3, 4 ]
 
 
 raidTracks model =
