@@ -17,14 +17,24 @@ import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
-import TrainingMode exposing (explanatoryText)
-import Types exposing (UiComponent(..))
-import Utils exposing (edges, helpButton, motorwaySign)
+import Utils exposing (edges, motorwaySign)
 
 
 squareSize =
     -- This is 'tuned' to suit the map image.
-    160
+    150
+
+imageDimensions =
+    String.fromInt <| squareSize * 4
+
+mapScale =
+    -- As is this but it really should be a properly derived metric.
+    toFloat squareSize / 70000.0
+
+
+stationPos model =
+    -- Pin our station on the map.
+    ( 1.74 * squareSize, 2.36 * squareSize )
 
 
 mapVisibleGrid : List (List String)
@@ -101,7 +111,7 @@ theMap model =
     <|
         Element.html <|
             svg
-                [ viewBox "0 0 800 800"
+                [ viewBox ("0 0 " ++ imageDimensions ++ " " ++ imageDimensions)
                 , A.width "100%"
                 , A.height "100%"
                 ]
@@ -109,16 +119,17 @@ theMap model =
                 [ Svg.image
                     [ x "0"
                     , y "0"
-                    , A.width <| String.fromInt <| squareSize * 5
-                    , A.height <| String.fromInt <| squareSize * 5
+                    , A.width imageDimensions
+                    , A.height imageDimensions
                     , xlinkHref "../resources/east_anglia.png"
                     ]
                     []
                 ]
-                    ++ gridLetters
-                    ++ gridLines
+                    --++ gridLetters
+                    --++ gridLines
                     ++ raidTracks model
                     ++ userPlots model
+                    ++ [ ourStation model, ourRange model ]
 
 
 gridLetters =
@@ -178,8 +189,8 @@ raidTracks model =
     -- Remember station is notionally in central square.
     -- Scalewise, our map is made of 100km squares and they occupy 'squareSize' on the screen.
     let
-        mapScale =
-            toFloat squareSize / 100000.0
+        ( stationX, stationY ) =
+            stationPos model
 
         noMoreThan100Miles ( _, r, _ ) =
             r <= 160000
@@ -191,8 +202,8 @@ raidTracks model =
 
         plotArrow ( time, range, theta ) =
             Svg.circle
-                [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
-                , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
+                [ cx <| String.fromFloat <| stationX + range * sin theta * mapScale
+                , cy <| String.fromFloat <| stationY - range * cos theta * mapScale -- y is +ve downwards!
                 , r "5"
                 , stroke "orange"
                 , strokeWidth "1"
@@ -214,13 +225,13 @@ userPlots model =
     -- Remember station is notionally in central square.
     -- Scalewise, our map is made of 100km squares and they occupy 'squareSize' on the screen.
     let
-        mapScale =
-            toFloat squareSize / 100000.0
+        ( stationX, stationY ) =
+            stationPos model
 
         plot ( time, range, theta ) =
             Svg.circle
-                [ cx <| String.fromFloat <| range * sin theta * mapScale + 2.5 * squareSize
-                , cy <| String.fromFloat <| 2.5 * squareSize - range * cos theta * mapScale -- y is +ve downwards!
+                [ cx <| String.fromFloat <| stationX + range * sin theta * mapScale -- x is +ve rightwards.
+                , cy <| String.fromFloat <| stationY - range * cos theta * mapScale -- y is +ve downwards!
                 , r "5"
                 , stroke "navy"
                 , strokeWidth "1"
@@ -229,3 +240,35 @@ userPlots model =
                 []
     in
     List.map plot model.storedPlots
+
+
+ourStation model =
+    let
+        ( stationX, stationY ) =
+            stationPos model
+    in
+    Svg.circle
+        [ cx <| String.fromFloat <| stationX
+        , cy <| String.fromFloat <| stationY
+        , r "7"
+        , stroke "green"
+        , strokeWidth "2"
+        , A.fill "blue"
+        ]
+        []
+
+
+ourRange model =
+    let
+        ( stationX, stationY ) =
+            stationPos model
+    in
+    Svg.circle
+        [ cx <| String.fromFloat <| stationX
+        , cy <| String.fromFloat <| stationY
+        , r <| String.fromFloat <| 1.6 * squareSize
+        , stroke "red"
+        , strokeWidth "1"
+        , A.fill "none"
+        ]
+        []
