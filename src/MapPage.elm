@@ -6,6 +6,7 @@ module MapPage exposing (..)
    Note that we do not try to correlate. In general we may not know which raid the user is plotting.
 -}
 
+import Config exposing (bawdsey)
 import Constants exposing (lightCharcoal)
 import Element exposing (..)
 import Element.Border as Border
@@ -35,8 +36,9 @@ mapScale =
 
 
 stationPos model =
-    -- Pin our station on the map.
-    ( 1.74 * squareSize, 2.36 * squareSize )
+    -- Pin our station on the map. This needs to be a station attribute because the calculator needs it.
+    ( (1.0 + bawdsey.gridSquareEasting ) * squareSize
+    , (3.0 - bawdsey.gridSquareNorthing) * squareSize )
 
 
 mapPage : Model -> Element Msg

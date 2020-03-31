@@ -1,9 +1,4 @@
 
---TODO: Consistent range scale conversion. My Map page is now looking OK but the calculator is not consistent.
--- partly as Bawdsey is not centred. But more than that; constants all over the shop.
--- gridPosition fn in Grid.elm is probably not consistent with the conversions on the map page.
--- there should be one only, used consistently.
-
 --TODO: Levels of play where you practice with fixed number of each raid type.
 --TODO: Help text visibility on a page by page basis.
 --TODO: Some level of information about every component.

@@ -55,6 +55,8 @@ bawdsey =
     { longitude = degrees 1.408614
     , latitude = degrees 51.993661
     , lineOfShoot = degrees 90.0
+    , gridSquareEasting = 0.74
+    , gridSquareNorthing = 0.64
     }
 
 

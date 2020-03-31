@@ -4,6 +4,7 @@ module Grid exposing (..)
    Making this module for anything Grid related, to break dependency loop.
 -}
 
+import Config exposing (bawdsey)
 import Model exposing (Model)
 import Utils exposing (choose)
 
@@ -65,15 +66,15 @@ letterFromGrid maybeGridPosition =
 
 gridPosition : Maybe Float -> Maybe Float -> Maybe GridPosition
 gridPosition range bearing =
-    -- Ideally, use RAF grid, but doesn't really matter.
+    -- We use RAF grid.
     -- Each lettered square is 100km. Range is in km.
     -- Without much loss of generality, assume station is centred in centre square.
     let
         easting r b =
-            truncate <| r * sin b + 50
+            truncate <| r * sin b + 100 * bawdsey.gridSquareEasting
 
         northing r b =
-            truncate <| r * cos b + 50
+            truncate <| r * cos b + 100 * bawdsey.gridSquareNorthing
 
         eastSquareBoundary r b =
             floor <| toFloat (easting r b) / 100.0
