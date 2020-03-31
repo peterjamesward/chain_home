@@ -40,3 +40,4 @@ type Msg
     | TutorialBack
     | RandomRaidGenerated (Float, Float)
     | SetActualTraceVisible Bool
+    | SetRangeCircleVisible Bool

@@ -87,6 +87,7 @@ init _ =
       , timeForNextRaid = Nothing
       , storedPlots = []
       , actualTraceVisibleOnMap = False
+      , rangeCircleVisibleOnMap = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -488,6 +489,11 @@ update msg model =
 
         SetActualTraceVisible visible ->
             ( { model | actualTraceVisibleOnMap = visible }
+            , Cmd.none
+            )
+
+        SetRangeCircleVisible visible ->
+            ( { model | rangeCircleVisibleOnMap = visible }
             , Cmd.none
             )
 

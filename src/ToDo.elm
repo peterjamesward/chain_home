@@ -4,7 +4,6 @@
 --TODO: Some level of information about every component.
 
 --TODO: Tutorial - needs Sharon's input.
---TODO: Use Sharon's map.
 
 --TODO: Find nice way to constrain to 14 active aircraft (plus two ground rays). (Perhaps just cull the oldest.)
 -- ths probly obviated by game levels above.

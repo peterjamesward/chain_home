@@ -50,4 +50,5 @@ type alias Model =
     , timeForNextRaid : Maybe Int
     , storedPlots : List (Int, Float, Float)
     , actualTraceVisibleOnMap : Bool
+    , rangeCircleVisibleOnMap : Bool
     }

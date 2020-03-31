@@ -37,8 +37,9 @@ mapScale =
 
 stationPos model =
     -- Pin our station on the map. This needs to be a station attribute because the calculator needs it.
-    ( (1.0 + bawdsey.gridSquareEasting ) * squareSize
-    , (3.0 - bawdsey.gridSquareNorthing) * squareSize )
+    ( (1.0 + bawdsey.gridSquareEasting) * squareSize
+    , (3.0 - bawdsey.gridSquareNorthing) * squareSize
+    )
 
 
 mapPage : Model -> Element Msg
@@ -53,6 +54,7 @@ mapPage model =
         [ theMap model
         , column [ Element.spacing 50 ]
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
+            , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             , motorwaySign explainMapPage
             ]
 
@@ -68,6 +70,28 @@ and deduces the most likely position of the raids.
 We have the advantage of being able to see exactly where the raids were!
 Generally, the range is quite accurate but bearing less so.
        """
+
+
+checkBoxShowRangeCircle visible =
+    Input.checkbox
+        [ Element.height (px 40)
+        , Border.width 1
+        , Border.rounded 5
+        , Border.color lightCharcoal
+        , Font.color lightCharcoal
+        , centerY
+        , padding 10
+        ]
+        { onChange = SetRangeCircleVisible
+        , checked = visible
+        , label =
+            Input.labelRight
+                [ htmlAttribute <| H.style "-webkit-user-select" "none"
+                ]
+            <|
+                Element.text "Show the 100 mile range limit"
+        , icon = Input.defaultCheckbox
+        }
 
 
 checkBoxShowActualTrace visible =
@@ -119,7 +143,7 @@ theMap model =
                 ]
                     ++ raidTracks model
                     ++ userPlots model
-                    ++ [ ourStation model, ourRange model ]
+                    ++ ourStation model
 
 
 raidTracks model =
@@ -187,28 +211,26 @@ ourStation model =
         ( stationX, stationY ) =
             stationPos model
     in
-    Svg.circle
-        [ cx <| String.fromFloat <| stationX
-        , cy <| String.fromFloat <| stationY
-        , r "7"
-        , stroke "green"
-        , strokeWidth "2"
-        , A.fill "blue"
+    if model.rangeCircleVisibleOnMap then
+        [ Svg.circle
+            [ cx <| String.fromFloat <| stationX
+            , cy <| String.fromFloat <| stationY
+            , r "7"
+            , stroke "green"
+            , strokeWidth "2"
+            , A.fill "blue"
+            ]
+            []
+        , Svg.circle
+            [ cx <| String.fromFloat <| stationX
+            , cy <| String.fromFloat <| stationY
+            , r <| String.fromFloat <| 1.6 * squareSize
+            , stroke "red"
+            , strokeWidth "1"
+            , A.fill "none"
+            ]
+            []
         ]
-        []
 
-
-ourRange model =
-    let
-        ( stationX, stationY ) =
-            stationPos model
-    in
-    Svg.circle
-        [ cx <| String.fromFloat <| stationX
-        , cy <| String.fromFloat <| stationY
-        , r <| String.fromFloat <| 1.6 * squareSize
-        , stroke "red"
-        , strokeWidth "1"
-        , A.fill "none"
-        ]
+    else
         []
