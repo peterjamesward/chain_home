@@ -67,9 +67,11 @@ explainMapPage =
 Your plots are relayed to the Filter Room where they are placed
 on the map. The team there combines your plots with plots from other CH stations
 and deduces the most likely position of the raids.
-We have the advantage of being able to see exactly where the raids were!
-Generally, the range is quite accurate but bearing less so.
-       """
+You should make a fresh plot for each raid every minute or so, so thet the
+track of the raid becomes clear.
+We have the advantage of knowing where our raids are, and you can see
+them plotted here minute by minute.
+"""
 
 
 checkBoxShowRangeCircle visible =

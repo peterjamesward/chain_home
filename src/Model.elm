@@ -51,4 +51,5 @@ type alias Model =
     , storedPlots : List (Int, Float, Float)
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
+    , gameMode : GameMode
     }

@@ -129,6 +129,12 @@ type TutorialScenario
     | ScenarioFriendly
 
 
+type GameMode
+    = GameSingleRaid
+    | GameThreeRaids
+    | GameUnlimited
+    | GameNone
+
 type TutorialStep
     = TutorialWelcome
     | TutorialIncomingRaid

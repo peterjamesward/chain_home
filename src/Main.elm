@@ -88,6 +88,7 @@ init _ =
       , storedPlots = []
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
+      , gameMode = GameNone
       }
     , Task.perform SetStartTime Time.now
     )
@@ -230,9 +231,11 @@ update msg model =
             , Cmd.none
             )
 
-        StartScenario ->
+        StartScenario gameMode ->
             ( { cleanModel
                 | currPage = OperatorPage
+                , gameMode = gameMode
+                , targets = []
 
                 -- Pseudo randomness will suffice at least for now.
                 , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
@@ -515,9 +518,33 @@ saveNewPlot model =
 
 setNextRandomRaidTime : Model -> Model
 setNextRandomRaidTime model =
-    { model
-        | timeForNextRaid = Just <| model.modelTime + truncate (120000 * abs (sin <| toFloat model.modelTime))
-    }
+    -- If there are raids remaining for our current level, line the next one up here.
+    let
+        activeRaidCount =
+            List.length model.targets
+
+        scheduleRaid =
+            { model | timeForNextRaid = Just <| model.modelTime + truncate (120000 * abs (sin <| toFloat model.modelTime)) }
+
+        dontScheduleRaid =
+            { model | timeForNextRaid = Nothing }
+    in
+    case ( model.gameMode, activeRaidCount ) of
+        ( GameNone, _ ) ->
+            dontScheduleRaid
+
+        ( GameSingleRaid, _ ) ->
+            dontScheduleRaid
+
+        ( GameThreeRaids, n ) ->
+            if n < 3 then
+                scheduleRaid
+
+            else
+                dontScheduleRaid
+
+        ( GameUnlimited, _ ) ->
+            scheduleRaid
 
 
 makeNewTarget : ( Float, Float ) -> Model -> Model
@@ -805,17 +832,17 @@ inputPage model =
             [ el [ width (px 400) ] (motorwaySign explainPlayLevels)
             , Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
-                { onPress = Just StartScenario
+                { onPress = Just (StartScenario GameSingleRaid)
                 , label = el [ centerX ] <| text "One practice raid"
                 }
             , Input.button
                 (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
-                { onPress = Just StartScenario
+                { onPress = Just (StartScenario GameThreeRaids)
                 , label = el [ centerX ] <| text "Three practice raids"
                 }
             , Input.button
                 (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
-                { onPress = Just StartScenario
+                { onPress = Just (StartScenario GameUnlimited)
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
