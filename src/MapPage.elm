@@ -158,18 +158,18 @@ raidTracks model =
         ( stationX, stationY ) =
             stationPos model
 
-        noMoreThan100Miles ( _, r, _ ) =
-            r <= 160000
+        noMoreThan100Miles plot =
+            plot.range <= 160000
 
         raidTrack target =
             List.map plotArrow <|
                 List.filter noMoreThan100Miles
                     target.positionHistory
 
-        plotArrow ( time, range, theta ) =
+        plotArrow plot =
             Svg.circle
-                [ cx <| String.fromFloat <| stationX + range * sin theta * mapScale
-                , cy <| String.fromFloat <| stationY - range * cos theta * mapScale -- y is +ve downwards!
+                [ cx <| String.fromFloat <| stationX + plot.range  * sin plot.bearing * mapScale
+                , cy <| String.fromFloat <| stationY - plot.range * cos plot.bearing * mapScale -- y is +ve downwards!
                 , r "5"
                 , stroke "orange"
                 , strokeWidth "1"
@@ -194,10 +194,10 @@ userPlots model =
         ( stationX, stationY ) =
             stationPos model
 
-        plot ( time, range, theta ) =
+        drawThePlot plot =
             Svg.circle
-                [ cx <| String.fromFloat <| stationX + range * sin theta * mapScale -- x is +ve rightwards.
-                , cy <| String.fromFloat <| stationY - range * cos theta * mapScale -- y is +ve downwards!
+                [ cx <| String.fromFloat <| stationX + plot.range * sin plot.bearing * mapScale -- x is +ve rightwards.
+                , cy <| String.fromFloat <| stationY - plot.range * cos plot.bearing * mapScale -- y is +ve downwards!
                 , r "5"
                 , stroke "navy"
                 , strokeWidth "1"
@@ -205,7 +205,7 @@ userPlots model =
                 ]
                 []
     in
-    List.map plot model.storedPlots
+    List.map drawThePlot model.storedPlots
 
 
 ourStation model =

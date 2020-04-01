@@ -508,9 +508,17 @@ saveNewPlot : Model -> Model
 saveNewPlot model =
     -- After RANGE is stored, if we have bearing and range, add to history.
     -- Note that the stored value is in km, here we convert to meters.
+    let
+        newPlot range theta =
+            { range = range * 1000
+            , bearing = theta
+            , time = model.modelTime
+            , plotType = UserPlot
+            }
+    in
     case ( model.storedAzimuth, model.storedAzimuthRange ) of
         ( Just theta, Just range ) ->
-            { model | storedPlots = ( model.modelTime, range * 1000, theta ) :: model.storedPlots }
+            { model | storedPlots = newPlot range theta  :: model.storedPlots }
 
         _ ->
             model

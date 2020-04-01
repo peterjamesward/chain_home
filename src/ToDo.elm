@@ -1,5 +1,8 @@
 
 --TODO: Levels of play where you practice with fixed number of each raid type.
+--TODO: Keep separate plots when user enters a plot and show these separately.
+--TODO: Clear old user plots when starting tutorial or scenario. (cleanModel.)
+
 --TODO: Help text visibility on a page by page basis.
 --TODO: Some level of information about every component.
 

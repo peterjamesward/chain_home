@@ -40,7 +40,10 @@ type alias Antenna =
     , horizontalLobeFunction : Float -> Float
     }
 
+
+
 -- DEEP BREATH: moving to single Target type.
+
 
 type alias TargetProforma =
     -- Use this in config / tutorials; not actual targets.
@@ -69,7 +72,7 @@ type alias Target =
     , rangeInMetres : Float -- metres
     , theta : Float -- azimuth radians 0 is North.
     , alpha : Float -- elevation in radians, ignoring curvature for now
-    , positionHistory : List ( Int, Float, Float ) -- the actual track of the raid, minute by minute.
+    , positionHistory : List RecordedPlot -- the actual track of the raid, minute by minute.
     }
 
 
@@ -135,6 +138,7 @@ type GameMode
     | GameUnlimited
     | GameNone
 
+
 type TutorialStep
     = TutorialWelcome
     | TutorialIncomingRaid
@@ -158,3 +162,17 @@ type TutorialStep
     | TutorialJustSwinging
     | TutorialIntroduceTheTube2
     | TutorialIntroduceGonio
+
+
+type PlotType
+    = UserPlot -- where the user thinks a raid is
+    | TimedPlot -- raid positions stored each minute
+    | ActualPlot -- raid positions stored when user stores a position
+
+
+type alias RecordedPlot =
+    { plotType : PlotType
+    , time : Int
+    , range : Float
+    , bearing : Float
+    }

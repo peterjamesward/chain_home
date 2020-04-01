@@ -3,7 +3,7 @@ module Target exposing (..)
 import Html exposing (..)
 import Spherical exposing (..)
 import Station exposing (Station)
-import Types exposing (Target, TargetProforma)
+import Types exposing (PlotType(..), Target, TargetProforma)
 
 
 targetFromProforma : Station -> Int -> TargetProforma -> Target
@@ -59,6 +59,13 @@ targetAtTime station timeNow target =
 
         theta =
             findBearingToTarget stationPos targetPos
+
+        newPlot =
+            { plotType = TimedPlot
+            , time = timeNow
+            , range = rng
+            , bearing = theta
+            }
     in
     { target
         | latitude = newLat
@@ -75,15 +82,15 @@ targetAtTime station timeNow target =
         , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
         , positionHistory =
             case List.head target.positionHistory of
-                Just ( prevTime, _, _ ) ->
-                    if timeNow - prevTime > 60000 then
-                        ( timeNow, rng, theta ) :: target.positionHistory
+                Just plot ->
+                    if timeNow - plot.time > 60000 then
+                         newPlot :: target.positionHistory
 
                     else
                         target.positionHistory
 
                 Nothing ->
-                    [ ( timeNow, rng, theta ) ]
+                    [ newPlot ]
     }
 
 
