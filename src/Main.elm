@@ -457,6 +457,7 @@ update msg model =
                         | storedAzimuthRange = Just (1.6 * model.rangeSlider)
                         , inputState = BearingInput
                     }
+                        |> recordCurrentTargetPositions
 
                 HeightRangeInput ->
                     { model
@@ -518,7 +519,7 @@ saveNewPlot model =
     in
     case ( model.storedAzimuth, model.storedAzimuthRange ) of
         ( Just theta, Just range ) ->
-            { model | storedPlots = newPlot range theta  :: model.storedPlots }
+            { model | storedPlots = newPlot range theta :: model.storedPlots }
 
         _ ->
             model
@@ -884,3 +885,8 @@ Raids will come from different directions, at different heights, and on differen
 You should make several entries for each raid so that Fighter Command can work out
 where the raid is heading. You will be able to see how you perform by looking at the Map.
     """
+
+
+recordCurrentTargetPositions : Model -> Model
+recordCurrentTargetPositions model =
+    { model | targets = List.map (recordCurrentTargetPosition model.modelTime) model.targets }

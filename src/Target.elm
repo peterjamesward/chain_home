@@ -84,7 +84,7 @@ targetAtTime station timeNow target =
             case List.head target.positionHistory of
                 Just plot ->
                     if timeNow - plot.time > 60000 then
-                         newPlot :: target.positionHistory
+                        newPlot :: target.positionHistory
 
                     else
                         target.positionHistory
@@ -92,6 +92,19 @@ targetAtTime station timeNow target =
                 Nothing ->
                     [ newPlot ]
     }
+
+
+recordCurrentTargetPosition : Int -> Target -> Target
+recordCurrentTargetPosition timeNow target =
+    let
+        newPlot =
+            { plotType = ActualPlot
+            , time = timeNow
+            , range = target.rangeInMetres
+            , bearing = target.theta
+            }
+    in
+    { target | positionHistory = newPlot :: target.positionHistory }
 
 
 findTargetHeight : List Target -> Float -> Maybe Float

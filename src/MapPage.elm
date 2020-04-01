@@ -168,8 +168,8 @@ plotPlotter plots =
             plot.range <= 160000
 
         timedPlotStyles =
-            [ r "3"
-            , stroke "orange"
+            [ r "2.5"
+            , stroke "navy"
             , strokeWidth "1"
             , A.fill "navy"
             ]
