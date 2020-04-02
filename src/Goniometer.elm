@@ -3,6 +3,7 @@ module Goniometer exposing (drawGoniometer, goniometerTurnAngle)
 import Svg exposing (..)
 import Svg.Attributes as S exposing (..)
 import Types exposing (..)
+import Utils exposing (imageLocation)
 
 
 
@@ -76,7 +77,7 @@ drawGoniometerScale =
         , y "-190"
         , S.width "380"
         , S.height "380"
-        , xlinkHref "../resources/goniometer.png"
+        , xlinkHref <| imageLocation ++ "goniometer.png"
         ]
         []
 

@@ -11,6 +11,7 @@ import Element.Font as Font exposing (..)
 import Html.Attributes exposing (style)
 import Messages exposing (Msg(..))
 
+imageLocation = "img/"
 
 choose b o1 o2 =
     if b then

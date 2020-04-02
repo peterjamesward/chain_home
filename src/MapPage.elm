@@ -19,7 +19,7 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import Types exposing (PlotType(..), RecordedPlot)
-import Utils exposing (edges, motorwaySign)
+import Utils exposing (edges, imageLocation, motorwaySign)
 
 
 squareSize =
@@ -140,7 +140,7 @@ theMap model =
                     , y "0"
                     , A.width imageDimensions
                     , A.height imageDimensions
-                    , xlinkHref "../resources/east_anglia.png"
+                    , xlinkHref <| imageLocation ++ "east_anglia.png"
                     ]
                     []
                 ]
