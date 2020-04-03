@@ -26,13 +26,9 @@ content =
 This application aims to give an impression of being an operator
 at a Chain Home station during the Battle of Britain in 1940.
 
-Scientists and engineers developed radio technology rapidly to prepare for the war, and were constantly
-improving it. By modern standards, it was primitive. Rather than the circular screen familiar today, with aircraft
-conveniently labelled, the operator would spend hours studying the "tube" looking for faint
+Scientists and engineers rapidly developed radio technology to prepare for  war, and were constantly
+improving it. By modern standards it was primitive. The operator studied the "tube" looking for faint
 signals amongst the noise.
-
-To help, we have included the "Electrical Calculator" that works out the position and the height
--- before that, some lengthy calculations were required.
 
 ## How should I use this?
 
@@ -44,11 +40,13 @@ You can then try to keep up with a series of incoming raids. The operator had to
 the raids and send frequent updates on their position to Fighter Command. Keeping
 track of all the raids is not easy.
 
-## Credits
+## Credits and licenses
 
  * Application code written by Peter Ward.
  * Historical research by Sharon Ward.
- * The application is written in Elm (elm-lang.org) and uses elm-ui and WebGL for the display.
- * Temporary map image from Google.
+ * The application is written in Elm ( © 2012-2020 Evan Czaplicki )
+ * Display layout uses elm-ui (Copyright © 2018, Matthew Griffith, BSD-3-Clause license).
+ * elm-webgl library (Copyright © 2014, John P Mayer, Jr, BSD-3-Clause license).
+ * Packaging for iOS courtesy of Cordova (Apache License 2.0).
 
 """

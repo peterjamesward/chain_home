@@ -43,8 +43,8 @@ stationPos =
     )
 
 
-mapPage : Model -> Element Msg
-mapPage model =
+mapPageLandscape : Model -> Element Msg
+mapPageLandscape model =
     row
         [ centerX
         , alignTop
@@ -60,6 +60,35 @@ mapPage model =
             ]
         , helpButton
         ]
+
+
+mapPagePortrait : Model -> Element Msg
+mapPagePortrait model =
+    column
+        [ centerX
+        , alignTop
+        , paddingEach { edges | left = 50, right = 50 }
+        , Element.spacing 20
+        , Element.width Element.fill
+        ]
+        [ row [ Element.width Element.fill ]
+            [ theMap model
+            , helpButton
+            ]
+        , checkBoxShowActualTrace model.actualTraceVisibleOnMap
+        , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
+        , motorwaySign model explainMapPage
+        ]
+
+
+mapPage : Model -> Element Msg
+mapPage model =
+    case model.outputDevice.orientation of
+        Landscape ->
+            mapPageLandscape model
+
+        Portrait ->
+            mapPagePortrait model
 
 
 explainMapPage =

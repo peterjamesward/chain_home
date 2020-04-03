@@ -213,11 +213,15 @@ deriveModelAtTime model timeNow =
         }
 
 
+clearHistory : Model -> Model
+clearHistory model =
+    { model | storedPlots = [] }
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
         cleanModel =
-            exitTutorial model
+             model |> exitTutorial |> clearTargets |> clearCalculator |> clearHistory
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
@@ -238,7 +242,6 @@ update msg model =
             ( { cleanModel
                 | currPage = OperatorPage
                 , gameMode = gameMode
-                , targets = []
 
                 -- Pseudo randomness will suffice at least for now.
                 , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
@@ -794,10 +797,10 @@ targetSelector model availableRaidTypes tutorialsDone =
 
         display : TargetSelector -> Element Msg
         display g =
-            row [ spacing 10 ]
+            row [ spacing 10, width fill ]
                 [ Input.checkbox
                     [ E.height (px 40)
-                    , E.width (px 400)
+                    , E.width fill
                     , Border.width 1
                     , Border.rounded 5
                     , Border.color lightCharcoal
@@ -829,11 +832,11 @@ targetSelector model availableRaidTypes tutorialsDone =
     in
     column
         [ spacingXY 0 10
-        , paddingEach { edges | left = 100, top = 50 }
+        , paddingEach { edges | left = 20, top = 50 }
         , Font.color lightCharcoal
         ]
     <|
-        el [ width (px 480) ] (motorwaySign model explainRaidTypes)
+        el [ width fill ] (motorwaySign model explainRaidTypes)
             :: List.map display availableRaidTypes
 
 
@@ -843,8 +846,8 @@ calculatorPage model =
         model
 
 
-inputPage : Model -> Element Msg
-inputPage model =
+inputPageLandscape : Model -> Element Msg
+inputPageLandscape model =
     row
         [ E.width fill
         , Font.color lightCharcoal
@@ -872,8 +875,50 @@ inputPage model =
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
-            , helpButton
+        , helpButton
         ]
+
+
+inputPagePortrait : Model -> Element Msg
+inputPagePortrait model =
+    column
+        [ E.width fill
+        , Font.color lightCharcoal
+        , paddingEach { edges | left = 50, right  = 50 }
+        , spacing 20
+        ]
+        [ helpButton
+        , targetSelector model
+            model.activeConfigurations
+            model.tutorialsCompleted
+        , el
+            [ width fill ]
+            (motorwaySign model explainPlayLevels)
+        , Input.button
+            (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
+            { onPress = Just (StartScenario GameSingleRaid)
+            , label = el [ centerX ] <| text "One practice raid"
+            }
+        , Input.button
+            (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+            { onPress = Just (StartScenario GameThreeRaids)
+            , label = el [ centerX ] <| text "Three practice raids"
+            }
+        , Input.button
+            (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+            { onPress = Just (StartScenario GameUnlimited)
+            , label = el [ centerX ] <| text "Unlimited raids"
+            }
+        ]
+
+
+inputPage model =
+    case model.outputDevice.orientation of
+        Landscape ->
+            inputPageLandscape model
+
+        Portrait ->
+            inputPagePortrait model
 
 
 main : Program Flags Model Msg
