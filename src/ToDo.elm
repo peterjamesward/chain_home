@@ -1,6 +1,7 @@
 
 --TODO: Levels of play where you practice with fixed number of each raid type.
 --TODO: Clear old user plots when starting tutorial or scenario. (cleanModel.)
+--TODO: Remove the debug value at foot of receiver page.
 
 --TODO: Help text visibility on a page by page basis.
 --TODO: Some level of information about every component.
@@ -11,8 +12,6 @@
 -- ths probly obviated by game levels above.
 
 --TODO: Test on Android tablet !! (Currently using some webkit-only CSS tags to control touch actions.)
---TODO: Installable on iOS. -- Probably means getting to grips with Cordova/PhoneGap.
---TODO: Submit to App Store(s).
 
 --TODO: Reset WebGL time occasionally as the noise visibly degrades, or fix otherwise.
 --TODO: Fit it on 800x600 screen?

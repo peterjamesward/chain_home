@@ -1,7 +1,5 @@
 module Utils exposing (..)
 
--- SVG requires a line to be expressed as a space separated string of pairs.
-
 import Constants exposing (blue, flatWetAsphalt, paletteDarkGreen, paletteSand, white)
 import Element as E exposing (..)
 import Element.Background as Background exposing (..)
@@ -11,7 +9,10 @@ import Element.Font as Font exposing (..)
 import Html.Attributes exposing (style)
 import Messages exposing (Msg(..))
 
-imageLocation = "img/"
+
+imageLocation =
+    "img/"
+
 
 choose b o1 o2 =
     if b then
