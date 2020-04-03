@@ -321,7 +321,7 @@ operatorPageLandscape model =
                 , el (explanatoryText model UIRangeButton) <|
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
-            , debugModel model
+            --, debugModel model
             ]
         , column [ width <| fillPortion 2, centerX ]
             [ helpButton
