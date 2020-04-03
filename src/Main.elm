@@ -779,8 +779,8 @@ setTutorialCompletedState scenario state model =
     }
 
 
-targetSelector : List TargetSelector -> List TutorialScenario -> Element Msg
-targetSelector availableRaidTypes tutorialsDone =
+targetSelector : Model -> List TargetSelector -> List TutorialScenario -> Element Msg
+targetSelector model availableRaidTypes tutorialsDone =
     let
         tutorialScenarioDone scenario =
             List.member scenario tutorialsDone
@@ -833,7 +833,7 @@ targetSelector availableRaidTypes tutorialsDone =
         , Font.color lightCharcoal
         ]
     <|
-        el [ width (px 480) ] (motorwaySign explainRaidTypes)
+        el [ width (px 480) ] (motorwaySign model explainRaidTypes)
             :: List.map display availableRaidTypes
 
 
@@ -850,12 +850,12 @@ inputPage model =
         , Font.color lightCharcoal
         , padding 20
         ]
-        [ targetSelector model.activeConfigurations model.tutorialsCompleted
+        [ targetSelector model model.activeConfigurations model.tutorialsCompleted
         , column
             [ centerX
             , spacingXY 0 20
             ]
-            [ el [ width (px 400) ] (motorwaySign explainPlayLevels)
+            [ el [ width (px 400) ] (motorwaySign model explainPlayLevels)
             , Input.button
                 (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
                 { onPress = Just (StartScenario GameSingleRaid)

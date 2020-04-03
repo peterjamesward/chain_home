@@ -1,6 +1,6 @@
 module Utils exposing (..)
 
-import Constants exposing (blue, flatWetAsphalt, paletteDarkGreen, paletteSand, white)
+import Constants exposing (blue, flatMidnightBlue, flatWetAsphalt, paletteDarkGreen, paletteSand, white)
 import Element as E exposing (..)
 import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
@@ -8,6 +8,8 @@ import Element.Events exposing (onClick)
 import Element.Font as Font exposing (..)
 import Html.Attributes exposing (style)
 import Messages exposing (Msg(..))
+import Model exposing (Model)
+import Types exposing (Page(..))
 
 
 imageLocation =
@@ -94,8 +96,10 @@ helpButton =
         text "?"
 
 
-motorwaySign : String -> Element msg
-motorwaySign text =
+motorwaySign : Model -> String -> Element msg
+motorwaySign model text =
+    -- This is a sign that always occupies space but is only visible in explain mode.
+    if explainModeEnabledForCurrentPage model then
     paragraph
         [ Background.color blue
         , Font.color white
@@ -107,3 +111,37 @@ motorwaySign text =
         , Font.size 16
         ]
         [ E.text text ]
+    else
+    paragraph
+        [ Background.color flatMidnightBlue
+        , Font.color flatMidnightBlue
+        , Border.color flatMidnightBlue
+        , Border.width 2
+        , Border.rounded 5
+        , spacing 4
+        , padding 10
+        , Font.size 16
+        ]
+        [ E.text text ]
+
+explainModeEnabledForCurrentPage : Model -> Bool
+explainModeEnabledForCurrentPage model =
+    case model.currPage of
+        InputPage ->
+            model.explainModeMenu
+
+        OperatorPage ->
+            model.explainModeReceiver
+
+        CalculatorPage ->
+            model.explainModeCalculator
+
+        MapPage ->
+            model.explainModeMap
+
+        TrainingPage ->
+            False
+
+        AboutPage ->
+            False
+

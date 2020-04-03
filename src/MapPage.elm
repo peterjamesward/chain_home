@@ -56,7 +56,7 @@ mapPage model =
         , column [ Element.spacing 50 ]
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-            , motorwaySign explainMapPage
+            , motorwaySign model explainMapPage
             ]
         , helpButton
         ]

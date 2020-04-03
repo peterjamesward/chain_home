@@ -13,6 +13,7 @@ import Messages exposing (..)
 import Model exposing (Model)
 import Target exposing (findTargetHeight)
 import Types exposing (..)
+import Utils exposing (explainModeEnabledForCurrentPage)
 
 
 
@@ -1371,27 +1372,6 @@ findStep currentTutorial tutorialStep =
         Nothing ->
             Nothing
 
-
-explainModeEnabledForCurrentPage : Model -> Bool
-explainModeEnabledForCurrentPage model =
-    case model.currPage of
-        InputPage ->
-            model.explainModeMenu
-
-        OperatorPage ->
-            model.explainModeReceiver
-
-        CalculatorPage ->
-            model.explainModeCalculator
-
-        MapPage ->
-            model.explainModeMap
-
-        TrainingPage ->
-            False
-
-        AboutPage ->
-            False
 
 
 
