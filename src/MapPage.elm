@@ -19,7 +19,7 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import Types exposing (PlotType(..), RecordedPlot)
-import Utils exposing (edges, imageLocation, motorwaySign)
+import Utils exposing (edges, helpButton, imageLocation, motorwaySign)
 
 
 squareSize =
@@ -58,8 +58,7 @@ mapPage model =
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             , motorwaySign explainMapPage
             ]
-
-        --, helpButton
+        , helpButton
         ]
 
 

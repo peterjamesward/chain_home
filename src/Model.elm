@@ -44,7 +44,10 @@ type alias Model =
     , storedStrengthPlus : Maybe Bool
     , tutorialScenario : Maybe TutorialScenario
     , tutorialStage : Maybe TutorialStep
-    , explainMode : Bool
+    , explainModeMenu : Bool
+    , explainModeReceiver : Bool
+    , explainModeCalculator : Bool
+    , explainModeMap : Bool
     , tutorialsCompleted : List TutorialScenario -- would like to use Set but can't. Because Elm.
     , newRaid : Maybe Target
     , timeForNextRaid : Maybe Int

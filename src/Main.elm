@@ -81,7 +81,10 @@ init _ =
       , storedStrengthPlus = Nothing
       , tutorialStage = Nothing
       , tutorialScenario = Nothing
-      , explainMode = False
+      , explainModeMenu = False
+      , explainModeReceiver = False
+      , explainModeCalculator = False
+      , explainModeMap = False
       , tutorialsCompleted = []
       , newRaid = Nothing
       , timeForNextRaid = Nothing
@@ -269,7 +272,21 @@ update msg model =
             )
 
         ExplainModeToggle ->
-            ( { model | explainMode = not model.explainMode }
+            ( case model.currPage of
+                InputPage ->
+                    { model | explainModeMenu = not model.explainModeMenu }
+
+                OperatorPage ->
+                    { model | explainModeReceiver = not model.explainModeReceiver }
+
+                CalculatorPage ->
+                    { model | explainModeCalculator = not model.explainModeCalculator }
+
+                MapPage ->
+                    { model | explainModeMap = not model.explainModeMap }
+
+                _ ->
+                    model
             , Cmd.none
             )
 
@@ -292,7 +309,7 @@ update msg model =
             )
 
         DisplayCalculator ->
-            ( { cleanModel | currPage = OutputPage }
+            ( { cleanModel | currPage = CalculatorPage }
             , Cmd.none
             )
 
@@ -663,7 +680,7 @@ view model =
                 InputPage ->
                     inputPage model
 
-                OutputPage ->
+                CalculatorPage ->
                     calculatorPage model
 
                 TrainingPage ->
@@ -730,7 +747,7 @@ navBar model =
         [ navItem model "About" DisplayAboutPage AboutPage
         , navItem model "Learn & Play" DisplayConfiguration InputPage
         , navItem model "Receiver" DisplayReceiver OperatorPage
-        , navItem model "Calculator" DisplayCalculator OutputPage
+        , navItem model "Calculator" DisplayCalculator CalculatorPage
         , navItem model "Map" DisplayMapPage MapPage
         ]
 
@@ -855,6 +872,7 @@ inputPage model =
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
+            , helpButton
         ]
 
 

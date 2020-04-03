@@ -8,7 +8,7 @@ type alias Angle =
 type Page
     = InputPage
     | OperatorPage
-    | OutputPage
+    | CalculatorPage
     | TrainingPage
     | AboutPage
     | MapPage

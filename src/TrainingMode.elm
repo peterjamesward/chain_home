@@ -1210,7 +1210,7 @@ tutorialBearingMode model =
 
 tutorialShowCalculator : TutorialAction
 tutorialShowCalculator model =
-    { model | currPage = OutputPage }
+    { model | currPage = CalculatorPage }
 
 
 tutorialShowOperator : TutorialAction
@@ -1372,6 +1372,29 @@ findStep currentTutorial tutorialStep =
             Nothing
 
 
+explainModeEnabledForCurrentPage : Model -> Bool
+explainModeEnabledForCurrentPage model =
+    case model.currPage of
+        InputPage ->
+            model.explainModeMenu
+
+        OperatorPage ->
+            model.explainModeReceiver
+
+        CalculatorPage ->
+            model.explainModeCalculator
+
+        MapPage ->
+            model.explainModeMap
+
+        TrainingPage ->
+            False
+
+        AboutPage ->
+            False
+
+
+
 explanatoryText : Model -> UiComponent -> List (Attribute Msg)
 explanatoryText model uiComponent =
     -- Show the text for components in explain mode.
@@ -1412,7 +1435,7 @@ explanatoryText model uiComponent =
         , Border.innerGlow flatMidnightBlue 2.0
         , Border.rounded 5
         ]
-            ++ (case ( model.explainMode, uiComponentDescription ) of
+            ++ (case ( explainModeEnabledForCurrentPage model, uiComponentDescription ) of
                     ( True, Just txt ) ->
                         [ inFront <|
                             el

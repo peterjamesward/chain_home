@@ -1,10 +1,9 @@
 
 --TODO: Levels of play where you practice with fixed number of each raid type.
 --TODO: Clear old user plots when starting tutorial or scenario. (cleanModel.)
---TODO: Remove the debug value at foot of receiver page.
-
+--TODO: passable portrait layout for all pages
 --TODO: Help text visibility on a page by page basis.
---TODO: Some level of information about every component.
+--TODO: Some level of information about every component (?).
 
 --TODO: Tutorial - needs Sharon's input.
 
