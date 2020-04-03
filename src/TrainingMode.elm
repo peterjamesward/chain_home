@@ -323,8 +323,8 @@ tutorial2SameBearing =
         noStateActions
         noExitActions
         (static
-            """The white V shape under the 90 on the 'tube' is a new raid.
-        Note how it moves up and down. This is always two aircraft.
+            """The white V shape on the 'tube' is a new raid.
+        The regular "beating" up and down is always two aircraft.
         Let's find their bearing and height.
         """
         )
@@ -426,7 +426,7 @@ tutorial2SameBearing =
         noStateActions
         noExitActions
         (static
-            """Finally, the operator presses Raid Strength 2, because this bouncing signal is two aircraft.
+            """The operator presses Raid Strength 2, because this beating signal is two aircraft.
         """
         )
     , TutorialEntry
@@ -436,14 +436,6 @@ tutorial2SameBearing =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
-    , TutorialEntry
-        TutorialEnded
-        UiDummy
-        noEntryActions
-        noStateActions
-        [ stopTutorialRaid ]
-        (static """Choose more training or click on Operate.
-        """)
     , tutorialCloseStep ScenarioTwoTogether
     ]
 
@@ -457,7 +449,7 @@ tutorial2DifferentBearings =
         [ tutorialGoniometerSwinging ]
         noExitActions
         (static
-            """The operator is turning the gonio, looking for any sign of a signal.
+            """The operator is turning the gonio, looking for a signal.
         Click ► to begin.
         """
         )
@@ -468,8 +460,8 @@ tutorial2DifferentBearings =
         noStateActions
         noExitActions
         (static
-            """The white V shape under the 90 on the 'tube' is a new raid.
-        Note how it moves up and down. This is always two aircraft.
+            """The white V shape on the 'tube' is a new raid.
+        The regular "beating" up and down is always two aircraft.
         Let's find their bearing and height.
         """
         )
@@ -573,15 +565,6 @@ tutorial2DifferentBearings =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
-    , TutorialEntry
-        TutorialEnded
-        UiDummy
-        noEntryActions
-        noStateActions
-        [ stopTutorialRaid ]
-        --, clearCalculator ]
-        (static """Choose more training or click on Operate.
-        """)
     , tutorialCloseStep ScenarioTwoSeparate
     ]
 
@@ -607,7 +590,7 @@ tutorial3to6 =
         noExitActions
         (static
             """The white V shape under the 100 on the 'tube' is a new raid.
-        Note how it dances with a complex pattern.
+        Note how it moves up and down in a complex pattern.
         This is typical of from 3 to 6 aircraft.
         """
         )
@@ -719,14 +702,6 @@ tutorial3to6 =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
-    , TutorialEntry
-        TutorialEnded
-        UiDummy
-        noEntryActions
-        noStateActions
-        [ stopTutorialRaid ]
-        (static """Choose more training or click on Operate.
-        """)
     , tutorialCloseStep ScenarioThreeToSix
     ]
 
@@ -751,8 +726,8 @@ tutorialIFF =
         noStateActions
         noExitActions
         (static
-            """There's something closer than 10 miles, and is heading away from us.
-            Notice how the signal is bigger every 12 seconds.
+            """The white 'V' shape is a new raid.
+            Notice how the signal is bigger every 6 seconds.
             This is the IFF (Information Friend or Foe) signal that identifies
             a friendly aircraft.
         """
@@ -865,14 +840,6 @@ tutorialIFF =
         noStateActions
         [ tutorialShowOperator ]
         tutorialInterpretCalculator
-    , TutorialEntry
-        TutorialEnded
-        UiDummy
-        noEntryActions
-        noStateActions
-        [ stopTutorialRaid ]
-        (static """Choose more training or click on Operate.
-        """)
     , tutorialCloseStep ScenarioFriendly
     ]
 

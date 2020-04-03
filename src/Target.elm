@@ -76,7 +76,7 @@ targetAtTime station timeNow target =
                     False
 
                 Just n ->
-                    modBy 12 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
+                    modBy 6 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
         , rangeInMetres = rng
         , theta = theta
         , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)

@@ -299,7 +299,7 @@ update msg model =
             )
 
         DisplayReceiver ->
-            ( { cleanModel
+            ( { model
                 | currPage = OperatorPage
                 , tutorialStage = Nothing
               }
@@ -307,12 +307,12 @@ update msg model =
             )
 
         DisplayConfiguration ->
-            ( { cleanModel | currPage = InputPage }
+            ( { model | currPage = InputPage }
             , Cmd.none
             )
 
         DisplayCalculator ->
-            ( { cleanModel | currPage = CalculatorPage }
+            ( { model | currPage = CalculatorPage }
             , Cmd.none
             )
 

@@ -1,6 +1,5 @@
 
---TODO: Levels of play where you practice with fixed number of each raid type.
---TODO: Logic to advance between play levels.
+--TODO: Logic to advance between play levels. Including button highlighting.
 --TODO: Some level of information about every component (?).
 
 --TODO: Tutorial - needs Sharon's input.
