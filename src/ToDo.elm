@@ -1,7 +1,7 @@
 
 --TODO: Logic to advance between play levels. Including button highlighting.
---TODO: Some level of information about every component (?).
 --TODO: Local state for tutorials and game level. And Reset button.
+--TODO: Some level of information about every component (?).
 
 --TODO: Test on Android tablet !! (Currently using some webkit-only CSS tags to control touch actions.)
 
