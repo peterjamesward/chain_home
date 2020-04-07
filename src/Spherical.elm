@@ -21,6 +21,9 @@ findBearingToTarget (φ1, λ1) (φ2, λ2) =
       atan2 y x
 
 -- Find new lat long after travelling d metres on given bearing.
+
+
+
 newPosition : (Float, Float) -> Float -> Float -> (Float, Float)
 newPosition (φ1, λ1) d θ =
   let

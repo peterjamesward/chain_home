@@ -217,11 +217,12 @@ clearHistory : Model -> Model
 clearHistory model =
     { model | storedPlots = [] }
 
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
         cleanModel =
-             model |> exitTutorial |> clearTargets |> clearCalculator |> clearHistory
+            model |> exitTutorial |> clearTargets |> clearCalculator |> clearHistory
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
@@ -587,11 +588,14 @@ makeNewTarget ( bearing, height ) model =
         ( newLat, newLong ) =
             newPosition ( station.latitude, station.longitude ) 160000 (bearing + station.lineOfShoot)
 
-        heading =
-            -- Som pseudo randomness in raid heading.
-            degrees 250 + degrees 40 * fractional (5000 * sin (toFloat model.modelTime))
+        pseudoRandom =
+            fractional <| 5000 * sin (toFloat model.modelTime)
 
-        -- so we should see Westerly tracks.
+        heading =
+            -- Som pseudo randomness in raid heading, which we try to
+            -- make interesting in as much as it will pass near the station.
+            degrees 270 + pseudoRandom * (degrees 30)
+
         hostileSingle : TargetProforma
         hostileSingle =
             { latitude = newLat
@@ -884,7 +888,7 @@ inputPagePortrait model =
     column
         [ E.width fill
         , Font.color lightCharcoal
-        , paddingEach { edges | left = 50, right  = 50 }
+        , paddingEach { edges | left = 50, right = 50 }
         , spacing 20
         ]
         [ helpButton
