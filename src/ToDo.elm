@@ -1,10 +1,8 @@
 
---TODO: Something WRONG with my polar coordinates. Check everywhere for use of line of shoot vs due north.
-
---TODO: Logic to advance between play levels. Including button highlighting.
+--TODO: Logic to advance between play levels. Including button highlighting. Badges ?!
 --(Should I replace the all-at-once-visible buttons with ... what?)
 
---TODO: Local state for tutorials and game level. And Reset button.
+--TODO: Local storage for tutorials and game level. And Reset button.
 
 --TODO: Some level of information about every component (?).
 

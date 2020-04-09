@@ -97,32 +97,27 @@ helpButton =
 
 
 motorwaySign : Model -> String -> Element msg
-motorwaySign model text =
+motorwaySign model frontText =
     -- This is a sign that always occupies space but is only visible in explain mode.
+    let
+        shared =
+            [ Background.color blue
+            , Font.color white
+            , Border.color white
+            , Border.width 2
+            , Border.rounded 5
+            , spacing 4
+            , padding 10
+            , Font.size 16
+            ]
+    in
     if explainModeEnabledForCurrentPage model then
-    paragraph
-        [ Background.color blue
-        , Font.color white
-        , Border.color white
-        , Border.width 2
-        , Border.rounded 5
-        , spacing 4
-        , padding 10
-        , Font.size 16
-        ]
-        [ E.text text ]
+        paragraph shared
+            [ E.text frontText ]
+
     else
-    paragraph
-        [ Background.color flatMidnightBlue
-        , Font.color flatMidnightBlue
-        , Border.color flatMidnightBlue
-        , Border.width 2
-        , Border.rounded 5
-        , spacing 4
-        , padding 10
-        , Font.size 16
-        ]
-        [ E.text text ]
+        none
+
 
 explainModeEnabledForCurrentPage : Model -> Bool
 explainModeEnabledForCurrentPage model =
@@ -144,4 +139,3 @@ explainModeEnabledForCurrentPage model =
 
         AboutPage ->
             False
-

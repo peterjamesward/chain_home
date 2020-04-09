@@ -77,7 +77,7 @@ mapPagePortrait model =
             ]
         , checkBoxShowActualTrace model.actualTraceVisibleOnMap
         , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-        , motorwaySign model explainMapPage
+        , motorwaySign model  explainMapPage
         ]
 
 

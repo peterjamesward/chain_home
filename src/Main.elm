@@ -594,7 +594,7 @@ makeNewTarget ( bearing, height ) model =
         heading =
             -- Som pseudo randomness in raid heading, which we try to
             -- make interesting in as much as it will pass near the station.
-            degrees 270 + pseudoRandom * (degrees 30)
+            degrees 270 + pseudoRandom * degrees 30
 
         hostileSingle : TargetProforma
         hostileSingle =
@@ -804,7 +804,6 @@ targetSelector model availableRaidTypes tutorialsDone =
             row [ spacing 10, width fill ]
                 [ Input.checkbox
                     [ E.height (px 40)
-                    , E.width fill
                     , Border.width 1
                     , Border.rounded 5
                     , Border.color lightCharcoal
@@ -835,13 +834,14 @@ targetSelector model availableRaidTypes tutorialsDone =
                 ]
     in
     column
-        [ spacingXY 0 10
-        , paddingEach { edges | left = 20, top = 50 }
-        , Font.color lightCharcoal
+        [ Font.color lightCharcoal
+        , spacing 20
+        , width fill
         ]
     <|
-        el [ width fill ] (motorwaySign model explainRaidTypes)
-            :: List.map display availableRaidTypes
+        List.map
+            display
+            availableRaidTypes
 
 
 calculatorPage : Model -> Element Msg
@@ -855,31 +855,54 @@ inputPageLandscape model =
     row
         [ E.width fill
         , Font.color lightCharcoal
+        , explain Debug.todo
         , padding 20
+        , spacing 20
         ]
-        [ targetSelector model model.activeConfigurations model.tutorialsCompleted
-        , column
-            [ centerX
-            , spacingXY 0 20
+        [ column
+            [ padding 20
+            , width <| fillPortion 3
+            , alignBottom
+            , spacing 20
+            , inFront <| motorwaySign model explainRaidTypes
             ]
-            [ el [ width (px 400) ] (motorwaySign model explainPlayLevels)
+            [ paragraph
+                [ width fill
+                , Font.color white
+                , Font.size 24
+                ]
+                [ text "Tutorials" ]
+            , targetSelector model model.activeConfigurations model.tutorialsCompleted
+            ]
+        , column
+            [ padding 20
+            , width <| fillPortion 3
+            , spacing 20
+            , inFront <| motorwaySign model explainPlayLevels
+            ]
+            [ paragraph
+                [ width fill
+                , Font.color white
+                , Font.size 24
+                ]
+                [ text "Test your skills" ]
             , Input.button
-                (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
+                (Attr.greenButton ++ [ width fill, height (px 40), centerX ])
                 { onPress = Just (StartScenario GameSingleRaid)
                 , label = el [ centerX ] <| text "One practice raid"
                 }
             , Input.button
-                (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+                (Attr.greyButton ++ [ width fill, height (px 40), centerX ])
                 { onPress = Just (StartScenario GameThreeRaids)
                 , label = el [ centerX ] <| text "Three practice raids"
                 }
             , Input.button
-                (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
+                (Attr.greyButton ++ [ width fill, height (px 40), centerX ])
                 { onPress = Just (StartScenario GameUnlimited)
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
-        , helpButton
+        , column [ padding 10, alignRight, alignTop, width <| fillPortion 1 ] [ helpButton ]
         ]
 
 
