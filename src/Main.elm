@@ -855,7 +855,6 @@ inputPageLandscape model =
     row
         [ E.width fill
         , Font.color lightCharcoal
-        , explain Debug.todo
         , padding 20
         , spacing 20
         ]
@@ -962,15 +961,16 @@ explainRaidTypes =
     """
 Click the Learn buttons to work through these tutorials.
 You will learn how to recognise the common types of
-raids and record their details so they can be passed to Fighter Command.
+raids.
 As you complete each tutorial, receive a tick and these raid types will appear in your practice session.
+You can tick a box if you're familiar with the scenario.
     """
 
 
 explainPlayLevels =
     """
 Test yourself with one, three, or many incoming raids. This will only use the
-raid types that you have worked through in the tutorial, or chosen yourself.
+raid types that are ticked.
 Raids will come from different directions, at different heights, and on different headings.
 You should make several entries for each raid so that Fighter Command can work out
 where the raid is heading. You will be able to see how you perform by looking at the Map.

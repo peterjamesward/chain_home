@@ -108,7 +108,7 @@ motorwaySign model frontText =
             , Border.rounded 5
             , spacing 4
             , padding 10
-            , Font.size 16
+            , Font.size 18
             ]
     in
     if explainModeEnabledForCurrentPage model then
