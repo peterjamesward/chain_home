@@ -11,7 +11,11 @@ import Messages exposing (Msg)
 
 aboutPage : Element Msg
 aboutPage =
-    paragraph [ Font.color white, padding 20, width fill ]
+    paragraph
+        [ Font.color white
+        , padding 40
+        , width fill
+        ]
         [ html content ]
 
 
@@ -26,19 +30,23 @@ content =
 This application aims to give an impression of being an operator
 at a Chain Home station during the Battle of Britain in 1940.
 
-Scientists and engineers rapidly developed radio technology to prepare for  war, and were constantly
-improving it. By modern standards it was primitive. The operator studied the "tube" looking for faint
-signals amongst the noise.
-
 ## How should I use this?
 
-We have picked five distinctive patterns of incoming aircraft. Under "Learn & Play", you can learn about how each of these
-would appear on the tube, and what the operator would do to try to find the bearing and the height
-so that this information can be passed on to Fighter Command.
+Using the Menu, under **Learn & Play**, discover how different types of raid
+would appear on the tube, and how the operator would find their bearing and height
+to be passed on to Fighter Command.
 
-You can then try to keep up with a series of incoming raids. The operator had to keep track of all
-the raids and send frequent updates on their position to Fighter Command. Keeping
-track of all the raids is not easy.
+You can then try to keep up with a series of incoming raids.
+
+**Receiver** is the main operator's control panel, slightly simplified here.
+
+**Calculator** illustrates the output from the electrical calculator that derives the height and
+summarises the information to be passed to Fighter Command.
+
+**Map** allows you to see how well your plots correspond with the actual raid positions.
+This of course would not have been available to the operator!
+
+Each screen (other than this one) has a green **?** button which will provide some explanation of the elements,
 
 ## Credits and licenses
 
