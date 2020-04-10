@@ -885,6 +885,7 @@ inputPageLandscape model =
         , Font.color lightCharcoal
         , padding 20
         , spacing 20
+        , moveDown 20
         ]
         [ column
             [ padding 20
@@ -938,7 +939,7 @@ inputPagePortrait model =
     column
         [ E.width fill
         , Font.color lightCharcoal
-        , paddingEach { edges | left = 50, right = 50 }
+        , paddingEach { edges | left = 50, right = 50, top = 40 }
         , spacing 20
         ]
         [ helpButton
