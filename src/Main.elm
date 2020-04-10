@@ -92,6 +92,7 @@ init _ =
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
       , gameMode = GameNone
+      , isMenuOpen = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -239,6 +240,11 @@ update msg model =
             , Cmd.none
             )
 
+        ToggleMenu menuState ->
+            ( { model | isMenuOpen = menuState }
+            , Cmd.none
+            )
+
         StartScenario gameMode ->
             ( { cleanModel
                 | currPage = OperatorPage
@@ -302,18 +308,25 @@ update msg model =
         DisplayReceiver ->
             ( { model
                 | currPage = OperatorPage
+                , isMenuOpen = False
                 , tutorialStage = Nothing
               }
             , Cmd.none
             )
 
         DisplayConfiguration ->
-            ( { model | currPage = InputPage }
+            ( { model
+                | currPage = InputPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
         DisplayCalculator ->
-            ( { model | currPage = CalculatorPage }
+            ( { model
+                | currPage = CalculatorPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
@@ -323,12 +336,18 @@ update msg model =
             )
 
         DisplayAboutPage ->
-            ( { model | currPage = AboutPage }
+            ( { model
+                | currPage = AboutPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
         DisplayMapPage ->
-            ( { model | currPage = MapPage }
+            ( { model
+                | currPage = MapPage
+                , isMenuOpen = False
+              }
             , Cmd.none
             )
 
@@ -706,10 +725,12 @@ view model =
             , width fill
             ]
           <|
-            column [ E.width E.fill, spacingXY 0 20 ]
-                [ navBar model
-                , content
+            el
+                [ E.width E.fill
+                , padding 20
+                , inFront <| navBar model
                 ]
+                content
         ]
     }
 
@@ -744,19 +765,26 @@ navItem model label action pageId =
 
 navBar : Model -> Element Msg
 navBar model =
-    row
-        [ width fill
-        , paddingXY 60 10
-        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color paletteSand
-        , spaceEvenly
-        ]
-        [ navItem model "About" DisplayAboutPage AboutPage
-        , navItem model "Learn & Play" DisplayConfiguration InputPage
-        , navItem model "Receiver" DisplayReceiver OperatorPage
-        , navItem model "Calculator" DisplayCalculator CalculatorPage
-        , navItem model "Map" DisplayMapPage MapPage
-        ]
+    if model.isMenuOpen then
+        column
+            [ spacing 20
+            , Background.color paletteDarkGreen
+            , Border.color paletteSand
+            , Border.width 2
+            , padding 20
+            ]
+            [ navItem model "<<" (ToggleMenu False) model.currPage
+            , navItem model "About" DisplayAboutPage AboutPage
+            , navItem model "Learn & Play" DisplayConfiguration InputPage
+            , navItem model "Receiver" DisplayReceiver OperatorPage
+            , navItem model "Calculator" DisplayCalculator CalculatorPage
+            , navItem model "Map" DisplayMapPage MapPage
+            ]
+
+    else
+        column [ padding 20 ]
+            [ navItem model "Menu" (ToggleMenu True) model.currPage
+            ]
 
 
 

@@ -59,8 +59,7 @@ calculatorLandscape model =
             model.storedFriendly
     in
     column
-        [ centerX
-        ]
+        [ centerX, centerY, moveDown 50 ]
         [ row [ spacing 10, padding 5, width fill ]
             [ positionGridDisplay model position
             , column [ spacing 10, alignLeft ]

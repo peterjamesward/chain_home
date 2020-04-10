@@ -55,4 +55,5 @@ type alias Model =
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
     , gameMode : GameMode
+    , isMenuOpen : Bool
     }

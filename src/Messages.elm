@@ -41,3 +41,4 @@ type Msg
     | RandomRaidGenerated (Float, Float)
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
+    | ToggleMenu Bool

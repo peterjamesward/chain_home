@@ -47,16 +47,17 @@ mapPageLandscape : Model -> Element Msg
 mapPageLandscape model =
     row
         [ centerX
-        , alignTop
-        , paddingEach { edges | left = 50, right = 50 }
+        , paddingEach { edges | left = 40, right = 40, top = 50 }
         , Element.spacing 20
         , Element.width Element.fill
         ]
         [ theMap model
-        , column [ Element.spacing 50 ]
+        , column
+            [ Element.spacing 50
+            , inFront <| motorwaySign model explainMapPage
+            ]
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-            , motorwaySign model explainMapPage
             ]
         , helpButton
         ]
@@ -77,7 +78,7 @@ mapPagePortrait model =
             ]
         , checkBoxShowActualTrace model.actualTraceVisibleOnMap
         , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-        , motorwaySign model  explainMapPage
+        , motorwaySign model explainMapPage
         ]
 
 
