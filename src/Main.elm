@@ -438,7 +438,7 @@ update msg model =
             )
 
         AdjustRangeValue newRange ->
-            ( { model | rangeSlider = newRange }
+            ( model  --| rangeSlider = newRange }
             , Cmd.none
             )
 

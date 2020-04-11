@@ -49,22 +49,22 @@ type alias Uniforms =
     , raid13 : Vec3
     , raid14 : Vec3
     , raid15 : Vec3
-     , raid16 : Vec3
-     , raid17 : Vec3
-     , raid18 : Vec3
-     , raid19 : Vec3
-     , raid20 : Vec3
-     , raid21 : Vec3
-     , raid22 : Vec3
-     , raid23 : Vec3
-     , raid24 : Vec3
-     , raid25 : Vec3
-     , raid26 : Vec3
-     , raid27 : Vec3
-     , raid28 : Vec3
-     , raid29 : Vec3
-     , raid30 : Vec3
-     , raid31 : Vec3
+    , raid16 : Vec3
+    , raid17 : Vec3
+    , raid18 : Vec3
+    , raid19 : Vec3
+    , raid20 : Vec3
+    , raid21 : Vec3
+    , raid22 : Vec3
+    , raid23 : Vec3
+    , raid24 : Vec3
+    , raid25 : Vec3
+    , raid26 : Vec3
+    , raid27 : Vec3
+    , raid28 : Vec3
+    , raid29 : Vec3
+    , raid30 : Vec3
+    , raid31 : Vec3
     }
 
 
@@ -116,22 +116,22 @@ uniforms time echoes =
     , raid13 = echoToVec echoArray 13
     , raid14 = echoToVec echoArray 14
     , raid15 = echoToVec echoArray 15
-     , raid16 = echoToVec echoArray 16
-     , raid17 = echoToVec echoArray 17
-     , raid18 = echoToVec echoArray 18
-     , raid19 = echoToVec echoArray 19
-     , raid20 = echoToVec echoArray 20
-     , raid21 = echoToVec echoArray 21
-     , raid22 = echoToVec echoArray 22
-     , raid23 = echoToVec echoArray 23
-     , raid24 = echoToVec echoArray 24
-     , raid25 = echoToVec echoArray 25
-     , raid26 = echoToVec echoArray 26
-     , raid27 = echoToVec echoArray 27
-     , raid28 = echoToVec echoArray 28
-     , raid29 = echoToVec echoArray 29
-     , raid30 = echoToVec echoArray 30
-     , raid31 = echoToVec echoArray 31
+    , raid16 = echoToVec echoArray 16
+    , raid17 = echoToVec echoArray 17
+    , raid18 = echoToVec echoArray 18
+    , raid19 = echoToVec echoArray 19
+    , raid20 = echoToVec echoArray 20
+    , raid21 = echoToVec echoArray 21
+    , raid22 = echoToVec echoArray 22
+    , raid23 = echoToVec echoArray 23
+    , raid24 = echoToVec echoArray 24
+    , raid25 = echoToVec echoArray 25
+    , raid26 = echoToVec echoArray 26
+    , raid27 = echoToVec echoArray 27
+    , raid28 = echoToVec echoArray 28
+    , raid29 = echoToVec echoArray 29
+    , raid30 = echoToVec echoArray 30
+    , raid31 = echoToVec echoArray 31
     }
 
 

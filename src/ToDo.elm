@@ -1,6 +1,4 @@
 
---TODO: Stop range slider messaging, or ignore them.
-
 --TODO: Larger raids occasionally now we are back to a 32 limit.
 
 --TODO: If I leave it running why does the map not "fill up"?
