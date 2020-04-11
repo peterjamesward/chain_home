@@ -1,7 +1,11 @@
 
---TODO: Spinny vector addition in shader may obviate sorting.
-
 --TODO: Stop range slider messaging, or ignore them.
+
+--TODO: Larger raids occasionally now we are back to a 32 limit.
+
+--TODO: If I leave it running why does the map not "fill up"?
+
+--TODO: Package as a Mac app?
 
 --TODO: Logic to advance between play levels. Including button highlighting. Badges ?!
 --(Should I replace the all-at-once-visible buttons with ... what?)

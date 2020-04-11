@@ -36,7 +36,7 @@ Using the Menu, under **Learn & Play**, discover how different types of raid
 would appear on the tube, and how the operator would find their bearing and height
 to be passed on to Fighter Command.
 
-You can then try to keep up with a series of incoming raids.
+You can then test your skills with a series of incoming raids.
 
 **Receiver** is the main operator's control panel, slightly simplified here.
 

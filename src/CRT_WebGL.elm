@@ -369,35 +369,29 @@ vertexShader =
             raid[30] = raid30;
             raid[31] = raid31;
 
-
-            // Compute height and slope for each raid, at this x position.
-            vec3 pulse[32];
-            for (int i = 0; i < 16; i++) {
-                pulse[i] = pulseShape(raid[i], 0.02);
-            }
-
             // 2020-04-11 New attempt at simpler (= better) signal combination using
             // time-rotating vector on slightly different frequency for each raid.
             // Kind of what I'm emulating but mathematically better and avoiding
             // need to sort signals in decreasing strength.
 
+            vec3 pulse[32];
             float cumulativeX = 0.0; // We will add in cartesian space
             float cumulativeY = 0.0;
-            float cumulativeSlopeX = 0.0; // We will add in cartesian space
-            float cumulativeSlopeY = 0.0;
+            float slope = 0.0; // Seems to work better if we accumulate slope directly.
 
             for (int i = 0; i < 32; i++) {
                 // The pulse height becomes amplitude of the rotating vector.
                 // Signal 'i' is taken to rotate at rate i in our pretend phase space.
                 // This is experimental of course.
                 // We do the same for the slope but separately.
+                pulse[i] = pulseShape(raid[i], 0.02);
+
                 if (pulse[i].y > 0.0) { // optimisation!
                     float amplitude = pulse[i].y;
                     float phase = u_time * periodicity(i);
                     cumulativeX += amplitude * cos(phase);
                     cumulativeY += amplitude * sin(phase);
-                    cumulativeSlopeX += pulse[i].z * sin(phase); // Derivative therefore swap sin & cos.
-                    cumulativeSlopeY += pulse[i].z * cos(phase);
+                    slope += pulse[i].z;
 
                     // We have used pulse.x to pass through the raid colour identifier!!
                     if (pulse[i].x > 0.0 && position.y == 0.0) {
@@ -408,7 +402,6 @@ vertexShader =
 
             // Now we reclaim the height and slope by converting back to polar.
             float height = sqrt(cumulativeX * cumulativeX + cumulativeY * cumulativeY);
-            float slope = sqrt(cumulativeSlopeX * cumulativeSlopeX + cumulativeSlopeY * cumulativeSlopeY);
 
           // Additional "spiky" line noise.
           if (lineSpikes > 0.0) {
