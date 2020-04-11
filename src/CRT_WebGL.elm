@@ -49,6 +49,22 @@ type alias Uniforms =
     , raid13 : Vec3
     , raid14 : Vec3
     , raid15 : Vec3
+     , raid16 : Vec3
+     , raid17 : Vec3
+     , raid18 : Vec3
+     , raid19 : Vec3
+     , raid20 : Vec3
+     , raid21 : Vec3
+     , raid22 : Vec3
+     , raid23 : Vec3
+     , raid24 : Vec3
+     , raid25 : Vec3
+     , raid26 : Vec3
+     , raid27 : Vec3
+     , raid28 : Vec3
+     , raid29 : Vec3
+     , raid30 : Vec3
+     , raid31 : Vec3
     }
 
 
@@ -83,7 +99,7 @@ uniforms time echoes =
     , u_time = time
     , lineJiggle = 0.03 -- 0.03 is OK.
     , lineSpikes = 0.2 -- 1.0 is OK.
-    , numRaids = min 16 <| List.length echoes
+    , numRaids = min 32 <| List.length echoes
     , raid0 = echoToVec echoArray 0
     , raid1 = echoToVec echoArray 1
     , raid2 = echoToVec echoArray 2
@@ -100,6 +116,22 @@ uniforms time echoes =
     , raid13 = echoToVec echoArray 13
     , raid14 = echoToVec echoArray 14
     , raid15 = echoToVec echoArray 15
+     , raid16 = echoToVec echoArray 16
+     , raid17 = echoToVec echoArray 17
+     , raid18 = echoToVec echoArray 18
+     , raid19 = echoToVec echoArray 19
+     , raid20 = echoToVec echoArray 20
+     , raid21 = echoToVec echoArray 21
+     , raid22 = echoToVec echoArray 22
+     , raid23 = echoToVec echoArray 23
+     , raid24 = echoToVec echoArray 24
+     , raid25 = echoToVec echoArray 25
+     , raid26 = echoToVec echoArray 26
+     , raid27 = echoToVec echoArray 27
+     , raid28 = echoToVec echoArray 28
+     , raid29 = echoToVec echoArray 29
+     , raid30 = echoToVec echoArray 30
+     , raid31 = echoToVec echoArray 31
     }
 
 
@@ -217,6 +249,22 @@ vertexShader =
         uniform vec3 raid13;
         uniform vec3 raid14;
         uniform vec3 raid15;
+        uniform vec3 raid16;
+        uniform vec3 raid17;
+        uniform vec3 raid18;
+        uniform vec3 raid19;
+        uniform vec3 raid20;
+        uniform vec3 raid21;
+        uniform vec3 raid22;
+        uniform vec3 raid23;
+        uniform vec3 raid24;
+        uniform vec3 raid25;
+        uniform vec3 raid26;
+        uniform vec3 raid27;
+        uniform vec3 raid28;
+        uniform vec3 raid29;
+        uniform vec3 raid30;
+        uniform vec3 raid31;
 
 
         varying vec3 vcolor;
@@ -287,7 +335,7 @@ vertexShader =
             stretch = 0.0; // The amount by which the rendered segment should be dimmed.
 
             // Copy raids into array for easier handling, probably.
-            vec3 raid[16]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).
+            vec3 raid[32]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).
             raid[0] = raid0;
             raid[1] = raid1;
             raid[2] = raid2;
@@ -304,10 +352,26 @@ vertexShader =
             raid[13] = raid13;
             raid[14] = raid14;
             raid[15] = raid15;
+            raid[16] = raid16;
+            raid[17] = raid17;
+            raid[18] = raid18;
+            raid[19] = raid19;
+            raid[20] = raid20;
+            raid[21] = raid21;
+            raid[22] = raid22;
+            raid[23] = raid23;
+            raid[24] = raid24;
+            raid[25] = raid25;
+            raid[26] = raid26;
+            raid[27] = raid27;
+            raid[28] = raid28;
+            raid[29] = raid29;
+            raid[30] = raid30;
+            raid[31] = raid31;
 
 
             // Compute height and slope for each raid, at this x position.
-            vec3 pulse[16];
+            vec3 pulse[32];
             for (int i = 0; i < 16; i++) {
                 pulse[i] = pulseShape(raid[i], 0.02);
             }
@@ -322,7 +386,7 @@ vertexShader =
             float cumulativeSlopeX = 0.0; // We will add in cartesian space
             float cumulativeSlopeY = 0.0;
 
-            for (int i = 0; i < 16; i++) {
+            for (int i = 0; i < 32; i++) {
                 // The pulse height becomes amplitude of the rotating vector.
                 // Signal 'i' is taken to rotate at rate i in our pretend phase space.
                 // This is experimental of course.
