@@ -269,71 +269,6 @@ vertexShader =
             return vec3( tutorialRaidIndicator, height, slope );
         }
 
-        void sortPulses16(inout vec3 unsorted[16]) {
-            //Network for N=16, using Best Known Arrangement.
-
-            if (unsorted[0].y < unsorted[1].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[1]; unsorted[1] = tmp;};
-            if (unsorted[2].y < unsorted[3].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[3]; unsorted[3] = tmp;};
-            if (unsorted[4].y < unsorted[5].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[5]; unsorted[5] = tmp;};
-            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};
-            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};
-            if (unsorted[10].y < unsorted[11].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[11]; unsorted[11] = tmp;};
-            if (unsorted[12].y < unsorted[13].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[13]; unsorted[13] = tmp;};
-            if (unsorted[14].y < unsorted[15].y) {vec3 tmp = unsorted[14]; unsorted[14] = unsorted[15]; unsorted[15] = tmp;};
-            if (unsorted[0].y < unsorted[2].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[2]; unsorted[2] = tmp;};
-            if (unsorted[4].y < unsorted[6].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[6]; unsorted[6] = tmp;};
-            if (unsorted[8].y < unsorted[10].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[10]; unsorted[10] = tmp;};
-            if (unsorted[12].y < unsorted[14].y) {vec3 tmp = unsorted[12]; unsorted[12] = unsorted[14]; unsorted[14] = tmp;};
-            if (unsorted[1].y < unsorted[3].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[3]; unsorted[3] = tmp;};
-            if (unsorted[5].y < unsorted[7].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[7]; unsorted[7] = tmp;};
-            if (unsorted[9].y < unsorted[11].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[11]; unsorted[11] = tmp;};
-            if (unsorted[13].y < unsorted[15].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[15]; unsorted[15] = tmp;};
-            if (unsorted[0].y < unsorted[4].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[4]; unsorted[4] = tmp;};
-            if (unsorted[8].y < unsorted[12].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[1].y < unsorted[5].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[5]; unsorted[5] = tmp;};
-            if (unsorted[9].y < unsorted[13].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[13]; unsorted[13] = tmp;};
-            if (unsorted[2].y < unsorted[6].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[6]; unsorted[6] = tmp;};
-            if (unsorted[10].y < unsorted[14].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[14]; unsorted[14] = tmp;};
-            if (unsorted[3].y < unsorted[7].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[7]; unsorted[7] = tmp;};
-            if (unsorted[11].y < unsorted[15].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[15]; unsorted[15] = tmp;};
-            if (unsorted[0].y < unsorted[8].y) {vec3 tmp = unsorted[0]; unsorted[0] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[1].y < unsorted[9].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[9]; unsorted[9] = tmp;};
-            if (unsorted[2].y < unsorted[10].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[10]; unsorted[10] = tmp;};
-            if (unsorted[3].y < unsorted[11].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[11]; unsorted[11] = tmp;};
-            if (unsorted[4].y < unsorted[12].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[5].y < unsorted[13].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[13]; unsorted[13] = tmp;};
-            if (unsorted[6].y < unsorted[14].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[14]; unsorted[14] = tmp;};
-            if (unsorted[7].y < unsorted[15].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[15]; unsorted[15] = tmp;};
-            if (unsorted[5].y < unsorted[10].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[10]; unsorted[10] = tmp;};
-            if (unsorted[6].y < unsorted[9].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[9]; unsorted[9] = tmp;};
-            if (unsorted[3].y < unsorted[12].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[13].y < unsorted[14].y) {vec3 tmp = unsorted[13]; unsorted[13] = unsorted[14]; unsorted[14] = tmp;};
-            if (unsorted[7].y < unsorted[11].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[11]; unsorted[11] = tmp;};
-            if (unsorted[1].y < unsorted[2].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[2]; unsorted[2] = tmp;};
-            if (unsorted[4].y < unsorted[8].y) {vec3 tmp = unsorted[4]; unsorted[4] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[1].y < unsorted[4].y) {vec3 tmp = unsorted[1]; unsorted[1] = unsorted[4]; unsorted[4] = tmp;};
-            if (unsorted[7].y < unsorted[13].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[13]; unsorted[13] = tmp;};
-            if (unsorted[2].y < unsorted[8].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[11].y < unsorted[14].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[14]; unsorted[14] = tmp;};
-            if (unsorted[2].y < unsorted[4].y) {vec3 tmp = unsorted[2]; unsorted[2] = unsorted[4]; unsorted[4] = tmp;};
-            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};
-            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};
-            if (unsorted[11].y < unsorted[13].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[13]; unsorted[13] = tmp;};
-            if (unsorted[3].y < unsorted[8].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[7].y < unsorted[12].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[6].y < unsorted[8].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[10].y < unsorted[12].y) {vec3 tmp = unsorted[10]; unsorted[10] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[3].y < unsorted[5].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[5]; unsorted[5] = tmp;};
-            if (unsorted[7].y < unsorted[9].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[9]; unsorted[9] = tmp;};
-            if (unsorted[3].y < unsorted[4].y) {vec3 tmp = unsorted[3]; unsorted[3] = unsorted[4]; unsorted[4] = tmp;};
-            if (unsorted[5].y < unsorted[6].y) {vec3 tmp = unsorted[5]; unsorted[5] = unsorted[6]; unsorted[6] = tmp;};
-            if (unsorted[7].y < unsorted[8].y) {vec3 tmp = unsorted[7]; unsorted[7] = unsorted[8]; unsorted[8] = tmp;};
-            if (unsorted[9].y < unsorted[10].y) {vec3 tmp = unsorted[9]; unsorted[9] = unsorted[10]; unsorted[10] = tmp;};
-            if (unsorted[11].y < unsorted[12].y) {vec3 tmp = unsorted[11]; unsorted[11] = unsorted[12]; unsorted[12] = tmp;};
-            if (unsorted[6].y < unsorted[7].y) {vec3 tmp = unsorted[6]; unsorted[6] = unsorted[7]; unsorted[7] = tmp;};
-            if (unsorted[8].y < unsorted[9].y) {vec3 tmp = unsorted[8]; unsorted[8] = unsorted[9]; unsorted[9] = tmp;};
-        }
-
         // Kludged to try to look OK with multiple raids.
         float coefficient(int i) {
             return 1.0 - 2.0 * mod(float(i),2.0);
@@ -377,19 +312,27 @@ vertexShader =
                 pulse[i] = pulseShape(raid[i], 0.02);
             }
 
-            // Sort pulses into decreasing displacement.
-            sortPulses16(pulse);
+            // 2020-04-11 New attempt at simpler (= better) signal combination using
+            // time-rotating vector on slightly different frequency for each raid.
+            // Kind of what I'm emulating but mathematically better and avoiding
+            // need to sort signals in decreasing strength.
 
-            // Combine pulses. Try with loop but worried it won't work on iOS
-            // (ref https://www.shaderific.com/glsl-types)
-            // Good news, it looks OK.
+            float cumulativeX = 0.0; // We will add in cartesian space
+            float cumulativeY = 0.0;
+            float cumulativeSlopeX = 0.0; // We will add in cartesian space
+            float cumulativeSlopeY = 0.0;
 
-            float height = 0.0;
-            float slope = 0.0;
             for (int i = 0; i < 16; i++) {
-                // Note we use cos so that pulse[0] doesn't disappear.
-                height += pulse[i].y * coefficient(i) * cos(position.x + u_time * periodicity(i));
-                slope += pulse[i].z * coefficient(i) * cos(position.x + u_time * periodicity(i));
+                // The pulse height becomes amplitude of the rotating vector.
+                // Signal 'i' is taken to rotate at rate i in our pretend phase space.
+                // This is experimental of course.
+                // We do the same for the slope but separately.
+                float amplitude = pulse[i].y;
+                float phase = u_time * periodicity(i);
+                cumulativeX += amplitude * cos(phase);
+                cumulativeY += amplitude * sin(phase);
+                cumulativeSlopeX += pulse[i].z * sin(phase); // Derivative therefore swap sin & cos.
+                cumulativeSlopeY += pulse[i].z * cos(phase);
 
                 // We have used pulse.x to pass through the raid colour identifier!!
                 if (pulse[i].x > 0.0 && position.y == 0.0) {
@@ -397,8 +340,9 @@ vertexShader =
                 }
             }
 
-
-            // TODO: Limit slope and use that to limit height changes!
+            // Now we reclaim the height and slope by converting back to polar.
+            float height = sqrt(cumulativeX * cumulativeX + cumulativeY * cumulativeY);
+            float slope = sqrt(cumulativeSlopeX * cumulativeSlopeX + cumulativeSlopeY * cumulativeSlopeY);
 
           // Additional "spiky" line noise.
           if (lineSpikes > 0.0) {
