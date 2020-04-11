@@ -391,16 +391,18 @@ vertexShader =
                 // Signal 'i' is taken to rotate at rate i in our pretend phase space.
                 // This is experimental of course.
                 // We do the same for the slope but separately.
-                float amplitude = pulse[i].y;
-                float phase = u_time * periodicity(i);
-                cumulativeX += amplitude * cos(phase);
-                cumulativeY += amplitude * sin(phase);
-                cumulativeSlopeX += pulse[i].z * sin(phase); // Derivative therefore swap sin & cos.
-                cumulativeSlopeY += pulse[i].z * cos(phase);
+                if (pulse[i].y > 0.0) { // optimisation!
+                    float amplitude = pulse[i].y;
+                    float phase = u_time * periodicity(i);
+                    cumulativeX += amplitude * cos(phase);
+                    cumulativeY += amplitude * sin(phase);
+                    cumulativeSlopeX += pulse[i].z * sin(phase); // Derivative therefore swap sin & cos.
+                    cumulativeSlopeY += pulse[i].z * cos(phase);
 
-                // We have used pulse.x to pass through the raid colour identifier!!
-                if (pulse[i].x > 0.0 && position.y == 0.0) {
-                    newColour = vec3(1.0, 1.0, 1.0);
+                    // We have used pulse.x to pass through the raid colour identifier!!
+                    if (pulse[i].x > 0.0 && position.y == 0.0) {
+                        newColour = vec3(1.0, 1.0, 1.0);
+                    }
                 }
             }
 
