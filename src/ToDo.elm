@@ -6,11 +6,7 @@
 --TODO: Logic to advance between play levels. Including button highlighting. Badges ?!
 --(Should I replace the all-at-once-visible buttons with ... what?)
 
---TODO: If I leave it running why does the map not "fill up"?
-
---TODO: Package as a Mac app? (Node.js, Electron ?)
-
---TODO: Some level of information about every component (?).
+--TODO: Package as a Mac app? (Node.js, Electron, just HTML + images ?)
 
 --TODO: Test on Android tablet !! (Currently using some webkit-only CSS tags to control touch actions.)
 
