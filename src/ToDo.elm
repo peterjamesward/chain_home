@@ -8,8 +8,6 @@
 
 --TODO: If I leave it running why does the map not "fill up"?
 
---TODO: Don't store the plot when G&R pressed but operator left it in height mode.
-
 --TODO: Package as a Mac app? (Node.js, Electron ?)
 
 --TODO: Some level of information about every component (?).

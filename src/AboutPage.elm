@@ -24,7 +24,6 @@ content =
     Markdown.toHtmlWith { defaultOptions | smartypants = True }
         [ class "content" ]
         """
-
 ## What is this?
 
 This application aims to give an impression of being an operator

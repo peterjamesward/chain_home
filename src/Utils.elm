@@ -6,7 +6,8 @@ import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)
 import Element.Events exposing (onClick)
 import Element.Font as Font exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class, style)
+import Markdown exposing (defaultOptions)
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Types exposing (Page(..))
@@ -112,8 +113,12 @@ motorwaySign model frontText =
             ]
     in
     if explainModeEnabledForCurrentPage model then
-        paragraph shared
-            [ E.text frontText ]
+        paragraph shared <|
+            [ html <|
+                Markdown.toHtmlWith { defaultOptions | smartypants = True }
+                    [ class "content" ]
+                    frontText
+            ]
 
     else
         none
