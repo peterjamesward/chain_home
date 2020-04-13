@@ -1,9 +1,9 @@
 
---TODO: Larger raids occasionally now we are back to a 32 limit.
-
 --TODO: If I leave it running why does the map not "fill up"?
 
---TODO: Package as a Mac app?
+--TODO: Don't store the plot when G&R pressed but operator left it in height mode.
+
+--TODO: Package as a Mac app? (Node.js, Electron ?)
 
 --TODO: Logic to advance between play levels. Including button highlighting. Badges ?!
 --(Should I replace the all-at-once-visible buttons with ... what?)

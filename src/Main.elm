@@ -663,6 +663,9 @@ makeNewTarget ( bearing, height ) model =
                 5 ->
                     raidIfSelected ScenarioThreeToSix (hostileMultiple 5)
 
+                9 ->
+                    raidIfSelected ScenarioThreeToSix (hostileMultiple 16) --!
+
                 _ ->
                     [ hostileSingle ]
 
