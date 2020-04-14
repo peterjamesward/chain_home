@@ -309,7 +309,7 @@ update msg model =
             ( { model
                 | currPage = OperatorPage
                 , isMenuOpen = False
-                , tutorialStage = Nothing
+                --, tutorialStage = Nothing
               }
             , Cmd.none
             )

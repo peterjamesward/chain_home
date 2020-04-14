@@ -982,6 +982,7 @@ exitTutorial model =
             { m
                 | tutorialStage = Nothing
                 , tutorialScenario = Nothing
+                , targets = []
             }
     in
     clearAnyCurrentTutorial <|
