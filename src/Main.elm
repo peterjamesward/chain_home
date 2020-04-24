@@ -309,7 +309,6 @@ update msg model =
             ( { model
                 | currPage = OperatorPage
                 , isMenuOpen = False
-                --, tutorialStage = Nothing
               }
             , Cmd.none
             )
@@ -438,7 +437,8 @@ update msg model =
             )
 
         AdjustRangeValue newRange ->
-            ( model  --| rangeSlider = newRange }
+            ( model
+              --| rangeSlider = newRange }
             , Cmd.none
             )
 
@@ -664,8 +664,9 @@ makeNewTarget ( bearing, height ) model =
                     raidIfSelected ScenarioThreeToSix (hostileMultiple 5)
 
                 9 ->
-                    raidIfSelected ScenarioThreeToSix (hostileMultiple 16) --!
+                    raidIfSelected ScenarioThreeToSix (hostileMultiple 16)
 
+                --!
                 _ ->
                     [ hostileSingle ]
 
@@ -726,6 +727,7 @@ view model =
         [ layout
             [ Background.color flatMidnightBlue
             , width fill
+            , htmlAttribute <| style "touch-action" "none"
             ]
           <|
             el

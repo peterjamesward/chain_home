@@ -57,6 +57,11 @@ normalise theta =
 disableSelection =
     [ htmlAttribute <| style "-webkit-user-select" "none"
     , htmlAttribute <| style "-webkit-touch-callout" "none"
+    , htmlAttribute <| style "-khtml-user-select" "none"
+    , htmlAttribute <| style "-moz-user-select" "none"
+    , htmlAttribute <| style "-ms-user-select" "none"
+    , htmlAttribute <| style "user-select" "none"
+    , htmlAttribute <| style "touch-action" "none"
     ]
 
 
