@@ -113,7 +113,7 @@ bomber2A =
 bomber3 : TargetProforma
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 2.208
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
     , heading = degrees 270
