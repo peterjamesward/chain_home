@@ -666,7 +666,6 @@ makeNewTarget ( bearing, height ) model =
                 9 ->
                     raidIfSelected ScenarioThreeToSix (hostileMultiple 16)
 
-                --!
                 _ ->
                     [ hostileSingle ]
 
@@ -832,37 +831,54 @@ targetSelector model availableRaidTypes tutorialsDone =
             else
                 paletteLightGreen
 
+        buttonStyle scenario =
+            if tutorialScenarioDone scenario then
+                [ Background.color paletteGrey
+                , Border.color paletteDarkGreen
+                , Border.rounded 5
+                , Border.width 2
+                , Font.color paletteDarkGreen
+                , width (fillPortion 14)
+                , paddingXY 20 6
+                , height (px 40)
+                , centerX
+                ]
+
+            else
+                [ Background.color flatMidnightBlue
+                , Border.color paletteLightGreen
+                , Border.rounded 5
+                , Border.width 2
+                , Font.color paletteLightGreen
+                , width (fillPortion 14)
+                , paddingXY 20 6
+                , height (px 40)
+                , centerX
+                ]
+
         display : TargetSelector -> Element Msg
         display g =
-            row [ spacing 10, width fill ]
-                [ Input.checkbox
+            row
+                [ spacing 10
+                , width fill
+                ]
+                [ Input.button
+                    (buttonStyle g.id)
+                    { onPress = Just <| DisplayTraining g.id
+                    , label = text g.description
+                    }
+                , Input.checkbox
                     [ E.height (px 40)
-                    , Border.width 1
-                    , Border.rounded 5
-                    , Border.color lightCharcoal
-                    , padding 10
+                    --, Border.width 1
+                    --, Border.rounded 5
+                    --, Border.color lightCharcoal
+                    , width (fillPortion 1)
+                    , paddingEach { edges | left = 10 }
                     ]
                     { onChange = setConfig g
                     , checked = tutorialScenarioDone g.id
-                    , label =
-                        Input.labelRight
-                            [ htmlAttribute <| style "-webkit-user-select" "none"
-                            ]
-                        <|
-                            E.text g.description
+                    , label = Input.labelHidden g.description
                     , icon = Input.defaultCheckbox
-                    }
-                , Input.button
-                    [ Background.color paletteDarkGreen
-                    , Border.color (learnButtonTextColour g.id)
-                    , Border.width 2
-                    , Border.rounded 5
-                    , padding 5
-                    , alignRight
-                    , Font.color (learnButtonTextColour g.id)
-                    ]
-                    { onPress = Just <| DisplayTraining g.id
-                    , label = text "Learn"
                     }
                 ]
     in
@@ -903,6 +919,7 @@ inputPageLandscape model =
                 [ width fill
                 , Font.color white
                 , Font.size 24
+                , centerX
                 ]
                 [ text "Tutorials" ]
             , targetSelector model model.activeConfigurations model.tutorialsCompleted
