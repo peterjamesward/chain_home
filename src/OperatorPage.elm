@@ -46,7 +46,7 @@ clickableGonioImage model tutorial =
          , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
          , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
          , htmlAttribute <| style "touch-action" "none"
-         , width (px 300)
+         , width fill
          , pointer
          ]
             ++ explanatoryText model UiGoniometer
@@ -57,10 +57,10 @@ clickableGonioImage model tutorial =
 rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
-        , E.width (E.px 600)
-        , moveRight 5
-        --, pointer
+        , E.width (E.px 610)
+        --, moveRight 5
 
+        --, pointer
         -- Here is where we're creating/styling the "track"
         , E.behindContent
             (E.el
@@ -166,8 +166,8 @@ rangeTicks =
     in
     svg
         [ viewBox "-5 -10 2010 200"
-        , S.width "102%"
-        , S.height "100%"
+        , S.width "600px"
+        , S.height "100px"
         ]
     <|
         List.concatMap tick (List.range 0 100)
@@ -175,9 +175,7 @@ rangeTicks =
 
 rangeScale model =
     el
-        ([ width fill
-         , centerX
-         , paddingEach { edges | left = 10, right = 30, top = 10 }
+        ([ width (px 600)
          , E.above (rangeSlider model)
          ]
             ++ disableSelection
@@ -188,12 +186,14 @@ rangeScale model =
 
 rangeSliderAndCRT model trace =
     column
-        ([ padding 5 ] ++ explanatoryText model UiCRT)
+        ([ padding 5
+         ]
+            ++ explanatoryText model UiCRT
+        )
         [ el
             [ inFront <|
                 el
-                    [ alignTop
-                    , width fill
+                    [ width fill
                     , paddingEach { edges | left = 20 }
                     ]
                     (rangeScale model)
@@ -314,13 +314,14 @@ operatorPageLandscape model =
                     (rangeSliderAndCRT model <| traceDependingOnMode model)
                 ]
             , row []
-                [ clickableGonioImage model UiRangeKnob
+                [ clickableGonioImage model UiGoniometer
                 , el (explanatoryText model UiGonioButton) <|
                     actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                , clickableRangeKnob model UiGoniometer
+                , clickableRangeKnob model UiRangeKnob
                 , el (explanatoryText model UIRangeButton) <|
                     actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
+
             --, debugModel model
             ]
         , column [ width <| fillPortion 2, centerX ]
