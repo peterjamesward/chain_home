@@ -34,8 +34,8 @@ drawRangeKnob theta =
     in
     svg
         [ viewBox "-140 -140 280 280"
-        , S.width "100%"
-        , S.height "100%"
+        , S.width "200px"
+        , S.height "200px"
         ]
     <|
         [ Svg.circle
