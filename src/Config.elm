@@ -14,11 +14,11 @@ type alias TargetSelector =
 
 availableTargetOptions : List TargetSelector
 availableTargetOptions =
-    [ TargetSelector ScenarioBasic False "One aircraft at a time"
+    [ TargetSelector ScenarioBasic False "One aircraft"
     , TargetSelector ScenarioTwoTogether False "Two aircraft in close formation"
     , TargetSelector ScenarioTwoSeparate False "Two aircraft at the same range"
     , TargetSelector ScenarioThreeToSix False "Three to six planes in close formation"
-    , TargetSelector ScenarioFriendly False "A solitary friendly aircraft"
+    , TargetSelector ScenarioFriendly False "A friendly aircraft with IFF"
     ]
 
 

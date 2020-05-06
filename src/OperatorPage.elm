@@ -58,9 +58,7 @@ rangeSlider model =
     Input.slider
         [ E.height (E.px 30)
         , E.width (E.px 610)
-        --, moveRight 5
 
-        --, pointer
         -- Here is where we're creating/styling the "track"
         , E.behindContent
             (E.el

@@ -166,8 +166,8 @@ theMap model =
         Element.html <|
             svg
                 [ viewBox ("0 0 " ++ imageDimensions ++ " " ++ imageDimensions)
-                , A.width "100%"
-                , A.height "100%"
+                , A.width "600px"
+                , A.height "600px"
                 ]
             <|
                 [ Svg.image

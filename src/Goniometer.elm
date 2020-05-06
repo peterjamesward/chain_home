@@ -13,8 +13,8 @@ import Utils exposing (imageLocation)
 drawGoniometer theta =
     svg
         [ viewBox "-200 -200 400 400"
-        , S.width "100%"
-        , S.height "100%"
+        , S.width "300px"
+        , S.height "300px"
         ]
     <|
         drawGoniometerScale
