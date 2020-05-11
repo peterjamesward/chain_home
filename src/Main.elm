@@ -934,52 +934,6 @@ inputPageLandscape model =
         ]
 
 
-inputPageLandscapeNew : Model -> Element Msg
-inputPageLandscapeNew model =
-    let
-        deltaT =
-            model.modelTime
-
-        fakeEchoTemplate =
-            { sequence = 1
-            , r = 0.0
-            , theta = 0.0
-            , alpha = 0.0
-            , phase = 0.0
-            , duration = 0.0
-            , amplitude = 2.0
-            , tutorial = False
-            }
-
-        fakeEchoes =
-            [ { fakeEchoTemplate | r = 20000 } -- Single enemy
-            , { fakeEchoTemplate
-                -- Single with IFF
-                | r = 50000
-                , amplitude =
-                    if modBy 6 (deltaT // 1000) == 0 && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500 then
-                        6.0
-
-                    else
-                        1.0
-              }
-            , { fakeEchoTemplate | r = 80000 } -- Pair at same range, to show "beating"
-            , { fakeEchoTemplate | r = 80000 }
-            , { fakeEchoTemplate | r = 110000 } -- Another pair, but would be differing bearings
-            , { fakeEchoTemplate | r = 110100, amplitude = 1.5 }
-            , { fakeEchoTemplate | r = 140000, amplitude = 1.2 } -- Six in formation
-            , { fakeEchoTemplate | r = 140200, amplitude = 1.2 }
-            , { fakeEchoTemplate | r = 140400, amplitude = 1.2 }
-            , { fakeEchoTemplate | r = 140600, amplitude = 1.2 }
-            , { fakeEchoTemplate | r = 140800, amplitude = 1.2 }
-            , { fakeEchoTemplate | r = 140500, amplitude = 1.2 }
-            ]
-    in
-    el [ centerX, centerY ] <|
-        html <|
-            crt model.webGLtime fakeEchoes
-
-
 inputPagePortrait : Model -> Element Msg
 inputPagePortrait model =
     column
