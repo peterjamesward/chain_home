@@ -1016,7 +1016,7 @@ inputPagePortrait model =
 inputPage model =
     case model.outputDevice.orientation of
         Landscape ->
-            inputPageLandscapeNew model
+            inputPageLandscape model
 
         Portrait ->
             inputPagePortrait model
