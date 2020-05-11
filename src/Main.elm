@@ -9,6 +9,7 @@ import AboutPage exposing (aboutPage)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
+import CRT_WebGL exposing (crt)
 import CalculatorDisplay exposing (calculator)
 import Config exposing (..)
 import Constants exposing (..)
@@ -831,7 +832,6 @@ targetSelector model availableRaidTypes tutorialsDone =
                 , Border.rounded 5
                 , Border.width 2
                 , Font.color paletteDarkGreen
-                , width (fillPortion 14)
                 , paddingXY 20 6
                 , height (px 40)
                 , centerX
@@ -843,7 +843,6 @@ targetSelector model availableRaidTypes tutorialsDone =
                 , Border.rounded 5
                 , Border.width 2
                 , Font.color paletteLightGreen
-                , width (fillPortion 14)
                 , paddingXY 20 6
                 , height (px 40)
                 , centerX
@@ -851,28 +850,31 @@ targetSelector model availableRaidTypes tutorialsDone =
 
         display : TargetSelector -> Element Msg
         display g =
-            row
-                [ spacing 10
+            column
+                [ spaceEvenly
                 , width fill
+                , centerX
                 ]
-                [ Input.button
+                [ paragraph [ width (px 100), centerX ]
+                    [ text g.description ]
+                , Input.button
                     (buttonStyle g.id)
                     { onPress = Just <| DisplayTraining g.id
-                    , label = text g.description
+                    , label = text "Learn"
                     }
                 , Input.checkbox
                     [ E.height (px 40)
-                    , width (fillPortion 1)
                     , paddingEach { edges | left = 10 }
+                    , centerX
                     ]
                     { onChange = setConfig g
                     , checked = tutorialScenarioDone g.id
-                    , label = Input.labelHidden g.description
+                    , label = Input.labelHidden "Learn"
                     , icon = Input.defaultCheckbox
                     }
                 ]
     in
-    column
+    row
         [ Font.color lightCharcoal
         , spacing 20
         , width fill
@@ -891,42 +893,28 @@ calculatorPage model =
 
 inputPageLandscape : Model -> Element Msg
 inputPageLandscape model =
-    row
+    column
         [ E.width fill
         , Font.color lightCharcoal
         , padding 20
         , spacing 20
         , moveDown 20
         ]
-        [ column
+        [ row
             [ padding 20
             , width <| fillPortion 3
             , alignTop
             , spacing 20
             , inFront <| motorwaySign model explainRaidTypes
             ]
-            [ paragraph
-                [ width fill
-                , Font.color white
-                , Font.size 24
-                , centerX
-                ]
-                [ text "Tutorials" ]
-            , targetSelector model model.activeConfigurations model.tutorialsCompleted
-            ]
-        , column
+            [ targetSelector model model.activeConfigurations model.tutorialsCompleted ]
+        , row
             [ padding 20
             , width <| fillPortion 3
             , spacing 20
             , inFront <| motorwaySign model explainPlayLevels
             ]
-            [ paragraph
-                [ width fill
-                , Font.color white
-                , Font.size 24
-                ]
-                [ text "Test your skills" ]
-            , Input.button
+            [ Input.button
                 (Attr.greenButton ++ [ width fill, height (px 40), centerX ])
                 { onPress = Just (StartScenario GameSingleRaid)
                 , label = el [ centerX ] <| text "One practice raid"
@@ -944,6 +932,52 @@ inputPageLandscape model =
             ]
         , column [ padding 10, alignRight, alignTop, width <| fillPortion 1 ] [ helpButton ]
         ]
+
+
+inputPageLandscapeNew : Model -> Element Msg
+inputPageLandscapeNew model =
+    let
+        deltaT =
+            model.modelTime
+
+        fakeEchoTemplate =
+            { sequence = 1
+            , r = 0.0
+            , theta = 0.0
+            , alpha = 0.0
+            , phase = 0.0
+            , duration = 0.0
+            , amplitude = 2.0
+            , tutorial = False
+            }
+
+        fakeEchoes =
+            [ { fakeEchoTemplate | r = 20000 } -- Single enemy
+            , { fakeEchoTemplate
+                -- Single with IFF
+                | r = 50000
+                , amplitude =
+                    if modBy 6 (deltaT // 1000) == 0 && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500 then
+                        6.0
+
+                    else
+                        1.0
+              }
+            , { fakeEchoTemplate | r = 80000 } -- Pair at same range, to show "beating"
+            , { fakeEchoTemplate | r = 80000 }
+            , { fakeEchoTemplate | r = 110000 } -- Another pair, but would be differing bearings
+            , { fakeEchoTemplate | r = 110100, amplitude = 1.5 }
+            , { fakeEchoTemplate | r = 140000, amplitude = 1.2 } -- Six in formation
+            , { fakeEchoTemplate | r = 140200, amplitude = 1.2 }
+            , { fakeEchoTemplate | r = 140400, amplitude = 1.2 }
+            , { fakeEchoTemplate | r = 140600, amplitude = 1.2 }
+            , { fakeEchoTemplate | r = 140800, amplitude = 1.2 }
+            , { fakeEchoTemplate | r = 140500, amplitude = 1.2 }
+            ]
+    in
+    el [ centerX, centerY ] <|
+        html <|
+            crt model.webGLtime fakeEchoes
 
 
 inputPagePortrait : Model -> Element Msg
@@ -982,7 +1016,7 @@ inputPagePortrait model =
 inputPage model =
     case model.outputDevice.orientation of
         Landscape ->
-            inputPageLandscape model
+            inputPageLandscapeNew model
 
         Portrait ->
             inputPagePortrait model

@@ -43,7 +43,6 @@ deriveEchoes station txAntenna targets =
         List.range 1 (List.length targets)
 
 
-
 -- Handy function for debuggery.
 
 
