@@ -9,7 +9,6 @@ import AboutPage exposing (aboutPage)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
-import CRT_WebGL exposing (crt)
 import CalculatorDisplay exposing (calculator)
 import Config exposing (..)
 import Constants exposing (..)
@@ -832,6 +831,7 @@ targetSelector model availableRaidTypes tutorialsDone =
                 , Border.rounded 5
                 , Border.width 2
                 , Font.color paletteDarkGreen
+                , width (fillPortion 14)
                 , paddingXY 20 6
                 , height (px 40)
                 , centerX
@@ -843,6 +843,7 @@ targetSelector model availableRaidTypes tutorialsDone =
                 , Border.rounded 5
                 , Border.width 2
                 , Font.color paletteLightGreen
+                , width (fillPortion 14)
                 , paddingXY 20 6
                 , height (px 40)
                 , centerX
@@ -850,31 +851,28 @@ targetSelector model availableRaidTypes tutorialsDone =
 
         display : TargetSelector -> Element Msg
         display g =
-            column
-                [ spaceEvenly
+            row
+                [ spacing 10
                 , width fill
-                , centerX
                 ]
-                [ paragraph [ width (px 100), centerX ]
-                    [ text g.description ]
-                , Input.button
+                [ Input.button
                     (buttonStyle g.id)
                     { onPress = Just <| DisplayTraining g.id
-                    , label = text "Learn"
+                    , label = text g.description
                     }
                 , Input.checkbox
                     [ E.height (px 40)
+                    , width (fillPortion 1)
                     , paddingEach { edges | left = 10 }
-                    , centerX
                     ]
                     { onChange = setConfig g
                     , checked = tutorialScenarioDone g.id
-                    , label = Input.labelHidden "Learn"
+                    , label = Input.labelHidden g.description
                     , icon = Input.defaultCheckbox
                     }
                 ]
     in
-    row
+    column
         [ Font.color lightCharcoal
         , spacing 20
         , width fill
@@ -893,28 +891,42 @@ calculatorPage model =
 
 inputPageLandscape : Model -> Element Msg
 inputPageLandscape model =
-    column
+    row
         [ E.width fill
         , Font.color lightCharcoal
         , padding 20
         , spacing 20
         , moveDown 20
         ]
-        [ row
+        [ column
             [ padding 20
             , width <| fillPortion 3
             , alignTop
             , spacing 20
-            , inFront <| motorwaySign model explainRaidTypes
+            , inFront <| el [ centerY ] <| motorwaySign model explainRaidTypes
             ]
-            [ targetSelector model model.activeConfigurations model.tutorialsCompleted ]
-        , row
+            [ paragraph
+                [ width fill
+                , Font.color white
+                , Font.size 24
+                , centerX
+                ]
+                [ text "Tutorials" ]
+            , targetSelector model model.activeConfigurations model.tutorialsCompleted
+            ]
+        , column
             [ padding 20
             , width <| fillPortion 3
             , spacing 20
             , inFront <| motorwaySign model explainPlayLevels
             ]
-            [ Input.button
+            [ paragraph
+                [ width fill
+                , Font.color white
+                , Font.size 24
+                ]
+                [ text "Test your skills" ]
+            , Input.button
                 (Attr.greenButton ++ [ width fill, height (px 40), centerX ])
                 { onPress = Just (StartScenario GameSingleRaid)
                 , label = el [ centerX ] <| text "One practice raid"
