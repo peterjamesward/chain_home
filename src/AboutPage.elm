@@ -32,8 +32,8 @@ at a Chain Home station during the Battle of Britain in 1940.
 ## How should I use this?
 
 Using the Menu, under **Learn & Play**, discover how different types of raid
-would appear on the tube, and how the operator would find their bearing and height
-to be passed on to Fighter Command.
+would appear on the tube, and how the operator would find the raids' bearing, height
+and strength to be passed on to Fighter Command.
 
 You can then test your skills with a series of incoming raids.
 
