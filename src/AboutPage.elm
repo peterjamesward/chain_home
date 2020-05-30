@@ -37,7 +37,7 @@ to be passed on to Fighter Command.
 
 You can then test your skills with a series of incoming raids.
 
-**Receiver** is the main operator's control panel, slightly simplified here.
+**Receiver** is a mock-up of the main operator's control panel, slightly simplified here.
 
 **Calculator** illustrates the output from the electrical calculator that derives the height and
 summarises the information to be passed to Fighter Command.

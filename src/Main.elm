@@ -891,6 +891,24 @@ calculatorPage model =
 
 inputPageLandscape : Model -> Element Msg
 inputPageLandscape model =
+    let
+        tutorialDone =
+            not <| List.isEmpty model.tutorialsCompleted
+
+        buttonActiveIfTutorialDone =
+            if tutorialDone then
+                Attr.greenButton ++ [ width fill, height (px 40), centerX ]
+
+            else
+                Attr.greyButton ++ [ width fill, height (px 40), centerX ]
+
+        buttonAction action =
+            if tutorialDone then
+                Just (StartScenario action)
+
+            else
+                Nothing
+    in
     row
         [ E.width fill
         , Font.color lightCharcoal
@@ -927,18 +945,18 @@ inputPageLandscape model =
                 ]
                 [ text "Test your skills" ]
             , Input.button
-                (Attr.greenButton ++ [ width fill, height (px 40), centerX ])
-                { onPress = Just (StartScenario GameSingleRaid)
+                buttonActiveIfTutorialDone
+                { onPress = buttonAction GameSingleRaid
                 , label = el [ centerX ] <| text "One practice raid"
                 }
             , Input.button
-                (Attr.greyButton ++ [ width fill, height (px 40), centerX ])
-                { onPress = Just (StartScenario GameThreeRaids)
+                buttonActiveIfTutorialDone
+                { onPress = buttonAction GameThreeRaids
                 , label = el [ centerX ] <| text "Three practice raids"
                 }
             , Input.button
-                (Attr.greyButton ++ [ width fill, height (px 40), centerX ])
-                { onPress = Just (StartScenario GameUnlimited)
+                buttonActiveIfTutorialDone
+                { onPress = buttonAction GameUnlimited
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
