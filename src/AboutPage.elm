@@ -52,8 +52,5 @@ Each screen (other than this one) has a green **?** button which will provide so
  * Application code written by Peter Ward.
  * Historical research by Sharon Ward.
  * The application is written in Elm (Copyright © 2012-2020 Evan Czaplicki, BSD-3-Clause license)
- * elm-ui library (Copyright © 2018, Matthew Griffith, BSD-3-Clause license).
- * elm-webgl library (Copyright © 2014, John P Mayer, Jr, BSD-3-Clause license).
- * Packaging for iOS courtesy of Cordova (Apache License 2.0).
 
 """
