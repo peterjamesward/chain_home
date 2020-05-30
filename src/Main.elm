@@ -912,9 +912,8 @@ inputPageLandscape model =
     row
         [ E.width fill
         , Font.color lightCharcoal
-        , padding 20
-        , spacing 20
-        , moveDown 20
+        , paddingEach { edges | top = 60, left = 60 }
+        , spacing 30
         ]
         [ column
             [ padding 20
