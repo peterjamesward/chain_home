@@ -774,7 +774,7 @@ navBar model =
             , Background.color paletteDarkGreen
             --, Border.color paletteSand
             --, Border.width 2
-            , paddingEach { edges | left = 20, right = 20, top = 5, bottom = 5 }
+            , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
             , spaceEvenly
             ]
             [ navItem model "About" DisplayAboutPage AboutPage
