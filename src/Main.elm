@@ -729,12 +729,12 @@ view model =
             , htmlAttribute <| style "touch-action" "none"
             ]
           <|
-            el
+            column
                 [ E.width E.fill
-                , padding 20
-                , inFront <| navBar model
                 ]
-                content
+                [ navBar model
+                , content
+                ]
         ]
     }
 
@@ -769,25 +769,19 @@ navItem model label action pageId =
 
 navBar : Model -> Element Msg
 navBar model =
-    if model.isMenuOpen then
-        column
-            [ spacing 20
+        row
+            [ width fill
             , Background.color paletteDarkGreen
-            , Border.color paletteSand
-            , Border.width 2
-            , padding 20
+            --, Border.color paletteSand
+            --, Border.width 2
+            , paddingEach { edges | left = 20, right = 20, top = 5, bottom = 5 }
+            , spaceEvenly
             ]
-            [ navItem model "<<" (ToggleMenu False) model.currPage
-            , navItem model "About" DisplayAboutPage AboutPage
+            [ navItem model "About" DisplayAboutPage AboutPage
             , navItem model "Learn & Play" DisplayConfiguration InputPage
             , navItem model "Receiver" DisplayReceiver OperatorPage
             , navItem model "Calculator" DisplayCalculator CalculatorPage
             , navItem model "Map" DisplayMapPage MapPage
-            ]
-
-    else
-        column [ padding 20 ]
-            [ navItem model "Menu" (ToggleMenu True) model.currPage
             ]
 
 

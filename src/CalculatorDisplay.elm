@@ -79,6 +79,7 @@ calculatorLandscape model =
                         ]
                 , heightGrid model height
                 ]
+            , el [ width (px 40)] none
             , helpButton
             ]
         , el (explanatoryText model UiCalcOffset) <|

@@ -296,6 +296,7 @@ raidStrengthPanel model =
 operatorPageLandscape model =
     row
         ([ centerX
+        , paddingEach { edges | top = 20 }
          , tutorialTextBox model
             [ moveUp 100
             , moveLeft 80
