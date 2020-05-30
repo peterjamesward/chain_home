@@ -293,6 +293,16 @@ tutorialBasic =
         """
         )
     , TutorialEntry
+        TutorialLeaveHeightMode
+        UiHeight
+        [ tutorialEndHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """Make sure you don't leave the receiver in Height mode.
+        """
+        )
+    , TutorialEntry
         TutorialShowCalculator
         UiCalculator
         [ tutorialShowCalculator ]
@@ -427,6 +437,16 @@ tutorial2SameBearing =
         noExitActions
         (static
             """The operator presses Raid Strength 2, because this beating signal is two aircraft.
+        """
+        )
+    , TutorialEntry
+        TutorialLeaveHeightMode
+        UiHeight
+        [ tutorialEndHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """Make sure you don't leave the receiver in Height mode.
         """
         )
     , TutorialEntry
@@ -696,6 +716,16 @@ tutorial3to6 =
         """
         )
     , TutorialEntry
+        TutorialLeaveHeightMode
+        UiHeight
+        [ tutorialEndHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """Make sure you don't leave the receiver in Height mode.
+        """
+        )
+    , TutorialEntry
         TutorialShowCalculator
         UiCalculator
         [ tutorialShowCalculator ]
@@ -831,6 +861,16 @@ tutorialIFF =
         noExitActions
         (static
             """The operator presses Raid Strength 1 and the F sign to show it's friendly.
+        """
+        )
+    , TutorialEntry
+        TutorialLeaveHeightMode
+        UiHeight
+        [ tutorialEndHeightMode ]
+        noStateActions
+        noExitActions
+        (static
+            """Make sure you don't leave the receiver in Height mode.
         """
         )
     , TutorialEntry
@@ -1166,6 +1206,13 @@ tutorialHeightMode model =
     { model
         | goniometerMode = Elevation
         , inputState = HeightInput
+    }
+
+tutorialEndHeightMode : TutorialAction
+tutorialEndHeightMode model =
+    { model
+        | goniometerMode = Azimuth
+        , inputState = BearingInput
     }
 
 
