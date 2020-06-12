@@ -726,7 +726,7 @@ view model =
         [ layout
             [ Background.color flatMidnightBlue
             , width fill
-            , htmlAttribute <| style "touch-action" "none"
+            , htmlAttribute <| style "touch-action" "manipulation"
             ]
           <|
             column
@@ -896,9 +896,9 @@ inputPageLandscape model =
             else
                 Attr.greyButton ++ [ width fill, height (px 40), centerX ]
 
-        buttonAction action =
+        buttonAction scenario =
             if tutorialDone then
-                Just (StartScenario action)
+                Just (StartScenario scenario)
 
             else
                 Nothing

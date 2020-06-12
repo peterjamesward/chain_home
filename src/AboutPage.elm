@@ -31,8 +31,10 @@ at a Chain Home station during the Battle of Britain in 1940.
 
 ## How should I use this?
 
+ __ [Click here for User Guide](img/User%20guide.pdf) __
+
 Using the Menu, under **Learn & Play**, discover how different types of raid
-would appear on the tube, and how the operator would find the raids' bearing, height
+would appear on the tube, and how the operator would find each raid's bearing, height
 and strength to be passed on to Fighter Command.
 
 You can then test your skills with a series of incoming raids.
@@ -46,6 +48,13 @@ summarises the information to be passed to Fighter Command.
 This of course would not have been available to the operator!
 
 Each screen (other than this one) has a green **?** button which will provide some explanation of the elements,
+
+## Platforms supported
+
+This has been tested on and works fine using Safari, Chrome and Firefox browsers on MacOS X,
+and Chrome, Firefox and Microsoft Edge browsers on Windows 10. It does not work with Internet Explorer 10 on Windows 10.
+It also works on iPad with iOS 13.4 or higher; the iPad Mini will work but the screen is too small to work properly.
+Other tablets have not been tested; feedback would be welcome but there is NO SUPPORT.
 
 ## Credits and licenses
 
