@@ -916,12 +916,17 @@ inputPageLandscape model =
         , spacing 30
         ]
         [ column
-            [ padding 20
-            , width <| fillPortion 3
-            , alignTop
-            , spacing 20
-            , inFront <| el [ centerY ] <| motorwaySign model explainRaidTypes
-            ]
+            ([ padding 20
+             , width <| fillPortion 3
+             , alignTop
+             , spacing 20
+             ]
+                ++ showExplanation model.explainModeMenu
+                    """Click "Learn" to understand each of the types of raid.
+                    As you complete each section, the box will be ticked and raids like
+                    that will appear when you click "Go!".
+                    You can tick or untick them anyway, if you like."""
+            )
             [ paragraph
                 [ width fill
                 , Font.color white
@@ -932,11 +937,14 @@ inputPageLandscape model =
             , targetSelector model model.activeConfigurations model.tutorialsCompleted
             ]
         , column
-            [ padding 20
-            , width <| fillPortion 3
-            , spacing 20
-            , inFront <| motorwaySign model explainPlayLevels
-            ]
+            ([ padding 20
+             , width <| fillPortion 3
+             , spacing 20
+             ]
+                ++ showExplanation model.explainModeMenu
+                    """Test yourself with a series of incoming raids.
+                    This will only use the types of raid that are ticked."""
+            )
             [ paragraph
                 [ width fill
                 , Font.color white

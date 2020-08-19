@@ -61,17 +61,6 @@ static s =
     -- As we now allow derived tutorial strings, we need a way to declare a fixed string.
     \_ -> s
 
---TODO: Move these remaining two into the page and lose this list.
-uiExplanations : List ( UiComponent, String )
-uiExplanations =
-    [ ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
-    As you complete each section, the box will be ticked and raids like
-    that will appear when you click "Go!".
-    You can tick or untick them anyway, if you like.""" )
-    , ( UiGoButton, """Test yourself with a series of incoming raids.
-                        This will only use the types of raid that are ticked.""" )
-    ]
-
 
 type alias TutorialAction =
     Model -> Model
@@ -900,20 +889,6 @@ tutorialStartScenario id model =
                     exitTutorial model
 
 
-lookupUiExplanation : UiComponent -> Maybe String
-lookupUiExplanation ui =
-    List.head <|
-        List.filterMap
-            (\( i, s ) ->
-                if i == ui then
-                    Just s
-
-                else
-                    Nothing
-            )
-            uiExplanations
-
-
 findNextStep : Maybe Tutorial -> Maybe TutorialStep -> Maybe TutorialStep
 findNextStep currentTutorial currentStep =
     let
@@ -1379,7 +1354,10 @@ findStep currentTutorial tutorialStep =
             Nothing
 
 
+
 --TODO: Factor out this ugly repeating search pattern
+
+
 findTutorialSubject : Model -> Maybe UiComponent
 findTutorialSubject model =
     let
@@ -1395,7 +1373,8 @@ findTutorialSubject model =
                 Nothing ->
                     Nothing
 
-        _ -> Nothing
+        _ ->
+            Nothing
 
 
 highlightTutorialSubject : Maybe UiComponent -> UiComponent -> List (Attribute Msg)
@@ -1428,12 +1407,13 @@ tutorialText model =
         ( Just scenario, Just stage ) ->
             case currentStep scenario of
                 Just step ->
-                    Just ( step.tutorialText model)
+                    Just (step.tutorialText model)
 
                 Nothing ->
                     Nothing
 
-        _ -> Nothing
+        _ ->
+            Nothing
 
 
 tutorialTextBox : Model -> List (Attribute Msg) -> Element Msg
