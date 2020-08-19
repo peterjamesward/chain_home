@@ -1497,9 +1497,13 @@ tutorialTextBox model adjustments =
                                     text "▶︎"
                                 ]
 
+
+
 --TODO: This view is not centred widthways.
 --but then we have floated the text box right to the top whereas it used to
 --be laid over the panel explicitly.
+--TODO: All pages to move towards this style. Probably.
+
 
 viewCalculatorInTutorial : Model -> Element Msg
 viewCalculatorInTutorial model =
@@ -1511,7 +1515,8 @@ viewCalculatorInTutorial model =
             Calculator.View.interpretCalculator model.calculator
     in
     el
-        [ inFront <|
+        [ centerX
+        , inFront <|
             el
                 [ width (px 500)
                 , height (px 160)
