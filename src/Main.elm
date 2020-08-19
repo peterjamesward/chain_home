@@ -464,6 +464,7 @@ update msg model =
             , Cmd.none
             )
 
+        --TODO: Perhaps these should be Calculator Messages.
         StoreGoniometerSetting ->
             -- TODO: This breaks calc interface (like it's not already).
             ( case model.calculator.inputState of
