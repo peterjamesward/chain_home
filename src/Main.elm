@@ -29,7 +29,7 @@ import LobeFunctions exposing (..)
 import MapPage exposing (mapPage)
 import Messages exposing (..)
 import Model exposing (..)
-import OperatorPage exposing (operatorPage)
+import OperatorPage exposing (operatorPage, operatorPageWithTutorial)
 import Platform.Cmd exposing (Cmd)
 import Random
 import Range exposing (rangeTurnAngle)
@@ -710,6 +710,9 @@ view model =
             case model.currPage of
                 OperatorPage ->
                     operatorPage model
+
+                OperatorPageInTutorial ->
+                    operatorPageWithTutorial model
 
                 InputPage ->
                     inputPage model

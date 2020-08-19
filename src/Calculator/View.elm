@@ -373,7 +373,7 @@ interpretCalculator model =
            )
         ++ (case model.storedFriendly of
                 Just True ->
-                    ", friendly."
+                    ", and is friendly."
 
                 _ ->
                     "."

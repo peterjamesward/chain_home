@@ -61,16 +61,10 @@ static s =
     -- As we now allow derived tutorial strings, we need a way to declare a fixed string.
     \_ -> s
 
-
+--TODO: Move these remaining two into the page and lose this list.
 uiExplanations : List ( UiComponent, String )
 uiExplanations =
-    [ ( UiCRT, """The operators "tube", or CRT""" )
-    , ( UiGoniometer, """Goniometer""" )
-    , ( UiRangeKnob, """Range knob""" )
-    , ( UiRangeScale, """Range scale (miles) and range indicator""" )
-    , ( UiSwitchPanel, """Mode switches""" )
-    , ( UiRaidStrength, """Raid strength entry buttons""" )
-    , ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
+    [ ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
     As you complete each section, the box will be ticked and raids like
     that will appear when you click "Go!".
     You can tick or untick them anyway, if you like.""" )
@@ -891,7 +885,7 @@ tutorialStartScenario id model =
             { m
                 | tutorialScenario = Just id
                 , tutorialStage = Just s.tutorialStep
-                , currPage = OperatorPage
+                , currPage = OperatorPageInTutorial
                 , startTime = model.modelTime
                 , webGLtime = 0.0
             }
@@ -1385,32 +1379,29 @@ findStep currentTutorial tutorialStep =
             Nothing
 
 
-explanatoryText : Model -> UiComponent -> List (Attribute Msg)
-explanatoryText model uiComponent =
-    -- Show the text for components in explain mode.
-    -- Highlight the control when this control pertains to current state of active tutorial.
+--TODO: Factor out this ugly repeating search pattern
+findTutorialSubject : Model -> Maybe UiComponent
+findTutorialSubject model =
     let
-        uiComponentDescription =
-            lookupUiExplanation uiComponent
-
-        isTutorialSubject =
-            case model.tutorialScenario of
-                Just scenarioId ->
-                    let
-                        tutorialStep =
-                            findMatchingStep scenarioId model.tutorialStage uiComponent
-                    in
-                    case tutorialStep of
-                        Just _ ->
-                            True
-
-                        _ ->
-                            False
-
-                _ ->
-                    False
+        currentStep id =
+            findStep (Just (tutorialFromId id)) model.tutorialStage
     in
-    if isTutorialSubject then
+    case ( model.tutorialScenario, model.tutorialStage ) of
+        ( Just scenario, Just _ ) ->
+            case currentStep scenario of
+                Just step ->
+                    Just step.uiComponent
+
+                Nothing ->
+                    Nothing
+
+        _ -> Nothing
+
+
+highlightTutorialSubject : Maybe UiComponent -> UiComponent -> List (Attribute Msg)
+highlightTutorialSubject tutorialSubject uiComponent =
+    -- Highlight the control when this control pertains to current state of active tutorial.
+    if Just uiComponent == tutorialSubject then
         [ Border.color paletteSand
         , Border.width 2
         , Border.glow paletteSand 2.0
@@ -1425,59 +1416,50 @@ explanatoryText model uiComponent =
         , Border.innerGlow flatMidnightBlue 2.0
         , Border.rounded 5
         ]
-            ++ (case ( explainModeEnabledForCurrentPage model, uiComponentDescription ) of
-                    ( True, Just txt ) ->
-                        [ inFront <|
-                            el
-                                [ centerX
-                                , centerY
-                                , Background.color blue
-                                , Border.color white
-                                , Border.width 1
-                                , Border.rounded 5
-                                ]
-                            <|
-                                paragraph
-                                    [ spacing 1
-                                    , Font.size 16
-                                    , Font.family [ Font.typeface "Helvetica" ]
-                                    , Font.color white
-                                    , padding 5
-                                    ]
-                                    [ text txt ]
-                        ]
-
-                    _ ->
-                        []
-               )
 
 
-tutorialTextBox : Model -> List (Attribute Msg) -> Attribute Msg
+tutorialText : Model -> Maybe String
+tutorialText model =
+    let
+        currentStep id =
+            findStep (Just (tutorialFromId id)) model.tutorialStage
+    in
+    case ( model.tutorialScenario, model.tutorialStage ) of
+        ( Just scenario, Just stage ) ->
+            case currentStep scenario of
+                Just step ->
+                    Just ( step.tutorialText model)
+
+                Nothing ->
+                    Nothing
+
+        _ -> Nothing
+
+
+tutorialTextBox : Model -> List (Attribute Msg) -> Element Msg
 tutorialTextBox model adjustments =
     -- Use a single central text box for all tutorial text.
     -- Second argument allows caller to finesse the position
-    inFront <|
-        case model.tutorialScenario of
-            Nothing ->
-                none
+    let
+        theText =
+            tutorialText model
+    in
+    case theText of
+        Nothing ->
+            none
 
-            Just scenario ->
-                case findStep (Just (tutorialFromId scenario)) model.tutorialStage of
-                    Nothing ->
-                        none
-
-                    Just step ->
-                        el
-                            (tutorialControlHolderStyles ++ adjustments)
-                        <|
-                            tutorialControls (step.tutorialText model)
+        Just someText ->
+            el
+                (tutorialControlHolderStyles ++ adjustments)
+            <|
+                tutorialControls someText
 
 
 
 {-
-TODO: All pages to move towards this style. Probably.
- I think this means we have to ask the page to do the highlighting of the control
- but the controls remain in the common floating box.
+   TODO: All pages to move towards this (below) style. Probably.
+    I think this means we have to ask the page to do the highlighting of the control
+    but the controls remain in the common floating box.
 -}
 
 
@@ -1497,7 +1479,7 @@ viewCalculatorInTutorial model =
         rawPage
 
 
-tutorialControls tutorialText =
+tutorialControls someText =
     el tutorialControlHolderStyles <|
         row
             [ width fill, centerY ]
@@ -1508,7 +1490,7 @@ tutorialControls tutorialText =
                 , padding 10
                 , Font.size 16
                 ]
-                [ text tutorialText ]
+                [ text someText ]
             , el [ onClick TutorialAdvance, alignRight, pointer ] <|
                 text "▶︎"
             ]

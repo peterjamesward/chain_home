@@ -139,6 +139,9 @@ explainModeEnabledForCurrentPage model =
         OperatorPage ->
             model.explainModeReceiver
 
+        OperatorPageInTutorial ->
+            False
+
         CalculatorPage ->
             False
 
