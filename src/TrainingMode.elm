@@ -1468,34 +1468,9 @@ tutorialTextBox model adjustments =
 
                     Just step ->
                         el
-                            ([ width (px 500)
-                             , height (px 160)
-                             , centerY
-                             , Background.color blue
-                             , Border.color flatSunflower
-                             , Border.width 2
-                             , Border.rounded 5
-                             , Font.center
-                             , Font.color white
-                             , Font.size 32
-                             , Font.family [ Font.typeface "Helvetica" ]
-                             ]
-                                ++ adjustments
-                            )
+                            (tutorialControlHolderStyles ++ adjustments)
                         <|
-                            row
-                                [ width fill, centerY ]
-                                [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
-                                , paragraph
-                                    [ Background.color blue
-                                    , spacing 4
-                                    , padding 10
-                                    , Font.size 16
-                                    ]
-                                    [ text (step.tutorialText model) ]
-                                , el [ onClick TutorialAdvance, alignRight, pointer ] <|
-                                    text "▶︎"
-                                ]
+                            tutorialControls (step.tutorialText model)
 
 
 
@@ -1516,37 +1491,42 @@ viewCalculatorInTutorial model =
     in
     el
         [ centerX
-        , inFront <|
-            el
-                [ width (px 500)
-                , height (px 160)
-                , centerY
-                , centerX
-                , Background.color blue
-                , Border.color flatSunflower
-                , Border.width 2
-                , Border.rounded 5
-                , Font.center
-                , Font.color white
-                , Font.size 32
-                , Font.family [ Font.typeface "Helvetica" ]
-                ]
-            <|
-                row
-                    [ width fill, centerY ]
-                    [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
-                    , paragraph
-                        [ Background.color blue
-                        , spacing 4
-                        , padding 10
-                        , Font.size 16
-                        ]
-                        [ text calcText ]
-                    , el [ onClick TutorialAdvance, alignRight, pointer ] <|
-                        text "▶︎"
-                    ]
+        , inFront <| tutorialControls calcText
         ]
         rawPage
+
+
+tutorialControls tutorialText =
+    el tutorialControlHolderStyles <|
+        row
+            [ width fill, centerY ]
+            [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
+            , paragraph
+                [ Background.color blue
+                , spacing 4
+                , padding 10
+                , Font.size 16
+                ]
+                [ text tutorialText ]
+            , el [ onClick TutorialAdvance, alignRight, pointer ] <|
+                text "▶︎"
+            ]
+
+
+tutorialControlHolderStyles =
+    [ width (px 500)
+    , height (px 160)
+    , centerY
+    , centerX
+    , Background.color blue
+    , Border.color flatSunflower
+    , Border.width 2
+    , Border.rounded 5
+    , Font.center
+    , Font.color white
+    , Font.size 32
+    , Font.family [ Font.typeface "Helvetica" ]
+    ]
 
 
 tutorialInterpretCalculator : Model -> String
