@@ -1474,10 +1474,11 @@ tutorialTextBox model adjustments =
 
 
 
---TODO: This view is not centred widthways.
---but then we have floated the text box right to the top whereas it used to
---be laid over the panel explicitly.
---TODO: All pages to move towards this style. Probably.
+{-
+TODO: All pages to move towards this style. Probably.
+ I think this means we have to ask the page to do the highlighting of the control
+ but the controls remain in the common floating box.
+-}
 
 
 viewCalculatorInTutorial : Model -> Element Msg

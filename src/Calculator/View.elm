@@ -36,25 +36,7 @@ calculatorLandscape : Bool -> Model -> Element Msg
 calculatorLandscape withExplanations model =
     let
         position =
-            gridPosition range bearing
-
-        range =
-            model.storedAzimuthRange
-
-        bearing =
-            model.storedAzimuth
-
-        height =
-            model.storedElevation
-
-        strength =
-            model.storedStrength
-
-        plus =
-            model.storedStrengthPlus
-
-        friendly =
-            model.storedFriendly
+            gridPosition model.storedAzimuthRange model.storedAzimuth
     in
     column
         [ centerX, centerY, moveDown 50 ]
@@ -67,15 +49,15 @@ calculatorLandscape withExplanations model =
                         , spacing 10
                         , width fill
                         ]
-                        [ strengthDisplay withExplanations strength
-                        , maybeBoolDisplay "+" plus
-                        , maybeBoolDisplay "F" friendly
+                        [ strengthDisplay withExplanations model.storedStrength
+                        , maybeBoolDisplay "+" model.storedStrengthPlus
+                        , maybeBoolDisplay "F" model.storedFriendly
                         , column []
                             [ none
                             , none
                             ]
                         ]
-                , heightGrid withExplanations height
+                , heightGrid withExplanations model.storedElevation
                 ]
             , el [ width (px 40) ] none
             , helpButton
@@ -95,25 +77,7 @@ calculatorPortrait : Bool -> Model -> Element Msg
 calculatorPortrait withExplanations model =
     let
         position =
-            gridPosition range bearing
-
-        range =
-            model.storedAzimuthRange
-
-        bearing =
-            model.storedAzimuth
-
-        height =
-            model.storedElevation
-
-        strength =
-            model.storedStrength
-
-        plus =
-            model.storedStrengthPlus
-
-        friendly =
-            model.storedFriendly
+            gridPosition model.storedAzimuthRange model.storedAzimuth
     in
     column
         [ centerX
@@ -132,11 +96,11 @@ calculatorPortrait withExplanations model =
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
         , row [ centerX ]
-            [ strengthDisplay withExplanations strength
-            , maybeBoolDisplay "+" plus
-            , maybeBoolDisplay "F" friendly
+            [ strengthDisplay withExplanations model.storedStrength
+            , maybeBoolDisplay "+" model.storedStrengthPlus
+            , maybeBoolDisplay "F" model.storedFriendly
             ]
-        , heightGrid withExplanations height
+        , heightGrid withExplanations model.storedElevation
         ]
 
 
