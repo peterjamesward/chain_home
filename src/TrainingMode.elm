@@ -1,5 +1,8 @@
 module TrainingMode exposing (..)
 
+import Browser
+import Calculator.Model exposing (InputState(..), setInputState, storeAzimuth, storeAzimuthRange, storeElevation, storeFriendly, storeStrength, storeStrengthPlus)
+import Calculator.View exposing (interpretCalculator)
 import Config exposing (trainingMode, trainingMode2, trainingMode3, trainingMode3to6, trainingModeFriendlyOutbound)
 import Constants exposing (blue, flatMidnightBlue, flatSunflower, flatWetAsphalt, paletteSand, white)
 import Element exposing (..)
@@ -7,7 +10,6 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events exposing (onClick)
 import Element.Font as Font
-import Grid exposing (tutorialInterpretCalculator)
 import Keys exposing (Keys, updateKeys)
 import Messages exposing (..)
 import Model exposing (Model)
@@ -68,10 +70,6 @@ uiExplanations =
     , ( UiRangeScale, """Range scale (miles) and range indicator""" )
     , ( UiSwitchPanel, """Mode switches""" )
     , ( UiRaidStrength, """Raid strength entry buttons""" )
-    , ( UiCalcStrength, """Estimate of number of planes in raid""" )
-    , ( UiCalcGrid, """The 100km map grid square containing the raid""" )
-    , ( UiCalcHeight, """The approximate height of the raid""" )
-    , ( UiCalcOffset, """The approximate position within the grid square""" )
     , ( UiConfigOptions, """Click "Learn" to understand each of the types of raid.
     As you complete each section, the box will be ticked and raids like
     that will appear when you click "Go!".
@@ -1137,13 +1135,7 @@ stopTutorialRaid model =
 
 clearCalculator model =
     { model
-        | storedAzimuth = Nothing
-        , storedElevation = Nothing
-        , storedAzimuthRange = Nothing
-        , storedElevationRange = Nothing
-        , storedStrength = Nothing
-        , storedFriendly = Nothing
-        , storedStrengthPlus = Nothing
+        | calculator = Calculator.Model.init
     }
 
 
@@ -1164,8 +1156,10 @@ recordScenarioDone scenario model =
 tutorialStoreBearing : TutorialAction
 tutorialStoreBearing model =
     { model
-        | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
-        , inputState = BearingRangeInput
+        | calculator =
+            setInputState BearingRangeInput <|
+                storeAzimuth (model.goniometerAzimuth + model.station.lineOfShoot)
+                    model.calculator
     }
 
 
@@ -1173,31 +1167,33 @@ tutorialStoreElevation : TutorialAction
 tutorialStoreElevation model =
     -- Use the actual known elevation for target near range setting.
     { model
-        | storedElevation = findTargetHeight model.targets model.rangeSlider
-        , inputState = HeightRangeInput
+        | calculator =
+            setInputState HeightRangeInput <|
+                storeElevation (findTargetHeight model.targets model.rangeSlider) model.calculator
     }
 
 
 tutorialStoreStrength : Int -> TutorialAction
 tutorialStoreStrength strength model =
-    { model | storedStrength = Just strength }
+    { model | calculator = storeStrength strength model.calculator }
 
 
 tutorialStorePlus : TutorialAction
 tutorialStorePlus model =
-    { model | storedStrengthPlus = Just True }
+    { model | calculator = storeStrengthPlus True model.calculator }
 
 
 tutorialStoreFriendly : TutorialAction
 tutorialStoreFriendly model =
-    { model | storedFriendly = Just True }
+    { model | calculator = storeFriendly True model.calculator }
 
 
 tutorialStoreRange1 : TutorialAction
 tutorialStoreRange1 model =
     { model
-        | storedAzimuthRange = Just (1.6 * model.rangeSlider)
-        , inputState = BearingInput
+        | calculator =
+            storeAzimuthRange (1.6 * model.rangeSlider) <|
+                setInputState BearingInput model.calculator
     }
 
 
@@ -1205,14 +1201,15 @@ tutorialHeightMode : TutorialAction
 tutorialHeightMode model =
     { model
         | goniometerMode = Elevation
-        , inputState = HeightInput
+        , calculator = setInputState HeightInput model.calculator
     }
+
 
 tutorialEndHeightMode : TutorialAction
 tutorialEndHeightMode model =
     { model
         | goniometerMode = Azimuth
-        , inputState = BearingInput
+        , calculator = setInputState BearingInput model.calculator
     }
 
 
@@ -1220,13 +1217,13 @@ tutorialBearingMode : TutorialAction
 tutorialBearingMode model =
     { model
         | goniometerMode = Azimuth
-        , inputState = BearingInput
+        , calculator = setInputState BearingInput model.calculator
     }
 
 
 tutorialShowCalculator : TutorialAction
 tutorialShowCalculator model =
-    { model | currPage = CalculatorPage }
+    { model | currPage = CalculatorInTutorial }
 
 
 tutorialShowOperator : TutorialAction
@@ -1388,8 +1385,6 @@ findStep currentTutorial tutorialStep =
             Nothing
 
 
-
-
 explanatoryText : Model -> UiComponent -> List (Attribute Msg)
 explanatoryText model uiComponent =
     -- Show the text for components in explain mode.
@@ -1501,3 +1496,54 @@ tutorialTextBox model adjustments =
                                 , el [ onClick TutorialAdvance, alignRight, pointer ] <|
                                     text "▶︎"
                                 ]
+
+--TODO: This view is not centred widthways.
+--but then we have floated the text box right to the top whereas it used to
+--be laid over the panel explicitly.
+
+viewCalculatorInTutorial : Model -> Element Msg
+viewCalculatorInTutorial model =
+    let
+        rawPage =
+            Calculator.View.view model.outputDevice model.calculator
+
+        calcText =
+            Calculator.View.interpretCalculator model.calculator
+    in
+    el
+        [ inFront <|
+            el
+                [ width (px 500)
+                , height (px 160)
+                , centerY
+                , centerX
+                , Background.color blue
+                , Border.color flatSunflower
+                , Border.width 2
+                , Border.rounded 5
+                , Font.center
+                , Font.color white
+                , Font.size 32
+                , Font.family [ Font.typeface "Helvetica" ]
+                ]
+            <|
+                row
+                    [ width fill, centerY ]
+                    [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
+                    , paragraph
+                        [ Background.color blue
+                        , spacing 4
+                        , padding 10
+                        , Font.size 16
+                        ]
+                        [ text calcText ]
+                    , el [ onClick TutorialAdvance, alignRight, pointer ] <|
+                        text "▶︎"
+                    ]
+        ]
+        rawPage
+
+
+tutorialInterpretCalculator : Model -> String
+tutorialInterpretCalculator model =
+    interpretCalculator model.calculator

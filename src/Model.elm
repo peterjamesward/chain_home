@@ -5,6 +5,7 @@ import Element exposing (Device)
 import Keys exposing (Keys)
 import Station exposing (Station)
 import Types exposing (..)
+import Calculator.Model
 
 
 type alias Model =
@@ -34,19 +35,10 @@ type alias Model =
     , reflector : Bool
     , receiveAB : Bool
     , receiveAntenna : Antenna
-    , inputState : InputState
-    , storedAzimuth : Maybe Float
-    , storedElevation : Maybe Float
-    , storedAzimuthRange : Maybe Float
-    , storedElevationRange : Maybe Float
-    , storedStrength : Maybe Int
-    , storedFriendly : Maybe Bool
-    , storedStrengthPlus : Maybe Bool
     , tutorialScenario : Maybe TutorialScenario
     , tutorialStage : Maybe TutorialStep
     , explainModeMenu : Bool
     , explainModeReceiver : Bool
-    , explainModeCalculator : Bool
     , explainModeMap : Bool
     , tutorialsCompleted : List TutorialScenario -- would like to use Set but can't. Because Elm.
     , newRaid : Maybe Target
@@ -56,4 +48,5 @@ type alias Model =
     , rangeCircleVisibleOnMap : Bool
     , gameMode : GameMode
     , isMenuOpen : Bool
+    , calculator : Calculator.Model.Model
     }

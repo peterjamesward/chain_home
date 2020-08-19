@@ -1,19 +1,17 @@
-module CalculatorDisplay exposing (calculator)
+module Calculator.View exposing (interpretCalculator, view, pressGonioNext)
 
 {-
-   We attempt to mimic the output panel for the electronic calculator.
+   Mimic the output panel for the electronic calculator.
 -}
 
+import Calculator.Model exposing (InputState(..), Model)
 import Constants exposing (..)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Grid exposing (GridPosition, gridLettersList, gridPosition)
+import Grid exposing (GridPosition, gridLettersList, gridPosition, letterFromGrid)
 import Messages exposing (Msg)
-import Model exposing (Model)
-import TrainingMode exposing (lookupUiExplanation, tutorialTextBox)
-import Types exposing (UiComponent(..))
 import Utils exposing (choose, disableSelection, edges, helpButton)
 
 
@@ -25,18 +23,14 @@ withBorders widget =
         widget
 
 
-calculator : Model -> Element Msg
-calculator model =
-    let
-        withExplanations =
-            model.explainModeCalculator
-    in
-    case model.outputDevice.orientation of
+view : Device -> Model -> Element Msg
+view device model =
+    case device.orientation of
         Landscape ->
-            calculatorLandscape withExplanations model
+            calculatorLandscape model.explainMode model
 
         Portrait ->
-            calculatorPortrait withExplanations model
+            calculatorPortrait model.explainMode model
 
 
 calculatorLandscape : Bool -> Model -> Element Msg
@@ -87,7 +81,7 @@ calculatorLandscape withExplanations model =
             , el [ width (px 40) ] none
             , helpButton
             ]
-        , el (showExplanation withExplanations UiCalcOffset) <|
+        , el (showExplanation withExplanations """The approximate position within the grid square""") <|
             row
                 [ Border.color lightCharcoal
                 , Border.width 1
@@ -95,11 +89,6 @@ calculatorLandscape withExplanations model =
                 [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
                 , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
                 ]
-        , row
-            [ centerX
-            , tutorialTextBox model [ centerX, moveDown 20 ]
-            ]
-            [ el [] none ]
         ]
 
 
@@ -128,22 +117,19 @@ calculatorPortrait withExplanations model =
             model.storedFriendly
     in
     column
-        ([ centerX
-         , width fill
-         , tutorialTextBox model
-            [ alignTop
-            , centerX
-            ]
-         ]
-            ++ showExplanation withExplanations UiCalculator
-        )
+        [ centerX
+        , width fill
+        ]
         [ row [ centerX ]
-            [ positionGridDisplay withExplanations model
+            [ positionGridDisplay withExplanations
+                model
                 position
             , helpButton
             ]
         , column
-            (showExplanation withExplanations UiCalcOffset ++ [ centerX ])
+            (showExplanation withExplanations """The approximate position within the grid square"""
+                ++ [ centerX ]
+            )
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -156,35 +142,34 @@ calculatorPortrait withExplanations model =
         ]
 
 
-showExplanation visible uiComponent =
-    let
-        uiComponentDescription =
-            lookupUiExplanation uiComponent
-    in
-    case ( visible, uiComponentDescription ) of
-        ( True, Just txt ) ->
-            [ inFront <|
-                el
-                    [ centerX
-                    , centerY
-                    , Background.color blue
-                    , Border.color white
-                    , Border.width 1
-                    , Border.rounded 5
-                    ]
-                <|
-                    paragraph
-                        [ spacing 1
-                        , Font.size 16
-                        , Font.family [ Font.typeface "Helvetica" ]
-                        , Font.color white
-                        , padding 5
-                        ]
-                        [ text txt ]
-            ]
 
-        _ ->
-            []
+--TODO: This now duplicates code from TrainingMode.
+
+
+showExplanation visible uiComponentDescription =
+    if visible then
+        [ inFront <|
+            el
+                [ centerX
+                , centerY
+                , Background.color blue
+                , Border.color white
+                , Border.width 1
+                , Border.rounded 5
+                ]
+            <|
+                paragraph
+                    [ spacing 1
+                    , Font.size 16
+                    , Font.family [ Font.typeface "Helvetica" ]
+                    , Font.color white
+                    , padding 5
+                    ]
+                    [ text uiComponentDescription ]
+        ]
+
+    else
+        []
 
 
 bulbSize =
@@ -237,7 +222,7 @@ positionGridDisplay withExplanations model position =
                     (List.range -3 3)
                     letters
     in
-    el (showExplanation withExplanations UiCalcGrid) <|
+    el (showExplanation withExplanations """The 100km map grid square containing the raid""") <|
         column
             [ centerX
             , padding 10
@@ -269,7 +254,7 @@ strengthDisplay withExplanations model strength =
                 )
                 (text label)
     in
-    el (showExplanation withExplanations UiCalcStrength) <|
+    el (showExplanation withExplanations """Estimate of number of planes in raid""") <|
         row
             [ spacing 20
             , paddingEach { edges | left = 10 }
@@ -322,7 +307,7 @@ heightGrid withExplanations model storedHeight =
                 [ text label ]
     in
     -- Height is in '000 feet, sourced from config data!
-    el (width fill :: showExplanation withExplanations UiCalcHeight) <|
+    el (width fill :: showExplanation withExplanations """The approximate height of the raid""") <|
         column
             [ width fill
             , padding 20
@@ -402,3 +387,73 @@ offsetDisplay offset =
         [ significantDigit <| Maybe.map (\n -> n // 10) offset
         , significantDigit <| Maybe.map (modBy 10) offset
         ]
+
+
+interpretCalculator : Calculator.Model.Model -> String
+interpretCalculator model =
+    let
+        gridPos =
+            gridPosition model.storedAzimuthRange model.storedAzimuth
+
+        letter =
+            letterFromGrid gridPos
+
+        twoDigits x =
+            String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
+    in
+    "The calculator display tells us the raid is at grid position "
+        ++ (case ( gridPos, letter ) of
+                ( Just grid, Just g ) ->
+                    g
+                        ++ twoDigits grid.gridSquareOffsetEast
+                        ++ twoDigits grid.gridSquareOffsetNorth
+
+                _ ->
+                    "unknown"
+           )
+        ++ ", height "
+        ++ (case model.storedElevation of
+                Just h ->
+                    if h >= 1 then
+                        (String.fromInt <| truncate h)
+                            ++ ",000 ft"
+
+                    else
+                        "below 1000 ft"
+
+                Nothing ->
+                    "unknown"
+           )
+        ++ ", strength "
+        ++ (case model.storedStrengthPlus of
+                Just True ->
+                    "more than "
+
+                _ ->
+                    ""
+           )
+        ++ (case model.storedStrength of
+                Just n ->
+                    String.fromInt n
+
+                _ ->
+                    " unknown"
+           )
+        ++ (case model.storedFriendly of
+                Just True ->
+                    ", friendly."
+
+                _ ->
+                    "."
+           )
+
+
+
+-- State readouts that we need on the main receiver page.
+
+
+pressGonioNext : Model -> Bool
+pressGonioNext model =
+    (model.inputState == BearingInput)
+        || (model.inputState == HeightInput)
+

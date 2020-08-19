@@ -9,7 +9,8 @@ import AboutPage exposing (aboutPage)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
-import CalculatorDisplay exposing (calculator)
+import Calculator.Model exposing (InputState(..), setInputState, storeAzimuth, storeAzimuthRange, storeElevation, storeElevationRange, storeFriendly, storeStrength, storeStrengthPlus, toggleExplainMode)
+import Calculator.View
 import Config exposing (..)
 import Constants exposing (..)
 import Echo exposing (..)
@@ -71,19 +72,10 @@ init _ =
       , reflector = False
       , receiveAB = True
       , receiveAntenna = receiveHigh
-      , inputState = BearingInput
-      , storedAzimuth = Nothing
-      , storedElevation = Nothing
-      , storedAzimuthRange = Nothing
-      , storedElevationRange = Nothing
-      , storedStrength = Nothing
-      , storedFriendly = Nothing
-      , storedStrengthPlus = Nothing
       , tutorialStage = Nothing
       , tutorialScenario = Nothing
       , explainModeMenu = False
       , explainModeReceiver = False
-      , explainModeCalculator = False
       , explainModeMap = False
       , tutorialsCompleted = []
       , newRaid = Nothing
@@ -93,6 +85,7 @@ init _ =
       , rangeCircleVisibleOnMap = False
       , gameMode = GameNone
       , isMenuOpen = False
+      , calculator = Calculator.Model.init
       }
     , Task.perform SetStartTime Time.now
     )
@@ -290,7 +283,7 @@ update msg model =
                     { model | explainModeReceiver = not model.explainModeReceiver }
 
                 CalculatorPage ->
-                    { model | explainModeCalculator = not model.explainModeCalculator }
+                    { model | calculator = toggleExplainMode model.calculator }
 
                 MapPage ->
                     { model | explainModeMap = not model.explainModeMap }
@@ -466,23 +459,26 @@ update msg model =
         SelectGoniometerMode mode ->
             ( { model
                 | goniometerMode = choose mode Azimuth Elevation
-                , inputState = choose mode BearingInput HeightInput
+                , calculator = setInputState (choose mode BearingInput HeightInput) model.calculator
               }
             , Cmd.none
             )
 
         StoreGoniometerSetting ->
-            ( case model.inputState of
+            -- TODO: This breaks calc interface (like it's not already).
+            ( case model.calculator.inputState of
                 BearingInput ->
                     { model
-                        | storedAzimuth = Just (model.goniometerAzimuth + model.station.lineOfShoot)
-                        , inputState = BearingRangeInput
+                        | calculator =
+                            storeAzimuth (model.goniometerAzimuth + model.station.lineOfShoot) <|
+                                setInputState BearingRangeInput model.calculator
                     }
 
                 HeightInput ->
                     { model
-                        | storedElevation = findTargetHeight model.targets model.rangeSlider
-                        , inputState = HeightRangeInput
+                        | calculator =
+                            storeElevation (findTargetHeight model.targets model.rangeSlider) <|
+                                setInputState HeightRangeInput model.calculator
                     }
 
                 _ ->
@@ -491,18 +487,20 @@ update msg model =
             )
 
         StoreRangeSetting ->
-            ( (case model.inputState of
+            ( (case model.calculator.inputState of
                 BearingRangeInput ->
                     { model
-                        | storedAzimuthRange = Just (1.6 * model.rangeSlider)
-                        , inputState = BearingInput
+                        | calculator =
+                            storeAzimuthRange (1.6 * model.rangeSlider) <|
+                                setInputState BearingInput model.calculator
                     }
                         |> recordCurrentTargetPositions
 
                 HeightRangeInput ->
                     { model
-                        | storedElevationRange = Just (1.6 * model.rangeSlider)
-                        , inputState = HeightInput
+                        | calculator =
+                            storeElevationRange (1.6 * model.rangeSlider) <|
+                                setInputState HeightInput model.calculator
                     }
 
                 _ ->
@@ -513,13 +511,19 @@ update msg model =
             )
 
         RaidStrength strength ->
-            ( { model | storedStrength = Just strength }, Cmd.none )
+            ( { model | calculator = storeStrength strength model.calculator }
+            , Cmd.none
+            )
 
         RaidStrengthPlus ->
-            ( { model | storedStrengthPlus = Just True }, Cmd.none )
+            ( { model | calculator = storeStrengthPlus True model.calculator }
+            , Cmd.none
+            )
 
         RaidFriendly ->
-            ( { model | storedFriendly = Just True }, Cmd.none )
+            ( { model | calculator = storeFriendly True model.calculator }
+            , Cmd.none
+            )
 
         ResetInputState ->
             ( clearCalculator model
@@ -557,7 +561,7 @@ saveNewPlot model =
             , plotType = UserPlot
             }
     in
-    case ( model.storedAzimuth, model.storedAzimuthRange ) of
+    case ( model.calculator.storedAzimuth, model.calculator.storedAzimuthRange ) of
         ( Just theta, Just range ) ->
             { model | storedPlots = newPlot range theta :: model.storedPlots }
 
@@ -710,7 +714,10 @@ view model =
                     inputPage model
 
                 CalculatorPage ->
-                    calculatorPage model
+                    Calculator.View.view model.outputDevice model.calculator
+
+                CalculatorInTutorial ->
+                    viewCalculatorInTutorial model
 
                 TrainingPage ->
                     operatorPage model
@@ -769,20 +776,21 @@ navItem model label action pageId =
 
 navBar : Model -> Element Msg
 navBar model =
-        row
-            [ width fill
-            , Background.color paletteDarkGreen
-            --, Border.color paletteSand
-            --, Border.width 2
-            , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
-            , spaceEvenly
-            ]
-            [ navItem model "About" DisplayAboutPage AboutPage
-            , navItem model "Learn & Play" DisplayConfiguration InputPage
-            , navItem model "Receiver" DisplayReceiver OperatorPage
-            , navItem model "Calculator" DisplayCalculator CalculatorPage
-            , navItem model "Map" DisplayMapPage MapPage
-            ]
+    row
+        [ width fill
+        , Background.color paletteDarkGreen
+
+        --, Border.color paletteSand
+        --, Border.width 2
+        , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
+        , spaceEvenly
+        ]
+        [ navItem model "About" DisplayAboutPage AboutPage
+        , navItem model "Learn & Play" DisplayConfiguration InputPage
+        , navItem model "Receiver" DisplayReceiver OperatorPage
+        , navItem model "Calculator" DisplayCalculator CalculatorPage
+        , navItem model "Map" DisplayMapPage MapPage
+        ]
 
 
 
@@ -875,12 +883,6 @@ targetSelector model availableRaidTypes tutorialsDone =
         List.map
             display
             availableRaidTypes
-
-
-calculatorPage : Model -> Element Msg
-calculatorPage model =
-    calculator
-        model
 
 
 inputPageLandscape : Model -> Element Msg

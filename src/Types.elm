@@ -9,6 +9,7 @@ type Page
     = InputPage
     | OperatorPage
     | CalculatorPage
+    | CalculatorInTutorial
     | TrainingPage
     | AboutPage
     | MapPage
@@ -86,15 +87,6 @@ type alias Echo =
     , amplitude : Float
     , tutorial : Bool -- this raid needs to be highlighting in a tutorial.
     }
-
-
-type
-    InputState
-    -- Inferred sequence of operator actions
-    = BearingInput
-    | BearingRangeInput
-    | HeightInput
-    | HeightRangeInput
 
 
 type UiComponent

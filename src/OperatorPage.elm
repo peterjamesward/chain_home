@@ -1,6 +1,7 @@
 module OperatorPage exposing (operatorPage)
 
 import CRT_WebGL exposing (crt)
+import Calculator.View exposing (pressGonioNext)
 import Config exposing (groundRays)
 import Constants exposing (..)
 import Element as E exposing (..)
@@ -244,17 +245,20 @@ modeSwitchPanel model =
         , row (commonStyles ++ explanatoryText model UiOperatorPrompts)
             [ el [ centerX, width <| fillPortion 1 ] <|
                 indicatorLabelBelow "PRESS\nGONIO" <|
-                    (model.inputState == BearingInput)
-                        || (model.inputState == HeightInput)
+                    pressGonioNext model.calculator
             , el [ centerX, width <| fillPortion 1 ] <|
                 indicatorLabelBelow "PRESS\nRANGE" <|
-                    (model.inputState == BearingRangeInput)
-                        || (model.inputState == HeightRangeInput)
+                    not <|
+                        pressGonioNext model.calculator
             ]
         ]
 
 
 raidStrengthPanel model =
+    let
+        strength =
+            model.calculator.storedStrength
+    in
     column
         [ Border.color paletteSand
         , Border.widthEach { edges | left = 1, right = 1, top = 1, bottom = 1 }
@@ -267,24 +271,28 @@ raidStrengthPanel model =
                 , Font.bold
                 , alignRight
                 ]
-                [ raidStrengthButtonLabelLeft "1" (RaidStrength 1) (model.storedStrength == Just 1)
-                , raidStrengthButtonLabelLeft "2" (RaidStrength 2) (model.storedStrength == Just 2)
-                , raidStrengthButtonLabelLeft "3" (RaidStrength 3) (model.storedStrength == Just 3)
-                , raidStrengthButtonLabelLeft "6" (RaidStrength 6) (model.storedStrength == Just 6)
-                , raidStrengthButtonLabelLeft "9" (RaidStrength 9) (model.storedStrength == Just 9)
-                , raidStrengthButtonLabelLeft "12" (RaidStrength 12) (model.storedStrength == Just 12)
+                [ raidStrengthButtonLabelLeft "1" (RaidStrength 1) (strength == Just 1)
+                , raidStrengthButtonLabelLeft "2" (RaidStrength 2) (strength == Just 2)
+                , raidStrengthButtonLabelLeft "3" (RaidStrength 3) (strength == Just 3)
+                , raidStrengthButtonLabelLeft "6" (RaidStrength 6) (strength == Just 6)
+                , raidStrengthButtonLabelLeft "9" (RaidStrength 9) (strength == Just 9)
+                , raidStrengthButtonLabelLeft "12" (RaidStrength 12) (strength == Just 12)
                 ]
             , el [ width (px 30) ] none
             , column
                 [ Font.size 18
                 , Font.bold
                 ]
-                [ raidStrengthButtonLabelRight "18" (RaidStrength 18) (model.storedStrength == Just 18)
+                [ raidStrengthButtonLabelRight "18" (RaidStrength 18) (strength == Just 18)
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
                 , el [ height <| minimum 30 <| px 30 ] <| none
-                , raidStrengthButtonLabelRight "+" RaidStrengthPlus (model.storedStrengthPlus == Just True)
-                , raidStrengthButtonLabelRight "F" RaidFriendly (model.storedFriendly == Just True)
+                , raidStrengthButtonLabelRight "+"
+                    RaidStrengthPlus
+                    (model.calculator.storedStrengthPlus == Just True)
+                , raidStrengthButtonLabelRight "F"
+                    RaidFriendly
+                    (model.calculator.storedFriendly == Just True)
                 ]
             ]
         , row commonStyles
@@ -296,7 +304,7 @@ raidStrengthPanel model =
 operatorPageLandscape model =
     row
         ([ centerX
-        , paddingEach { edges | top = 20 }
+         , paddingEach { edges | top = 20 }
          , tutorialTextBox model
             [ moveUp 100
             , moveLeft 80

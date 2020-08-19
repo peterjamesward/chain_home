@@ -140,7 +140,10 @@ explainModeEnabledForCurrentPage model =
             model.explainModeReceiver
 
         CalculatorPage ->
-            model.explainModeCalculator
+            False
+
+        CalculatorInTutorial ->
+            False
 
         MapPage ->
             model.explainModeMap

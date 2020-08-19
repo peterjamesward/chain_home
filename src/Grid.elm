@@ -5,8 +5,6 @@ module Grid exposing (..)
 -}
 
 import Config exposing (bawdsey)
-import Model exposing (Model)
-import Utils exposing (choose)
 
 
 type alias GridPosition =
@@ -93,59 +91,3 @@ gridPosition range bearing =
 
         ( _, _ ) ->
             Nothing
-
-
-tutorialInterpretCalculator : Model -> String
-tutorialInterpretCalculator model =
-    let
-        gridPos =
-            gridPosition model.storedAzimuthRange model.storedAzimuth
-
-        letter =
-            letterFromGrid gridPos
-
-        twoDigits x =
-            String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
-    in
-    "The calculator display tells us the raid is at grid position "
-        ++ (case ( gridPos, letter ) of
-                ( Just grid, Just g ) ->
-                    g
-                        ++ twoDigits grid.gridSquareOffsetEast
-                        ++ twoDigits grid.gridSquareOffsetNorth
-
-                _ ->
-                    "unknown"
-           )
-        ++ ", height "
-        ++ (case model.storedElevation of
-                Just h ->
-                    if h >= 1 then
-                    (String.fromInt <| truncate h)
-                        ++ ",000 ft" else "below 1000 ft"
-
-                Nothing ->
-                    "unknown"
-           )
-        ++ ", strength "
-        ++ (case model.storedStrengthPlus of
-                Just True ->
-                    "more than "
-
-                _ ->
-                    ""
-           )
-        ++ (case model.storedStrength of
-                Just n ->
-                    String.fromInt n
-
-                _ ->
-                    " unknown"
-           )
-        ++ (case model.storedFriendly of
-                Just True ->
-                    ", friendly."
-
-                _ ->
-                    "."
-           )
