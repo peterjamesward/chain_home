@@ -1,4 +1,4 @@
-module Calculator.View exposing (interpretCalculator, view, pressGonioNext)
+module Calculator.View exposing (interpretCalculator, pressGonioNext, view)
 
 {-
    Mimic the output panel for the electronic calculator.
@@ -7,12 +7,11 @@ module Calculator.View exposing (interpretCalculator, view, pressGonioNext)
 import Calculator.Model exposing (InputState(..), Model)
 import Constants exposing (..)
 import Element exposing (..)
-import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Grid exposing (GridPosition, gridLettersList, gridPosition, letterFromGrid)
 import Messages exposing (Msg)
-import Utils exposing (choose, disableSelection, edges, helpButton)
+import Utils exposing (choose, disableSelection, edges, helpButton, showExplanation)
 
 
 withBorders widget =
@@ -60,7 +59,7 @@ calculatorLandscape withExplanations model =
     column
         [ centerX, centerY, moveDown 50 ]
         [ row [ spacing 10, padding 5, width fill ]
-            [ positionGridDisplay withExplanations model position
+            [ positionGridDisplay withExplanations position
             , column [ spacing 10, alignLeft ]
                 [ withBorders <|
                     row
@@ -68,7 +67,7 @@ calculatorLandscape withExplanations model =
                         , spacing 10
                         , width fill
                         ]
-                        [ strengthDisplay withExplanations model strength
+                        [ strengthDisplay withExplanations strength
                         , maybeBoolDisplay "+" plus
                         , maybeBoolDisplay "F" friendly
                         , column []
@@ -76,7 +75,7 @@ calculatorLandscape withExplanations model =
                             , none
                             ]
                         ]
-                , heightGrid withExplanations model height
+                , heightGrid withExplanations height
                 ]
             , el [ width (px 40) ] none
             , helpButton
@@ -122,7 +121,6 @@ calculatorPortrait withExplanations model =
         ]
         [ row [ centerX ]
             [ positionGridDisplay withExplanations
-                model
                 position
             , helpButton
             ]
@@ -134,42 +132,12 @@ calculatorPortrait withExplanations model =
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
         , row [ centerX ]
-            [ strengthDisplay withExplanations model strength
+            [ strengthDisplay withExplanations strength
             , maybeBoolDisplay "+" plus
             , maybeBoolDisplay "F" friendly
             ]
-        , heightGrid withExplanations model height
+        , heightGrid withExplanations height
         ]
-
-
-
---TODO: This now duplicates code from TrainingMode.
-
-
-showExplanation visible uiComponentDescription =
-    if visible then
-        [ inFront <|
-            el
-                [ centerX
-                , centerY
-                , Background.color blue
-                , Border.color white
-                , Border.width 1
-                , Border.rounded 5
-                ]
-            <|
-                paragraph
-                    [ spacing 1
-                    , Font.size 16
-                    , Font.family [ Font.typeface "Helvetica" ]
-                    , Font.color white
-                    , padding 5
-                    ]
-                    [ text uiComponentDescription ]
-        ]
-
-    else
-        []
 
 
 bulbSize =
@@ -196,8 +164,8 @@ buttonStyle enabled colour =
         ++ disableSelection
 
 
-positionGridDisplay : Bool -> Model -> Maybe GridPosition -> Element Msg
-positionGridDisplay withExplanations model position =
+positionGridDisplay : Bool -> Maybe GridPosition -> Element Msg
+positionGridDisplay withExplanations position =
     let
         thisIsTheSquare e n =
             case position of
@@ -236,8 +204,8 @@ positionGridDisplay withExplanations model position =
                 gridLettersList
 
 
-strengthDisplay : Bool -> Model -> Maybe Int -> Element Msg
-strengthDisplay withExplanations model strength =
+strengthDisplay : Bool -> Maybe Int -> Element Msg
+strengthDisplay withExplanations strength =
     let
         thisIsTheSquare n =
             case strength of
@@ -283,8 +251,8 @@ maybeBoolDisplay label b =
         (text label)
 
 
-heightGrid : Bool -> Model -> Maybe Float -> Element Msg
-heightGrid withExplanations model storedHeight =
+heightGrid : Bool -> Maybe Float -> Element Msg
+heightGrid withExplanations storedHeight =
     let
         theRightHeight low high =
             case storedHeight of
@@ -456,4 +424,3 @@ pressGonioNext : Model -> Bool
 pressGonioNext model =
     (model.inputState == BearingInput)
         || (model.inputState == HeightInput)
-

@@ -153,3 +153,29 @@ explainModeEnabledForCurrentPage model =
 
         AboutPage ->
             False
+
+
+showExplanation visible uiComponentDescription =
+    if visible then
+        [ inFront <|
+            el
+                [ centerX
+                , centerY
+                , Background.color blue
+                , Border.color white
+                , Border.width 1
+                , Border.rounded 5
+                ]
+            <|
+                paragraph
+                    [ spacing 1
+                    , Font.size 16
+                    , Font.family [ Font.typeface "Helvetica" ]
+                    , Font.color white
+                    , padding 5
+                    ]
+                    [ text uiComponentDescription ]
+        ]
+
+    else
+        []
