@@ -6,12 +6,13 @@ module CalculatorDisplay exposing (calculator)
 
 import Constants exposing (..)
 import Element exposing (..)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Grid exposing (GridPosition, gridLettersList, gridPosition)
 import Messages exposing (Msg)
 import Model exposing (Model)
-import TrainingMode exposing (explanatoryText, tutorialTextBox)
+import TrainingMode exposing (lookupUiExplanation, tutorialTextBox)
 import Types exposing (UiComponent(..))
 import Utils exposing (choose, disableSelection, edges, helpButton)
 
@@ -26,16 +27,20 @@ withBorders widget =
 
 calculator : Model -> Element Msg
 calculator model =
+    let
+        withExplanations =
+            model.explainModeCalculator
+    in
     case model.outputDevice.orientation of
         Landscape ->
-            calculatorLandscape model
+            calculatorLandscape withExplanations model
 
         Portrait ->
-            calculatorPortrait model
+            calculatorPortrait withExplanations model
 
 
-calculatorLandscape : Model -> Element Msg
-calculatorLandscape model =
+calculatorLandscape : Bool -> Model -> Element Msg
+calculatorLandscape withExplanations model =
     let
         position =
             gridPosition range bearing
@@ -61,7 +66,7 @@ calculatorLandscape model =
     column
         [ centerX, centerY, moveDown 50 ]
         [ row [ spacing 10, padding 5, width fill ]
-            [ positionGridDisplay model position
+            [ positionGridDisplay withExplanations model position
             , column [ spacing 10, alignLeft ]
                 [ withBorders <|
                     row
@@ -69,7 +74,7 @@ calculatorLandscape model =
                         , spacing 10
                         , width fill
                         ]
-                        [ strengthDisplay model strength
+                        [ strengthDisplay withExplanations model strength
                         , maybeBoolDisplay "+" plus
                         , maybeBoolDisplay "F" friendly
                         , column []
@@ -77,12 +82,12 @@ calculatorLandscape model =
                             , none
                             ]
                         ]
-                , heightGrid model height
+                , heightGrid withExplanations model height
                 ]
-            , el [ width (px 40)] none
+            , el [ width (px 40) ] none
             , helpButton
             ]
-        , el (explanatoryText model UiCalcOffset) <|
+        , el (showExplanation withExplanations UiCalcOffset) <|
             row
                 [ Border.color lightCharcoal
                 , Border.width 1
@@ -98,8 +103,8 @@ calculatorLandscape model =
         ]
 
 
-calculatorPortrait : Model -> Element Msg
-calculatorPortrait model =
+calculatorPortrait : Bool -> Model -> Element Msg
+calculatorPortrait withExplanations model =
     let
         position =
             gridPosition range bearing
@@ -130,25 +135,56 @@ calculatorPortrait model =
             , centerX
             ]
          ]
-            ++ explanatoryText model UiCalculator
+            ++ showExplanation withExplanations UiCalculator
         )
         [ row [ centerX ]
-            [ positionGridDisplay model
+            [ positionGridDisplay withExplanations model
                 position
             , helpButton
             ]
         , column
-            (explanatoryText model UiCalcOffset ++ [ centerX ])
+            (showExplanation withExplanations UiCalcOffset ++ [ centerX ])
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
         , row [ centerX ]
-            [ strengthDisplay model strength
+            [ strengthDisplay withExplanations model strength
             , maybeBoolDisplay "+" plus
             , maybeBoolDisplay "F" friendly
             ]
-        , heightGrid model height
+        , heightGrid withExplanations model height
         ]
+
+
+showExplanation visible uiComponent =
+    let
+        uiComponentDescription =
+            lookupUiExplanation uiComponent
+    in
+    case ( visible, uiComponentDescription ) of
+        ( True, Just txt ) ->
+            [ inFront <|
+                el
+                    [ centerX
+                    , centerY
+                    , Background.color blue
+                    , Border.color white
+                    , Border.width 1
+                    , Border.rounded 5
+                    ]
+                <|
+                    paragraph
+                        [ spacing 1
+                        , Font.size 16
+                        , Font.family [ Font.typeface "Helvetica" ]
+                        , Font.color white
+                        , padding 5
+                        ]
+                        [ text txt ]
+            ]
+
+        _ ->
+            []
 
 
 bulbSize =
@@ -175,8 +211,8 @@ buttonStyle enabled colour =
         ++ disableSelection
 
 
-positionGridDisplay : Model -> Maybe GridPosition -> Element Msg
-positionGridDisplay model position =
+positionGridDisplay : Bool -> Model -> Maybe GridPosition -> Element Msg
+positionGridDisplay withExplanations model position =
     let
         thisIsTheSquare e n =
             case position of
@@ -201,7 +237,7 @@ positionGridDisplay model position =
                     (List.range -3 3)
                     letters
     in
-    el (explanatoryText model UiCalcGrid) <|
+    el (showExplanation withExplanations UiCalcGrid) <|
         column
             [ centerX
             , padding 10
@@ -215,8 +251,8 @@ positionGridDisplay model position =
                 gridLettersList
 
 
-strengthDisplay : Model -> Maybe Int -> Element Msg
-strengthDisplay model strength =
+strengthDisplay : Bool -> Model -> Maybe Int -> Element Msg
+strengthDisplay withExplanations model strength =
     let
         thisIsTheSquare n =
             case strength of
@@ -233,7 +269,7 @@ strengthDisplay model strength =
                 )
                 (text label)
     in
-    el (explanatoryText model UiCalcStrength) <|
+    el (showExplanation withExplanations UiCalcStrength) <|
         row
             [ spacing 20
             , paddingEach { edges | left = 10 }
@@ -262,8 +298,8 @@ maybeBoolDisplay label b =
         (text label)
 
 
-heightGrid : Model -> Maybe Float -> Element Msg
-heightGrid model storedHeight =
+heightGrid : Bool -> Model -> Maybe Float -> Element Msg
+heightGrid withExplanations model storedHeight =
     let
         theRightHeight low high =
             case storedHeight of
@@ -286,7 +322,7 @@ heightGrid model storedHeight =
                 [ text label ]
     in
     -- Height is in '000 feet, sourced from config data!
-    el (width fill :: explanatoryText model UiCalcHeight) <|
+    el (width fill :: showExplanation withExplanations UiCalcHeight) <|
         column
             [ width fill
             , padding 20
