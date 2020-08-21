@@ -26,14 +26,14 @@ import Html.Attributes exposing (style)
 import Json.Decode as D exposing (..)
 import Keys exposing (Keys, noKeys, updateKeys)
 import LobeFunctions exposing (..)
-import MapPage exposing (mapPage)
+import Map.View exposing (mapPage)
 import Messages exposing (..)
 import Model exposing (..)
-import OperatorPage exposing (operatorPage, operatorPageWithTutorial)
 import Platform.Cmd exposing (Cmd)
 import Random
 import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
+import Receiver.OperatorPage exposing (operatorPage, operatorPageWithTutorial)
 import Spherical exposing (newPosition)
 import Station exposing (..)
 import Target exposing (..)
@@ -41,7 +41,9 @@ import Task
 import Time
 import Tutorials.ActionCodes exposing (TutorialScenario(..))
 import Tutorials.Actions exposing (..)
-import Tutorials.Tutorials exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialStartScenario)
+import Tutorials.Messages exposing (TutorialMsg(..))
+import Tutorials.Tutorials exposing (tutorialAutomation)
+import Tutorials.Update
 import Tutorials.Views exposing (viewCalculatorInTutorial)
 import Types exposing (..)
 import Utils exposing (..)
@@ -349,28 +351,10 @@ update msg model =
             , Cmd.none
             )
 
-        DisplayTraining scenario ->
+        TutorialMsg tutMsg ->
             let
                 ( ts, acts ) =
-                    tutorialStartScenario scenario
-            in
-            ( applyTutorialActions acts { model | tutorialActive = ts }
-            , Cmd.none
-            )
-
-        TutorialAdvance ->
-            let
-                ( ts, acts ) =
-                    advanceTutorial model.tutorialActive
-            in
-            ( applyTutorialActions acts { model | tutorialActive = ts }
-            , Cmd.none
-            )
-
-        TutorialBack ->
-            let
-                ( ts, acts ) =
-                    goBackInTutorial model.tutorialActive
+                    Tutorials.Update.update tutMsg model.tutorialActive
             in
             ( applyTutorialActions acts { model | tutorialActive = ts }
             , Cmd.none
@@ -886,7 +870,7 @@ targetSelector model availableRaidTypes tutorialsDone =
                 ]
                 [ Input.button
                     (buttonStyle g.id)
-                    { onPress = Just <| DisplayTraining g.id
+                    { onPress = Just <| TutorialMsg (DisplayTraining g.id)
                     , label = text g.description
                     }
                 , Input.checkbox

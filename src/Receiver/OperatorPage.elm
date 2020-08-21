@@ -1,4 +1,4 @@
-module OperatorPage exposing (operatorPage, operatorPageWithTutorial)
+module Receiver.OperatorPage exposing (operatorPage, operatorPageWithTutorial)
 
 import CRT_WebGL exposing (crt)
 import Calculator.View exposing (pressGonioNext)

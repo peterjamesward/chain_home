@@ -1,4 +1,4 @@
-module MapPage exposing (..)
+module Map.View exposing (..)
 
 {-
    This will display actual tracks of raids and the user's plots.
@@ -12,7 +12,6 @@ import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Grid exposing (mapGridLettersList)
 import Html.Attributes as H exposing (style)
 import Messages exposing (Msg(..))
 import Model exposing (Model)

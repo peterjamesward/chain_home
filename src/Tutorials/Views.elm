@@ -13,6 +13,7 @@ import Element.Font as Font
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Tutorials.ActionCodes exposing (TutorialTextFunction(..))
+import Tutorials.Messages exposing (TutorialMsg(..))
 import Zipper
 
 
@@ -75,7 +76,7 @@ tutorialControls someText =
     el tutorialControlHolderStyles <|
         row
             [ width fill, centerY ]
-            [ el [ onClick TutorialBack, pointer ] <| text "◀︎"
+            [ el [ onClick (TutorialMsg TutorialBack), pointer ] <| text "◀︎"
             , paragraph
                 [ Background.color blue
                 , spacing 4
@@ -83,7 +84,7 @@ tutorialControls someText =
                 , Font.size 16
                 ]
                 [ text someText ]
-            , el [ onClick TutorialAdvance, alignRight, pointer ] <|
+            , el [ onClick (TutorialMsg TutorialAdvance), alignRight, pointer ] <|
                 text "▶︎"
             ]
 

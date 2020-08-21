@@ -380,11 +380,8 @@ interpretCalculator model =
            )
 
 
-
--- State readouts that we need on the main receiver page.
-
-
 pressGonioNext : Model -> Bool
 pressGonioNext model =
+    -- Support readouts that we need on the main receiver page.
     (model.inputState == BearingInput)
         || (model.inputState == HeightInput)

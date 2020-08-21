@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Time exposing (..)
 import Tutorials.ActionCodes exposing (TutorialScenario)
+import Tutorials.Messages exposing (TutorialMsg)
 import Types exposing (..)
 
 
@@ -15,7 +16,6 @@ type Msg
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
-    | DisplayTraining TutorialScenario
     | DisplayAboutPage
     | DisplayMapPage
     | KeyChanged Bool String
@@ -36,10 +36,9 @@ type Msg
     | RaidStrength Int
     | RaidStrengthPlus
     | RaidFriendly
-    | TutorialAdvance
     | ExplainModeToggle
-    | TutorialBack
-    | RandomRaidGenerated (Float, Float)
+    | RandomRaidGenerated ( Float, Float )
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
     | ToggleMenu Bool
+    | TutorialMsg TutorialMsg
