@@ -19,7 +19,7 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import Types exposing (PlotType(..), RecordedPlot)
-import Utils exposing (edges, helpButton, imageLocation, motorwaySign)
+import Utils exposing (edges, helpButton, imageLocation, showExplanation)
 
 
 squareSize =
@@ -53,11 +53,12 @@ mapPageLandscape model =
         ]
         [ theMap model
         , column
-            [ Element.spacing 50
-            , inFront <| motorwaySign model explainMapPage
-            , alignTop
-            , moveDown 100
-            ]
+            ([ Element.spacing 50
+             , alignTop
+             , moveDown 100
+             ]
+                ++ showExplanation model.explainModeMap explainMapPage
+            )
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             ]
@@ -65,7 +66,7 @@ mapPageLandscape model =
         ]
 
 
-mapPagePortrait : Model -> Element Msg
+mapPagePortrait : Model.Model -> Element Msg
 mapPagePortrait model =
     column
         [ centerX
@@ -74,17 +75,19 @@ mapPagePortrait model =
         , Element.spacing 20
         , Element.width Element.fill
         ]
-        [ row [ Element.width Element.fill ]
+        [ row
+            ([ Element.width Element.fill ]
+                ++ showExplanation model.explainModeMap explainMapPage
+            )
             [ theMap model
             , helpButton
             ]
         , checkBoxShowActualTrace model.actualTraceVisibleOnMap
         , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-        , motorwaySign model explainMapPage
         ]
 
 
-mapPage : Model -> Element Msg
+mapPage : Model.Model -> Element Msg
 mapPage model =
     case model.outputDevice.orientation of
         Landscape ->

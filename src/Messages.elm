@@ -1,6 +1,7 @@
 module Messages exposing (..)
 
 import Time exposing (..)
+import Tutorials.ActionCodes exposing (TutorialScenario)
 import Types exposing (..)
 
 

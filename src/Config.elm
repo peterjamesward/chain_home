@@ -2,24 +2,8 @@ module Config exposing (..)
 
 import Station exposing (Station)
 import Target exposing (targetFromProforma)
-import Types exposing (Echo, Target, TargetProforma, TutorialScenario(..))
+import Types exposing (Echo, Target, TargetProforma)
 
-
-type alias TargetSelector =
-    { id : TutorialScenario
-    , active : Bool -- Whether this group is active (dynamic)
-    , description : String -- e.g. "mass raid"
-    }
-
-
-availableTargetOptions : List TargetSelector
-availableTargetOptions =
-    [ TargetSelector ScenarioBasic False "One aircraft"
-    , TargetSelector ScenarioTwoTogether False "Two aircraft in close formation"
-    , TargetSelector ScenarioTwoSeparate False "Two aircraft at the same range"
-    , TargetSelector ScenarioThreeToSix False "Three to six planes in formation"
-    , TargetSelector ScenarioFriendly False "A friendly aircraft with IFF"
-    ]
 
 
 groundRays : List Echo

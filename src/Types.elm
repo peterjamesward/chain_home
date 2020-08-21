@@ -117,45 +117,11 @@ type UiComponent
     | UiDummy
 
 
-type TutorialScenario
-    = ScenarioBasic
-    | ScenarioTwoTogether
-    | ScenarioTwoSeparate
-    | ScenarioThreeToSix
-    | ScenarioFriendly
-
-
 type GameMode
     = GameSingleRaid
     | GameThreeRaids
     | GameUnlimited
     | GameNone
-
-
-type TutorialStep
-    = TutorialWelcome
-    | TutorialIncomingRaid
-    | TutorialAdjustRange
-    | TutorialFindBearing
-    | TutorialFindBearingPlaneA
-    | TutorialFindBearingPlaneB
-    | TutorialStoreBearing
-    | TutorialStoreRange1 -- relates to bearing
-    | TutorialHeightMode
-    | TutorialLeaveHeightMode
-    | TutorialFindElevation
-    | TutorialStoreElevation
-    | TutorialAdjustRangeForHeight
-    | TutorialStoreRange2 -- relates to height
-    | TutorialStoreStrength
-    | TutorialShowCalculator
-    | TutorialShowCalculator2
-    | TutorialEnded -- last thing we show
-    | TutorialDummy -- not shown, if it occurs.
-    | TutorialIntroduceTheTube
-    | TutorialJustSwinging
-    | TutorialIntroduceTheTube2
-    | TutorialIntroduceGonio
 
 
 type PlotType

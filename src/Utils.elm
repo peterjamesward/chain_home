@@ -7,10 +7,7 @@ import Element.Border as Border exposing (..)
 import Element.Events exposing (onClick)
 import Element.Font as Font exposing (..)
 import Html.Attributes exposing (class, style)
-import Markdown exposing (defaultOptions)
 import Messages exposing (Msg(..))
-import Model exposing (Model)
-import Types exposing (Page(..))
 
 
 imageLocation =
@@ -100,62 +97,6 @@ helpButton =
         ]
     <|
         text "?"
-
-
-motorwaySign : Model -> String -> Element msg
-motorwaySign model frontText =
-    -- This is a sign that always occupies space but is only visible in explain mode.
-    let
-        shared =
-            [ Background.color blue
-            , Font.color white
-            , Border.color white
-            , Border.width 2
-            , Border.rounded 5
-            , spacing 4
-            , padding 10
-            , Font.size 18
-            , centerY
-            ]
-    in
-    if explainModeEnabledForCurrentPage model then
-        paragraph shared <|
-            [ html <|
-                Markdown.toHtmlWith { defaultOptions | smartypants = True }
-                    [ class "content" ]
-                    frontText
-            ]
-
-    else
-        none
-
-
-explainModeEnabledForCurrentPage : Model -> Bool
-explainModeEnabledForCurrentPage model =
-    case model.currPage of
-        InputPage ->
-            model.explainModeMenu
-
-        OperatorPage ->
-            model.explainModeReceiver
-
-        OperatorPageInTutorial ->
-            False
-
-        CalculatorPage ->
-            False
-
-        CalculatorInTutorial ->
-            False
-
-        MapPage ->
-            model.explainModeMap
-
-        TrainingPage ->
-            False
-
-        AboutPage ->
-            False
 
 
 showExplanation visible uiComponentDescription =

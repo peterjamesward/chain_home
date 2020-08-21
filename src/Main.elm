@@ -9,7 +9,7 @@ import AboutPage exposing (aboutPage)
 import Attr exposing (..)
 import Browser
 import Browser.Events exposing (..)
-import Calculator.Model exposing (InputState(..), setInputState, storeAzimuth, storeAzimuthRange, storeElevation, storeElevationRange, storeFriendly, storeStrength, storeStrengthPlus, toggleExplainMode)
+import Calculator.Model as Calculator exposing (..)
 import Calculator.View
 import Config exposing (..)
 import Constants exposing (..)
@@ -39,12 +39,15 @@ import Station exposing (..)
 import Target exposing (..)
 import Task
 import Time
-import TrainingMode exposing (..)
+import Tutorials.ActionCodes exposing (TutorialScenario(..))
+import Tutorials.Actions exposing (..)
+import Tutorials.Tutorials exposing (advanceTutorial, exitTutorial, goBackInTutorial, tutorialAutomation, tutorialStartScenario)
+import Tutorials.Views exposing (viewCalculatorInTutorial)
 import Types exposing (..)
 import Utils exposing (..)
 
 
-init : Flags -> ( Model, Cmd Msg )
+init : Flags -> ( Model.Model, Cmd Msg )
 init _ =
     ( { currPage = AboutPage
       , webGLtime = 0.0
@@ -72,8 +75,7 @@ init _ =
       , reflector = False
       , receiveAB = True
       , receiveAntenna = receiveHigh
-      , tutorialStage = Nothing
-      , tutorialScenario = Nothing
+      , tutorialActive = Nothing
       , explainModeMenu = False
       , explainModeReceiver = False
       , explainModeMap = False
@@ -85,7 +87,7 @@ init _ =
       , rangeCircleVisibleOnMap = False
       , gameMode = GameNone
       , isMenuOpen = False
-      , calculator = Calculator.Model.init
+      , calculator = Calculator.init
       }
     , Task.perform SetStartTime Time.now
     )
@@ -124,7 +126,7 @@ slideRangeSlider range keys =
             range
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Model.Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Time.every 40 UpdateModel
@@ -148,7 +150,7 @@ applyReceiver antenna rawEchoes =
         rawEchoes
 
 
-deriveModelAtTime : Model -> Int -> Model
+deriveModelAtTime : Model.Model -> Int -> Model.Model
 deriveModelAtTime model timeNow =
     let
         targetsNow =
@@ -190,33 +192,42 @@ deriveModelAtTime model timeNow =
         newRangeKnobPosition =
             -- Map 0..100 onto -pi..+pi
             (newRangeSliderPosition - 50) * degrees 175 / 50
+
+        ( newTutorialState, actionCodeList ) =
+            tutorialAutomation model.tutorialActive
+
+        postTutorialModel =
+            applyTutorialActions actionCodeList preTutorialModel
+
+        preTutorialModel =
+            { model
+                | modelTime = timeNow
+                , targets = targetsNow
+                , inRangeTargets = inRangeTargets
+                , echoes = echoSignals
+                , gonioOutput = gonioOutput
+                , azimuthModeTrace = gonioOutput
+                , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
+                , rangeSlider = newRangeSliderPosition
+                , rangeKnobAngle = newRangeKnobPosition
+                , elevation_A_trace = heightMode_A_Outputs
+                , elevation_B_trace = heightMode_B_Outputs
+            }
     in
-    tutorialAutomation
-        { model
-            | modelTime = timeNow
-            , targets = targetsNow
-            , inRangeTargets = inRangeTargets
-            , echoes = echoSignals
-            , gonioOutput = gonioOutput
-            , azimuthModeTrace = gonioOutput
-            , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
-            , rangeSlider = newRangeSliderPosition
-            , rangeKnobAngle = newRangeKnobPosition
-            , elevation_A_trace = heightMode_A_Outputs
-            , elevation_B_trace = heightMode_B_Outputs
-        }
+    --Wrapping this in automation allows the Tutorials to do anything.
+    { postTutorialModel | tutorialActive = newTutorialState }
 
 
-clearHistory : Model -> Model
+clearHistory : Model.Model -> Model.Model
 clearHistory model =
     { model | storedPlots = [] }
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
 update msg model =
     let
         cleanModel =
-            model |> exitTutorial |> clearTargets |> clearCalculator |> clearHistory
+            model |> actionExitAction |> actionClearTargets |> actionClearCalculator |> clearHistory
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
@@ -322,11 +333,6 @@ update msg model =
             , Cmd.none
             )
 
-        DisplayTraining scenario ->
-            ( tutorialStartScenario scenario model
-            , Cmd.none
-            )
-
         DisplayAboutPage ->
             ( { model
                 | currPage = AboutPage
@@ -343,13 +349,30 @@ update msg model =
             , Cmd.none
             )
 
+        DisplayTraining scenario ->
+            let
+                ( ts, acts ) =
+                    tutorialStartScenario scenario
+            in
+            ( applyTutorialActions acts { model | tutorialActive = ts }
+            , Cmd.none
+            )
+
         TutorialAdvance ->
-            ( advanceTutorial model
+            let
+                ( ts, acts ) =
+                    advanceTutorial model.tutorialActive
+            in
+            ( applyTutorialActions acts { model | tutorialActive = ts }
             , Cmd.none
             )
 
         TutorialBack ->
-            ( goBackInTutorial model
+            let
+                ( ts, acts ) =
+                    goBackInTutorial model.tutorialActive
+            in
+            ( applyTutorialActions acts { model | tutorialActive = ts }
             , Cmd.none
             )
 
@@ -527,7 +550,7 @@ update msg model =
             )
 
         ResetInputState ->
-            ( clearCalculator model
+            ( actionClearCalculator model
             , Cmd.none
             )
 
@@ -550,7 +573,7 @@ update msg model =
             ( model, Cmd.none )
 
 
-saveNewPlot : Model -> Model
+saveNewPlot : Model.Model -> Model.Model
 saveNewPlot model =
     -- After RANGE is stored, if we have bearing and range, add to history.
     -- Note that the stored value is in km, here we convert to meters.
@@ -570,7 +593,7 @@ saveNewPlot model =
             model
 
 
-setNextRandomRaidTime : Model -> Model
+setNextRandomRaidTime : Model.Model -> Model.Model
 setNextRandomRaidTime model =
     -- If there are raids remaining for our current level, line the next one up here.
     let
@@ -601,7 +624,7 @@ setNextRandomRaidTime model =
             scheduleRaid
 
 
-makeNewTarget : ( Float, Float ) -> Model -> Model
+makeNewTarget : ( Float, Float ) -> Model.Model -> Model.Model
 makeNewTarget ( bearing, height ) model =
     -- Create raids along a line of longitude about 100 miles away.
     -- This assumes 90degE line of shoot!
@@ -703,7 +726,7 @@ selectTransmitAntenna ab reflect =
             transmitBNoReflect
 
 
-view : Model -> Browser.Document Msg
+view : Model.Model -> Browser.Document Msg
 view model =
     let
         content =
@@ -778,7 +801,7 @@ navItem model label action pageId =
         text label
 
 
-navBar : Model -> Element Msg
+navBar : Model.Model -> Element Msg
 navBar model =
     row
         [ width fill
@@ -808,7 +831,7 @@ setConfig selector newState =
     SetConfigStateMsg selector.id newState
 
 
-setTutorialCompletedState : TutorialScenario -> Bool -> Model -> Model
+setTutorialCompletedState : TutorialScenario -> Bool -> Model.Model -> Model.Model
 setTutorialCompletedState scenario state model =
     { model
         | tutorialsCompleted =
@@ -824,7 +847,7 @@ setTutorialCompletedState scenario state model =
     }
 
 
-targetSelector : Model -> List TargetSelector -> List TutorialScenario -> Element Msg
+targetSelector : Model.Model -> List TargetSelector -> List TutorialScenario -> Element Msg
 targetSelector model availableRaidTypes tutorialsDone =
     let
         tutorialScenarioDone scenario =
@@ -889,7 +912,7 @@ targetSelector model availableRaidTypes tutorialsDone =
             availableRaidTypes
 
 
-inputPageLandscape : Model -> Element Msg
+inputPageLandscape : Model.Model -> Element Msg
 inputPageLandscape model =
     let
         tutorialDone =
@@ -971,7 +994,7 @@ inputPageLandscape model =
         ]
 
 
-inputPagePortrait : Model -> Element Msg
+inputPagePortrait : Model.Model -> Element Msg
 inputPagePortrait model =
     column
         [ E.width fill
@@ -984,8 +1007,10 @@ inputPagePortrait model =
             model.activeConfigurations
             model.tutorialsCompleted
         , el
-            [ width fill ]
-            (motorwaySign model explainPlayLevels)
+            (width fill
+                :: showExplanation model.explainModeMenu explainPlayLevels
+            )
+            (text "Hello world.")
         , Input.button
             (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
             { onPress = Just (StartScenario GameSingleRaid)
@@ -1013,7 +1038,7 @@ inputPage model =
             inputPagePortrait model
 
 
-main : Program Flags Model Msg
+main : Program Flags Model.Model Msg
 main =
     Browser.document
         { init = init
@@ -1047,6 +1072,6 @@ where the raid is heading. You will be able to see how you perform by looking at
     """
 
 
-recordCurrentTargetPositions : Model -> Model
+recordCurrentTargetPositions : Model.Model -> Model.Model
 recordCurrentTargetPositions model =
     { model | targets = List.map (recordCurrentTargetPosition model.modelTime) model.targets }
