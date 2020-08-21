@@ -254,7 +254,7 @@ actionShowCalculator model =
 
 actionShowOperator : Model -> Model
 actionShowOperator model =
-    { model | currPage = OperatorPage }
+    { model | currPage = OperatorPageInTutorial }
 
 
 actionExitAction : Model -> Model

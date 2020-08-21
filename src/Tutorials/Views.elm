@@ -57,7 +57,6 @@ tutorialTextBox model adjustments =
 
 viewCalculatorInTutorial : Model -> Element Msg
 viewCalculatorInTutorial model =
-    --TODO: This probably should not be here.
     let
         rawPage =
             Calculator.View.view model.outputDevice model.calculator
