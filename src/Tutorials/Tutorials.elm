@@ -199,7 +199,7 @@ tutorialBasic =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """The GONIO setting is stored, this allows the calculator to work out the elevation. """
+                """The GONIO setting is stored to work out the elevation."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -325,7 +325,7 @@ tutorial2SameBearing =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """The GONIO setting is stored, this gives the elevation."""
+                """The GONIO setting is stored to work out the elevation."""
             )
         , TutorialEntry
             UiRangeKnob
