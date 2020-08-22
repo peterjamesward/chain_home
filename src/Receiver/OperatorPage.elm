@@ -248,7 +248,15 @@ modeSwitchPanel tutorialSubject model =
             [ el ([ centerX, width <| fillPortion 1 ] ++ highlightTutorialSubject tutorialSubject UiSense) <|
                 actionButtonLabelAboveWithIndicator "SENSE" model.reflector (EnableReflector (not model.reflector))
             , el ([ centerX, width <| fillPortion 1 ] ++ highlightTutorialSubject tutorialSubject UiHeight) <|
-                actionButtonLabelAbove "HEIGHT" (SelectGoniometerMode (model.goniometerMode == Elevation))
+                actionButtonLabelAbove "HEIGHT" <|
+                    SelectGoniometerMode
+                        (case model.goniometerMode of
+                            Elevation ->
+                                Azimuth
+
+                            Azimuth ->
+                                Elevation
+                        )
             ]
         , row (commonStyles ++ highlightTutorialSubject tutorialSubject UiOperatorPrompts)
             [ el [ centerX, width <| fillPortion 1 ] <|

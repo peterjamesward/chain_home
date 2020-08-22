@@ -85,11 +85,11 @@ init _ =
       , newRaid = Nothing
       , timeForNextRaid = Nothing
       , storedPlots = []
-      , actualTraceVisibleOnMap = False
-      , rangeCircleVisibleOnMap = False
       , gameMode = GameNone
       , isMenuOpen = False
       , calculator = Calculator.init
+      , actualTraceVisibleOnMap = False
+      , rangeCircleVisibleOnMap = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -465,8 +465,17 @@ update msg model =
 
         SelectGoniometerMode mode ->
             ( { model
-                | goniometerMode = choose mode Azimuth Elevation
-                , calculator = setInputState (choose mode BearingInput HeightInput) model.calculator
+                | goniometerMode = mode
+                , calculator =
+                    setInputState
+                        (case mode of
+                            Azimuth ->
+                                BearingInput
+
+                            Elevation ->
+                                HeightInput
+                        )
+                        model.calculator
               }
             , Cmd.none
             )
@@ -474,23 +483,22 @@ update msg model =
         --TODO: Perhaps these should be Calculator Messages.
         StoreGoniometerSetting ->
             -- TODO: This breaks calc interface (like it's not already).
-            ( case model.calculator.inputState of
-                BearingInput ->
-                    { model
-                        | calculator =
+            ( { model
+                | calculator =
+                    case model.calculator.inputState of
+                        BearingInput ->
                             storeAzimuth (model.goniometerAzimuth + model.station.lineOfShoot) <|
-                                setInputState BearingRangeInput model.calculator
-                    }
+                                setInputState BearingRangeInput <|
+                                    model.calculator
 
-                HeightInput ->
-                    { model
-                        | calculator =
+                        HeightInput ->
                             storeElevation (findTargetHeight model.targets model.rangeSlider) <|
-                                setInputState HeightRangeInput model.calculator
-                    }
+                                setInputState HeightRangeInput <|
+                                    model.calculator
 
-                _ ->
-                    model
+                        _ ->
+                            model.calculator
+              }
             , Cmd.none
             )
 
@@ -831,8 +839,8 @@ setTutorialCompletedState scenario state model =
     }
 
 
-targetSelector : Model.Model -> List TargetSelector -> List TutorialScenario -> Element Msg
-targetSelector model availableRaidTypes tutorialsDone =
+targetSelector : List TargetSelector -> List TutorialScenario -> Element Msg
+targetSelector availableRaidTypes tutorialsDone =
     let
         tutorialScenarioDone scenario =
             List.member scenario tutorialsDone
@@ -941,7 +949,7 @@ inputPageLandscape model =
                 , centerX
                 ]
                 [ text "Tutorials" ]
-            , targetSelector model model.activeConfigurations model.tutorialsCompleted
+            , targetSelector model.activeConfigurations model.tutorialsCompleted
             ]
         , column
             ([ padding 20
@@ -987,7 +995,7 @@ inputPagePortrait model =
         , spacing 20
         ]
         [ helpButton
-        , targetSelector model
+        , targetSelector
             model.activeConfigurations
             model.tutorialsCompleted
         , el

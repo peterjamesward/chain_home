@@ -29,7 +29,7 @@ type Msg
     | RangeRelease Point
     | SelectReceiveAntenna Bool
     | EnableReflector Bool
-    | SelectGoniometerMode Bool
+    | SelectGoniometerMode GoniometerMode
     | StoreGoniometerSetting
     | StoreRangeSetting
     | ResetInputState
@@ -38,7 +38,8 @@ type Msg
     | RaidFriendly
     | ExplainModeToggle
     | RandomRaidGenerated ( Float, Float )
-    | SetActualTraceVisible Bool
-    | SetRangeCircleVisible Bool
+    | MapMessage
     | ToggleMenu Bool
     | TutorialMsg TutorialMsg
+    | SetActualTraceVisible Bool
+    | SetRangeCircleVisible Bool
