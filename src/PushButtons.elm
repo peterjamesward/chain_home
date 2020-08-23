@@ -11,14 +11,6 @@ import Messages exposing (Msg)
 import Utils exposing (choose, commonStyles, disableSelection, edges)
 
 
-
--- Buttons to change for historical accuracy. 2020-02-27.
--- Buttons will be small, circular with label outside (aside or below).
--- Separate indicator lights may (or not) be used to show state or recommended actions.
--- It follows that we don't have switch groups or their use as toggles (there were
--- toggles but not in our scope).
-
-
 buttonStyles =
     [ Element.height (px 20)
     , Element.width (px 20)
