@@ -40,9 +40,9 @@ calculatorLandscape withExplanations model =
     in
     column
         [ centerX, centerY, moveDown 50 ]
-        [ row [ spacing 10, padding 5, width fill ]
+        [ row [ spacing 10, padding 5, centerX ]
             [ positionGridDisplay withExplanations position
-            , column [ spacing 10, alignLeft ]
+            , column [ spacing 10, alignLeft, width fill ]
                 [ withBorders <|
                     row
                         [ paddingEach { edges | left = 10, bottom = 10 }
@@ -62,10 +62,15 @@ calculatorLandscape withExplanations model =
             , el [ width (px 40) ] none
             , helpButton
             ]
-        , el (showExplanation withExplanations """The approximate position within the grid square""") <|
+        , el
+            (alignLeft
+                :: showExplanation withExplanations """The approximate position within the grid square"""
+            )
+          <|
             row
                 [ Border.color lightCharcoal
                 , Border.width 1
+                , centerX
                 ]
                 [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
                 , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
@@ -105,7 +110,16 @@ calculatorPortrait withExplanations model =
 
 
 bulbSize =
-    40
+    45
+
+
+heightGridFontSize label =
+    -- Slightly reduce font size for longer labels
+    if String.length label > 3 then
+        20
+
+    else
+        24
 
 
 buttonStyle : Bool -> Element.Color -> List (Attribute Msg)
@@ -232,8 +246,10 @@ heightGrid withExplanations storedHeight =
 
         lamp label low high =
             paragraph
-                (Font.size 24
+                (Font.size (heightGridFontSize label)
                     :: spacingXY 10 0
+                    :: padding 10
+                    :: centerY
                     :: buttonStyle (theRightHeight low high) flatSunflower
                 )
                 [ text label ]
@@ -241,37 +257,36 @@ heightGrid withExplanations storedHeight =
     -- Height is in '000 feet, sourced from config data!
     el (width fill :: showExplanation withExplanations """The approximate height of the raid""") <|
         column
-            [ width fill
-            , padding 20
-            , centerX
+            [ padding 20
+            , spacingXY 0 10
             , Border.color lightCharcoal
             , Border.width 1
             ]
-            [ row [ width fill, spaceEvenly ] <|
+            [ row [ spacing 20 ] <|
                 List.map3
                     (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                     [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5" ]
                     (List.range 0 11)
                     (List.range 1 12)
-            , row [ width fill, spaceEvenly ] <|
+            , row [ spacing 20 ] <|
                 List.map3
                     (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                     [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10", "10.5", "11", "11.5" ]
                     (List.range 12 23)
                     (List.range 13 24)
-            , row [ width fill, spaceEvenly ] <|
+            , row [ spacing 20 ] <|
                 List.map3
                     (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                     [ "12", "12.5", "13", "13.5", "14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5" ]
                     (List.range 24 35)
                     (List.range 25 36)
-            , row [ width fill, spaceEvenly ] <|
+            , row [ spacing 20 ] <|
                 List.map3
                     (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                     [ "18", "18.5", "19", "19.5", "20", "21", "22", "23", "24", "25", "26", "27" ]
                     [ 36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54 ]
                     [ 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56 ]
-            , row [ alignLeft ] <|
+            , row [ alignLeft, spacing 20 ] <|
                 List.map3
                     (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
                     [ "28", "29", "30", "30+" ]
