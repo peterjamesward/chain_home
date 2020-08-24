@@ -261,7 +261,12 @@ actionExitAction : Model -> Model
 actionExitAction model =
     { model
         | tutorialActive = Nothing
-        , currPage = InputPage
+        , currPage =
+            if model.kioskTimer == Nothing then
+                InputPage
+
+            else
+                model.currPage
     }
 
 

@@ -2,21 +2,36 @@ module AboutPage exposing (..)
 
 import Constants exposing (white)
 import Element exposing (..)
+import Element.Events as Event
 import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Markdown exposing (defaultOptions)
-import Messages exposing (Msg)
+import Messages exposing (Msg(..))
 
 
 aboutPage : Element Msg
 aboutPage =
-    paragraph
-        [ Font.color white
-        , padding 40
-        , width fill
+    column []
+        [ paragraph
+            [ Font.color white
+            , padding 40
+            , width fill
+            ]
+            [ html content ]
+        , kioskModeButton
         ]
-        [ html content ]
+
+
+kioskModeButton =
+    el
+        [ pointer
+        , Event.onClick KioskMode
+        , padding 5
+        ]
+        (text
+            "Enter kiosk mode"
+        )
 
 
 content : Html msg

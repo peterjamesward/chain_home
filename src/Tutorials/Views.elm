@@ -54,22 +54,24 @@ viewCalculatorInTutorial model =
         rawPage
 
 
-
 tutorialControls someText =
-    el tutorialControlHolderStyles <|
-        row
-            [ width fill, centerY ]
-            [ el [ onClick (TutorialMsg TutorialBack), pointer ] <| text "◀︎"
-            , paragraph
-                [ Background.color blue
-                , spacing 4
-                , padding 10
-                , Font.size 16
+    column [ centerX, width fill]
+        [ el [ height (px 20) ] none
+        , el tutorialControlHolderStyles <|
+            row
+                [ width fill, centerY ]
+                [ el [ onClick (TutorialMsg TutorialBack), pointer ] <| text "◀︎"
+                , paragraph
+                    [ Background.color blue
+                    , spacing 4
+                    , padding 10
+                    , Font.size 16
+                    ]
+                    [ text someText ]
+                , el [ onClick (TutorialMsg TutorialAdvance), alignRight, pointer ] <|
+                    text "▶︎"
                 ]
-                [ text someText ]
-            , el [ onClick (TutorialMsg TutorialAdvance), alignRight, pointer ] <|
-                text "▶︎"
-            ]
+        ]
 
 
 tutorialControlHolderStyles =

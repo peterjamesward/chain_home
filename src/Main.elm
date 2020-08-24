@@ -90,6 +90,7 @@ init _ =
       , calculator = Calculator.init
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
+      , kioskTimer = Nothing
       }
     , Task.perform SetStartTime Time.now
     )
@@ -225,6 +226,31 @@ clearHistory model =
     { model | storedPlots = [] }
 
 
+kioskAutomation : Model.Model -> Model.Model
+kioskAutomation model =
+    -- For now, just advance tutorial every 30 seconds.
+    let
+        ( advanceTutorial, _ ) =
+            update (TutorialMsg TutorialAdvance) model
+
+        ( beginTutorial, _ ) =
+            update (TutorialMsg (DisplayTraining ScenarioBasic)) model
+    in
+    case ( model.kioskTimer, model.tutorialActive ) of
+        ( Nothing, _ ) ->
+            model
+
+        ( _, Nothing ) ->
+            { beginTutorial | kioskTimer = Just model.modelTime }
+
+        ( Just lastTime, Just _ ) ->
+            if model.modelTime - lastTime > 10000 then
+                { advanceTutorial | kioskTimer = Just model.modelTime }
+
+            else
+                model
+
+
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
 update msg model =
     let
@@ -236,6 +262,15 @@ update msg model =
                 Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
     in
     case msg of
+        KioskMode ->
+            let
+                ( innerModel, innerCmd ) =
+                    update (TutorialMsg (DisplayTraining ScenarioBasic)) model
+            in
+            ( { innerModel | kioskTimer = Just model.modelTime }
+            , Cmd.none
+            )
+
         TimeDelta dt ->
             ( { model | webGLtime = model.webGLtime + dt / 100.0 }
             , Cmd.none
@@ -271,15 +306,16 @@ update msg model =
 
                         Just due ->
                             Time.posixToMillis time > due
-            in
-            ( deriveModelAtTime model (Time.posixToMillis time)
-                |> (\m ->
-                        if raidIsDue then
-                            { m | timeForNextRaid = Nothing }
 
-                        else
-                            m
-                   )
+                resetRaidDue m =
+                    if raidIsDue then
+                        { m | timeForNextRaid = Nothing }
+
+                    else
+                        m
+            in
+            ( deriveModelAtTime (kioskAutomation model) (Time.posixToMillis time)
+                |> resetRaidDue
             , if raidIsDue then
                 requestRandomRaid
 
@@ -758,7 +794,13 @@ view model =
             column
                 [ E.width E.fill
                 ]
-                [ navBar model
+                [ case model.kioskTimer of
+                    Just _ ->
+                        row [ height (px 40) ]
+                            []
+
+                    Nothing ->
+                        navBar model
                 , content
                 ]
         ]

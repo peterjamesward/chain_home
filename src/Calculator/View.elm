@@ -40,7 +40,7 @@ calculatorLandscape withExplanations model =
     in
     column
         [ centerX, centerY ]
-        [ el [ height (px 80) ] none
+        [ el [ height (px 100) ] none
         , row [ spacing 10, padding 5, centerX, centerY ]
             [ positionGridDisplay withExplanations position
             , column [ spacing 10, alignLeft, width fill ]

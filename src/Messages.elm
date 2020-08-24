@@ -38,8 +38,8 @@ type Msg
     | RaidFriendly
     | ExplainModeToggle
     | RandomRaidGenerated ( Float, Float )
-    | MapMessage
     | ToggleMenu Bool
     | TutorialMsg TutorialMsg
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
+    | KioskMode

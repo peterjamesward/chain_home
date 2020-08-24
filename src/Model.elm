@@ -49,6 +49,7 @@ type alias Model =
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
+    , kioskTimer : Maybe Int -- Time we last advanced when in kiosk mode
     }
 
 
