@@ -65,7 +65,7 @@ tutorialControls someText =
                     [ Background.color blue
                     , spacing 4
                     , padding 10
-                    , Font.size 16
+                    , Font.size 20
                     ]
                     [ text someText ]
                 , el [ onClick (TutorialMsg TutorialAdvance), alignRight, pointer ] <|

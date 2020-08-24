@@ -263,11 +263,7 @@ update msg model =
     in
     case msg of
         KioskMode ->
-            let
-                ( innerModel, innerCmd ) =
-                    update (TutorialMsg (DisplayTraining ScenarioBasic)) model
-            in
-            ( { innerModel | kioskTimer = Just model.modelTime }
+            ( { model | kioskTimer = Just model.modelTime }
             , Cmd.none
             )
 

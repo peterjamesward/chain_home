@@ -36,7 +36,7 @@ tutorialCloseStep scenario =
 
 noEntryActions : TutorialActionList
 noEntryActions =
-    [ ]
+    []
 
 
 noExitActions : TutorialActionList
@@ -80,7 +80,7 @@ tutorialBasic =
             noStateActions
             noExitActions
             (TextConstant
-                """This tutorial will give a basic overview of the receiver and its operation.
+                """This tutorial gives an overview of the receiver and its operation.
             Click the ► to go on, ◀︎ to go back."""
             )
         , TutorialEntry
@@ -97,10 +97,17 @@ tutorialBasic =
             noStateActions
             noExitActions
             (TextConstant """A returned signal will be a V-shaped dip in the line that we see jiggling across the tube.
-        The more to the right, the further away the aircraft, with the scale in miles across the top.
-        The two large dips near the left are caused by local features such as buildings or hills.
-        The constant jiggling is just electrical noise - these are very sensitive receivers.
-        """)
+            The more to the right, the further away the aircraft, with the scale in miles across the top.
+
+            """)
+        , TutorialEntry
+            UiCRT
+            noEntryActions
+            noStateActions
+            noExitActions
+            (TextConstant """The two large dips near the left are caused by local features such as buildings or hills.
+            The constant jiggling is just electrical noise - these are very sensitive receivers.
+            """)
         , TutorialEntry
             UiGoniometer
             [ ActionBearingMode
@@ -123,7 +130,7 @@ tutorialBasic =
             noExitActions
             (TextConstant
                 """The white V shape under the 100 on the 'tube' is a new raid.
-            This simple and stable shape is always only one aircraft.
+            This shape means there is only one aircraft.
             The operator turns the Range knob until the Range Pointer points at the
             raid (ideally at the left hand edge) for an accurate range reading.
              """
@@ -141,22 +148,11 @@ tutorialBasic =
         , TutorialEntry
             UiGoniometer
             noEntryActions
-            noStateActions
-            noExitActions
-            (TextConstant
-                """The raid will keep moving, so the operator works quickly.
-            The operator will turn the Gonio to make the V as small as possible.
-            """
-            )
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
             [ ActionFindBearingOfNumberedTarget True 0 ]
             [ ActionFindBearingOfNumberedTarget False 0 ]
             (TextConstant
-                """The operator 'swings' the gonio until the V on the CRT vanishes.
-            The next step is to load information into the calculator. The lights
-            over to the right remind the operator which button to press."""
+                """The operator 'swings' the gonio to minimise the depth of the V.
+            The next step is to load information into the calculator."""
             )
         , TutorialEntry
             UiGonioButton
