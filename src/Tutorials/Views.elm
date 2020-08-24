@@ -34,26 +34,7 @@ applyTextFunction fnCode model =
             Just s
 
         TextInterpretCalculator ->
-            Just <| tutorialInterpretCalculator model
-
-
-tutorialTextBox : Model -> List (Attribute Msg) -> Element Msg
-tutorialTextBox model adjustments =
-    -- Use a single central text box for all tutorial text.
-    -- Second argument allows caller to finesse the position
-    let
-        theText =
-            tutorialText model
-    in
-    case theText of
-        Nothing ->
-            none
-
-        Just someText ->
-            el
-                (tutorialControlHolderStyles ++ adjustments)
-            <|
-                tutorialControls someText
+            Just <| interpretCalculator model.calculator
 
 
 viewCalculatorInTutorial : Model -> Element Msg
@@ -67,9 +48,11 @@ viewCalculatorInTutorial model =
     in
     el
         [ centerX
-        , inFront <| tutorialControls calcText
+        , alignBottom
+        , below <| tutorialControls calcText
         ]
         rawPage
+
 
 
 tutorialControls someText =
@@ -90,9 +73,7 @@ tutorialControls someText =
 
 
 tutorialControlHolderStyles =
-    [ width (px 500)
-    , height (px 160)
-    , centerY
+    [ width fill
     , centerX
     , Background.color blue
     , Border.color flatSunflower
@@ -103,8 +84,3 @@ tutorialControlHolderStyles =
     , Font.size 32
     , Font.family [ Font.typeface "Helvetica" ]
     ]
-
-
-tutorialInterpretCalculator : Model -> String
-tutorialInterpretCalculator model =
-    interpretCalculator model.calculator

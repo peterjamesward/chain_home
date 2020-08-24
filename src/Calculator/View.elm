@@ -39,8 +39,9 @@ calculatorLandscape withExplanations model =
             gridPosition model.storedAzimuthRange model.storedAzimuth
     in
     column
-        [ centerX, centerY, moveDown 50 ]
-        [ row [ spacing 10, padding 5, centerX ]
+        [ centerX, centerY ]
+        [ el [ height (px 80) ] none
+        , row [ spacing 10, padding 5, centerX, centerY ]
             [ positionGridDisplay withExplanations position
             , column [ spacing 10, alignLeft, width fill ]
                 [ withBorders <|
@@ -62,19 +63,16 @@ calculatorLandscape withExplanations model =
             , el [ width (px 40) ] none
             , helpButton
             ]
-        , el
-            (alignLeft
-                :: showExplanation withExplanations """The approximate position within the grid square"""
+        , row
+            ([ Border.color lightCharcoal
+             , Border.width 1
+             , centerX
+             ]
+                ++ showExplanation withExplanations """The approximate position within the grid square"""
             )
-          <|
-            row
-                [ Border.color lightCharcoal
-                , Border.width 1
-                , centerX
-                ]
-                [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
-                , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
-                ]
+            [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
+            , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
+            ]
         ]
 
 
@@ -247,8 +245,8 @@ heightGrid withExplanations storedHeight =
         lamp label low high =
             paragraph
                 (Font.size (heightGridFontSize label)
-                    :: spacingXY 10 0
-                    :: padding 10
+                    :: spacingXY 0 0
+                    :: padding 8
                     :: centerY
                     :: buttonStyle (theRightHeight low high) flatSunflower
                 )
