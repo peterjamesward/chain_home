@@ -1,10 +1,20 @@
 module Tutorials.KioskModeTutorial exposing (kioskModeTutorial)
 
 import Tutorials.ActionCodes exposing (TutorialActionCode(..), TutorialScenario(..), TutorialTextFunction(..))
+import Tutorials.Actions exposing (..)
 import Tutorials.Model exposing (TutorialEntry)
 import Types exposing (UiComponent(..))
 import Zipper
-import Tutorials.Actions exposing (..)
+
+
+
+--TODO: Remove some steps to reduce repetition
+--TODO: Display context banner (e.g. "IFF") (could use actions for this)
+--TODO: Clear calculator after each raid
+--TODO: End with a more realistic picture on the tube
+--TODO: Try with eCrisper.
+--DONE: Allow varying times.
+--TODO: Pressing range when in height mode automatically exits height mode.
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
@@ -67,6 +77,7 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """The white V shape under the 100 on the 'tube' is a new raid.
+
             This shape means there is only one aircraft.
              """
             )
@@ -86,8 +97,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget True 0 ]
             [ ActionFindBearingOfNumberedTarget False 0 ]
             (TextConstant
-                """The operator turns the gonio to minimise the depth of the V.
-            The next step is to load information into the calculator."""
+                """The operator turns the gonio to minimise the depth of the V."""
             )
         , TutorialEntry
             UiGonioButton
@@ -369,6 +379,18 @@ kioskModeTutorial =
             noStateActions
             [ ActionShowOperator ]
             TextInterpretCalculator
+        , TutorialEntry
+            UiGoniometer
+            [ ActionBearingMode
+            , ActionClearCalculator
+            , ActionClearTargets
+            ]
+            [ ActionSwingGoniometer ]
+            noExitActions
+            (TextConstant
+                """The operator swings the gonio looking for a new raid.
+             """
+            )
         , TutorialEntry
             UiCRT
             [ ActionSetupRaid3to6 ]

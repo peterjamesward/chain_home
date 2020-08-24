@@ -44,9 +44,10 @@ import Tutorials.Actions exposing (..)
 import Tutorials.Messages exposing (TutorialMsg(..))
 import Tutorials.Tutorials exposing (tutorialAutomation)
 import Tutorials.Update
-import Tutorials.Views exposing (viewCalculatorInTutorial)
+import Tutorials.Views exposing (tutorialText, viewCalculatorInTutorial)
 import Types exposing (..)
 import Utils exposing (..)
+import Zipper
 
 
 init : Flags -> ( Model.Model, Cmd Msg )
@@ -235,6 +236,8 @@ kioskAutomation model =
 
         ( beginTutorial, _ ) =
             update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
+
+        howLongTheStringIs = String.length <| Maybe.withDefault "" <| tutorialText model
     in
     case ( model.kioskTimer, model.tutorialActive ) of
         ( Nothing, _ ) ->
@@ -243,8 +246,8 @@ kioskAutomation model =
         ( _, Nothing ) ->
             { beginTutorial | kioskTimer = Just model.modelTime }
 
-        ( Just lastTime, Just _ ) ->
-            if model.modelTime - lastTime > 10000 then
+        ( Just lastTime, Just tut ) ->
+            if model.modelTime - lastTime >  howLongTheStringIs * 100 then
                 { advanceTutorial | kioskTimer = Just model.modelTime }
 
             else
