@@ -55,7 +55,7 @@ viewCalculatorInTutorial model =
 
 
 tutorialControls someText =
-    column [ centerX, width fill]
+    column [ centerX, width fill ]
         [ el [ height (px 20) ] none
         , el tutorialControlHolderStyles <|
             row

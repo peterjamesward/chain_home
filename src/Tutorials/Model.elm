@@ -9,8 +9,6 @@ type alias TutorialActionList =
     List TutorialActionCode
 
 
-
-
 type alias TutorialEntry =
     { uiComponent : UiComponent -- The UI component to be highlighted
     , entryActions : TutorialActionList -- Changes to the model so we can be idempotent

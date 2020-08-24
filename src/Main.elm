@@ -234,7 +234,7 @@ kioskAutomation model =
             update (TutorialMsg TutorialAdvance) model
 
         ( beginTutorial, _ ) =
-            update (TutorialMsg (DisplayTraining ScenarioBasic)) model
+            update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
     in
     case ( model.kioskTimer, model.tutorialActive ) of
         ( Nothing, _ ) ->

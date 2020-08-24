@@ -6,13 +6,43 @@ import Calculator.Model exposing (InputState(..), setInputState, storeAzimuth, s
 import Config exposing (..)
 import Model exposing (Model)
 import Target exposing (findTargetHeight)
-import Tutorials.ActionCodes exposing (TutorialActionCode(..), TutorialScenario)
-import Tutorials.Model exposing (TutorialActionList)
-import Types exposing (GoniometerMode(..), Page(..))
+import Tutorials.ActionCodes exposing (TutorialActionCode(..), TutorialScenario, TutorialTextFunction(..))
+import Tutorials.Model exposing (TutorialActionList, TutorialEntry)
+import Types exposing (GoniometerMode(..), Page(..), UiComponent(..))
 
 
 type alias TutorialAction =
     Model -> Model
+
+
+noEntryActions : TutorialActionList
+noEntryActions =
+    []
+
+
+noExitActions : TutorialActionList
+noExitActions =
+    []
+
+
+noStateActions : TutorialActionList
+noStateActions =
+    []
+
+
+tutorialCloseStep : TutorialScenario -> TutorialEntry
+tutorialCloseStep scenario =
+    -- Intended to be final step in any tutorial.
+    Tutorials.Model.TutorialEntry
+        UiDummy
+        [ ActionExitTutorial --> tutorialExitAction
+        , ActionClearCalculator
+        , ActionClearTargets
+        , ActionRecordScenarioDone scenario
+        ]
+        noStateActions
+        noExitActions
+        (TextConstant "Hello world.")
 
 
 applyTutorialActions : TutorialActionList -> Model -> Model

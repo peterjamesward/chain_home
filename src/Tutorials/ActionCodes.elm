@@ -12,6 +12,7 @@ type TutorialScenario
     | ScenarioTwoSeparate
     | ScenarioThreeToSix
     | ScenarioFriendly
+    | ScenarioKioskMode
 
 
 type
