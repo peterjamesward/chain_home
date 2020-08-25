@@ -409,7 +409,9 @@ operatorPageWithTutorial model =
     case tutorialText model of
         Just someText ->
             el
-                [ centerX, alignBottom
+                [ centerX
+                , alignBottom
+                , width fill
                 , below <| tutorialControls someText
                 ]
                 rawPage

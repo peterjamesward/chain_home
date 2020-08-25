@@ -11,11 +11,11 @@ import Zipper
 --TODO: Remove some steps to reduce repetition
 --TODO: Combine multiple raids in one display
 --TODO: Display context banner (e.g. "IFF") (could use actions for this)
---TODO: Clear calculator after each raid
+--DONE: Clear calculator after each raid
 --TODO: End with a more realistic picture on the tube
 --DONE: Try with eCrisper.
 --DONE: Allow varying times. (Proportional to text length.)
---TODO: Pressing range when in height mode automatically exits height mode.
+--DONE: Pressing range when in height mode automatically exits height mode.
 
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
@@ -170,13 +170,16 @@ kioskModeTutorial =
             )
         , TutorialEntry
             UiCalculator
-            [ ActionShowCalculator ]
+            [ ActionShowCalculator
+            ]
             noStateActions
             [ ActionShowOperator ]
             TextInterpretCalculator
         , TutorialEntry
             UiCRT
-            [ ActionSetupRaid2SameBearing ]
+            [ ActionSetupRaid2SameBearing
+            , ActionClearCalculator
+            ]
             noStateActions
             noExitActions
             (TextConstant
@@ -282,7 +285,9 @@ kioskModeTutorial =
             TextInterpretCalculator
         , TutorialEntry
             UiCRT
-            [ ActionSetupRaid2DifferentBearings ]
+            [ ActionSetupRaid2DifferentBearings
+            , ActionClearCalculator
+            ]
             noStateActions
             noExitActions
             (TextConstant
@@ -388,7 +393,9 @@ kioskModeTutorial =
             )
         , TutorialEntry
             UiCRT
-            [ ActionSetupRaid3to6 ]
+            [ ActionSetupRaid3to6
+            , ActionClearCalculator
+            ]
             noStateActions
             noExitActions
             (TextConstant
@@ -495,7 +502,9 @@ kioskModeTutorial =
             TextInterpretCalculator
         , TutorialEntry
             UiCRT
-            [ ActionSetupRaidFriendlyOutbound ]
+            [ ActionSetupRaidFriendlyOutbound
+            , ActionClearCalculator
+            ]
             noStateActions
             noExitActions
             (TextConstant
