@@ -9,12 +9,14 @@ import Zipper
 
 
 --TODO: Remove some steps to reduce repetition
+--TODO: Combine multiple raids in one display
 --TODO: Display context banner (e.g. "IFF") (could use actions for this)
 --TODO: Clear calculator after each raid
 --TODO: End with a more realistic picture on the tube
---TODO: Try with eCrisper.
---DONE: Allow varying times.
+--DONE: Try with eCrisper.
+--DONE: Allow varying times. (Proportional to text length.)
 --TODO: Pressing range when in height mode automatically exits height mode.
+
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
@@ -76,8 +78,7 @@ kioskModeTutorial =
             [ ActionStopGonioAwayFromRaidBearing ]
             noExitActions
             (TextConstant
-                """The white V shape under the 100 on the 'tube' is a new raid.
-
+                """The V shape under the 100 on the tube is a new raid.
             This shape means there is only one aircraft.
              """
             )
@@ -153,7 +154,9 @@ kioskModeTutorial =
             UIRangeButton
             noEntryActions
             noStateActions
-            [ ActionStoreRange ]
+            [ ActionStoreRange
+            , ActionEndHeightMode
+            ]
             (TextConstant
                 """Pressing the RANGE button stores the range in the calculator."""
             )
@@ -164,14 +167,6 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """Finally, the operator presses Raid Strength 1, because this small steady signal is one aircraft. """
-            )
-        , TutorialEntry
-            UiHeight
-            [ ActionEndHeightMode ]
-            noStateActions
-            noExitActions
-            (TextConstant
-                """The goniometer is put back to Bearing mode."""
             )
         , TutorialEntry
             UiCalculator
@@ -185,7 +180,7 @@ kioskModeTutorial =
             noStateActions
             noExitActions
             (TextConstant
-                """The white V shape on the 'tube' is a new raid.
+                """The V shape on the 'tube' is a new raid.
             The regular "beating" up and down is always two aircraft.
             """
             )

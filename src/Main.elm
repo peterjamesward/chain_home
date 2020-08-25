@@ -551,7 +551,8 @@ update msg model =
                     { model
                         | calculator =
                             storeElevationRange (1.6 * model.rangeSlider) <|
-                                setInputState HeightInput model.calculator
+                                setInputState BearingInput model.calculator
+                        , goniometerMode = Azimuth
                     }
 
                 _ ->
