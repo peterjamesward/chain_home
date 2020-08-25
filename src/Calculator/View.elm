@@ -361,10 +361,10 @@ interpretCalculator model =
                 Just h ->
                     if h >= 1 then
                         (String.fromInt <| truncate h)
-                            ++ ",000 ft"
+                            ++ " thousand feet"
 
                     else
-                        "below 1000 ft"
+                        "below one thousand feet"
 
                 Nothing ->
                     "unknown"

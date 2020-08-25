@@ -32,9 +32,11 @@ type
     | ActionEndHeightMode
     | ActionExitTutorial
     | ActionFindBearingOfNumberedTarget Bool Int
+    | ActionFindRangeOfNumberedTarget Bool Int
     | ActionHeightMode
     | ActionRecordScenarioDone TutorialScenario
     | ActionSeekElevation Bool
+    | ActionSeekElevationOfNumberedTarget Bool Int
     | ActionSetupRaid
     | ActionSetupRaidFriendlyOutbound
     | ActionSetupRaid2DifferentBearings

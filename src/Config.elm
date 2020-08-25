@@ -59,7 +59,7 @@ behindStation =
 
 bomber1 : TargetProforma
 bomber1 =
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 2.0
     , latitude = bawdsey.latitude + degrees 0.5
     , height = 20 -- ,000 ft
     , heading = degrees 250
@@ -72,7 +72,7 @@ bomber1 =
 bomber2 : TargetProforma
 bomber2 =
     -- 2 and 2A very close to look for "beating" effect.
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 1.2
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
@@ -84,7 +84,7 @@ bomber2 =
 
 bomber2A : TargetProforma
 bomber2A =
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 1.2
     , latitude = degrees 52.04
     , height = 30.2 -- ,000 ft
     , heading = degrees 280
@@ -97,7 +97,7 @@ bomber2A =
 bomber3 : TargetProforma
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 2.208
+    { longitude = bawdsey.longitude + degrees 1.608
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 40 -- ,000 ft
     , heading = degrees 270
@@ -109,7 +109,7 @@ bomber3 =
 
 bomber4 : TargetProforma
 bomber4 =
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 1.6
     , latitude = bawdsey.latitude - degrees 0.3
     , height = 40 -- ,000 ft
     , heading = degrees 270
@@ -122,7 +122,7 @@ bomber4 =
 fighter1 : TargetProforma
 fighter1 =
     -- Starts behind and heads out pretty quick.
-    { longitude = bawdsey.longitude + degrees 2.2
+    { longitude = bawdsey.longitude + degrees 1.8
     , latitude = bawdsey.latitude + degrees 0.01
     , height = 10 -- ,000 ft
     , heading = degrees 270
@@ -167,15 +167,15 @@ severalAligned n =
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ { bomber1 | tutorial = True } ]
+        [ { bomber1 | tutorial = False } ]
 
 
 trainingMode2 : Int -> List Target
 trainingMode2 timeNow =
     -- Two planes same range same heading
     List.map (targetFromProforma station timeNow)
-        [ { bomber2 | tutorial = True }
-        , { bomber2A | tutorial = True }
+        [ { bomber2 | tutorial = False }
+        , { bomber2A | tutorial = False }
         ]
 
 
@@ -183,22 +183,22 @@ trainingMode3 : Int -> List Target
 trainingMode3 timeNow =
     -- Two planes same range different headings
     List.map (targetFromProforma station timeNow)
-        [ { bomber3 | tutorial = True }
-        , { bomber4 | tutorial = True }
+        [ { bomber3 | tutorial = False }
+        , { bomber4 | tutorial = False }
         ]
 
 
 trainingModeFriendlyOutbound : Int -> List Target
 trainingModeFriendlyOutbound timeNow =
     List.map (targetFromProforma station timeNow)
-        [ { fighter1 | tutorial = True } ]
+        [ { fighter1 | tutorial = False } ]
 
 
 trainingMode3to6 : Int -> List Target
 trainingMode3to6 timeNow =
     let
         placeInTutorialMode t =
-            { t | tutorial = True }
+            { t | tutorial = False }
     in
     -- Four aircraft close together
     -- Wonder if it will work using them twice!

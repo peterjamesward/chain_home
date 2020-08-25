@@ -82,6 +82,9 @@ performTheAction a model =
                 ActionFindBearingOfNumberedTarget b i ->
                     actionFindBearingOfNumberedTarget b i
 
+                ActionFindRangeOfNumberedTarget b i ->
+                    actionFindRangeOfNumberedTarget b i
+
                 ActionHeightMode ->
                     actionHeightMode
 
@@ -90,6 +93,9 @@ performTheAction a model =
 
                 ActionSeekElevation b ->
                     actionSeekElevation b
+
+                ActionSeekElevationOfNumberedTarget b i ->
+                    actionSeekElevationOfNumberedTarget b i
 
                 ActionSetupRaid ->
                     actionSetupTutorialRaid
@@ -165,22 +171,22 @@ actionCentraliseKnobs model =
 
 actionSetupRaid2SameBearing : Model -> Model
 actionSetupRaid2SameBearing model =
-    { model | targets = trainingMode2 model.modelTime }
+    { model | targets = model.targets ++ trainingMode2 model.modelTime }
 
 
 actionSetupRaid2DifferentBearings : Model -> Model
 actionSetupRaid2DifferentBearings model =
-    { model | targets = trainingMode3 model.modelTime }
+    { model | targets = model.targets ++ trainingMode3 model.modelTime }
 
 
 actionSetupRaid3to6 : Model -> Model
 actionSetupRaid3to6 model =
-    { model | targets = trainingMode3to6 model.modelTime }
+    { model | targets = model.targets ++ trainingMode3to6 model.modelTime }
 
 
 actionSetupRaidFriendlyOutbound : Model -> Model
 actionSetupRaidFriendlyOutbound model =
-    { model | targets = trainingModeFriendlyOutbound model.modelTime }
+    { model | targets = trainingModeFriendlyOutbound model.modelTime ++ model.targets }
 
 
 actionStopTutorialRaid : Model -> Model
@@ -310,7 +316,7 @@ actionSwingGoniometer model =
 
 
 actionStopGonioAwayFromRaidBearing model =
-    if model.goniometerAzimuth >= degrees -50 && model.goniometerAzimuth <= degrees 0 then
+    if model.goniometerAzimuth >= degrees -50 || model.goniometerAzimuth >= degrees 50 then
         actionSwingGoniometer model
         -- keep turning.
 
@@ -366,6 +372,31 @@ actionFindBearingOfNumberedTarget active index model =
     }
 
 
+actionFindRangeOfNumberedTarget active index model =
+    -- Note index is zero based.
+    -- Use simulated key presses to mimic the operator tracking the raid
+    let
+        rangeInMetres =
+            Maybe.withDefault 50000 <|
+                List.head <|
+                    List.drop index <|
+                        List.map .rangeInMetres model.targets
+
+        rangeInMiles =
+            toFloat <| floor <| rangeInMetres / 1600
+
+        currentKeys =
+            model.keys
+    in
+    { model
+        | keys =
+            { currentKeys
+                | rangeLeft = active && model.rangeSlider > rangeInMiles
+                , rangeRight = active && model.rangeSlider < rangeInMiles - 1
+            }
+    }
+
+
 actionSeekElevation active model =
     -- Use simulated key presses to mimic the operator tracking the raid.
     -- Unlike bearing, we don't know which way to move, so just go clockwise and
@@ -375,6 +406,28 @@ actionSeekElevation active model =
             Maybe.withDefault 1.5 <|
                 List.head <|
                     List.map .amplitude model.elevation_A_trace
+
+        currentKeys =
+            model.keys
+    in
+    { model
+        | keys =
+            { currentKeys
+                | gonioClock = active && targetElevation > 0.2
+            }
+    }
+
+
+actionSeekElevationOfNumberedTarget active index model =
+    -- Use simulated key presses to mimic the operator tracking the raid.
+    -- Unlike bearing, we don't know which way to move, so just go clockwise and
+    -- don't try for zero!
+    let
+        targetElevation =
+            Maybe.withDefault 1.5 <|
+                List.head <|
+                    List.drop index <|
+                        List.map .amplitude model.elevation_A_trace
 
         currentKeys =
             model.keys
