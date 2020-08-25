@@ -5,7 +5,6 @@ import Target exposing (targetFromProforma)
 import Types exposing (Echo, Target, TargetProforma)
 
 
-
 groundRays : List Echo
 groundRays =
     [ { sequence = 0
@@ -135,7 +134,7 @@ fighter1 =
 severalAbreast n =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 2.2
+            { longitude = bawdsey.longitude + degrees 2.1
             , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
             , height = 25
             , heading = degrees 275
@@ -203,5 +202,10 @@ trainingMode3to6 timeNow =
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map (targetFromProforma station timeNow) <|
-        List.map placeInTutorialMode <|
-            severalAligned 5
+        severalAligned 5
+
+
+trainingMassRaids : Int -> List Target
+trainingMassRaids timeNow =
+    List.map (targetFromProforma station timeNow) <|
+        (severalAbreast 10 ++ severalAligned 10)

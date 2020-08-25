@@ -8,7 +8,7 @@ import Zipper
 
 
 
---TODO: Remove some steps to reduce repetition
+--DONE: Remove some steps to reduce repetition
 --TODO: Combine multiple raids in one display
 --DROP: Display context banner (e.g. "IFF") (could use actions for this)
 --DONE: Clear calculator after each raid
@@ -49,7 +49,7 @@ kioskModeTutorial =
             [ ActionSwingGoniometer ]
             noExitActions
             (TextConstant
-                """The operator "swings" the gonio, looking for new signals.
+                """ "Swing" the gonio, looking for new signals.
              """
             )
         , TutorialEntry
@@ -60,8 +60,8 @@ kioskModeTutorial =
             [ ActionStopGonioAwayFromRaidBearing ]
             noExitActions
             (TextConstant
-                """Here are two raids, each is a single aircraft.
-                One is friendly, shown by the pulsing IFF pattern.
+                """Here are two raids. Each is a single aircraft.
+                The pulsing pattern is a friendly aircraft using IFF.
              """
             )
         , TutorialEntry
@@ -119,7 +119,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """Store the GONIO setting to work out the height."""
+                """Store the GONIO setting."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -127,7 +127,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget True 0 ]
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
-                """Adjusts the range pointer."""
+                """Check the range pointer."""
             )
         , TutorialEntry
             UIRangeButton
@@ -137,7 +137,7 @@ kioskModeTutorial =
             , ActionEndHeightMode
             ]
             (TextConstant
-                """Press the RANGE button to store the range."""
+                """Store the range."""
             )
         , TutorialEntry
             UiRaidStrength
@@ -182,7 +182,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget True 1 ]
             [ ActionFindBearingOfNumberedTarget False 1 ]
             (TextConstant
-                """Turn the gonio to minimise the depth of the V."""
+                """Turn the gonio to minimise the V."""
             )
         , TutorialEntry
             UiGonioButton
@@ -190,7 +190,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreBearing ]
             (TextConstant
-                """Press the GONIO button to store the bearing in the calculator."""
+                """Store the bearing."""
             )
         , TutorialEntry
             UIRangeButton
@@ -198,7 +198,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreRange ]
             (TextConstant
-                """Press the RANGE button to store the range in the calculator."""
+                """Store the range."""
             )
         , TutorialEntry
             UiHeight
@@ -206,7 +206,7 @@ kioskModeTutorial =
             noStateActions
             noExitActions
             (TextConstant
-                """Press the HEIGHT button to begin working out the height."""
+                """Press the HEIGHT button."""
             )
         , TutorialEntry
             UiGoniometer
@@ -222,7 +222,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """Store the GONIO setting to work out the height."""
+                """Store the gonio setting."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -230,7 +230,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget True 1 ]
             [ ActionFindRangeOfNumberedTarget False 1 ]
             (TextConstant
-                """Adjusts the range pointer."""
+                """Check the range."""
             )
         , TutorialEntry
             UIRangeButton
@@ -240,7 +240,7 @@ kioskModeTutorial =
             , ActionEndHeightMode
             ]
             (TextConstant
-                """Press the RANGE button to store the range."""
+                """Store the range."""
             )
         , TutorialEntry
             UiRaidStrength
@@ -281,7 +281,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget True 0 ]
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
-                """Turn the rang knob so the pointer aligns with a raid.
+                """Turn the range knob so the pointer aligns with a raid.
             """
             )
         , TutorialEntry
@@ -290,7 +290,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget True 0 ]
             [ ActionFindBearingOfNumberedTarget False 0 ]
             (TextConstant
-                """Turn the gonio to shrink the V on the CRT vanishes."""
+                """Turn the gonio to shrink the V."""
             )
         , TutorialEntry
             UiGonioButton
@@ -298,7 +298,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreBearing ]
             (TextConstant
-                """Press the GONIO button to store the bearing."""
+                """Store the bearing."""
             )
         , TutorialEntry
             UIRangeButton
@@ -306,7 +306,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreRange ]
             (TextConstant
-                """Press the RANGE button to store the range."""
+                """Store the range."""
             )
         , TutorialEntry
             UiHeight
@@ -314,7 +314,7 @@ kioskModeTutorial =
             noStateActions
             noExitActions
             (TextConstant
-                """Press HEIGHT button to work out the height."""
+                """Press HEIGHT button."""
             )
         , TutorialEntry
             UiGoniometer
@@ -322,7 +322,7 @@ kioskModeTutorial =
             [ ActionSeekElevationOfNumberedTarget True 0 ]
             [ ActionSeekElevationOfNumberedTarget False 0 ]
             (TextConstant
-                """Turn the gonio again, to minimise the V."""
+                """Turn the gonio minimise the V."""
             )
         , TutorialEntry
             UiGonioButton
@@ -330,7 +330,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """Store GONIO setting to work out the elevation."""
+                """Store the gonio setting."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -437,8 +437,31 @@ kioskModeTutorial =
             ]
             (TextConstant
                 """We find another bearing where the movement stops.
-            This means we have located the other the aircraft.
-            The rest of the steps are the same."""
+            This means we have located the other the aircraft."""
+            )
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 3 ]
+            [ ActionFindRangeOfNumberedTarget False 3 ]
+            (TextConstant
+                """Adjust the range pointer."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreBearing ]
+            (TextConstant
+                """Store the bearing."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange ]
+            (TextConstant
+                """Store the range."""
             )
         , TutorialEntry
             UiCalculator
@@ -462,7 +485,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget True 4 ]
             [ ActionFindBearingOfNumberedTarget False 4 ]
             (TextConstant
-                """This is a close formation of aircraft so it will still D/F out."""
+                """This close formation of aircraft will still "D/F out"."""
             )
         , TutorialEntry
             UiGonioButton
@@ -470,7 +493,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreBearing ]
             (TextConstant
-                """Store the bearing in the calculator."""
+                """Store the bearing."""
             )
         , TutorialEntry
             UIRangeButton
@@ -478,7 +501,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreRange ]
             (TextConstant
-                """Store the range in the calculator."""
+                """Store the range."""
             )
         , TutorialEntry
             UiHeight
@@ -536,5 +559,19 @@ kioskModeTutorial =
             noStateActions
             [ ActionShowOperator ]
             TextInterpretCalculator
+        , TutorialEntry
+            UiCRT
+            [ ActionMassRaids
+            , ActionCentraliseKnobs
+            , ActionClearCalculator
+            ]
+            [ ActionSwingGoniometer ]
+            noExitActions
+            (TextConstant
+                """The operator must track multiple raids.
+                Here are some large raids just coming within range.
+                Good luck.
+            """
+            )
         , tutorialCloseStep ScenarioKioskMode
         ]

@@ -112,6 +112,9 @@ performTheAction a model =
                 ActionSetupRaid2SameBearing ->
                     actionSetupRaid2SameBearing
 
+                ActionMassRaids ->
+                    actionSetupMassRaids
+
                 ActionShowCalculator ->
                     actionShowCalculator
 
@@ -182,6 +185,11 @@ actionSetupRaid2DifferentBearings model =
 actionSetupRaid3to6 : Model -> Model
 actionSetupRaid3to6 model =
     { model | targets = model.targets ++ trainingMode3to6 model.modelTime }
+
+
+actionSetupMassRaids : Model -> Model
+actionSetupMassRaids model =
+    { model | targets = model.targets ++ trainingMassRaids model.modelTime }
 
 
 actionSetupRaidFriendlyOutbound : Model -> Model

@@ -34,6 +34,7 @@ type
     | ActionFindBearingOfNumberedTarget Bool Int
     | ActionFindRangeOfNumberedTarget Bool Int
     | ActionHeightMode
+    | ActionMassRaids
     | ActionRecordScenarioDone TutorialScenario
     | ActionSeekElevation Bool
     | ActionSeekElevationOfNumberedTarget Bool Int

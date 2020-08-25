@@ -346,7 +346,7 @@ interpretCalculator model =
         twoDigits x =
             String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
     in
-    "The calculator display tells us the raid is at grid position "
+    "The raid grid position is "
         ++ (case ( gridPos, letter ) of
                 ( Just grid, Just g ) ->
                     g
@@ -386,7 +386,7 @@ interpretCalculator model =
            )
         ++ (case model.storedFriendly of
                 Just True ->
-                    ", and is friendly."
+                    ", friendly."
 
                 _ ->
                     "."
