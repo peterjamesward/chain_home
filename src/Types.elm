@@ -14,6 +14,7 @@ type Page
     | TrainingPage
     | AboutPage
     | MapPage
+    | SplashPage
 
 
 type alias Flags =

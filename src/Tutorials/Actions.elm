@@ -118,6 +118,9 @@ performTheAction a model =
                 ActionShowCalculator ->
                     actionShowCalculator
 
+                ActionShowSplashPage ->
+                    actionShowSplashPage
+
                 ActionShowOperator ->
                     actionShowOperator
 
@@ -300,6 +303,9 @@ actionShowOperator : Model -> Model
 actionShowOperator model =
     { model | currPage = OperatorPageInTutorial }
 
+actionShowSplashPage : Model -> Model
+actionShowSplashPage model =
+    { model | currPage = SplashPage }
 
 actionExitAction : Model -> Model
 actionExitAction model =

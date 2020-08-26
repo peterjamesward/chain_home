@@ -1,5 +1,6 @@
 module Tutorials.KioskModeTutorial exposing (kioskModeTutorial)
 
+import SplashPage exposing (splashText)
 import Tutorials.ActionCodes exposing (TutorialActionCode(..), TutorialScenario(..), TutorialTextFunction(..))
 import Tutorials.Actions exposing (..)
 import Tutorials.Model exposing (TutorialEntry)
@@ -9,7 +10,7 @@ import Zipper
 
 
 --DONE: Remove some steps to reduce repetition
---TODO: Combine multiple raids in one display
+--DONE: Combine multiple raids in one display
 --DROP: Display context banner (e.g. "IFF") (could use actions for this)
 --DONE: Clear calculator after each raid
 --TODO: End with a more realistic picture on the tube
@@ -17,13 +18,19 @@ import Zipper
 --DONE: Allow varying times. (Proportional to text length.)
 --DONE: Pressing range when in height mode automatically exits height mode.
 --TODO: Include a splash screen in the tutorial cycle.
---TODO: Reset model/webgl time each cycle.
+--TODO: Reset model/webgl time each cycle so it doesn't degrade.
 
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
     Zipper.fromList
         [ TutorialEntry
+            UiCRT
+            [ ActionShowSplashPage ]
+            noStateActions
+            noExitActions
+            (TextConstant splashText)
+        , TutorialEntry
             UiCRT
             [ ActionInitialiseTutorial
             , ActionCentraliseKnobs
@@ -517,7 +524,7 @@ kioskModeTutorial =
             [ ActionSeekElevationOfNumberedTarget True 4 ]
             [ ActionSeekElevationOfNumberedTarget False 4 ]
             (TextConstant
-                """Turn the gonio again, to minimise the V."""
+                """Minimise the V."""
             )
         , TutorialEntry
             UiGonioButton
@@ -525,7 +532,7 @@ kioskModeTutorial =
             noStateActions
             [ ActionStoreElevation ]
             (TextConstant
-                """Store the goniometer setting."""
+                """Store the gonio setting."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -559,6 +566,8 @@ kioskModeTutorial =
             noStateActions
             [ ActionShowOperator ]
             TextInterpretCalculator
+
+        --TODO: Round it off with two 10 raids.
         , TutorialEntry
             UiCRT
             [ ActionMassRaids

@@ -35,6 +35,7 @@ import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
 import Receiver.OperatorPage exposing (operatorPage, operatorPageWithTutorial)
 import Spherical exposing (newPosition)
+import SplashPage exposing (splashPage)
 import Station exposing (..)
 import Target exposing (..)
 import Task
@@ -779,6 +780,9 @@ view model =
 
                 AboutPage ->
                     aboutPage
+
+                SplashPage ->
+                    splashPage
 
                 MapPage ->
                     mapPage model

@@ -53,3 +53,4 @@ type
     | ActionStoreRange
     | ActionStoreStrength Int
     | ActionSwingGoniometer
+    | ActionShowSplashPage
