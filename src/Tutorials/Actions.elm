@@ -326,6 +326,7 @@ actionClearTargets model =
 
 
 actionSwingGoniometer model =
+    --TODO: Better to use keys?
     { model | goniometerAzimuth = 1.2 * sin (toFloat model.modelTime / 1000) }
 
 

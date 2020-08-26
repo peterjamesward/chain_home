@@ -13,19 +13,21 @@ import Zipper
 --DONE: Combine multiple raids in one display
 --DROP: Display context banner (e.g. "IFF") (could use actions for this)
 --DONE: Clear calculator after each raid
---TODO: End with a more realistic picture on the tube
+--DONE: End with a more realistic picture on the tube
 --DONE: Try with eCrisper.
 --DONE: Allow varying times. (Proportional to text length.)
 --DONE: Pressing range when in height mode automatically exits height mode.
---TODO: Include a splash screen in the tutorial cycle.
---TODO: Reset model/webgl time each cycle so it doesn't degrade.
+--DONE: Include a splash screen in the tutorial cycle.
+--DONE A: Reset model/webgl time each cycle so it doesn't degrade.
+--TODO B: Transition to swinging gonio should start where it rests.
+--DONE C: The first large raid does not always DF out.
 
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
     Zipper.fromList
         [ TutorialEntry
-            UiCRT
+            UiDummy
             [ ActionShowSplashPage ]
             noStateActions
             noExitActions
@@ -443,7 +445,7 @@ kioskModeTutorial =
             , ActionStoreBearing
             ]
             (TextConstant
-                """We find another bearing where the movement stops.
+                """We find another bearing where the beating stops.
                   This means we have located the other aircraft."""
             )
         , TutorialEntry
@@ -567,7 +569,7 @@ kioskModeTutorial =
             [ ActionShowOperator ]
             TextInterpretCalculator
 
-        --TODO: Round it off with two 10 raids.
+        --DONE: Round it off with two 10 raids.
         , TutorialEntry
             UiCRT
             [ ActionClearTargets
@@ -575,6 +577,7 @@ kioskModeTutorial =
             , ActionCentraliseKnobs
             , ActionClearCalculator
             , ActionShowOperator
+            , ActionEndHeightMode
             ]
             [ ActionSwingGoniometer ]
             noExitActions
@@ -590,7 +593,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
                 """Set the Range Pointer points to the nearest raid.
-                This may be several aircraft that appear from our position to be in a long line.
+                This wide shape is several aircraft that appear from our position to be in a long line.
             """
             )
         , TutorialEntry
@@ -792,5 +795,5 @@ kioskModeTutorial =
                 A constant stream of reports must be passed to the control rooms so they can respond.
                 """
             )
-        , tutorialCloseStep ScenarioKioskMode
+--        , tutorialCloseStep ScenarioKioskMode
         ]

@@ -1,6 +1,6 @@
 
---TODO: Disable unwanted touch actions on all devices.
+--DROP: Disable unwanted touch actions on all devices.
 
---TODO: Unattended "demo" or "attractor" mode.
+--DONE: Unattended "demo" or "attractor" mode.
 
---TODO: Make a build that has NO interaction, just runs kiosk mode.
+--DONE: Make a build that has NO interaction, just runs kiosk mode.

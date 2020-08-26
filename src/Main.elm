@@ -218,9 +218,18 @@ deriveModelAtTime model timeNow =
                 , elevation_A_trace = heightMode_A_Outputs
                 , elevation_B_trace = heightMode_B_Outputs
             }
+
+        wrapAnimationTime m =
+            -- Stop randomness degrading by limiting webGLtime
+            if model.webGLtime > 300 * 1000 then
+                { m | webGLtime = 0.0 }
+
+            else
+                m
     in
     --Wrapping this in automation allows the Tutorials to do anything.
     { postTutorialModel | tutorialActive = newTutorialState }
+        |> wrapAnimationTime
 
 
 clearHistory : Model.Model -> Model.Model
@@ -521,7 +530,6 @@ update msg model =
 
         --TODO: Perhaps these should be Calculator Messages.
         StoreGoniometerSetting ->
-            -- TODO: This breaks calc interface (like it's not already).
             ( { model
                 | calculator =
                     case model.calculator.inputState of
@@ -852,10 +860,12 @@ navBar model =
         --, Border.width 2
         , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
         , spacingXY 100 0
+
         --, spaceEvenly
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
         , navItem model "Demo" KioskMode OperatorPage
+
         --, navItem model "Learn & Play" DisplayConfiguration InputPage
         --, navItem model "Receiver" DisplayReceiver OperatorPage
         --, navItem model "Calculator" DisplayCalculator CalculatorPage

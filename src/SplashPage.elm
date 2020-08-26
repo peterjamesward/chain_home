@@ -11,19 +11,19 @@ import Messages exposing (Msg(..))
 
 splashPage : Element Msg
 splashPage =
-    row [ width fill ]
+    row [ width fill, moveUp 40 ]
         [ column [ width (fillPortion 3) ]
-            [ image []
-                { src = ""
-                , description = "Place holder for picture 1"
+            [ image [ width (px 500)]
+                { src = "img/receiver.png"
+                , description = "The receiver panel"
                 }
-            , image []
-                { src = ""
-                , description = "Place holder for picture 2"
+            , image [width (px 500)]
+                { src = "img/calculator.png"
+                , description = "The electronic calculator display"
                 }
-            , image []
-                { src = ""
-                , description = "Place holder for picture 3"
+            , image [width (px 500)]
+                { src = "img/map.png"
+                , description = "Plots on a map"
                 }
             ]
         , column [ width (fillPortion 5) ]
