@@ -46,4 +46,11 @@ content =
 splashText =
         """
 # Chain Home Receiver
+
+This looping demonstration begins with single aircraft to introduce the main controls.
+
+It then moves on to variations of two and more aircraft, and raids of ten.
+
+The operator must track all the raids and report on them regularly.
+
         """

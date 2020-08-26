@@ -238,7 +238,8 @@ kioskAutomation model =
         ( beginTutorial, _ ) =
             update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
 
-        howLongTheStringIs = String.length <| Maybe.withDefault "" <| tutorialText model
+        howLongTheStringIs =
+            String.length <| Maybe.withDefault "" <| tutorialText model
     in
     case ( model.kioskTimer, model.tutorialActive ) of
         ( Nothing, _ ) ->
@@ -248,7 +249,7 @@ kioskAutomation model =
             { beginTutorial | kioskTimer = Just model.modelTime }
 
         ( Just lastTime, Just tut ) ->
-            if model.modelTime - lastTime >  howLongTheStringIs * 100 then
+            if model.modelTime - lastTime > howLongTheStringIs * 100 then
                 { advanceTutorial | kioskTimer = Just model.modelTime }
 
             else
@@ -277,7 +278,9 @@ update msg model =
             )
 
         SetStartTime time ->
-            ( { model | startTime = Time.posixToMillis time }
+            ( { model
+                | startTime = Time.posixToMillis time
+              }
             , Cmd.none
             )
 
@@ -848,13 +851,15 @@ navBar model =
         --, Border.color paletteSand
         --, Border.width 2
         , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
-        , spaceEvenly
+        , spacingXY 100 0
+        --, spaceEvenly
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
-        , navItem model "Learn & Play" DisplayConfiguration InputPage
-        , navItem model "Receiver" DisplayReceiver OperatorPage
-        , navItem model "Calculator" DisplayCalculator CalculatorPage
-        , navItem model "Map" DisplayMapPage MapPage
+        , navItem model "Demo" KioskMode OperatorPage
+        --, navItem model "Learn & Play" DisplayConfiguration InputPage
+        --, navItem model "Receiver" DisplayReceiver OperatorPage
+        --, navItem model "Calculator" DisplayCalculator CalculatorPage
+        --, navItem model "Map" DisplayMapPage MapPage
         ]
 
 
