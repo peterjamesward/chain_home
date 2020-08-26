@@ -26,9 +26,12 @@ content =
     Markdown.toHtmlWith { defaultOptions | smartypants = True }
         [ class "content" ]
         """
+
+# _For demonstration only_
+
 ## What is this?
 
-This application show the work of an operator
+This application shows the work of an operator
 at a Chain Home station during the Battle of Britain in 1940.
 
 ## Platforms supported

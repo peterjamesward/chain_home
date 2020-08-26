@@ -293,7 +293,7 @@ vertexShader =
             float x1 = abs((x - c)/w); // 0 <= x1 <= 1
             if (x1 > 1.0) return 0.0;
             float gradient = x1 * (1.0 - x1);
-            return gradient * sign(c - x);
+            return gradient; // * sign(c - x);
         }
 
         // Different version of FBM.
@@ -420,7 +420,7 @@ vertexShader =
 
             newPos.y -= max(0.0, height);
             newPos.x += position.y * slope;
-            stretch = abs(slope);
+            stretch = slope;
 
             // Lower the resolution of the x line to make the noise less noisy.
             float newx = floor((position.x) * 153.0);
@@ -442,7 +442,6 @@ vertexShader =
 
             gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);
             vcolor = newColour;
-            stretch = abs(stretch);
         }
   |]
 
@@ -456,6 +455,6 @@ fragmentShader =
 
         void main () {
             // Constants are empirical.
-            gl_FragColor = vec4(vcolor * (1.0 - 2.5 * stretch), 0.0);
+            gl_FragColor = vec4(vcolor * (1.0 - 2.0 * abs(stretch)), 0.0);
         }
   |]

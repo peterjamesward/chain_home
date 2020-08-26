@@ -135,7 +135,7 @@ severalAbreast n =
     List.map
         (\i ->
             { longitude = bawdsey.longitude + degrees 2.1
-            , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.001)
+            , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.002)
             , height = 25
             , heading = degrees 275
             , speed = 200
@@ -150,7 +150,7 @@ severalAbreast n =
 severalAligned n =
     List.map
         (\i ->
-            { longitude = bawdsey.longitude + degrees 2.2 + (degrees (toFloat i - 5) * 0.001)
+            { longitude = bawdsey.longitude + degrees 1.9 + (degrees (toFloat i - 5) * 0.002)
             , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
             , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
             , heading = degrees 265
@@ -208,4 +208,4 @@ trainingMode3to6 timeNow =
 trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
-        (severalAbreast 10 ++ severalAligned 10)
+        (severalAligned 10 ++ severalAbreast 10)

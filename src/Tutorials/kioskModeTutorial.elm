@@ -45,8 +45,8 @@ kioskModeTutorial =
             noStateActions
             noExitActions
             (TextConstant """The two large dips are caused by local buildings or hills.
-            The jiggling is electrical noise in the sensitive receivers.
-            """)
+                  The jiggling is electrical noise in the sensitive receivers.
+                  """)
         , TutorialEntry
             UiGoniometer
             [ ActionBearingMode
@@ -57,7 +57,7 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """ "Swing" the gonio, looking for new signals.
-             """
+                   """
             )
         , TutorialEntry
             UiCRT
@@ -68,8 +68,8 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """Here are two raids. Each is a single aircraft.
-                The pulsing pattern is a friendly aircraft using IFF.
-             """
+                      The pulsing pattern is a friendly aircraft using IFF.
+                   """
             )
         , TutorialEntry
             UiRangeKnob
@@ -78,7 +78,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
                 """Turn the Range knob so the Range Pointer points at a raid.
-            """
+                  """
             )
         , TutorialEntry
             UiGoniometer
@@ -181,7 +181,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget False 1 ]
             (TextConstant
                 """Turn the Range knob so the Range Pointer points at the other raid.
-            """
+                  """
             )
         , TutorialEntry
             UiGoniometer
@@ -279,8 +279,8 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """Here are three raids. The regular beats signify two aircraft.
-                The irregular pattern signifies three to six aircraft.
-            """
+                      The irregular pattern signifies three to six aircraft.
+                  """
             )
         , TutorialEntry
             UiRangeKnob
@@ -289,7 +289,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
                 """Turn the range knob so the pointer aligns with a raid.
-            """
+                  """
             )
         , TutorialEntry
             UiGoniometer
@@ -386,7 +386,7 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """We can't make the 'V' disappear completely.
-            The aircraft are at the same range, on different bearings."""
+                  The aircraft are at the same range, on different bearings."""
             )
         , TutorialEntry
             UiGoniometer
@@ -395,7 +395,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget False 2 ]
             (TextConstant
                 """We find the bearing where the V stops going up and down.
-            This means we have located one of the aircraft."""
+                  This means we have located one of the aircraft."""
             )
         , TutorialEntry
             UiGonioButton
@@ -444,7 +444,7 @@ kioskModeTutorial =
             ]
             (TextConstant
                 """We find another bearing where the movement stops.
-            This means we have located the other the aircraft."""
+                  This means we have located the other aircraft."""
             )
         , TutorialEntry
             UiRangeKnob
@@ -570,17 +570,227 @@ kioskModeTutorial =
         --TODO: Round it off with two 10 raids.
         , TutorialEntry
             UiCRT
-            [ ActionMassRaids
+            [ ActionClearTargets
+            , ActionMassRaids
             , ActionCentraliseKnobs
             , ActionClearCalculator
+            , ActionShowOperator
             ]
             [ ActionSwingGoniometer ]
             noExitActions
             (TextConstant
-                """The operator must track multiple raids.
-                Here are some large raids just coming within range.
-                Good luck.
+                """
+                Here are two larger raids.
             """
+            )
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 0 ]
+            [ ActionFindRangeOfNumberedTarget False 0 ]
+            (TextConstant
+                """Set the Range Pointer points to the nearest raid.
+                This may be several aircraft that appear from our position to be in a long line.
+            """
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionFindBearingOfNumberedTarget True 0 ]
+            [ ActionFindBearingOfNumberedTarget False 0 ]
+            (TextConstant
+                """They D/F out together, so it's a single raid."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreBearing ]
+            (TextConstant
+                """Store the bearing."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange ]
+            (TextConstant
+                """Store the range."""
+            )
+        , TutorialEntry
+            UiHeight
+            [ ActionHeightMode ]
+            noStateActions
+            noExitActions
+            (TextConstant
+                """Press the HEIGHT button."""
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionSeekElevationOfNumberedTarget True 0 ]
+            [ ActionSeekElevationOfNumberedTarget False 0 ]
+            (TextConstant
+                """Turn the gonio again to minimise the V."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreElevation ]
+            (TextConstant
+                """Store the gonio setting."""
+            )
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 0 ]
+            [ ActionFindRangeOfNumberedTarget False 0 ]
+            (TextConstant
+                """Check the range."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange
+            , ActionEndHeightMode
+            ]
+            (TextConstant
+                """Store the range."""
+            )
+        , TutorialEntry
+            UiRaidStrength
+            [ ActionStoreStrength 12
+            ]
+            noStateActions
+            noExitActions
+            (TextConstant
+                """Press Raid Strength 12 as an estimate of size. """
+            )
+        , TutorialEntry
+            UiCalculator
+            [ ActionShowCalculator
+            ]
+            noStateActions
+            [ ActionShowOperator
+            , ActionClearCalculator
+            ]
+            TextInterpretCalculator
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 10 ]
+            [ ActionFindRangeOfNumberedTarget False 10 ]
+            (TextConstant
+                """Set the Range Pointer points to the next raid.
+                This deep signal may be several aircraft in a wide formation.
+            """
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionFindBearingOfNumberedTarget True 10 ]
+            [ ActionFindBearingOfNumberedTarget False 10 ]
+            (TextConstant
+                """They D/F out together, so it's a single raid."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreBearing ]
+            (TextConstant
+                """Store the bearing."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange ]
+            (TextConstant
+                """Store the range."""
+            )
+        , TutorialEntry
+            UiHeight
+            [ ActionHeightMode ]
+            noStateActions
+            noExitActions
+            (TextConstant
+                """Press the HEIGHT button."""
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionSeekElevationOfNumberedTarget True 10 ]
+            [ ActionSeekElevationOfNumberedTarget False 10 ]
+            (TextConstant
+                """Turn the gonio again to minimise the V."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreElevation ]
+            (TextConstant
+                """Store the gonio setting."""
+            )
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 10 ]
+            [ ActionFindRangeOfNumberedTarget False 10 ]
+            (TextConstant
+                """Check the range."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange
+            , ActionEndHeightMode
+            ]
+            (TextConstant
+                """Store the range."""
+            )
+        , TutorialEntry
+            UiRaidStrength
+            [ ActionStoreStrength 9
+            , ActionStorePlus
+            ]
+            noStateActions
+            noExitActions
+            (TextConstant
+                """Press Raid Strength 9 and '+' as an estimate of size. """
+            )
+        , TutorialEntry
+            UiCalculator
+            [ ActionShowCalculator
+            ]
+            noStateActions
+            [ ActionShowOperator
+            , ActionClearCalculator
+            ]
+            TextInterpretCalculator
+        , TutorialEntry
+            UiCRT
+            [ ActionClearCalculator
+            , ActionClearTargets
+            , ActionSetupRaid
+            , ActionSetupRaid2DifferentBearings
+            , ActionSetupRaid2SameBearing
+            , ActionSetupRaid3to6
+            , ActionSetupRaidFriendlyOutbound
+            , ActionMassRaids
+            , ActionCentraliseKnobs
+            , ActionShowOperator
+            ]
+            [ ActionSwingGoniometer ]
+            noExitActions
+            (TextConstant
+                """In the heat of battle, the operator must maintain concentration to track multiple raids.
+                A constant stream of reports must be passed to the control rooms so they can respond.
+                """
             )
         , tutorialCloseStep ScenarioKioskMode
         ]

@@ -47,10 +47,18 @@ splashText =
         """
 # Chain Home Receiver
 
-This looping demonstration begins with single aircraft to introduce the main controls.
+## Demonstration mode
 
-It then moves on to variations of two and more aircraft, and raids of ten.
+This looping demonstration covers basic training scenarios:
 
-The operator must track all the raids and report on them regularly.
+ - Single aircraft, including IFF
+
+ - Two aircraft at same range, on same or different bearings
+
+ - Three to six aircraft
+
+ -  Larger formations in different orientations
+
+The full application allows you to track multiple raids and check your accuracy.
 
         """
