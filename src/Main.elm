@@ -241,15 +241,23 @@ kioskAutomation : Model.Model -> Model.Model
 kioskAutomation model =
     -- For now, just advance tutorial every 30 seconds.
     let
+        ( beginTutorial, _ ) =
+            update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
+
         ( advanceTutorial, _ ) =
             update (TutorialMsg TutorialAdvance) model
 
-        ( beginTutorial, _ ) =
-            update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
+        loopTutorial m =
+            if m.tutorialActive == Nothing then
+                beginTutorial
+
+            else
+                m
 
         howLongTheStringIs =
             String.length <| Maybe.withDefault "" <| tutorialText model
     in
+    -- KioskTimer being not Nothing forces the looping demo.
     case ( model.kioskTimer, model.tutorialActive ) of
         ( Nothing, _ ) ->
             model
@@ -260,6 +268,7 @@ kioskAutomation model =
         ( Just lastTime, Just tut ) ->
             if model.modelTime - lastTime > howLongTheStringIs * 100 then
                 { advanceTutorial | kioskTimer = Just model.modelTime }
+                    |> loopTutorial
 
             else
                 model

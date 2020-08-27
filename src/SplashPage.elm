@@ -49,7 +49,7 @@ splashText =
 
 ## Demonstration mode
 
-This looping demonstration covers basic training scenarios:
+This seven minute loop covers basic training scenarios:
 
  - Single aircraft, including IFF
 
@@ -57,8 +57,5 @@ This looping demonstration covers basic training scenarios:
 
  - Three to six aircraft
 
- -  Larger formations in different orientations
-
-The full application allows you to track multiple raids and check your accuracy.
-
+ - Larger formations in different orientations
         """

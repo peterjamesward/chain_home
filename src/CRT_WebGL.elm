@@ -11,10 +11,6 @@ import Utils exposing (choose)
 import WebGL exposing (clearColor)
 
 
-
---TODO: Deep signals don't look good - the stretching is out. Only with multiple raids so related to slope adding??
-
-
 crt : Float -> List Echo -> Html Msg
 crt time echoes =
     WebGL.toHtmlWith

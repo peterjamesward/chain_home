@@ -19,8 +19,9 @@ import Zipper
 --DONE: Pressing range when in height mode automatically exits height mode.
 --DONE: Include a splash screen in the tutorial cycle.
 --DONE A: Reset model/webgl time each cycle so it doesn't degrade.
---TODO B: Transition to swinging gonio should start where it rests.
+--DUPE B: Transition to swinging gonio should start where it rests.
 --DONE C: The first large raid does not always DF out.
+--TODO: Seems to be a flicker of another page at the end of the loop
 
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
@@ -56,7 +57,7 @@ kioskModeTutorial =
             , ActionClearTargets
             ]
             [ ActionSwingGoniometer ]
-            noExitActions
+            []
             (TextConstant
                 """ "Swing" the gonio, looking for new signals.
                    """
@@ -385,7 +386,7 @@ kioskModeTutorial =
             UiGoniometer
             noEntryActions
             [ ActionSwingGoniometer ]
-            noExitActions
+            [ ActionStopGonioAwayFromRaidBearing ]
             (TextConstant
                 """We can't make the 'V' disappear completely.
                   The aircraft are at the same range, on different bearings."""
@@ -580,7 +581,7 @@ kioskModeTutorial =
             , ActionEndHeightMode
             ]
             [ ActionSwingGoniometer ]
-            noExitActions
+            [ ActionStopGonioAwayFromRaidBearing ]
             (TextConstant
                 """
                 Here are two larger raids.
@@ -795,5 +796,6 @@ kioskModeTutorial =
                 A constant stream of reports must be passed to the control rooms so they can respond.
                 """
             )
---        , tutorialCloseStep ScenarioKioskMode
+
+        --        , tutorialCloseStep ScenarioKioskMode
         ]
