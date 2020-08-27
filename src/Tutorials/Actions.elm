@@ -147,6 +147,7 @@ performTheAction a model =
 
                 ActionSwingGoniometer ->
                     actionSwingGoniometer
+
     in
     actionFunction model
 
@@ -156,7 +157,6 @@ actionInitialiseTutorial m =
     { m
         | currPage = OperatorPageInTutorial
         , startTime = m.modelTime
-        , webGLtime = 0.0
     }
 
 
@@ -326,7 +326,6 @@ actionClearTargets model =
 
 
 actionSwingGoniometer model =
-    --TODO: Better to use keys?
     { model | goniometerAzimuth = 1.2 * sin (toFloat model.modelTime / 1000) }
 
 

@@ -247,12 +247,13 @@ kioskAutomation model =
         ( advanceTutorial, _ ) =
             update (TutorialMsg TutorialAdvance) model
 
-        loopTutorial m =
-            if m.tutorialActive == Nothing then
-                beginTutorial
+        loopedTutorial =
+            case advanceTutorial.tutorialActive of
+                Just _ ->
+                    advanceTutorial
 
-            else
-                m
+                Nothing ->
+                    beginTutorial
 
         howLongTheStringIs =
             String.length <| Maybe.withDefault "" <| tutorialText model
@@ -267,8 +268,7 @@ kioskAutomation model =
 
         ( Just lastTime, Just tut ) ->
             if model.modelTime - lastTime > howLongTheStringIs * 100 then
-                { advanceTutorial | kioskTimer = Just model.modelTime }
-                    |> loopTutorial
+                { loopedTutorial | kioskTimer = Just model.modelTime }
 
             else
                 model

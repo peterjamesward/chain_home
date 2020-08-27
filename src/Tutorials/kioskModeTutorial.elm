@@ -21,7 +21,7 @@ import Zipper
 --DONE A: Reset model/webgl time each cycle so it doesn't degrade.
 --DUPE B: Transition to swinging gonio should start where it rests.
 --DONE C: The first large raid does not always DF out.
---TODO: Seems to be a flicker of another page at the end of the loop
+--DONE: Seems to be a flicker of another page at the end of the loop
 
 
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
@@ -796,6 +796,4 @@ kioskModeTutorial =
                 A constant stream of reports must be passed to the control rooms so they can respond.
                 """
             )
-
-        --        , tutorialCloseStep ScenarioKioskMode
         ]
