@@ -874,18 +874,17 @@ navBar model =
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
         , navItem model "Demo" KioskMode OperatorPage
-
-        --, navItem model "Learn & Play" DisplayConfiguration InputPage
-        --, navItem model "Receiver" DisplayReceiver OperatorPage
-        --, navItem model "Calculator" DisplayCalculator CalculatorPage
-        --, navItem model "Map" DisplayMapPage MapPage
+        , navItem model "Learn & Play" DisplayConfiguration InputPage
+        , navItem model "Receiver" DisplayReceiver OperatorPage
+        , navItem model "Calculator" DisplayCalculator CalculatorPage
+        , navItem model "Map" DisplayMapPage MapPage
         ]
 
 
 
 -- Show list of configurations with Checkboxes.
 -- This will now be on its own page with elm-ui.
--- Entries will be pre-ticker if the relevant tutorial is done, but can be ticked (& un-ticked) manually.
+-- Entries are ticked if the relevant tutorial is done, but can be ticked (& un-ticked) manually.
 
 
 setConfig : TargetSelector -> Bool -> Msg
