@@ -1,6 +1,7 @@
+--TODO:  Reinstate normal operating mode with mix of targets.
 
---DROP: Disable unwanted touch actions on all devices.
+--TODO: Increase raid limit by using more WebGL.
+--TODO: Put 10 plane pattern in WebGL
+--TODO: Put 100 plane pattern in WebGL
+--TODO: Put X plane pattern in WebGL
 
---DONE: Unattended "demo" or "attractor" mode.
-
---DONE: Make a build that has NO interaction, just runs kiosk mode.

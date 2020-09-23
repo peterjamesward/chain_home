@@ -54,6 +54,8 @@ and strength to be passed on to Fighter Command.
 
 You can then test your skills with a series of incoming raids.
 
+**Demo** puts the application into a looping demonstration. Reload the page to exit.
+
 **Receiver** is a mock-up of the main operator's control panel, slightly simplified here.
 
 **Calculator** illustrates the output from the electrical calculator that derives the height and
@@ -66,10 +68,10 @@ Each screen (other than this one) has a green **?** button which will provide so
 
 ## Platforms supported
 
-This has been tested on and works fine using Safari, Chrome and Firefox browsers on MacOS X,
-and Chrome, Firefox and Microsoft Edge browsers on Windows 10. It does not work with Internet Explorer 10 on Windows 10.
-It also works on iPad with iOS 13.4 or higher; the iPad Mini will work but the screen is too small to work properly.
-Other tablets have not been tested; feedback would be welcome but there is NO SUPPORT.
+This has been tested on and works fine using Safari, Chrome, Opera and Firefox browsers on MacOS X,
+and Chrome, Firefox and Microsoft Edge browsers on Windows 10. It does **not** work with Internet Explorer 10 on Windows 10.
+It also works on iPad with iOS 13.4 or higher; the iPad Mini will work but the screen is too small to use effectively.
+No other tablets have been tested; feedback would be welcome but there is NO SUPPORT.
 
 ## Credits and licenses
 

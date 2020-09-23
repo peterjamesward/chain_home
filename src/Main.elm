@@ -864,13 +864,10 @@ navBar model =
     row
         [ width fill
         , Background.color paletteDarkGreen
-
-        --, Border.color paletteSand
-        --, Border.width 2
+        , Border.color paletteSand
+        , Border.width 2
         , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
-        , spacingXY 100 0
-
-        --, spaceEvenly
+        , spaceEvenly
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
         , navItem model "Demo" KioskMode OperatorPage
