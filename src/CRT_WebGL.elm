@@ -376,7 +376,7 @@ vertexShader =
             // need to sort signals in decreasing strength.
 
             vec3 pulse[32];
-            float cumulativeX = 0.0; // We will add in cartesian space
+            float cumulativeX = 0.0; // Addition is in cartesian space
             float cumulativeY = 0.0;
             float slope = 0.0; // Seems to work better if we accumulate slope directly.
 
@@ -387,32 +387,24 @@ vertexShader =
                 // We do the same for the slope but separately.
                 pulse[i] = pulseShape(raid[i], 0.02);
 
-// The 'if' is not used below. My understanding is that this type of optimisation
-// may be counter-productive in a GPU context.
-//                if (pulse[i].y > 0.0) { // optimisation!
-                    float amplitude = pulse[i].y;
-                    float phase = u_time * periodicity(i);
-                    cumulativeX += amplitude * cos(phase);
-                    cumulativeY += amplitude * sin(phase);
-                    slope += pulse[i].z;
+                float amplitude = pulse[i].y;
+                float phase = u_time * periodicity(i);
+                cumulativeX += amplitude * cos(phase);
+                cumulativeY += amplitude * sin(phase);
+                slope += pulse[i].z;
 
-//                }
             }
 
             // Now we reclaim the height and slope by converting back to polar.
             float height = sqrt(cumulativeX * cumulativeX + cumulativeY * cumulativeY);
 
           // Additional "spiky" line noise.
-          // Same comment about 'if' as an optimisation.
-//          if (lineSpikes > 0.0) {
-              if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )
-              {
-                 vec3 noise = vec3(position.x, 0.1, 0.0);
-                 vec3 spike = pulseShape(noise, 0.05);
-                 height += lineSpikes * spike.y;
-                 //slope += lineSpikes * spike.z;
-              }
-//          }
+          if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )
+          {
+             vec3 noise = vec3(position.x, 0.1, 0.0);
+             vec3 spike = pulseShape(noise, 0.05);
+             height += lineSpikes * spike.y;
+          }
 
             newPos.y -= max(0.0, height);
             newPos.x += position.y * slope;
@@ -423,18 +415,15 @@ vertexShader =
             float newtime = floor(u_time / 2.0);
 
             // add time to the noise parameters so it's animated
-//            if (lineJiggle > 0.0) {
-                float noise = turbulence( newx * newtime );
-                float b = random( newx * newtime );
-                float displacement = lineJiggle * noise + 0.01 * b;
-                newPos.y += displacement;
-//            }
+            float noise = turbulence( newx * newtime );
+            float b = random( newx * newtime );
+            float displacement = lineJiggle * noise + 0.01 * b;
+            newPos.y += displacement;
 
             // Where no signal, narrow the line a bit.
             if (height == 0.0) {
                 newPos.y /= 2.0;
             }
-            //if (newPos.y > 0.0) { newPos.y /= 2.0; }
 
             gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);
             vcolor = newColour;
