@@ -56,10 +56,10 @@ You can then test your skills with a series of incoming raids.
 
 **Demo** puts the application into a looping demonstration. Reload the page to exit.
 
-**Receiver** is a mock-up of the main operator's control panel, slightly simplified here.
+**Receiver** is a slightly simplified mock-up of the main operator's control panel.
 
-**Calculator** illustrates the output from the electrical calculator that derives the height and
-summarises the information to be passed to Fighter Command.
+**Calculator** illustrates the output from the electrical calculator that derives the position and height, and
+collates information for Fighter Command.
 
 **Map** allows you to see how well your plots correspond with the actual raid positions.
 This of course would not have been available to the operator!

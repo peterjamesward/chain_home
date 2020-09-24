@@ -1,7 +1,6 @@
---TODO:  Reinstate normal operating mode with mix of targets.
+--TODO: Reinstate normal operating mode with mix of targets.
 
---TODO: Increase raid limit by using more WebGL.
---TODO: Put 10 plane pattern in WebGL
---TODO: Put 100 plane pattern in WebGL
---TODO: Put X plane pattern in WebGL
+--TODO: Push raid patterns onto GPU using more WebGL. (Raid = "array" of time-varying cubics?)
+-- All the components are there already.
 
+--TODO: Scenario gets increasingly worse by roughly doubling raid sizes.

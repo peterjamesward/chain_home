@@ -72,12 +72,13 @@ echoToVec : Array Echo -> Int -> Vec3
 echoToVec echoes i =
     -- Echoes are massaged into the "raids" uniforms and the WebGL -1..+1 coordinates.
     -- We can use z to allow us to colour the raids differently in tutorial mode.
+    -- Use z as raid size, which will mean the number of cubic curves it needs.
     case Array.get i echoes of
         Just echo ->
             vec3
                 (echo.r / 80000 - 1.0)
                 (echo.amplitude / 10.0)
-                (choose echo.tutorial 1.0 0.0)
+                1.0
 
         _ ->
             vec3 -1.0 0.0 0.0
@@ -89,7 +90,7 @@ uniforms time echoes =
         echoArray =
             Array.fromList echoes
     in
-    -- Apologies this is ch'ugly but the Elm GLSL parser does not accept array, for now.
+    -- Apologies this is chugly but the Elm GLSL parser does not accept array, for now.
     { rotation =
         Mat4.mul
             (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
@@ -386,25 +387,24 @@ vertexShader =
                 // We do the same for the slope but separately.
                 pulse[i] = pulseShape(raid[i], 0.02);
 
-                if (pulse[i].y > 0.0) { // optimisation!
+// The 'if' is not used below. My understanding is that this type of optimisation
+// may be counter-productive in a GPU context.
+//                if (pulse[i].y > 0.0) { // optimisation!
                     float amplitude = pulse[i].y;
                     float phase = u_time * periodicity(i);
                     cumulativeX += amplitude * cos(phase);
                     cumulativeY += amplitude * sin(phase);
                     slope += pulse[i].z;
 
-                    // We have used pulse.x to pass through the raid colour identifier!!
-                    if (pulse[i].x > 0.0 && position.y == 0.0) {
-                        newColour = vec3(1.0, 1.0, 1.0);
-                    }
-                }
+//                }
             }
 
             // Now we reclaim the height and slope by converting back to polar.
             float height = sqrt(cumulativeX * cumulativeX + cumulativeY * cumulativeY);
 
           // Additional "spiky" line noise.
-          if (lineSpikes > 0.0) {
+          // Same comment about 'if' as an optimisation.
+//          if (lineSpikes > 0.0) {
               if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )
               {
                  vec3 noise = vec3(position.x, 0.1, 0.0);
@@ -412,7 +412,7 @@ vertexShader =
                  height += lineSpikes * spike.y;
                  //slope += lineSpikes * spike.z;
               }
-          }
+//          }
 
             newPos.y -= max(0.0, height);
             newPos.x += position.y * slope;
@@ -423,12 +423,12 @@ vertexShader =
             float newtime = floor(u_time / 2.0);
 
             // add time to the noise parameters so it's animated
-            if (lineJiggle > 0.0) {
+//            if (lineJiggle > 0.0) {
                 float noise = turbulence( newx * newtime );
                 float b = random( newx * newtime );
                 float displacement = lineJiggle * noise + 0.01 * b;
                 newPos.y += displacement;
-            }
+//            }
 
             // Where no signal, narrow the line a bit.
             if (height == 0.0) {
