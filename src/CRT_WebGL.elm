@@ -158,8 +158,36 @@ fragmentShader =
         uniform vec3 raid14;
         uniform vec3 raid15;
 
-        vec3 COL1 = vec3(1.0,0.0,0.0);
-        vec3 COL2 = vec3(0.0,1.0,0.0);
+        vec3 COL1 = vec3(0.8,0.0,0.0);
+        vec3 COL2 = vec3(0.0,0.8,0.0);
+
+        float cubic(float x) {
+            return x * x * (3.0 - 2.0 * x) ;
+        }
+
+       // We need an envelope with cubic sidewalls and a flat top.
+       // So this is a variant of "cubicPulse".
+       // Aim is that this will work in all cases.
+       // l = left edge (not centre)
+       // w = width of flat top
+       // x = the location to be evaluated
+        float envelope( float l, float w, float x ) {
+            float cubicWidth = 0.01;
+            float leadingEdgeX = (x - l)/cubicWidth;
+            float trailingEdgeX = (l + w - x)/cubicWidth;
+            leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
+            trailingEdgeX = clamp(trailingEdgeX, 0.0, 1.0);
+            float leadingEdgeY = cubic(leadingEdgeX);
+            float trailingEdgeY = cubic(trailingEdgeX);
+
+            return min(leadingEdgeY, trailingEdgeY);
+        }
+
+        float envelope1( float l, float w, float x) {
+            float beyondLeft = float(x > l);
+            float beforeRight = float(x < l + w);
+            return min(beyondLeft, beforeRight);
+        }
 
         float cubicPulse( float c, float w, float x ) {
             x = abs(x - c); // NOTE 0 <= x <= +w
@@ -187,7 +215,7 @@ fragmentShader =
             mrf += 2.0 * sin(uv.x * 128.0 + 0.5) * sin(iTime * 5.0);
             mrf += 1.0 * sin(uv.x * 64.0 + 0.1) * sin(iTime * 4.0);
             mrf += 1.0 * sin(uv.x * 32.0 + 0.2) * sin(iTime * 3.0);
-            mrf /= 2.0;
+            mrf /= 3.0;
 
             // Add a noise field (use our existing one).
             // Lower the resolution of the x line to make the noise less noisy.
@@ -204,8 +232,8 @@ fragmentShader =
             lumpy += sin(uv.x * 256.0);
             lumpy = 0.0 - float(lumpy < -0.8);
             float lumpyTime = 0.0;
-            lumpyTime += sin(iTime * 11.0) + sin(iTime * 19.0);
-            lumpyTime = float(lumpyTime > 1.9);
+            lumpyTime += sin(iTime * 13.0) * fract(1000.0 * sin(iTime * 15.0));
+            lumpyTime = float(lumpyTime > 0.9);
 
             float sawtooth = 0.0;
             sawtooth = abs(0.5 - fract(uv.x * 20.0));
@@ -213,11 +241,10 @@ fragmentShader =
 
             // Now expose a section of the field where we have raids.
             // Note pulse width sqrt(N)/100 looks ok.
-            float raid1 = f1 * cubicPulse(0.2, 0.01, uv.x); // One
-            float raid2 = f2 * cubicPulse(0.3, 0.01, uv.x);  // Two
-            float raid3 = mrf * cubicPulse(0.5, 0.0140, uv.x); // Three
-            float raid4 = mrf * cubicPulse(0.7, 0.0200, uv.x); // Many
-            raid4 += mrf * cubicPulse(0.72, 0.0200, uv.x); // Many
+            float raid1 = f1 * envelope(0.1, 0.01, uv.x); // One
+            float raid2 = f2 * envelope(0.3, 0.014142, uv.x);  // Two
+            float raid3 = mrf * envelope(0.5, 0.03, uv.x); // Three
+            float raid4 = mrf * envelope(0.7, 0.04, uv.x); // Many
 
             float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
 
@@ -225,7 +252,7 @@ fragmentShader =
             beamY = beamY/50.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
-            float i = pow(1.0 - abs(uv.y - beamY), 25.0);
+            float i = pow(1.0 - abs(uv.y - beamY), 28.0);
             //float i = cubicPulse(beamY, 0.04, uv.y);
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
