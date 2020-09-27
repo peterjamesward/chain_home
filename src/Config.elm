@@ -8,21 +8,21 @@ import Types exposing (Echo, Target, TargetProforma)
 groundRays : List Echo
 groundRays =
     [ { sequence = 0
-      , r = 5000
+      , r = 8000 -- 8km
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , phase = 0
       , duration = 0
-      , amplitude = 10.0
+      , amplitude = 3
       , tutorial = False
       }
     , { sequence = 0
-      , r = 8000
+      , r = 10000 -- 10km
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , phase = 0
       , duration = 0
-      , amplitude = 8.0
+      , amplitude = 6
       , tutorial = False
       }
     ]

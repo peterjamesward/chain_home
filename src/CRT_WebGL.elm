@@ -15,8 +15,8 @@ crt time echoes =
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0
         ]
-        [ width 2000
-        , height 1000
+        [ width 1800
+        , height 800
         , style "display" "block"
         , style "width" "640px"
         ]
@@ -74,9 +74,9 @@ echoToVec echoes i =
     case Array.get i echoes of
         Just echo ->
             vec3
-                (echo.r / 80000)
-                (echo.amplitude * 1.0)
-                9.0
+                (echo.r / 160000)
+                (echo.amplitude * 40.0)
+                1.0
 
         _ ->
             vec3 -1.0 0.0 0.0
@@ -89,7 +89,7 @@ uniforms time echoes =
             Array.fromList echoes
     in
     -- Apologies this is chugly but the Elm GLSL parser does not accept array, for now.
-    { iResolution = vec3 800 400 0
+    { iResolution = vec3 1600 800 0
     , iTime = time / 10
     , numRaids = min 16 <| List.length echoes
     , raid0 = echoToVec echoArray 0
@@ -180,7 +180,7 @@ fragmentShader =
        // w = width of flat top
        // x = the location to be evaluated
         float envelope( float l, float w, float x ) {
-            float cubicWidth = 0.02;
+            float cubicWidth = 0.06;
             float leadingEdgeX = (x - l)/cubicWidth;
             float trailingEdgeX = (l + w - x)/cubicWidth;
             leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
