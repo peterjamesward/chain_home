@@ -75,7 +75,7 @@ echoToVec echoes i =
         Just echo ->
             vec3
                 (echo.r / 80000)
-                echo.amplitude
+                (echo.amplitude * 10.0)
                 1.0
 
         _ ->
@@ -162,6 +162,13 @@ fragmentShader =
         vec3 COL1 = vec3(0.8,0.0,0.0);
         vec3 COL2 = vec3(0.0,0.8,0.0);
 
+        float cubicPulse( float c, float w, float x ) {
+            x = abs(x - c); // NOTE 0 <= x <= +w
+            if (x > w) return 0.0;
+            x /= w; // 0 <= x <= +1 (width is actually 2w)
+            return 1.0 - x * x * (3.0 - 2.0 * x);
+        }
+
         float cubic(float x) {
             return x * x * (3.0 - 2.0 * x) ;
         }
@@ -173,7 +180,7 @@ fragmentShader =
        // w = width of flat top
        // x = the location to be evaluated
         float envelope( float l, float w, float x ) {
-            float cubicWidth = 0.01;
+            float cubicWidth = 0.03;
             float leadingEdgeX = (x - l)/cubicWidth;
             float trailingEdgeX = (l + w - x)/cubicWidth;
             leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
@@ -186,12 +193,12 @@ fragmentShader =
 
         // Think of this as a single target "field"
         float f1(float x) {
-            return -3.0;
+            return -1.0;
         }
 
         // A "two plane" field
         float f2(float x) {
-            return 3.0 * sin(iTime * 3.0);
+            return 1.0 * sin(iTime * 3.0);
         }
 
         // Think of this as a mass raid "field".
@@ -208,12 +215,12 @@ fragmentShader =
         }
 
         float includeRaid(vec3 raid, float x) {
-            float targets = raid.z;
-            float f1Component = f1(x);
-            float f2Component = f2(x) * clamp(targets - 1.0, 0.0, 1.0);
-            float fnComponent = fn(x) * clamp(targets - 2.0, 0.0, 1.0);
-            float shape = raid.y * envelope(raid.x, sqrt(targets)/100.0, x);
-            return shape * (f1Component);// + f2Component + fnComponent);
+            float f1Component = f1(x); // * float(raid.z <= 2.0);
+            float f2Component = f2(x) * float(raid.z == 2.0);
+            float fnComponent = fn(x) * float(raid.z > 2.0);
+            float added = min(f1Component + f2Component + fnComponent, 0.0);
+            float shape = raid.y * envelope(raid.x, sqrt(raid.z)/100.0, x);
+            return shape * added;
         }
 
         void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -272,11 +279,11 @@ fragmentShader =
             beamY += includeRaid(raid15, uv.x);
 
             // Fiddle with coordinate (needs some work).
-            beamY = beamY/50.0 + 0.78;
+            beamY = beamY/100.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
             float i = pow(1.0 - abs(uv.y - beamY), 28.0);
-            //float i = cubicPulse(beamY, 0.04, uv.y);
+            //float i = cubicPulse(beamY, 0.02 / abs(beamY), uv.y);
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
 
