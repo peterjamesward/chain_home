@@ -13,7 +13,7 @@ groundRays =
       , alpha = 0
       , phase = 0
       , duration = 0
-      , amplitude = 5.0
+      , amplitude = 10.0
       , tutorial = False
       }
     , { sequence = 0
@@ -22,7 +22,7 @@ groundRays =
       , alpha = 0
       , phase = 0
       , duration = 0
-      , amplitude = 3.0
+      , amplitude = 8.0
       , tutorial = False
       }
     ]

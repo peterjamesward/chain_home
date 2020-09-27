@@ -3,9 +3,8 @@ module CRT_WebGL exposing (..)
 import Array exposing (Array)
 import Html exposing (Html)
 import Html.Attributes exposing (height, style, width)
-import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector2 exposing (Vec2)
-import Math.Vector3 as Vec3 exposing (Vec3, vec3)
+import Math.Vector3 exposing (Vec3, vec3)
 import Messages exposing (Msg)
 import Types exposing (Echo, Point)
 import WebGL exposing (Mesh, Shader, clearColor)
@@ -28,9 +27,10 @@ crt time echoes =
             (uniforms time echoes)
         ]
 
+
 mesh : Mesh { position : Vec3 }
 mesh =
-    // The mesh corners adjusted empirically to align with range scale.
+    -- The mesh corners adjusted empirically to align with range scale.
     WebGL.triangles
         [ ( { position = vec3 -0.92 0.9 0 }
           , { position = vec3 0.92 0.9 0 }
@@ -41,6 +41,7 @@ mesh =
           , { position = vec3 0.92 -0.9 0 }
           )
         ]
+
 
 type alias Uniforms =
     { iResolution : Vec3
@@ -73,8 +74,8 @@ echoToVec echoes i =
     case Array.get i echoes of
         Just echo ->
             vec3
-                (echo.r / 80000 - 1.0)
-                (echo.amplitude / 10.0)
+                (echo.r / 80000)
+                echo.amplitude
                 1.0
 
         _ ->
@@ -114,7 +115,6 @@ type alias Vertex =
     { position : Vec3
     , color : Vec3
     }
-
 
 
 vertexShader : Shader { position : Vec3 } Uniforms { vFragCoord : Vec2 }
@@ -184,39 +184,42 @@ fragmentShader =
             return min(leadingEdgeY, trailingEdgeY);
         }
 
-        float envelope1( float l, float w, float x) {
-            float beyondLeft = float(x > l);
-            float beforeRight = float(x < l + w);
-            return min(beyondLeft, beforeRight);
+        // Think of this as a single target "field"
+        float f1(float x) {
+            return -3.0;
         }
 
-        float cubicPulse( float c, float w, float x ) {
-            x = abs(x - c); // NOTE 0 <= x <= +w
-            if (x > w) return 0.0;
-            x /= w; // 0 <= x <= +1 (width is actually 2w)
-            return 1.0 - x * x * (3.0 - 2.0 * x);
+        // A "two plane" field
+        float f2(float x) {
+            return 3.0 * sin(iTime * 3.0);
+        }
+
+        // Think of this as a mass raid "field".
+        float fn(float x) {
+            float f = 0.0;
+            f += 2.0 * sin(x * 512.0 + 0.0) * sin(iTime * 9.0);
+            f += 2.0 * sin(x * 256.0 + 0.0) * sin(iTime * 8.0);
+            f += 2.0 * sin(x * 128.0 + 0.0) * sin(iTime * 6.0);
+            f += 2.0 * sin(x * 128.0 + 0.5) * sin(iTime * 5.0);
+            f += 1.0 * sin(x * 64.0 + 0.1) * sin(iTime * 4.0);
+            f += 1.0 * sin(x * 32.0 + 0.2) * sin(iTime * 3.0);
+            f /= 3.0;
+            return f;
+        }
+
+        float includeRaid(vec3 raid, float x) {
+            float targets = raid.z;
+            float f1Component = f1(x);
+            float f2Component = f2(x) * clamp(targets - 1.0, 0.0, 1.0);
+            float fnComponent = fn(x) * clamp(targets - 2.0, 0.0, 1.0);
+            float shape = raid.y * envelope(raid.x, sqrt(targets)/100.0, x);
+            return shape * (f1Component);// + f2Component + fnComponent);
         }
 
         void mainImage( out vec4 fragColor, in vec2 fragCoord )
         {
             vec2 uv = fragCoord.xy/iResolution.xy;
             vec2 uvn = 2.0 * uv - 1.0;
-
-            // Think of this as a single target "field"
-            float f1 = -3.0;
-
-            // A "two plane" field
-            float f2 = f1 - (3.0 * sin(iTime * 3.0));
-
-            // Think of this as a mass raid "field".
-            float mrf = f1 + f2 - 6.0;
-            mrf += 2.0 * sin(uv.x * 512.0 + 0.0) * sin(iTime * 9.0);
-            mrf += 2.0 * sin(uv.x * 256.0 + 0.0) * sin(iTime * 8.0);
-            mrf += 2.0 * sin(uv.x * 128.0 + 0.0) * sin(iTime * 6.0);
-            mrf += 2.0 * sin(uv.x * 128.0 + 0.5) * sin(iTime * 5.0);
-            mrf += 1.0 * sin(uv.x * 64.0 + 0.1) * sin(iTime * 4.0);
-            mrf += 1.0 * sin(uv.x * 32.0 + 0.2) * sin(iTime * 3.0);
-            mrf /= 3.0;
 
             // Add a noise field (use our existing one).
             // Lower the resolution of the x line to make the noise less noisy.
@@ -242,12 +245,31 @@ fragmentShader =
 
             // Now expose a section of the field where we have raids.
             // Note pulse width sqrt(N)/100 looks ok.
-            float raid1 = f1 * envelope(0.1, 0.01, uv.x); // One
-            float raid2 = f2 * envelope(0.3, 0.014142, uv.x);  // Two
-            float raid3 = mrf * envelope(0.5, 0.03, uv.x); // Three
-            float raid4 = mrf * envelope(0.7, 0.04, uv.x); // Many
+            // These are test raids.
+            //float raid1 = f1 * envelope(0.1, 0.01, uv.x); // One
+            //float raid2 = f2 * envelope(0.3, 0.014142, uv.x);  // Two
+            //float raid3 = mrf * envelope(0.5, 0.03, uv.x); // Three
+            //float raid4 = mrf * envelope(0.7, 0.04, uv.x); // Many
+            //float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
 
-            float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
+
+            // Now get actual raids from the uniforms.
+            float beamY = noise + bumps;
+            beamY += includeRaid(raid0, uv.x);
+            beamY += includeRaid(raid1, uv.x);
+            beamY += includeRaid(raid2, uv.x);
+            beamY += includeRaid(raid3, uv.x);
+            beamY += includeRaid(raid4, uv.x);
+            beamY += includeRaid(raid5, uv.x);
+            beamY += includeRaid(raid7, uv.x);
+            beamY += includeRaid(raid8, uv.x);
+            beamY += includeRaid(raid9, uv.x);
+            beamY += includeRaid(raid10, uv.x);
+            beamY += includeRaid(raid11, uv.x);
+            beamY += includeRaid(raid12, uv.x);
+            beamY += includeRaid(raid13, uv.x);
+            beamY += includeRaid(raid14, uv.x);
+            beamY += includeRaid(raid15, uv.x);
 
             // Fiddle with coordinate (needs some work).
             beamY = beamY/50.0 + 0.78;
