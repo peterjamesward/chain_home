@@ -699,8 +699,8 @@ makeNewTarget ( bearing, height ) model =
             , height = height
             , heading = heading
             , speed = 300 -- Quicker testing!
+            , strength = 1
             , iff = Nothing
-            , tutorial = False
             }
 
         raidIfSelected scenario raidType =

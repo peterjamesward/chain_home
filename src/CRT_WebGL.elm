@@ -76,7 +76,7 @@ echoToVec echoes i =
             vec3
                 (echo.r / 160000)
                 (echo.amplitude * 40.0)
-                1.0
+                (toFloat echo.strength)
 
         _ ->
             vec3 -1.0 0.0 0.0

@@ -11,19 +11,19 @@ groundRays =
       , r = 8000 -- 8km
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
+      , strength = 1
       , phase = 0
       , duration = 0
       , amplitude = 3
-      , tutorial = False
       }
     , { sequence = 0
       , r = 10000 -- 10km
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
+      , strength = 1
       , phase = 0
       , duration = 0
       , amplitude = 6
-      , tutorial = False
       }
     ]
 
@@ -51,8 +51,8 @@ behindStation =
     , height = 30 -- ,000 ft
     , heading = degrees 180
     , speed = 200.0 -- mph
+    , strength = 1
     , iff = Nothing
-    , tutorial = False
     }
 
 
@@ -63,33 +63,20 @@ bomber1 =
     , height = 20 -- ,000 ft
     , heading = degrees 250
     , speed = 200.0 -- mph
+    , strength = 3
     , iff = Nothing
-    , tutorial = False
     }
 
 
 bomber2 : TargetProforma
 bomber2 =
-    -- 2 and 2A very close to look for "beating" effect.
     { longitude = bawdsey.longitude + degrees 1.2
     , latitude = degrees 52.05
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
     , speed = 200.0 -- mph
+    , strength = 12
     , iff = Nothing
-    , tutorial = False
-    }
-
-
-bomber2A : TargetProforma
-bomber2A =
-    { longitude = bawdsey.longitude + degrees 1.2
-    , latitude = degrees 52.04
-    , height = 30.2 -- ,000 ft
-    , heading = degrees 280
-    , speed = 200.0 -- mph
-    , iff = Nothing
-    , tutorial = False
     }
 
 
@@ -101,8 +88,8 @@ bomber3 =
     , height = 40 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
+    , strength = 24
     , iff = Nothing
-    , tutorial = False
     }
 
 
@@ -113,8 +100,8 @@ bomber4 =
     , height = 40 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
+    , strength = 60
     , iff = Nothing
-    , tutorial = False
     }
 
 
@@ -126,55 +113,44 @@ fighter1 =
     , height = 10 -- ,000 ft
     , heading = degrees 270
     , speed = 300 -- mph
+    , strength = 6
     , iff = Just 1
-    , tutorial = False
     }
 
 
-severalAbreast n =
-    List.map
-        (\i ->
-            { longitude = bawdsey.longitude + degrees 2.1
-            , latitude = bawdsey.latitude + degrees 0.3 + (degrees (toFloat i - 5) * 0.002)
-            , height = 25
-            , heading = degrees 275
-            , speed = 200
-            , iff = Nothing
-            , tutorial = False
-            }
-        )
-    <|
-        List.range 1 n
+largeGroup1 n =
+    { longitude = bawdsey.longitude + degrees 2.1
+    , latitude = bawdsey.latitude + degrees 0.3
+    , height = 25
+    , heading = degrees 275
+    , speed = 200
+    , strength = n
+    , iff = Nothing
+    }
 
 
-severalAligned n =
-    List.map
-        (\i ->
-            { longitude = bawdsey.longitude + degrees 1.9 + (degrees (toFloat i - 5) * 0.002)
-            , latitude = bawdsey.latitude - degrees 0.2 + (degrees <| 0.05 * cos (toFloat i))
-            , height = 25 + toFloat (modBy 7 (100 * i)) * 0.1
-            , heading = degrees 265
-            , speed = 250
-            , iff = Nothing
-            , tutorial = False
-            }
-        )
-    <|
-        List.range 1 n
+largeGroup2 n =
+    { longitude = bawdsey.longitude + degrees 1.9
+    , latitude = bawdsey.latitude - degrees 0.2
+    , height = 25
+    , heading = degrees 265
+    , speed = 250
+    , strength = n
+    , iff = Nothing
+    }
 
 
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ { bomber1 | tutorial = False } ]
+        [ bomber1 ]
 
 
 trainingMode2 : Int -> List Target
 trainingMode2 timeNow =
     -- Two planes same range same heading
     List.map (targetFromProforma station timeNow)
-        [ { bomber2 | tutorial = False }
-        , { bomber2A | tutorial = False }
+        [ bomber2
         ]
 
 
@@ -182,30 +158,26 @@ trainingMode3 : Int -> List Target
 trainingMode3 timeNow =
     -- Two planes same range different headings
     List.map (targetFromProforma station timeNow)
-        [ { bomber3 | tutorial = False }
-        , { bomber4 | tutorial = False }
+        [ bomber3
+        , bomber4
         ]
 
 
 trainingModeFriendlyOutbound : Int -> List Target
 trainingModeFriendlyOutbound timeNow =
     List.map (targetFromProforma station timeNow)
-        [ { fighter1 | tutorial = False } ]
+        [ fighter1 ]
 
 
 trainingMode3to6 : Int -> List Target
 trainingMode3to6 timeNow =
-    let
-        placeInTutorialMode t =
-            { t | tutorial = False }
-    in
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map (targetFromProforma station timeNow) <|
-        severalAligned 5
+        [largeGroup1 70]
 
 
 trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
-        (severalAligned 10 ++ severalAbreast 10)
+        [largeGroup2 100]

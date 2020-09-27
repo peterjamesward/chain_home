@@ -55,8 +55,8 @@ type alias TargetProforma =
     , height : Float -- in thousands of feet
     , heading : Float -- in degrees from North
     , speed : Float -- miles per hour (!)
+    , strength : Int
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
-    , tutorial : Bool
     }
 
 
@@ -66,11 +66,11 @@ type alias Target =
     , latitude : Float -- position after movement
     , longitude : Float
     , height : Float -- in thousands of feet
+    , strength : Int -- how many aircraft
     , heading : Float -- in radians from North
     , speed : Float -- miles per hour (!)
     , iff : Maybe Int -- the value at which t mod 12 triggers a return
     , iffActive : Bool -- pulsing now.
-    , tutorial : Bool -- highlight this raid on the CRT for tutorial mode.
     , startTime : Int -- Each target needs it own time baseline.
     , rangeInMetres : Float -- metres
     , theta : Float -- azimuth radians 0 is North.
@@ -84,10 +84,10 @@ type alias Echo =
     , r : Float
     , theta : Float
     , alpha : Float
+    , strength : Int
     , phase : Float
     , duration : Float
     , amplitude : Float
-    , tutorial : Bool -- this raid needs to be highlighting in a tutorial.
     }
 
 

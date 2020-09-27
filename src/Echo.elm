@@ -18,6 +18,7 @@ deriveEchoes station txAntenna targets =
             , r = target.rangeInMetres
             , theta = target.theta
             , alpha = target.alpha
+            , strength = target.strength
             , phase = normalise (target.rangeInMetres / wavelength)
             , duration = pulseDuration
             , amplitude =
@@ -34,7 +35,6 @@ deriveEchoes station txAntenna targets =
                             -- and ad-hoc adjustment for range
                             / logBase 10 (1 + target.rangeInMetres)
                             ^ 1.2
-            , tutorial = target.tutorial
             }
     in
     List.map2 echoFromDirectBeam
