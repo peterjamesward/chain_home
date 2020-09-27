@@ -15,8 +15,8 @@ crt time echoes =
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0
         ]
-        [ width 1000
-        , height 500
+        [ width 2000
+        , height 1000
         , style "display" "block"
         , style "width" "640px"
         ]
