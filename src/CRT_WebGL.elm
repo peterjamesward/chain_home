@@ -30,14 +30,15 @@ crt time echoes =
 
 mesh : Mesh { position : Vec3 }
 mesh =
+    // The mesh corners adjusted empirically to align with range scale.
     WebGL.triangles
-        [ ( { position = vec3 -1 1 0 }
-          , { position = vec3 1 1 0 }
-          , { position = vec3 -1 -1 0 }
+        [ ( { position = vec3 -0.92 0.9 0 }
+          , { position = vec3 0.92 0.9 0 }
+          , { position = vec3 -0.92 -0.9 0 }
           )
-        , ( { position = vec3 -1 -1 0 }
-          , { position = vec3 1 1 0 }
-          , { position = vec3 1 -1 0 }
+        , ( { position = vec3 -0.92 -0.9 0 }
+          , { position = vec3 0.92 0.9 0 }
+          , { position = vec3 0.92 -0.9 0 }
           )
         ]
 
