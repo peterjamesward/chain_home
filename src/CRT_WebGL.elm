@@ -15,8 +15,8 @@ crt time echoes =
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0
         ]
-        [ width 800
-        , height 400
+        [ width 1000
+        , height 500
         , style "display" "block"
         , style "width" "640px"
         ]
@@ -75,8 +75,8 @@ echoToVec echoes i =
         Just echo ->
             vec3
                 (echo.r / 80000)
-                (echo.amplitude * 10.0)
-                1.0
+                (echo.amplitude * 1.0)
+                9.0
 
         _ ->
             vec3 -1.0 0.0 0.0
@@ -180,7 +180,7 @@ fragmentShader =
        // w = width of flat top
        // x = the location to be evaluated
         float envelope( float l, float w, float x ) {
-            float cubicWidth = 0.03;
+            float cubicWidth = 0.02;
             float leadingEdgeX = (x - l)/cubicWidth;
             float trailingEdgeX = (l + w - x)/cubicWidth;
             leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
@@ -193,12 +193,12 @@ fragmentShader =
 
         // Think of this as a single target "field"
         float f1(float x) {
-            return -1.0;
+            return -2.0;
         }
 
         // A "two plane" field
         float f2(float x) {
-            return 1.0 * sin(iTime * 3.0);
+            return 2.0 * sin(iTime * 3.0);
         }
 
         // Think of this as a mass raid "field".
@@ -207,10 +207,9 @@ fragmentShader =
             f += 2.0 * sin(x * 512.0 + 0.0) * sin(iTime * 9.0);
             f += 2.0 * sin(x * 256.0 + 0.0) * sin(iTime * 8.0);
             f += 2.0 * sin(x * 128.0 + 0.0) * sin(iTime * 6.0);
-            f += 2.0 * sin(x * 128.0 + 0.5) * sin(iTime * 5.0);
             f += 1.0 * sin(x * 64.0 + 0.1) * sin(iTime * 4.0);
             f += 1.0 * sin(x * 32.0 + 0.2) * sin(iTime * 3.0);
-            f /= 3.0;
+            f /= 4.0;
             return f;
         }
 
@@ -261,24 +260,25 @@ fragmentShader =
 
 
             // Now get actual raids from the uniforms.
-            float beamY = noise + bumps;
-            beamY += includeRaid(raid0, uv.x);
-            beamY += includeRaid(raid1, uv.x);
-            beamY += includeRaid(raid2, uv.x);
-            beamY += includeRaid(raid3, uv.x);
-            beamY += includeRaid(raid4, uv.x);
-            beamY += includeRaid(raid5, uv.x);
-            beamY += includeRaid(raid7, uv.x);
-            beamY += includeRaid(raid8, uv.x);
-            beamY += includeRaid(raid9, uv.x);
-            beamY += includeRaid(raid10, uv.x);
-            beamY += includeRaid(raid11, uv.x);
-            beamY += includeRaid(raid12, uv.x);
-            beamY += includeRaid(raid13, uv.x);
-            beamY += includeRaid(raid14, uv.x);
-            beamY += includeRaid(raid15, uv.x);
+            float yBeforeNoise = 0.0;
+            yBeforeNoise += includeRaid(raid0, uv.x);
+            yBeforeNoise += includeRaid(raid1, uv.x);
+            yBeforeNoise += includeRaid(raid2, uv.x);
+            yBeforeNoise += includeRaid(raid3, uv.x);
+            yBeforeNoise += includeRaid(raid4, uv.x);
+            yBeforeNoise += includeRaid(raid5, uv.x);
+            yBeforeNoise += includeRaid(raid7, uv.x);
+            yBeforeNoise += includeRaid(raid8, uv.x);
+            yBeforeNoise += includeRaid(raid9, uv.x);
+            yBeforeNoise += includeRaid(raid10, uv.x);
+            yBeforeNoise += includeRaid(raid11, uv.x);
+            yBeforeNoise += includeRaid(raid12, uv.x);
+            yBeforeNoise += includeRaid(raid13, uv.x);
+            yBeforeNoise += includeRaid(raid14, uv.x);
+            yBeforeNoise += includeRaid(raid15, uv.x);
 
             // Fiddle with coordinate (needs some work).
+            float beamY = yBeforeNoise + noise + bumps;
             beamY = beamY/100.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
