@@ -1,7 +1,6 @@
 --TODO: Reinstate normal operating mode with mix of targets.
 --TODO: Put back the tutorial advance and regress controls.
 
---TODO: Push raid patterns onto GPU using more WebGL. (Raid = "array" of time-varying cubics?)
--- All the components are there already.
+--TODO: WebGL needs a "flat top" wider pulse shape.
 
 --TODO: Scenario gets increasingly worse by roughly doubling raid sizes.

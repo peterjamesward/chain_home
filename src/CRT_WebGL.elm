@@ -181,6 +181,7 @@ fragmentShader =
 
             // Think of this as a mass raid "field".
             float mrf = f1 + f2 - 6.0;
+            mrf += 2.0 * sin(uv.x * 512.0 + 0.0) * sin(iTime * 9.0);
             mrf += 2.0 * sin(uv.x * 256.0 + 0.0) * sin(iTime * 8.0);
             mrf += 2.0 * sin(uv.x * 128.0 + 0.0) * sin(iTime * 6.0);
             mrf += 2.0 * sin(uv.x * 128.0 + 0.5) * sin(iTime * 5.0);
@@ -212,18 +213,19 @@ fragmentShader =
 
             // Now expose a section of the field where we have raids.
             // Note pulse width sqrt(N)/100 looks ok.
-            float raid1 = f1 * cubicPulse(0.15, 0.01, uv.x); // One
-            float raid2 = f2 * cubicPulse(0.3, 0.014142, uv.x);  // Two
-            float raid3 = mrf * cubicPulse(0.5, 0.0200, uv.x); // Three
-            float raid4 = mrf * cubicPulse(0.7, 0.1000, uv.x); // Many
+            float raid1 = f1 * cubicPulse(0.2, 0.01, uv.x); // One
+            float raid2 = f2 * cubicPulse(0.3, 0.01, uv.x);  // Two
+            float raid3 = mrf * cubicPulse(0.5, 0.0140, uv.x); // Three
+            float raid4 = mrf * cubicPulse(0.7, 0.0200, uv.x); // Many
+            raid4 += mrf * cubicPulse(0.72, 0.0200, uv.x); // Many
 
             float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
 
             // Fiddle with coordinate (needs some work).
-            beamY = beamY/50.0 + 0.9;
+            beamY = beamY/50.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
-            float i = pow(1.0 - abs(uv.y - beamY), 20.0);
+            float i = pow(1.0 - abs(uv.y - beamY), 25.0);
             //float i = cubicPulse(beamY, 0.04, uv.y);
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
