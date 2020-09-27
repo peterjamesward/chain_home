@@ -4,11 +4,11 @@ import Array exposing (Array)
 import Html exposing (Html)
 import Html.Attributes exposing (height, style, width)
 import Math.Matrix4 as Mat4 exposing (Mat4)
+import Math.Vector2 exposing (Vec2)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
 import Messages exposing (Msg)
 import Types exposing (Echo, Point)
-import Utils exposing (choose)
-import WebGL exposing (clearColor)
+import WebGL exposing (Mesh, Shader, clearColor)
 
 
 crt : Float -> List Echo -> Html Msg
@@ -21,17 +21,29 @@ crt time echoes =
         , style "display" "block"
         , style "width" "640px"
         ]
-        [ WebGL.entity vertexShader fragmentShader lineMesh (uniforms time echoes)
+        [ WebGL.entity
+            vertexShader
+            fragmentShader
+            mesh
+            (uniforms time echoes)
         ]
 
+mesh : Mesh { position : Vec3 }
+mesh =
+    WebGL.triangles
+        [ ( { position = vec3 -1 1 0 }
+          , { position = vec3 1 1 0 }
+          , { position = vec3 -1 -1 0 }
+          )
+        , ( { position = vec3 -1 -1 0 }
+          , { position = vec3 1 1 0 }
+          , { position = vec3 1 -1 0 }
+          )
+        ]
 
 type alias Uniforms =
-    { rotation : Mat4
-    , perspective : Mat4
-    , camera : Mat4
-    , u_time : Float
-    , lineJiggle : Float
-    , lineSpikes : Float
+    { iResolution : Vec3
+    , iTime : Float
     , numRaids : Int
     , raid0 : Vec3
     , raid1 : Vec3
@@ -49,22 +61,6 @@ type alias Uniforms =
     , raid13 : Vec3
     , raid14 : Vec3
     , raid15 : Vec3
-    , raid16 : Vec3
-    , raid17 : Vec3
-    , raid18 : Vec3
-    , raid19 : Vec3
-    , raid20 : Vec3
-    , raid21 : Vec3
-    , raid22 : Vec3
-    , raid23 : Vec3
-    , raid24 : Vec3
-    , raid25 : Vec3
-    , raid26 : Vec3
-    , raid27 : Vec3
-    , raid28 : Vec3
-    , raid29 : Vec3
-    , raid30 : Vec3
-    , raid31 : Vec3
     }
 
 
@@ -72,7 +68,7 @@ echoToVec : Array Echo -> Int -> Vec3
 echoToVec echoes i =
     -- Echoes are massaged into the "raids" uniforms and the WebGL -1..+1 coordinates.
     -- We can use z to allow us to colour the raids differently in tutorial mode.
-    -- Use z as raid size, which will mean the number of cubic curves it needs.
+    -- Use z as raid size, which will decide the number of cubic curves it needs.
     case Array.get i echoes of
         Just echo ->
             vec3
@@ -91,16 +87,9 @@ uniforms time echoes =
             Array.fromList echoes
     in
     -- Apologies this is chugly but the Elm GLSL parser does not accept array, for now.
-    { rotation =
-        Mat4.mul
-            (Mat4.makeRotate (3 * 0.0) (vec3 0 1 0))
-            (Mat4.makeRotate (2 * 0.0) (vec3 1 0 0))
-    , perspective = Mat4.makePerspective 19 1 0.1 10
-    , camera = Mat4.makeLookAt (vec3 0 0 6.5) (vec3 0 -0.5 0) (vec3 0 1 0)
-    , u_time = time
-    , lineJiggle = 0.03 -- 0.03 is OK.
-    , lineSpikes = 0.2 -- 1.0 is OK.
-    , numRaids = min 32 <| List.length echoes
+    { iResolution = vec3 800 400 0
+    , iTime = time / 10
+    , numRaids = min 16 <| List.length echoes
     , raid0 = echoToVec echoArray 0
     , raid1 = echoToVec echoArray 1
     , raid2 = echoToVec echoArray 2
@@ -117,22 +106,6 @@ uniforms time echoes =
     , raid13 = echoToVec echoArray 13
     , raid14 = echoToVec echoArray 14
     , raid15 = echoToVec echoArray 15
-    , raid16 = echoToVec echoArray 16
-    , raid17 = echoToVec echoArray 17
-    , raid18 = echoToVec echoArray 18
-    , raid19 = echoToVec echoArray 19
-    , raid20 = echoToVec echoArray 20
-    , raid21 = echoToVec echoArray 21
-    , raid22 = echoToVec echoArray 22
-    , raid23 = echoToVec echoArray 23
-    , raid24 = echoToVec echoArray 24
-    , raid25 = echoToVec echoArray 25
-    , raid26 = echoToVec echoArray 26
-    , raid27 = echoToVec echoArray 27
-    , raid28 = echoToVec echoArray 28
-    , raid29 = echoToVec echoArray 29
-    , raid30 = echoToVec echoArray 30
-    , raid31 = echoToVec echoArray 31
     }
 
 
@@ -142,98 +115,32 @@ type alias Vertex =
     }
 
 
-lineMesh : WebGL.Mesh Vertex
-lineMesh =
-    WebGL.triangles <| fatLineTwo 0.04 <| subDivideTheLine 1000
 
-
-subDivideTheLine : Int -> List Point
-subDivideTheLine n =
-    let
-        fraction i =
-            toFloat i / toFloat n
-    in
-    List.range 1 n |> List.map (\i -> ( 2 * fraction i - 1, 0.0 ))
-
-
-fatLineTwo : Float -> List Point -> List ( Vertex, Vertex, Vertex )
-fatLineTwo fatness points =
-    -- Fatness is amount we spread either side of the y axis.
-    -- We make four triangles for each new line segment.
-    -- Vertices on axis are green, outliers are black.
-    let
-        axisVertex x =
-            Vertex (vec3 x 0.0 0.0) beamCentreGreen
-
-        belowVertex x =
-            Vertex (vec3 x (0.0 - fatness) 0.0) beamEdgeGreen
-
-        aboveVertex x =
-            Vertex (vec3 x (0.0 + fatness) 0.0) beamEdgeGreen
-
-        v0 =
-            axisVertex -1.0
-
-        v1 =
-            belowVertex -1.0
-
-        v2 =
-            aboveVertex -1.0
-
-        addSegment ( x, _ ) ( ( prevAxis, prevBelow, prevAbove ), triangles ) =
-            let
-                vAxis =
-                    axisVertex x
-
-                vBelow =
-                    belowVertex x
-
-                vAbove =
-                    aboveVertex x
-            in
-            ( ( vAxis, vBelow, vAbove )
-            , [ ( prevAxis, prevBelow, vBelow )
-              , ( prevAxis, vBelow, vAxis )
-              , ( prevAxis, vAxis, vAbove )
-              , ( prevAxis, vAbove, prevAbove )
-              ]
-                ++ triangles
-            )
-
-        ( _, segments ) =
-            List.foldl addSegment ( ( v0, v1, v2 ), [] ) points
-    in
-    segments
-
-
-beamCentreGreen =
-    vec3 0 0.7 0
-
-
-beamEdgeGreen =
-    vec3 0 0 0.1
-
-
-vertexShader : WebGL.Shader Vertex Uniforms { vcolor : Vec3, stretch : Float }
+vertexShader : Shader { position : Vec3 } Uniforms { vFragCoord : Vec2 }
 vertexShader =
-    {-
-       Our vertex shader will have special cases built in to give convincing trace patterns
-       for our supported formations. We will not support variable numbers of raids, as Elm
-       does not support array Uniforms, so we will have a small number of presets that we
-       basically turn on and off, just by setting zero amplitude.
-       Hence the vertex shader is long and inelegant. It is what it is.
-    -}
     [glsl|
-        attribute vec3 position;
-        attribute vec3 color;
 
-        uniform mat4 perspective;
-        uniform mat4 camera;
-        uniform mat4 rotation;
-        uniform float u_time;
-        uniform float lineJiggle;
-        uniform float lineSpikes;
-        uniform int numRaids; // use this to vary sort load.
+        precision mediump float;
+        attribute vec3 position;
+        varying vec2 vFragCoord;
+        uniform vec3 iResolution;
+        void main () {
+            gl_Position = vec4(position, 1.0);
+            vFragCoord = (position.xy + 1.0) / 2.0 * iResolution.xy;
+        }
+
+  |]
+
+
+fragmentShader : WebGL.Shader {} Uniforms { vFragCoord : Vec2 }
+fragmentShader =
+    [glsl|
+        precision mediump float;
+
+        varying vec2 vFragCoord;
+        uniform vec3 iResolution;
+        uniform float iTime;
+        uniform int numRaids;
         uniform vec3 raid0;
         uniform vec3 raid1;
         uniform vec3 raid2;
@@ -250,34 +157,10 @@ vertexShader =
         uniform vec3 raid13;
         uniform vec3 raid14;
         uniform vec3 raid15;
-        uniform vec3 raid16;
-        uniform vec3 raid17;
-        uniform vec3 raid18;
-        uniform vec3 raid19;
-        uniform vec3 raid20;
-        uniform vec3 raid21;
-        uniform vec3 raid22;
-        uniform vec3 raid23;
-        uniform vec3 raid24;
-        uniform vec3 raid25;
-        uniform vec3 raid26;
-        uniform vec3 raid27;
-        uniform vec3 raid28;
-        uniform vec3 raid29;
-        uniform vec3 raid30;
-        uniform vec3 raid31;
 
+        vec3 COL1 = vec3(1.0,0.0,0.0);
+        vec3 COL2 = vec3(0.0,1.0,0.0);
 
-        varying vec3 vcolor;
-        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.
-
-        float random (in float x) {
-            return fract(sin(x) * 5000.0);
-        }
-
-        //  Function from Iñigo Quiles
-        //  www.iquilezles.org/www/articles/functions/functions.htm
-        // w = width, c = centre
         float cubicPulse( float c, float w, float x ) {
             x = abs(x - c); // NOTE 0 <= x <= +w
             if (x > w) return 0.0;
@@ -285,161 +168,71 @@ vertexShader =
             return 1.0 - x * x * (3.0 - 2.0 * x);
         }
 
-        // x adjustment to keep line thickness across cubic pulse.
-        float gradient(float c, float w, float x) {
-            float x1 = abs((x - c)/w); // 0 <= x1 <= 1
-            if (x1 > 1.0) return 0.0;
-            float gradient = x1 * (1.0 - x1);
-            return gradient; // * sign(c - x);
-        }
+        void mainImage( out vec4 fragColor, in vec2 fragCoord )
+        {
+            vec2 uv = fragCoord.xy/iResolution.xy;
+            vec2 uvn = 2.0 * uv - 1.0;
 
-        // Different version of FBM.
-        float turbulence( float p ) {
+            // Think of this as a single target "field"
+            float f1 = -3.0;
 
-            float w = 100.0;
-            float t = -0.5;
+            // A "two plane" field
+            float f2 = f1 - (3.0 * sin(iTime * 3.0));
 
-            for (float f = 1.0 ; f <= 10.0 ; f++ ){
-                float power = pow( 2.0, f );
-                t += random(p) / power ;
-            }
+            // Think of this as a mass raid "field".
+            float mrf = f1 + f2 - 6.0;
+            mrf += 2.0 * sin(uv.x * 256.0 + 0.0) * sin(iTime * 8.0);
+            mrf += 2.0 * sin(uv.x * 128.0 + 0.0) * sin(iTime * 6.0);
+            mrf += 2.0 * sin(uv.x * 128.0 + 0.5) * sin(iTime * 5.0);
+            mrf += 1.0 * sin(uv.x * 64.0 + 0.1) * sin(iTime * 4.0);
+            mrf += 1.0 * sin(uv.x * 32.0 + 0.2) * sin(iTime * 3.0);
+            mrf /= 2.0;
 
-          return t;
-
-        }
-
-        vec3 pulseShape(vec3 raid, float halfWidth) {
-            // returns x = x, y = displacement, z = gradient
-            float height = raid.y * cubicPulse(raid.x, halfWidth, position.x);
-            float slope = raid.y * gradient(raid.x, halfWidth, position.x);
-            float tutorialRaidIndicator = raid.z * height;
-
-           // WARNING -- x value of return used for raid colour indication!!
-            return vec3( tutorialRaidIndicator, height, slope );
-        }
-
-        // Kludged to try to look OK with multiple raids.
-        float coefficient(int i) {
-            return 1.0 - 2.0 * mod(float(i),2.0);
-        }
-
-        // Kludged to try to look OK with multiple raids.
-        float periodicity(int i) {
-            if (i == 0) return 0.0;
-            if (i == 1) return 1.0/3.0;
-            return 2.0 / float(i);
-        }
-
-        void main () {
-            vec3 newPos = position;
-            vec3 newColour = color;
-            stretch = 0.0; // The amount by which the rendered segment should be dimmed.
-
-            // Copy raids into array for easier handling, probably.
-            vec3 raid[32]; // x = x, y = amplitude, z = 1.0 if tutorial (=> white).
-            raid[0] = raid0;
-            raid[1] = raid1;
-            raid[2] = raid2;
-            raid[3] = raid3;
-            raid[4] = raid4;
-            raid[5] = raid5;
-            raid[6] = raid6;
-            raid[7] = raid7;
-            raid[8] = raid8;
-            raid[9] = raid9;
-            raid[10] = raid10;
-            raid[11] = raid11;
-            raid[12] = raid12;
-            raid[13] = raid13;
-            raid[14] = raid14;
-            raid[15] = raid15;
-            raid[16] = raid16;
-            raid[17] = raid17;
-            raid[18] = raid18;
-            raid[19] = raid19;
-            raid[20] = raid20;
-            raid[21] = raid21;
-            raid[22] = raid22;
-            raid[23] = raid23;
-            raid[24] = raid24;
-            raid[25] = raid25;
-            raid[26] = raid26;
-            raid[27] = raid27;
-            raid[28] = raid28;
-            raid[29] = raid29;
-            raid[30] = raid30;
-            raid[31] = raid31;
-
-            // 2020-04-11 New attempt at simpler (= better) signal combination using
-            // time-rotating vector on slightly different frequency for each raid.
-            // Kind of what I'm emulating but mathematically better and avoiding
-            // need to sort signals in decreasing strength.
-
-            vec3 pulse[32];
-            float cumulativeX = 0.0; // Addition is in cartesian space
-            float cumulativeY = 0.0;
-            float slope = 0.0; // Seems to work better if we accumulate slope directly.
-
-            for (int i = 0; i < 32; i++) {
-                // The pulse height becomes amplitude of the rotating vector.
-                // Signal 'i' is taken to rotate at rate i in our pretend phase space.
-                // This is experimental of course.
-                // We do the same for the slope but separately.
-                pulse[i] = pulseShape(raid[i], 0.02);
-
-                float amplitude = pulse[i].y;
-                float phase = u_time * periodicity(i);
-                cumulativeX += amplitude * cos(phase);
-                cumulativeY += amplitude * sin(phase);
-                slope += pulse[i].z;
-
-            }
-
-            // Now we reclaim the height and slope by converting back to polar.
-            float height = sqrt(cumulativeX * cumulativeX + cumulativeY * cumulativeY);
-
-          // Additional "spiky" line noise.
-          if ( random( floor( (3.0 + position.x) * 97.0) * floor(u_time / 3.0)) < 0.01 )
-          {
-             vec3 noise = vec3(position.x, 0.1, 0.0);
-             vec3 spike = pulseShape(noise, 0.05);
-             height += lineSpikes * spike.y;
-          }
-
-            newPos.y -= max(0.0, height);
-            newPos.x += position.y * slope;
-            stretch = slope;
-
+            // Add a noise field (use our existing one).
             // Lower the resolution of the x line to make the noise less noisy.
-            float newx = floor((position.x) * 153.0);
-            float newtime = floor(u_time / 2.0);
+            // add time to the noise parameters so it's animated.
+            // I want a component that is more 'spikey'.
+            float noise = 0.0;
+            noise += sin(uv.x * 256.0 + 0.0) * sin(iTime * 7.0);
+            noise += sin(uv.x * 512.0 + 0.0) * sin(iTime * 5.0);
+            noise += sin(uv.x * 1024.0 + 0.0) * sin(iTime * 11.0);
+            noise /= 8.0;
 
-            // add time to the noise parameters so it's animated
-            float noise = turbulence( newx * newtime );
-            float b = random( newx * newtime );
-            float displacement = lineJiggle * noise + 0.01 * b;
-            newPos.y += displacement;
+            // Spikey looking noise.
+            float lumpy = 0.0;
+            lumpy += sin(uv.x * 256.0);
+            lumpy = 0.0 - float(lumpy < -0.8);
+            float lumpyTime = 0.0;
+            lumpyTime += sin(iTime * 11.0) + sin(iTime * 19.0);
+            lumpyTime = float(lumpyTime > 1.9);
 
-            // Where no signal, narrow the line a bit.
-            if (height == 0.0) {
-                newPos.y /= 2.0;
-            }
+            float sawtooth = 0.0;
+            sawtooth = abs(0.5 - fract(uv.x * 20.0));
+            float bumps = 5.0 * lumpy * lumpyTime * sawtooth;
 
-            gl_Position = perspective * camera * rotation * vec4(newPos, 1.0);
-            vcolor = newColour;
+            // Now expose a section of the field where we have raids.
+            // Note pulse width sqrt(N)/100 looks ok.
+            float raid1 = f1 * cubicPulse(0.15, 0.01, uv.x); // One
+            float raid2 = f2 * cubicPulse(0.3, 0.014142, uv.x);  // Two
+            float raid3 = mrf * cubicPulse(0.5, 0.0200, uv.x); // Three
+            float raid4 = mrf * cubicPulse(0.7, 0.1000, uv.x); // Many
+
+            float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
+
+            // Fiddle with coordinate (needs some work).
+            beamY = beamY/50.0 + 0.9;
+
+            //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
+            float i = pow(1.0 - abs(uv.y - beamY), 20.0);
+            //float i = cubicPulse(beamY, 0.04, uv.y);
+
+            vec3 col = vec3(i) * mix(COL1,COL2,i);
+
+            fragColor = vec4(col,1.0);
         }
-  |]
 
-
-fragmentShader : WebGL.Shader {} Uniforms { vcolor : Vec3, stretch : Float }
-fragmentShader =
-    [glsl|
-        precision mediump float;
-        varying vec3 vcolor;
-        varying float stretch; // how much this line segment is pulled out, this weakens the illumination.
-
-        void main () {
-            // Constants are empirical.
-            gl_FragColor = vec4(vcolor * (1.0 - 2.0 * abs(stretch)), 0.0);
+        void main() {
+          mainImage(gl_FragColor, vFragCoord);
         }
+
   |]
