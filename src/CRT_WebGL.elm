@@ -273,23 +273,60 @@ fragmentShader =
 
 
             // Now get actual raids from the uniforms.
-            float yBeforeNoise = 0.0;
-            yBeforeNoise += includeRaid(raid0, uv.x);
-            yBeforeNoise += includeRaid(raid1, uv.x);
-            yBeforeNoise += includeRaid(raid2, uv.x);
-            yBeforeNoise += includeRaid(raid3, uv.x);
-            yBeforeNoise += includeRaid(raid4, uv.x);
-            yBeforeNoise += includeRaid(raid5, uv.x);
-            yBeforeNoise += includeRaid(raid6, uv.x);
-            yBeforeNoise += includeRaid(raid7, uv.x);
-            yBeforeNoise += includeRaid(raid8, uv.x);
-            yBeforeNoise += includeRaid(raid9, uv.x);
-            yBeforeNoise += includeRaid(raid10, uv.x);
-            yBeforeNoise += includeRaid(raid11, uv.x);
-            yBeforeNoise += includeRaid(raid12, uv.x);
-            yBeforeNoise += includeRaid(raid13, uv.x);
-            yBeforeNoise += includeRaid(raid14, uv.x);
-            yBeforeNoise += includeRaid(raid15, uv.x);
+            float r0 = includeRaid(raid0, uv.x);
+            float r1 = includeRaid(raid1, uv.x);
+            float r2 = includeRaid(raid2, uv.x);
+            float r3 = includeRaid(raid3, uv.x);
+            float r4 = includeRaid(raid4, uv.x);
+            float r5 = includeRaid(raid5, uv.x);
+            float r6 = includeRaid(raid6, uv.x);
+            float r7 = includeRaid(raid7, uv.x);
+            float r8 = includeRaid(raid8, uv.x);
+            float r9 = includeRaid(raid9, uv.x);
+            float r10 = includeRaid(raid10, uv.x);
+            float r11 = includeRaid(raid11, uv.x);
+            float r12 = includeRaid(raid12, uv.x);
+            float r13 = includeRaid(raid13, uv.x);
+            float r14 = includeRaid(raid14, uv.x);
+            float r15 = includeRaid(raid15, uv.x);
+
+            //Combine with artficial phase differences to re-create beating effect.
+            // Even though it may be rarely seen.
+            vec2 combined = vec2(0.0, 0.0);
+            combined.x += r0 * cos(iTime * 1.0);
+            combined.x += r1 * cos(iTime * 2.0);
+            combined.x += r2 * cos(iTime * 3.0);
+            combined.x += r3 * cos(iTime * 4.0);
+            combined.x += r4 * cos(iTime * 5.0);
+            combined.x += r5 * cos(iTime * 6.0);
+            combined.x += r6 * cos(iTime * 7.0);
+            combined.x += r7 * cos(iTime * 8.0);
+            combined.x += r8 * cos(iTime * 9.0);
+            combined.x += r9 * cos(iTime * 10.0);
+            combined.x += r10 * cos(iTime * 11.0);
+            combined.x += r11 * cos(iTime * 12.0);
+            combined.x += r12 * cos(iTime * 13.0);
+            combined.x += r13 * cos(iTime * 14.0);
+            combined.x += r14 * cos(iTime * 15.0);
+            combined.x += r15 * cos(iTime * 16.0);
+            combined.y += r0 * sin(iTime * 1.0);
+            combined.y += r1 * sin(iTime * 2.0);
+            combined.y += r2 * sin(iTime * 3.0);
+            combined.y += r3 * sin(iTime * 4.0);
+            combined.y += r4 * sin(iTime * 5.0);
+            combined.y += r5 * sin(iTime * 6.0);
+            combined.y += r6 * sin(iTime * 7.0);
+            combined.y += r7 * sin(iTime * 8.0);
+            combined.y += r8 * sin(iTime * 9.0);
+            combined.y += r9 * sin(iTime * 10.0);
+            combined.y += r10 * sin(iTime * 11.0);
+            combined.y += r11 * sin(iTime * 12.0);
+            combined.y += r12 * sin(iTime * 13.0);
+            combined.y += r13 * sin(iTime * 14.0);
+            combined.y += r14 * sin(iTime * 15.0);
+            combined.y += r15 * sin(iTime * 16.0);
+
+            float yBeforeNoise = 0.0 - length(combined);
 
             // Fiddle with coordinate (needs some work).
             float beamY = yBeforeNoise + noise + bumps;
