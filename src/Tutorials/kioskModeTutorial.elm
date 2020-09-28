@@ -8,22 +8,6 @@ import Types exposing (UiComponent(..))
 import Zipper
 
 
-
---DONE: Remove some steps to reduce repetition
---DONE: Combine multiple raids in one display
---DROP: Display context banner (e.g. "IFF") (could use actions for this)
---DONE: Clear calculator after each raid
---DONE: End with a more realistic picture on the tube
---DONE: Try with eCrisper.
---DONE: Allow varying times. (Proportional to text length.)
---DONE: Pressing range when in height mode automatically exits height mode.
---DONE: Include a splash screen in the tutorial cycle.
---DONE A: Reset model/webgl time each cycle so it doesn't degrade.
---DUPE B: Transition to swinging gonio should start where it rests.
---DONE C: The first large raid does not always DF out.
---DONE: Seems to be a flicker of another page at the end of the loop
-
-
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
     Zipper.fromList
@@ -47,7 +31,7 @@ kioskModeTutorial =
             noEntryActions
             noStateActions
             noExitActions
-            (TextConstant """The two large dips are caused by local buildings or hills.
+            (TextConstant """The two dips are caused by local buildings or hills.
                   The jiggling is electrical noise in the sensitive receivers.
                   """)
         , TutorialEntry
@@ -59,7 +43,7 @@ kioskModeTutorial =
             [ ActionSwingGoniometer ]
             []
             (TextConstant
-                """ "Swing" the gonio, looking for new signals.
+                """It's important to "swing" the gonio when looking for new signals.
                    """
             )
         , TutorialEntry
@@ -274,14 +258,13 @@ kioskModeTutorial =
             UiCRT
             [ ActionClearTargets
             , ActionSetupRaid2SameBearing
-            , ActionSetupRaid2DifferentBearings
             , ActionSetupRaid3to6
             , ActionClearCalculator
             ]
             noStateActions
             noExitActions
             (TextConstant
-                """Here are three raids. The regular beats signify two aircraft.
+                """Here are two more raids. The regular beats signify two aircraft.
                       The irregular pattern signifies three to six aircraft.
                   """
             )
@@ -374,126 +357,17 @@ kioskModeTutorial =
             TextInterpretCalculator
         , TutorialEntry
             UiRangeKnob
-            [ ActionClearCalculator
-            , ActionEndHeightMode
-            ]
-            [ ActionFindRangeOfNumberedTarget True 2 ]
-            [ ActionFindRangeOfNumberedTarget False 2 ]
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 1 ]
+            [ ActionFindRangeOfNumberedTarget False 1 ]
             (TextConstant
                 """Move the range pointer to the next raid."""
             )
         , TutorialEntry
             UiGoniometer
             noEntryActions
-            [ ActionSwingGoniometer ]
-            [ ActionStopGonioAwayFromRaidBearing ]
-            (TextConstant
-                """We can't make the 'V' disappear completely.
-                  The aircraft are at the same range, on different bearings."""
-            )
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
-            [ ActionFindBearingOfNumberedTarget True 2 ]
-            [ ActionFindBearingOfNumberedTarget False 2 ]
-            (TextConstant
-                """We find the bearing where the V stops going up and down.
-                  This means we have located one of the aircraft."""
-            )
-        , TutorialEntry
-            UiGonioButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreBearing ]
-            (TextConstant
-                """Store the bearing."""
-            )
-        , TutorialEntry
-            UIRangeButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreRange ]
-            (TextConstant
-                """Store the range."""
-            )
-        , TutorialEntry
-            UiHeight
-            []
-            noStateActions
-            []
-            (TextConstant
-                """We don't try to find the height because we can't know which aircraft it is."""
-            )
-        , TutorialEntry
-            UiRaidStrength
-            [ ActionStoreStrength 1 ]
-            noStateActions
-            noExitActions
-            (TextConstant
-                """Press Raid Strength 1 for one aircraft."""
-            )
-        , TutorialEntry
-            UiCalculator
-            [ ActionShowCalculator ]
-            noStateActions
-            [ ActionShowOperator ]
-            TextInterpretCalculator
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
-            [ ActionFindBearingOfNumberedTarget True 3 ]
-            [ ActionFindBearingOfNumberedTarget False 3
-            , ActionStoreBearing
-            ]
-            (TextConstant
-                """We find another bearing where the beating stops.
-                  This means we have located the other aircraft."""
-            )
-        , TutorialEntry
-            UiRangeKnob
-            noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 3 ]
-            [ ActionFindRangeOfNumberedTarget False 3 ]
-            (TextConstant
-                """Adjust the range pointer."""
-            )
-        , TutorialEntry
-            UiGonioButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreBearing ]
-            (TextConstant
-                """Store the bearing."""
-            )
-        , TutorialEntry
-            UIRangeButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreRange ]
-            (TextConstant
-                """Store the range."""
-            )
-        , TutorialEntry
-            UiCalculator
-            [ ActionShowCalculator ]
-            noStateActions
-            [ ActionShowOperator
-            , ActionClearCalculator
-            ]
-            TextInterpretCalculator
-        , TutorialEntry
-            UiRangeKnob
-            noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 4 ]
-            [ ActionFindRangeOfNumberedTarget False 4 ]
-            (TextConstant
-                """Move the range pointer to the next raid."""
-            )
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
-            [ ActionFindBearingOfNumberedTarget True 4 ]
-            [ ActionFindBearingOfNumberedTarget False 4 ]
+            [ ActionFindBearingOfNumberedTarget True 1 ]
+            [ ActionFindBearingOfNumberedTarget False 1 ]
             (TextConstant
                 """This close formation of aircraft will still "D/F out"."""
             )
@@ -524,8 +398,8 @@ kioskModeTutorial =
         , TutorialEntry
             UiGoniometer
             noEntryActions
-            [ ActionSeekElevationOfNumberedTarget True 4 ]
-            [ ActionSeekElevationOfNumberedTarget False 4 ]
+            [ ActionSeekElevationOfNumberedTarget True 1 ]
+            [ ActionSeekElevationOfNumberedTarget False 1 ]
             (TextConstant
                 """Minimise the V."""
             )
@@ -540,8 +414,8 @@ kioskModeTutorial =
         , TutorialEntry
             UiRangeKnob
             noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 4 ]
-            [ ActionFindRangeOfNumberedTarget False 4 ]
+            [ ActionFindRangeOfNumberedTarget True 1 ]
+            [ ActionFindRangeOfNumberedTarget False 1 ]
             (TextConstant
                 """Check the range."""
             )
@@ -671,101 +545,6 @@ kioskModeTutorial =
             noExitActions
             (TextConstant
                 """Press Raid Strength 12 as an estimate of size. """
-            )
-        , TutorialEntry
-            UiCalculator
-            [ ActionShowCalculator
-            ]
-            noStateActions
-            [ ActionShowOperator
-            , ActionClearCalculator
-            ]
-            TextInterpretCalculator
-        , TutorialEntry
-            UiRangeKnob
-            noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 10 ]
-            [ ActionFindRangeOfNumberedTarget False 10 ]
-            (TextConstant
-                """Set the Range Pointer points to the next raid.
-                This deep signal may be several aircraft in a wide formation.
-            """
-            )
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
-            [ ActionFindBearingOfNumberedTarget True 10 ]
-            [ ActionFindBearingOfNumberedTarget False 10 ]
-            (TextConstant
-                """They D/F out together, so it's a single raid."""
-            )
-        , TutorialEntry
-            UiGonioButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreBearing ]
-            (TextConstant
-                """Store the bearing."""
-            )
-        , TutorialEntry
-            UIRangeButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreRange ]
-            (TextConstant
-                """Store the range."""
-            )
-        , TutorialEntry
-            UiHeight
-            [ ActionHeightMode ]
-            noStateActions
-            noExitActions
-            (TextConstant
-                """Press the HEIGHT button."""
-            )
-        , TutorialEntry
-            UiGoniometer
-            noEntryActions
-            [ ActionSeekElevationOfNumberedTarget True 10 ]
-            [ ActionSeekElevationOfNumberedTarget False 10 ]
-            (TextConstant
-                """Turn the gonio again to minimise the V."""
-            )
-        , TutorialEntry
-            UiGonioButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreElevation ]
-            (TextConstant
-                """Store the gonio setting."""
-            )
-        , TutorialEntry
-            UiRangeKnob
-            noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 10 ]
-            [ ActionFindRangeOfNumberedTarget False 10 ]
-            (TextConstant
-                """Check the range."""
-            )
-        , TutorialEntry
-            UIRangeButton
-            noEntryActions
-            noStateActions
-            [ ActionStoreRange
-            , ActionEndHeightMode
-            ]
-            (TextConstant
-                """Store the range."""
-            )
-        , TutorialEntry
-            UiRaidStrength
-            [ ActionStoreStrength 9
-            , ActionStorePlus
-            ]
-            noStateActions
-            noExitActions
-            (TextConstant
-                """Press Raid Strength 9 and '+' as an estimate of size. """
             )
         , TutorialEntry
             UiCalculator

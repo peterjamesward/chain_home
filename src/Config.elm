@@ -8,16 +8,16 @@ import Types exposing (Echo, Target, TargetProforma)
 groundRays : List Echo
 groundRays =
     [ { sequence = 0
-      , r = 8000 -- 8km
+      , r = 5000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , strength = 1
       , phase = 0
       , duration = 0
-      , amplitude = 3
+      , amplitude = 4
       }
     , { sequence = 0
-      , r = 10000 -- 10km
+      , r = 8000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , strength = 1
@@ -26,6 +26,25 @@ groundRays =
       , amplitude = 10
       }
     ]
+
+
+{-
+regularlySpacedTargets : List Echo
+regularlySpacedTargets =
+    let
+        makeTargetAtMiles m =
+            { sequence = 0
+            , r = m * 1600
+            , theta = 0 -- ignored as these are injected after D/F
+            , alpha = 0
+            , strength = 1
+            , phase = 0
+            , duration = 0
+            , amplitude = 10
+            }
+    in
+    List.map makeTargetAtMiles [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90  ]
+-}
 
 
 station =
@@ -63,7 +82,7 @@ bomber1 =
     , height = 20 -- ,000 ft
     , heading = degrees 250
     , speed = 200.0 -- mph
-    , strength = 3
+    , strength = 1
     , iff = Nothing
     }
 
@@ -75,7 +94,7 @@ bomber2 =
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
     , speed = 200.0 -- mph
-    , strength = 12
+    , strength = 1
     , iff = Nothing
     }
 
@@ -88,7 +107,7 @@ bomber3 =
     , height = 40 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
-    , strength = 24
+    , strength = 1
     , iff = Nothing
     }
 
@@ -100,7 +119,7 @@ bomber4 =
     , height = 40 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
-    , strength = 60
+    , strength = 1
     , iff = Nothing
     }
 
@@ -113,7 +132,7 @@ fighter1 =
     , height = 10 -- ,000 ft
     , heading = degrees 270
     , speed = 300 -- mph
-    , strength = 6
+    , strength = 1
     , iff = Just 1
     }
 
@@ -174,10 +193,10 @@ trainingMode3to6 timeNow =
     -- Four aircraft close together
     -- Wonder if it will work using them twice!
     List.map (targetFromProforma station timeNow) <|
-        [largeGroup1 70]
+        [ largeGroup1 6 ]
 
 
 trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
-        [largeGroup2 100]
+        [ largeGroup2 60 ]

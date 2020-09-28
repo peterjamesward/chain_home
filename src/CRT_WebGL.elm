@@ -28,17 +28,29 @@ crt time echoes =
         ]
 
 
+
+-- Leave a border around the CRT line, to accommodate the range scale
+
+
+xLimit =
+    0.93
+
+
+yLimit =
+    0.9
+
+
 mesh : Mesh { position : Vec3 }
 mesh =
     -- The mesh corners adjusted empirically to align with range scale.
     WebGL.triangles
-        [ ( { position = vec3 -0.92 0.9 0 }
-          , { position = vec3 0.92 0.9 0 }
-          , { position = vec3 -0.92 -0.9 0 }
+        [ ( { position = vec3 (0 - xLimit) yLimit 0 }
+          , { position = vec3 xLimit yLimit 0 }
+          , { position = vec3 (0 - xLimit) (0 - yLimit) 0 }
           )
-        , ( { position = vec3 -0.92 -0.9 0 }
-          , { position = vec3 0.92 0.9 0 }
-          , { position = vec3 0.92 -0.9 0 }
+        , ( { position = vec3 (0 - xLimit) (0 - yLimit) 0 }
+          , { position = vec3 xLimit yLimit 0 }
+          , { position = vec3 xLimit (0 - yLimit) 0 }
           )
         ]
 
@@ -71,10 +83,11 @@ echoToVec echoes i =
     -- Echoes are massaged into the "raids" uniforms and the WebGL -1..+1 coordinates.
     -- We can use z to allow us to colour the raids differently in tutorial mode.
     -- Use z as raid size, which will decide the number of cubic curves it needs.
+    -- We should here do the conversion into 0..+1 coordinates.
     case Array.get i echoes of
         Just echo ->
             vec3
-                (echo.r / 160000)
+                ( (1 - xLimit)/2 + xLimit * echo.r / 160000)
                 (echo.amplitude * 40.0)
                 (toFloat echo.strength)
 
@@ -267,6 +280,7 @@ fragmentShader =
             yBeforeNoise += includeRaid(raid3, uv.x);
             yBeforeNoise += includeRaid(raid4, uv.x);
             yBeforeNoise += includeRaid(raid5, uv.x);
+            yBeforeNoise += includeRaid(raid6, uv.x);
             yBeforeNoise += includeRaid(raid7, uv.x);
             yBeforeNoise += includeRaid(raid8, uv.x);
             yBeforeNoise += includeRaid(raid9, uv.x);

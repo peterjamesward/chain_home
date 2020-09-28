@@ -267,7 +267,7 @@ kioskAutomation model =
             { beginTutorial | kioskTimer = Just model.modelTime }
 
         ( Just lastTime, Just tut ) ->
-            if model.modelTime - lastTime > howLongTheStringIs * 100 then
+            if model.modelTime - lastTime > howLongTheStringIs * 80 then
                 { loopedTutorial | kioskTimer = Just model.modelTime }
 
             else
