@@ -203,10 +203,10 @@ fragmentShader =
 
         // Think of this as a mass raid "field".
         float fn(float x) {
-            float f = 0.0;
-            f += 2.0 * sin(x * 512.0 + 0.0) * sin(iTime * 9.0);
-            f += 2.0 * sin(x * 256.0 + 0.0) * sin(iTime * 8.0);
-            f += 2.0 * sin(x * 128.0 + 0.0) * sin(iTime * 6.0);
+            float f = -1.3;
+            f += 1.0 * sin(x * 512.0 + 0.0) * sin(iTime * 9.0);
+            f += 1.0 * sin(x * 256.0 + 0.0) * sin(iTime * 8.0);
+            f += 1.0 * sin(x * 128.0 + 0.0) * sin(iTime * 6.0);
             f += 1.0 * sin(x * 64.0 + 0.1) * sin(iTime * 4.0);
             f += 1.0 * sin(x * 32.0 + 0.2) * sin(iTime * 3.0);
             f /= 4.0;
@@ -214,7 +214,7 @@ fragmentShader =
         }
 
         float includeRaid(vec3 raid, float x) {
-            float f1Component = f1(x); // * float(raid.z <= 2.0);
+            float f1Component = f1(x) * float(raid.z == 1.0);
             float f2Component = f2(x) * float(raid.z == 2.0);
             float fnComponent = fn(x) * float(raid.z > 2.0);
             float added = min(f1Component + f2Component + fnComponent, 0.0);

@@ -23,7 +23,7 @@ groundRays =
       , strength = 1
       , phase = 0
       , duration = 0
-      , amplitude = 6
+      , amplitude = 10
       }
     ]
 
