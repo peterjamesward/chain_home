@@ -3,4 +3,4 @@
 
 --TODO: Put back the tutorial advance and regress controls.
 
---TODO: Scenario should get increasingly worse by roughly doubling raid sizes.
+--TODO: Play scenario should get increasingly worse by roughly doubling raid sizes.

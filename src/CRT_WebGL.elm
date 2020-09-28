@@ -259,7 +259,7 @@ fragmentShader =
             lumpyTime = float(lumpyTime > 0.9);
 
             float sawtooth = 0.0;
-            sawtooth = abs(0.5 - fract(uv.x * 20.0));
+            sawtooth = abs(0.5 - fract(uv.x * 173.0));
             float bumps = 3.0 * lumpy * lumpyTime * sawtooth;
 
             // Now expose a section of the field where we have raids.
