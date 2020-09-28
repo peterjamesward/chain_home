@@ -1,5 +1,7 @@
 
---TODO: Update demo & tutorial for new raid sizes.
+--TODO: Structure kiosk tutorial as list of lists, so easier to understand and debug.
+
+--TODO: Make small signals bigger and big ones smaller.
 
 --TODO: Reinstate normal operating mode with mix of targets (bt simpler to use).
 

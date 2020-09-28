@@ -405,8 +405,8 @@ actionFindRangeOfNumberedTarget active index model =
     { model
         | keys =
             { currentKeys
-                | rangeLeft = active && model.rangeSlider > rangeInMiles
-                , rangeRight = active && model.rangeSlider < rangeInMiles - 1
+                | rangeLeft = active && model.rangeSlider > rangeInMiles + 1
+                , rangeRight = active && model.rangeSlider < rangeInMiles
             }
     }
 

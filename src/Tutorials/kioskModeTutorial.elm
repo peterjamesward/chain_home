@@ -258,13 +258,14 @@ kioskModeTutorial =
             UiCRT
             [ ActionClearTargets
             , ActionSetupRaid2SameBearing
+            , ActionSetupRaid2DifferentBearings
             , ActionSetupRaid3to6
             , ActionClearCalculator
             ]
             noStateActions
             noExitActions
             (TextConstant
-                """Here are two more raids. The regular beats signify two aircraft.
+                """Here are three more raids. The regular beats signify two aircraft.
                       The irregular pattern signifies three to six aircraft.
                   """
             )
@@ -353,7 +354,10 @@ kioskModeTutorial =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperator
+            , ActionEndHeightMode
+            , ActionClearCalculator
+            ]
             TextInterpretCalculator
         , TutorialEntry
             UiRangeKnob
@@ -361,13 +365,97 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget True 1 ]
             [ ActionFindRangeOfNumberedTarget False 1 ]
             (TextConstant
+                """The operator turns the range knob until the pointer
+            lines up with the left edge of the raid on the CRT."""
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionSwingGoniometer ]
+            noExitActions
+            (TextConstant
+                """The operator swings the gonio but the V will not disappear completely.
+            This means that the two planes are not together - they are on different bearings."""
+            )
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionFindBearingOfNumberedTarget True 2 ]
+            [ ActionFindBearingOfNumberedTarget False 2 ]
+            (TextConstant
+                """We can find the bearing where the V stops going up and down.
+            This means we have located one of the aircraft."""
+            )
+        , TutorialEntry
+            UiGonioButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreBearing ]
+            (TextConstant
+                """Pressing the GONIO button stores the bearing in the calculator."""
+            )
+        , TutorialEntry
+            UIRangeButton
+            noEntryActions
+            noStateActions
+            [ ActionStoreRange ]
+            (TextConstant
+                """Pressing the RANGE button stores the range in the calculator."""
+            )
+        , TutorialEntry
+            UiHeight
+            [ ActionHeightMode ]
+            noStateActions
+            [ ActionBearingMode ]
+            (TextConstant
+                """We don't try to find the height because we won't know which aircraft it is.
+            The gonio can do bearing or height, not both at the same time."""
+            )
+        , TutorialEntry
+            UiRaidStrength
+            [ ActionStoreStrength 1 ]
+            noStateActions
+            noExitActions
+            (TextConstant
+                """The operator presses Raid Strength 1 because the plot is for one aircraft."""
+            )
+        , TutorialEntry
+            UiCalculator
+            [ ActionShowCalculator ]
+            noStateActions
+            [ ActionShowOperator ]
+            TextInterpretCalculator
+        , TutorialEntry
+            UiGoniometer
+            noEntryActions
+            [ ActionFindBearingOfNumberedTarget True 1 ]
+            [ ActionFindBearingOfNumberedTarget False 1
+            , ActionStoreBearing
+            ]
+            (TextConstant
+                """We find another bearing where the movement stops.
+            This means we have located the other the aircraft.
+            The rest of the steps are the same."""
+            )
+        , TutorialEntry
+            UiCalculator
+            [ ActionShowCalculator ]
+            noStateActions
+            [ ActionShowOperator ]
+            TextInterpretCalculator
+        , TutorialEntry
+            UiRangeKnob
+            noEntryActions
+            [ ActionFindRangeOfNumberedTarget True 3 ]
+            [ ActionFindRangeOfNumberedTarget False 3 ]
+            (TextConstant
                 """Move the range pointer to the next raid."""
             )
         , TutorialEntry
             UiGoniometer
             noEntryActions
-            [ ActionFindBearingOfNumberedTarget True 1 ]
-            [ ActionFindBearingOfNumberedTarget False 1 ]
+            [ ActionFindBearingOfNumberedTarget True 3 ]
+            [ ActionFindBearingOfNumberedTarget False 3 ]
             (TextConstant
                 """This close formation of aircraft will still "D/F out"."""
             )
@@ -398,8 +486,8 @@ kioskModeTutorial =
         , TutorialEntry
             UiGoniometer
             noEntryActions
-            [ ActionSeekElevationOfNumberedTarget True 1 ]
-            [ ActionSeekElevationOfNumberedTarget False 1 ]
+            [ ActionSeekElevationOfNumberedTarget True 3 ]
+            [ ActionSeekElevationOfNumberedTarget False 3 ]
             (TextConstant
                 """Minimise the V."""
             )
@@ -414,8 +502,8 @@ kioskModeTutorial =
         , TutorialEntry
             UiRangeKnob
             noEntryActions
-            [ ActionFindRangeOfNumberedTarget True 1 ]
-            [ ActionFindRangeOfNumberedTarget False 1 ]
+            [ ActionFindRangeOfNumberedTarget True 3 ]
+            [ ActionFindRangeOfNumberedTarget False 3 ]
             (TextConstant
                 """Check the range."""
             )
@@ -468,7 +556,7 @@ kioskModeTutorial =
             [ ActionFindRangeOfNumberedTarget False 0 ]
             (TextConstant
                 """Set the Range Pointer points to the nearest raid.
-                This wide shape is several aircraft that appear from our position to be in a long line.
+                The wider the shape on the tube, the more aircraft in the raid.
             """
             )
         , TutorialEntry
@@ -477,7 +565,7 @@ kioskModeTutorial =
             [ ActionFindBearingOfNumberedTarget True 0 ]
             [ ActionFindBearingOfNumberedTarget False 0 ]
             (TextConstant
-                """They D/F out together, so it's a single raid."""
+                """Large raids may not D?F out completely."""
             )
         , TutorialEntry
             UiGonioButton

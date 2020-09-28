@@ -94,7 +94,7 @@ bomber2 =
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
     , speed = 200.0 -- mph
-    , strength = 1
+    , strength = 2
     , iff = Nothing
     }
 
@@ -138,7 +138,7 @@ fighter1 =
 
 
 largeGroup1 n =
-    { longitude = bawdsey.longitude + degrees 2.1
+    { longitude = bawdsey.longitude + degrees 1.8
     , latitude = bawdsey.latitude + degrees 0.3
     , height = 25
     , heading = degrees 275
@@ -149,7 +149,7 @@ largeGroup1 n =
 
 
 largeGroup2 n =
-    { longitude = bawdsey.longitude + degrees 1.9
+    { longitude = bawdsey.longitude + degrees 1.2
     , latitude = bawdsey.latitude - degrees 0.2
     , height = 25
     , heading = degrees 265
@@ -199,4 +199,5 @@ trainingMode3to6 timeNow =
 trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
-        [ largeGroup2 60 ]
+        [ largeGroup2 12
+        , largeGroup1 60 ]
