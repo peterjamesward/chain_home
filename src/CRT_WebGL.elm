@@ -230,9 +230,10 @@ fragmentShader =
             float f1Component = f1(x) * float(raid.z == 1.0);
             float f2Component = f2(x) * float(raid.z == 2.0);
             float fnComponent = fn(x) * float(raid.z > 2.0);
-            float added = min(f1Component + f2Component + fnComponent, 0.0);
+            float depth = min(f1Component + f2Component + fnComponent, 0.0);
             float shape = raid.y * envelope(raid.x, sqrt(raid.z)/100.0, x);
-            return shape * added;
+            depth /= 1.0 + sqrt(raid.z);
+            return shape * depth;
         }
 
         void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -259,7 +260,7 @@ fragmentShader =
             lumpyTime = float(lumpyTime > 0.9);
 
             float sawtooth = 0.0;
-            sawtooth = abs(0.5 - fract(uv.x * 173.0));
+            sawtooth = abs(0.5 - fract(uv.x * 20.0));
             float bumps = 3.0 * lumpy * lumpyTime * sawtooth;
 
             // Now expose a section of the field where we have raids.

@@ -60,7 +60,10 @@ demoIntro =
 demoOnes =
     [ TutorialEntry
         UiCRT
-        [ ActionSetupRaid
+        [ ActionInitialiseTutorial
+        , ActionCentraliseKnobs
+        , ActionClearTargets
+        , ActionSetupRaid
         , ActionSetupRaidFriendlyOutbound
         ]
         [ ActionStopGonioAwayFromRaidBearing ]
@@ -272,7 +275,9 @@ demoOnes =
 demoTwosAndThrees =
     [ TutorialEntry
         UiCRT
-        [ ActionClearTargets
+        [ ActionInitialiseTutorial
+        , ActionCentraliseKnobs
+        , ActionClearTargets
         , ActionSetupRaid2SameBearing
         , ActionSetupRaid2DifferentBearings
         , ActionSetupRaid3to6
