@@ -347,7 +347,7 @@ actionChaseTheRaidRange active model =
                     List.map .rangeInMetres model.targets
 
         rangeInMiles =
-            toFloat <| floor <| rangeInMetres / 1600
+            rangeInMetres / 1600
 
         currentKeys =
             model.keys
@@ -355,8 +355,8 @@ actionChaseTheRaidRange active model =
     { model
         | keys =
             { currentKeys
-                | rangeLeft = active && model.rangeSlider > rangeInMiles
-                , rangeRight = active && model.rangeSlider < rangeInMiles - 1
+                | rangeLeft = active && model.rangeSlider > rangeInMiles + 1
+                , rangeRight = active && model.rangeSlider < rangeInMiles
             }
     }
 

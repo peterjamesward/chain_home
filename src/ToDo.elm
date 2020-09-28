@@ -1,6 +1,5 @@
 
 --TODO: Update demo & tutorial for new raid sizes.
---TODO: Tutorial range detection reports short range.
 
 --TODO: Reinstate normal operating mode with mix of targets (bt simpler to use).
 
