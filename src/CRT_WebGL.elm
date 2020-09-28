@@ -248,7 +248,7 @@ fragmentShader =
             noise += sin(uv.x * 256.0 + 0.0) * sin(iTime * 7.0);
             noise += sin(uv.x * 512.0 + 0.0) * sin(iTime * 5.0);
             noise += sin(uv.x * 1024.0 + 0.0) * sin(iTime * 11.0);
-            noise /= 8.0;
+            noise /= 40.0;
 
             // Spikey looking noise.
             float lumpy = 0.0;
@@ -260,7 +260,7 @@ fragmentShader =
 
             float sawtooth = 0.0;
             sawtooth = abs(0.5 - fract(uv.x * 20.0));
-            float bumps = 5.0 * lumpy * lumpyTime * sawtooth;
+            float bumps = 3.0 * lumpy * lumpyTime * sawtooth;
 
             // Now expose a section of the field where we have raids.
             // Note pulse width sqrt(N)/100 looks ok.
@@ -326,13 +326,13 @@ fragmentShader =
             combined.y += r14 * sin(iTime * 15.0);
             combined.y += r15 * sin(iTime * 16.0);
 
-            float yBeforeNoise = 0.0 - length(combined);
+            float yBeforeNoise = 0.0 - sqrt(length(combined));
 
             // Fiddle with coordinate (needs some work).
             float beamY = yBeforeNoise + noise + bumps;
-            beamY = beamY/100.0 + 0.78;
+            beamY = beamY/10.0 + 0.78;
 
-            //create the beam by simple y distance that falls off quickly. (? smoothstep ?)
+            //create the beam by simple y distance that falls off quickly.
             float i = pow(1.0 - abs(uv.y - beamY), 28.0);
             //float i = cubicPulse(beamY, 0.02 / abs(beamY), uv.y);
 
