@@ -10,7 +10,7 @@ import Element.Background as Background
 import Element.Font as Font
 import Element.Input exposing (button)
 import Messages exposing (Msg(..))
-import Model exposing (Model)
+import Model exposing (ApplicationMode(..), Model)
 import Tutorials.ActionCodes exposing (TutorialTextFunction(..))
 import Tutorials.Messages exposing (TutorialMsg(..))
 import Tutorials.Model exposing (Tutorial)
@@ -45,68 +45,83 @@ viewCalculatorInTutorial model =
 
         calcText =
             Calculator.View.interpretCalculator model.calculator
+
+        showArrows =
+            case model.applicationMode of
+                TutorialMode _ ->
+                    True
+
+                Model.KioskMode _ _ ->
+                    False
+
+                InteractiveMode ->
+                    False
     in
     el
         [ centerX
         , width fill
         , alignBottom
-        , below <| tutorialControls calcText
+        , below <| tutorialControls showArrows calcText
         ]
         rawPage
 
+
+
 --TODO: Cater for interactive and kiosk modes!
 
-tutorialControlsSAVE someText =
-    row [ centerX, width fill, alignBottom ]
-        [ el [ height (px 15) ]
-            none
-        , paragraph
-            [ Background.color tutorialBackground
-            , alignBottom
-            , centerX
-            , spacing 4
-            , width fill
-            , padding 10
-            , Font.size 28
-            , Font.family [ Font.typeface "Courier New" ]
-            , Font.color lightGray
-            ]
-            [ text someText ]
-        ]
 
+tutorialControls : Bool -> String -> Element Msg
+tutorialControls withArrows someText =
+    let
+        backArrow =
+            button
+                [ Background.color midGray
+                , Font.size 40
+                , Font.color white
+                ]
+                { onPress = Just <| TutorialMsg TutorialBack
+                , label = el [ centerX ] <| text "◀︎"
+                }
 
-tutorialControls someText =
-    row [ centerX, width fill, alignBottom, spacing 10 ]
-        [ el [ height (px 15) ]
-            none
-        , button
-            [ Background.color midGray
-            , Font.size 40
-            , Font.color white
+        textBlock =
+            paragraph
+                [ Background.color tutorialBackground
+                , alignBottom
+                , centerX
+                , spacing 4
+                , width fill
+                , padding 10
+                , Font.size 28
+                , Font.family [ Font.typeface "Courier New" ]
+                , Font.color lightGray
+                ]
+                [ text someText ]
+
+        forwardArrow =
+            button
+                [ Background.color midGray
+                , Font.size 40
+                , Font.color white
+                ]
+                { onPress = Just <| TutorialMsg TutorialAdvance
+                , label = el [ centerX ] <| text "►"
+                }
+    in
+    row [ centerX, width fill, alignBottom, spacing 10 ] <|
+        if withArrows then
+            [ el [ height (px 15) ]
+                none
+            , backArrow
+            , textBlock
+            , forwardArrow
+            , el [ height (px 15) ]
+                none
             ]
-            { onPress = Just <| TutorialMsg TutorialBack
-            , label = el [ centerX ] <| text "◀︎"
-            }
-        , paragraph
-            [ Background.color tutorialBackground
-            , alignBottom
-            , centerX
-            , spacing 4
-            , width fill
-            , padding 10
-            , Font.size 28
-            , Font.family [ Font.typeface "Courier New" ]
-            , Font.color lightGray
+
+        else
+            [ el [ height (px 15) ]
+                none
+            , textBlock
+            , el [ height (px 15) ]
+                none
             ]
-            [ text someText ]
-        , button
-            [ Background.color midGray
-            , Font.size 40
-            , Font.color white
-            ]
-            { onPress = Just <| TutorialMsg TutorialAdvance
-            , label = el [ centerX ] <| text "►"
-            }
-        , el [ height (px 15) ]
-            none
-        ]

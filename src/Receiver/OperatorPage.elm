@@ -395,6 +395,9 @@ operatorPage model =
                 TutorialMode tutorial ->
                     findTutorialSubject tutorial
 
+                Model.KioskMode tutorial _ ->
+                    findTutorialSubject tutorial
+
                 _ ->
                     Nothing
     in
@@ -410,6 +413,17 @@ operatorPageWithTutorial tutorial model =
     let
         rawPage =
             operatorPage model
+
+        showArrows =
+            case model.applicationMode of
+                TutorialMode _ ->
+                    True
+
+                Model.KioskMode _ _ ->
+                    False
+
+                InteractiveMode ->
+                    False
     in
     case tutorialText tutorial model of
         Just someText ->
@@ -417,7 +431,7 @@ operatorPageWithTutorial tutorial model =
                 [ centerX
                 , alignBottom
                 , width fill
-                , below <| tutorialControls someText
+                , below <| tutorialControls showArrows someText
                 ]
                 rawPage
 

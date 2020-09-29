@@ -255,7 +255,21 @@ kioskAutomation model =
                 ( newModel, _ ) =
                     update (TutorialMsg TutorialAdvance) model
             in
-            newModel
+            startOverIfAtEnd newModel
+
+        startOverIfAtEnd m =
+            case m.applicationMode of
+                Model.KioskMode (Just _) _ ->
+                    m
+
+                Model.KioskMode Nothing _ ->
+                    { m
+                        | applicationMode = Model.KioskMode kioskModeTutorial m.modelTime
+                        , currPage = SplashPage
+                    }
+
+                _ ->
+                    m
     in
     -- KioskTimer being not Nothing forces the looping demo.
     case model.applicationMode of
@@ -284,6 +298,7 @@ update msg model =
         Messages.KioskMode ->
             ( { model
                 | applicationMode = Model.KioskMode kioskModeTutorial model.modelTime
+                , currPage = SplashPage
               }
             , Cmd.none
             )
@@ -430,11 +445,32 @@ update msg model =
                             applyTutorialActions acts model
                     in
                     { newModel
-                        | applicationMode = Model.KioskMode ts ticks
+                        | applicationMode =
+                            Model.KioskMode ts <|
+                                if ts == tut then
+                                    ticks
+
+                                else
+                                    model.modelTime
                     }
 
                 InteractiveMode ->
-                    model
+                    let
+                        ( ts, acts ) =
+                            Tutorials.Update.update tutMsg Nothing
+
+                        newModel =
+                            applyTutorialActions acts model
+                    in
+                    { newModel
+                        | applicationMode =
+                            case ts of
+                                Just x ->
+                                    TutorialMode (Just x)
+
+                                _ ->
+                                    InteractiveMode
+                    }
             , Cmd.none
             )
 
@@ -808,11 +844,12 @@ view model =
                     case model.applicationMode of
                         TutorialMode tut ->
                             operatorPageWithTutorial tut model
+
                         Model.KioskMode tut _ ->
                             operatorPageWithTutorial tut model
+
                         InteractiveMode ->
                             operatorPage model
-
 
                 InputPage ->
                     inputPage model

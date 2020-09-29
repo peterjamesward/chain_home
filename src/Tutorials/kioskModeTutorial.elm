@@ -11,7 +11,8 @@ import Zipper
 kioskModeTutorial : Maybe (Zipper.Zipper TutorialEntry)
 kioskModeTutorial =
     Zipper.fromList <|
-        demoIntro
+        []
+            ++ demoIntro
             ++ demoOnes
             ++ demoTwosAndThrees
             ++ demoMassRaids
@@ -429,8 +430,7 @@ demoTwosAndThrees =
         noStateActions
         [ ActionBearingMode ]
         (TextConstant
-            """We don't try to find the height because we won't know which aircraft it is.
-                                 The gonio can do bearing or height, not both at the same time."""
+            """We don't try to find the height because we wouldn't know which aircraft it is."""
         )
     , TutorialEntry
         UiRaidStrength
@@ -455,8 +455,8 @@ demoTwosAndThrees =
         ]
         (TextConstant
             """We find another bearing where the movement stops.
-                                 This means we have located the other the aircraft.
-                                 The rest of the steps are the same."""
+             This means we have located the other the aircraft.
+             The rest of the steps are the same."""
         )
     , TutorialEntry
         UiCalculator
@@ -550,7 +550,9 @@ demoTwosAndThrees =
         UiCalculator
         [ ActionShowCalculator ]
         noStateActions
-        [ ActionShowOperator ]
+        [ ActionShowOperator
+        , ActionEndHeightMode
+        ]
         TextInterpretCalculator
     ]
 
@@ -683,7 +685,7 @@ demoFinale =
         , ActionCentraliseKnobs
         , ActionShowOperator
         ]
-        [ ActionSwingGoniometer ]
+        []
         noExitActions
         (TextConstant
             """In the heat of battle, the operator must maintain concentration to track multiple raids.
