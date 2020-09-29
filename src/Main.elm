@@ -42,7 +42,8 @@ import Task
 import Time
 import Tutorials.ActionCodes exposing (TutorialScenario(..))
 import Tutorials.Actions exposing (..)
-import Tutorials.Messages exposing (TutorialMsg(..))
+import Tutorials.KioskModeTutorial exposing (kioskModeTutorial)
+import Tutorials.Messages as TutorialMsg exposing (TutorialMsg(..))
 import Tutorials.Tutorials exposing (tutorialAutomation)
 import Tutorials.Update
 import Tutorials.Views exposing (tutorialText, viewCalculatorInTutorial)
@@ -79,7 +80,6 @@ init _ =
       , reflector = False
       , receiveAB = True
       , receiveAntenna = receiveHigh
-      , tutorialActive = Nothing
       , explainModeMenu = False
       , explainModeReceiver = False
       , explainModeMap = False
@@ -92,7 +92,7 @@ init _ =
       , calculator = Calculator.init
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
-      , kioskTimer = Nothing
+      , applicationMode = InteractiveMode
       }
     , Task.perform SetStartTime Time.now
     )
@@ -198,8 +198,24 @@ deriveModelAtTime model timeNow =
             -- Map 0..100 onto -pi..+pi
             (newRangeSliderPosition - 50) * degrees 175 / 50
 
-        ( newTutorialState, actionCodeList ) =
-            tutorialAutomation model.tutorialActive
+        ( newMode, actionCodeList ) =
+            case model.applicationMode of
+                InteractiveMode ->
+                    ( InteractiveMode, [] )
+
+                TutorialMode tutorial ->
+                    let
+                        ( newTut, actions ) =
+                            tutorialAutomation tutorial
+                    in
+                    ( TutorialMode newTut, actions )
+
+                Model.KioskMode tutorial ticks ->
+                    let
+                        ( newTut, actions ) =
+                            tutorialAutomation tutorial
+                    in
+                    ( Model.KioskMode newTut ticks, actions )
 
         postTutorialModel =
             applyTutorialActions actionCodeList preTutorialModel
@@ -218,18 +234,9 @@ deriveModelAtTime model timeNow =
                 , elevation_A_trace = heightMode_A_Outputs
                 , elevation_B_trace = heightMode_B_Outputs
             }
-
-        wrapAnimationTime m =
-            -- Stop randomness degrading by limiting webGLtime
-            if model.webGLtime > 300 * 1000 then
-                { m | webGLtime = 0.0 }
-
-            else
-                m
     in
     --Wrapping this in automation allows the Tutorials to do anything.
-    { postTutorialModel | tutorialActive = newTutorialState }
-        |> wrapAnimationTime
+    { postTutorialModel | applicationMode = newMode }
 
 
 clearHistory : Model.Model -> Model.Model
@@ -239,39 +246,28 @@ clearHistory model =
 
 kioskAutomation : Model.Model -> Model.Model
 kioskAutomation model =
-    -- For now, just advance tutorial every 30 seconds.
     let
-        ( beginTutorial, _ ) =
-            update (TutorialMsg (DisplayTraining ScenarioKioskMode)) model
+        howLongTheStringIs tut =
+            String.length <| Maybe.withDefault "" <| tutorialText tut model
 
-        ( advanceTutorial, _ ) =
-            update (TutorialMsg TutorialAdvance) model
-
-        loopedTutorial =
-            case advanceTutorial.tutorialActive of
-                Just _ ->
-                    advanceTutorial
-
-                Nothing ->
-                    beginTutorial
-
-        howLongTheStringIs =
-            String.length <| Maybe.withDefault "" <| tutorialText model
+        advance =
+            let
+                ( newModel, _ ) =
+                    update (TutorialMsg TutorialAdvance) model
+            in
+            newModel
     in
     -- KioskTimer being not Nothing forces the looping demo.
-    case ( model.kioskTimer, model.tutorialActive ) of
-        ( Nothing, _ ) ->
-            model
-
-        ( _, Nothing ) ->
-            { beginTutorial | kioskTimer = Just model.modelTime }
-
-        ( Just lastTime, Just tut ) ->
-            if model.modelTime - lastTime > howLongTheStringIs * 80 then
-                { loopedTutorial | kioskTimer = Just model.modelTime }
+    case model.applicationMode of
+        Model.KioskMode tut lastTime ->
+            if model.modelTime - lastTime > howLongTheStringIs tut * 80 then
+                advance
 
             else
                 model
+
+        _ ->
+            model
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -285,8 +281,10 @@ update msg model =
                 Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
     in
     case msg of
-        KioskMode ->
-            ( { model | kioskTimer = Just model.modelTime }
+        Messages.KioskMode ->
+            ( { model
+                | applicationMode = Model.KioskMode kioskModeTutorial model.modelTime
+              }
             , Cmd.none
             )
 
@@ -313,7 +311,8 @@ update msg model =
                 , gameMode = gameMode
 
                 -- Pseudo randomness will suffice at least for now.
-                , timeForNextRaid = Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
+                , timeForNextRaid =
+                    Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
               }
             , requestRandomRaid
             )
@@ -409,11 +408,33 @@ update msg model =
             )
 
         TutorialMsg tutMsg ->
-            let
-                ( ts, acts ) =
-                    Tutorials.Update.update tutMsg model.tutorialActive
-            in
-            ( applyTutorialActions acts { model | tutorialActive = ts }
+            ( case model.applicationMode of
+                TutorialMode tut ->
+                    let
+                        ( ts, acts ) =
+                            Tutorials.Update.update tutMsg tut
+
+                        newModel =
+                            applyTutorialActions acts model
+                    in
+                    { newModel
+                        | applicationMode = TutorialMode ts
+                    }
+
+                Model.KioskMode tut ticks ->
+                    let
+                        ( ts, acts ) =
+                            Tutorials.Update.update tutMsg tut
+
+                        newModel =
+                            applyTutorialActions acts model
+                    in
+                    { newModel
+                        | applicationMode = Model.KioskMode ts ticks
+                    }
+
+                InteractiveMode ->
+                    model
             , Cmd.none
             )
 
@@ -784,7 +805,14 @@ view model =
                     operatorPage model
 
                 OperatorPageInTutorial ->
-                    operatorPageWithTutorial model
+                    case model.applicationMode of
+                        TutorialMode tut ->
+                            operatorPageWithTutorial tut model
+                        Model.KioskMode tut _ ->
+                            operatorPageWithTutorial tut model
+                        InteractiveMode ->
+                            operatorPage model
+
 
                 InputPage ->
                     inputPage model
@@ -818,12 +846,12 @@ view model =
             column
                 [ E.width E.fill
                 ]
-                [ case model.kioskTimer of
-                    Just _ ->
+                [ case model.applicationMode of
+                    Model.KioskMode _ _ ->
                         row [ height (px 40) ]
                             []
 
-                    Nothing ->
+                    _ ->
                         navBar model
                 , content
                 ]
@@ -870,7 +898,7 @@ navBar model =
         , spaceEvenly
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
-        , navItem model "Demo" KioskMode OperatorPage
+        , navItem model "Demo" Messages.KioskMode OperatorPage
         , navItem model "Learn & Play" DisplayConfiguration InputPage
         , navItem model "Receiver" DisplayReceiver OperatorPage
         , navItem model "Calculator" DisplayCalculator CalculatorPage

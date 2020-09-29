@@ -4,7 +4,7 @@ module Tutorials.Actions exposing (..)
 
 import Calculator.Model exposing (InputState(..), setInputState, storeAzimuth, storeAzimuthRange, storeElevation, storeFriendly, storeStrength, storeStrengthPlus)
 import Config exposing (..)
-import Model exposing (Model)
+import Model exposing (ApplicationMode(..), Model)
 import Target exposing (findTargetHeight)
 import Tutorials.ActionCodes exposing (TutorialActionCode(..), TutorialScenario, TutorialTextFunction(..))
 import Tutorials.Model exposing (TutorialActionList, TutorialEntry)
@@ -147,7 +147,6 @@ performTheAction a model =
 
                 ActionSwingGoniometer ->
                     actionSwingGoniometer
-
     in
     actionFunction model
 
@@ -303,20 +302,23 @@ actionShowOperator : Model -> Model
 actionShowOperator model =
     { model | currPage = OperatorPageInTutorial }
 
+
 actionShowSplashPage : Model -> Model
 actionShowSplashPage model =
     { model | currPage = SplashPage }
 
+
 actionExitAction : Model -> Model
 actionExitAction model =
     { model
-        | tutorialActive = Nothing
+        | applicationMode = InteractiveMode
         , currPage =
-            if model.kioskTimer == Nothing then
-                InputPage
+            case model.applicationMode of
+                KioskMode _ _ ->
+                    model.currPage
 
-            else
-                model.currPage
+                _ ->
+                    InputPage
     }
 
 

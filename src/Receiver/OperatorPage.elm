@@ -13,7 +13,7 @@ import Goniometer exposing (drawGoniometer)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
-import Model exposing (Model)
+import Model exposing (ApplicationMode(..), Model)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import Svg exposing (polygon, svg)
@@ -391,7 +391,12 @@ operatorPagePortrait tutorialSubject model =
 operatorPage model =
     let
         tutorialSubject =
-            findTutorialSubject model
+            case model.applicationMode of
+                TutorialMode tutorial ->
+                    findTutorialSubject tutorial
+
+                _ ->
+                    Nothing
     in
     case model.outputDevice.orientation of
         Landscape ->
@@ -401,12 +406,12 @@ operatorPage model =
             operatorPagePortrait tutorialSubject model
 
 
-operatorPageWithTutorial model =
+operatorPageWithTutorial tutorial model =
     let
         rawPage =
             operatorPage model
     in
-    case tutorialText model of
+    case tutorialText tutorial model of
         Just someText ->
             el
                 [ centerX

@@ -36,7 +36,6 @@ type alias Model =
     , reflector : Bool
     , receiveAB : Bool
     , receiveAntenna : Antenna
-    , tutorialActive : Tutorial
     , explainModeMenu : Bool
     , explainModeReceiver : Bool
     , explainModeMap : Bool
@@ -49,8 +48,17 @@ type alias Model =
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
-    , kioskTimer : Maybe Int -- Time we last advanced when in kiosk mode
+
+    --, tutorialActive : Tutorial
+    --, kioskTimer : Maybe Int -- Time we last advanced when in kiosk mode
+    , applicationMode : ApplicationMode
     }
+
+
+type ApplicationMode
+    = InteractiveMode
+    | TutorialMode Tutorial
+    | KioskMode Tutorial Int
 
 
 type alias TargetSelector =

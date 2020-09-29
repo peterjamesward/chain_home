@@ -806,10 +806,10 @@ tutorialAutomation activeTutorial =
             ( activeTutorial, (Zipper.current tutorial).stateActions )
 
 
-findTutorialSubject : Model -> Maybe UiComponent
-findTutorialSubject model =
+findTutorialSubject : Tutorial -> Maybe UiComponent
+findTutorialSubject tutorial =
     -- This helper for UI pages to know which element to highlight.
-    case model.tutorialActive of
+    case tutorial of
         Just stage ->
             Just <| (Zipper.current stage).uiComponent
 

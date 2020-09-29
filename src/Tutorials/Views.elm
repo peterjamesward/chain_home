@@ -4,19 +4,22 @@ module Tutorials.Views exposing (..)
 -- to complete the views in Tutorial mode.
 
 import Calculator.View exposing (interpretCalculator)
-import Constants exposing (blue, flatSunflower, lightGray, tutorialBackground, white)
+import Constants exposing (blue, flatSunflower, lightGray, midGray, tutorialBackground, white)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Font as Font
+import Element.Input exposing (button)
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Tutorials.ActionCodes exposing (TutorialTextFunction(..))
+import Tutorials.Messages exposing (TutorialMsg(..))
+import Tutorials.Model exposing (Tutorial)
 import Zipper
 
 
-tutorialText : Model -> Maybe String
-tutorialText model =
-    case model.tutorialActive of
+tutorialText : Tutorial -> Model -> Maybe String
+tutorialText tutorial model =
+    case tutorial of
         Nothing ->
             Nothing
 
@@ -51,9 +54,10 @@ viewCalculatorInTutorial model =
         ]
         rawPage
 
+--TODO: Cater for interactive and kiosk modes!
 
-tutorialControls someText =
-    column [ centerX, width fill, alignBottom ]
+tutorialControlsSAVE someText =
+    row [ centerX, width fill, alignBottom ]
         [ el [ height (px 15) ]
             none
         , paragraph
@@ -68,4 +72,41 @@ tutorialControls someText =
             , Font.color lightGray
             ]
             [ text someText ]
+        ]
+
+
+tutorialControls someText =
+    row [ centerX, width fill, alignBottom, spacing 10 ]
+        [ el [ height (px 15) ]
+            none
+        , button
+            [ Background.color midGray
+            , Font.size 40
+            , Font.color white
+            ]
+            { onPress = Just <| TutorialMsg TutorialBack
+            , label = el [ centerX ] <| text "◀︎"
+            }
+        , paragraph
+            [ Background.color tutorialBackground
+            , alignBottom
+            , centerX
+            , spacing 4
+            , width fill
+            , padding 10
+            , Font.size 28
+            , Font.family [ Font.typeface "Courier New" ]
+            , Font.color lightGray
+            ]
+            [ text someText ]
+        , button
+            [ Background.color midGray
+            , Font.size 40
+            , Font.color white
+            ]
+            { onPress = Just <| TutorialMsg TutorialAdvance
+            , label = el [ centerX ] <| text "►"
+            }
+        , el [ height (px 15) ]
+            none
         ]
