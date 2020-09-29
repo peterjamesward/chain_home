@@ -39,7 +39,7 @@ type alias Model =
     , explainModeMenu : Bool
     , explainModeReceiver : Bool
     , explainModeMap : Bool
-    , tutorialsCompleted : List TutorialScenario
+    --, tutorialsCompleted : List TutorialScenario
     , newRaid : Maybe Target
     , timeForNextRaid : Maybe Int
     , storedPlots : List RecordedPlot
@@ -48,9 +48,6 @@ type alias Model =
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
-
-    --, tutorialActive : Tutorial
-    --, kioskTimer : Maybe Int -- Time we last advanced when in kiosk mode
     , applicationMode : ApplicationMode
     }
 

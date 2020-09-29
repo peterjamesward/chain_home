@@ -83,7 +83,6 @@ init _ =
       , explainModeMenu = False
       , explainModeReceiver = False
       , explainModeMap = False
-      , tutorialsCompleted = []
       , newRaid = Nothing
       , timeForNextRaid = Nothing
       , storedPlots = []
@@ -761,11 +760,7 @@ makeNewTarget ( bearing, height ) model =
             }
 
         raidIfSelected scenario raidType =
-            if List.member scenario model.tutorialsCompleted then
                 raidType
-
-            else
-                [ hostileSingle ]
 
         hostileMultiple n =
             if n > 1 then
@@ -936,7 +931,7 @@ navBar model =
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
         , navItem model "Demo" Messages.KioskMode OperatorPage
-        , navItem model "Learn & Play" DisplayConfiguration InputPage
+        , navItem model "Mode selection" DisplayConfiguration InputPage
         , navItem model "Receiver" DisplayReceiver OperatorPage
         , navItem model "Calculator" DisplayCalculator CalculatorPage
         , navItem model "Map" DisplayMapPage MapPage
@@ -956,50 +951,13 @@ setConfig selector newState =
 
 setTutorialCompletedState : TutorialScenario -> Bool -> Model.Model -> Model.Model
 setTutorialCompletedState scenario state model =
-    { model
-        | tutorialsCompleted =
-            case ( List.member scenario model.tutorialsCompleted, state ) of
-                ( True, False ) ->
-                    removeFromList scenario model.tutorialsCompleted
-
-                ( False, True ) ->
-                    scenario :: model.tutorialsCompleted
-
-                _ ->
-                    model.tutorialsCompleted
-    }
+    -- Functionality removed 2020-09-28
+    model
 
 
-targetSelector : List TargetSelector -> List TutorialScenario -> Element Msg
-targetSelector availableRaidTypes tutorialsDone =
+targetSelector : List TargetSelector  -> Element Msg
+targetSelector availableRaidTypes  =
     let
-        tutorialScenarioDone scenario =
-            List.member scenario tutorialsDone
-
-        buttonStyle scenario =
-            if tutorialScenarioDone scenario then
-                [ Background.color paletteGrey
-                , Border.color paletteDarkGreen
-                , Border.rounded 5
-                , Border.width 2
-                , Font.color paletteDarkGreen
-                , width (fillPortion 14)
-                , paddingXY 20 6
-                , height (px 40)
-                , centerX
-                ]
-
-            else
-                [ Background.color flatMidnightBlue
-                , Border.color paletteLightGreen
-                , Border.rounded 5
-                , Border.width 2
-                , Font.color paletteLightGreen
-                , width (fillPortion 14)
-                , paddingXY 20 6
-                , height (px 40)
-                , centerX
-                ]
 
         display : TargetSelector -> Element Msg
         display g =
@@ -1008,19 +966,9 @@ targetSelector availableRaidTypes tutorialsDone =
                 , width fill
                 ]
                 [ Input.button
-                    (buttonStyle g.id)
+                    Attr.greenButton
                     { onPress = Just <| TutorialMsg (DisplayTraining g.id)
                     , label = text g.description
-                    }
-                , Input.checkbox
-                    [ E.height (px 40)
-                    , width (fillPortion 1)
-                    , paddingEach { edges | left = 10 }
-                    ]
-                    { onChange = setConfig g
-                    , checked = tutorialScenarioDone g.id
-                    , label = Input.labelHidden g.description
-                    , icon = Input.defaultCheckbox
                     }
                 ]
     in
@@ -1038,22 +986,8 @@ targetSelector availableRaidTypes tutorialsDone =
 inputPageLandscape : Model.Model -> Element Msg
 inputPageLandscape model =
     let
-        tutorialDone =
-            not <| List.isEmpty model.tutorialsCompleted
-
-        buttonActiveIfTutorialDone =
-            if tutorialDone then
-                Attr.greenButton ++ [ width fill, height (px 40), centerX ]
-
-            else
-                Attr.greyButton ++ [ width fill, height (px 40), centerX ]
-
         buttonAction scenario =
-            if tutorialDone then
                 Just (StartScenario scenario)
-
-            else
-                Nothing
     in
     row
         [ E.width fill
@@ -1080,7 +1014,7 @@ inputPageLandscape model =
                 , centerX
                 ]
                 [ text "Tutorials" ]
-            , targetSelector model.activeConfigurations model.tutorialsCompleted
+            , targetSelector model.activeConfigurations
             ]
         , column
             ([ padding 20
@@ -1098,17 +1032,17 @@ inputPageLandscape model =
                 ]
                 [ text "Test your skills" ]
             , Input.button
-                buttonActiveIfTutorialDone
+                Attr.greenButton
                 { onPress = buttonAction GameSingleRaid
                 , label = el [ centerX ] <| text "One practice raid"
                 }
             , Input.button
-                buttonActiveIfTutorialDone
+                Attr.greenButton
                 { onPress = buttonAction GameThreeRaids
                 , label = el [ centerX ] <| text "Three practice raids"
                 }
             , Input.button
-                buttonActiveIfTutorialDone
+                Attr.greenButton
                 { onPress = buttonAction GameUnlimited
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
@@ -1128,7 +1062,6 @@ inputPagePortrait model =
         [ helpButton
         , targetSelector
             model.activeConfigurations
-            model.tutorialsCompleted
         , el
             (width fill
                 :: showExplanation model.explainModeMenu explainPlayLevels

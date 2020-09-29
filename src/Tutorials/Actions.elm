@@ -215,14 +215,8 @@ actionRecordScenarioDone : TutorialScenario -> Model -> Model
 actionRecordScenarioDone scenario model =
     -- Needs to be Set but defined classes not Comparable.
     -- Minor problem, in the scheme of things.
-    { model
-        | tutorialsCompleted =
-            if List.member scenario model.tutorialsCompleted then
-                model.tutorialsCompleted
-
-            else
-                scenario :: model.tutorialsCompleted
-    }
+    -- Removed 2020-09-28
+    model
 
 
 actionStoreBearing : Model -> Model

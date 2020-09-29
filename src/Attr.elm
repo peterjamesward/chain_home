@@ -15,6 +15,9 @@ greenButton =
     , Border.width 2
     , Font.color paletteLightGreen
     , paddingXY 20 6
+    , width fill
+    , height (px 40)
+    , centerX
     ]
 
 
@@ -25,4 +28,7 @@ greyButton =
     , Border.rounded 5
     , Border.width 2
     , Font.color paletteDarkGreen
+    , width fill
+    , height (px 40)
+    , centerX
     ]

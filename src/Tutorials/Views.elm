@@ -7,6 +7,7 @@ import Calculator.View exposing (interpretCalculator)
 import Constants exposing (blue, flatSunflower, lightGray, midGray, tutorialBackground, white)
 import Element exposing (..)
 import Element.Background as Background
+import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
 import Messages exposing (Msg(..))
@@ -66,19 +67,23 @@ viewCalculatorInTutorial model =
         rawPage
 
 
-
---TODO: Cater for interactive and kiosk modes!
-
-
 tutorialControls : Bool -> String -> Element Msg
 tutorialControls withArrows someText =
     let
+        arrowStyles =
+            [ Background.color midGray
+            , Font.size 40
+            , Font.color white
+            , width (px 60)
+            , height (px 60)
+            , Border.color flatSunflower
+            , Border.width 2
+            , Border.rounded 2
+            , Border.glow flatSunflower 0.3
+            ]
+
         backArrow =
-            button
-                [ Background.color midGray
-                , Font.size 40
-                , Font.color white
-                ]
+            button arrowStyles
                 { onPress = Just <| TutorialMsg TutorialBack
                 , label = el [ centerX ] <| text "◀︎"
                 }
@@ -98,11 +103,7 @@ tutorialControls withArrows someText =
                 [ text someText ]
 
         forwardArrow =
-            button
-                [ Background.color midGray
-                , Font.size 40
-                , Font.color white
-                ]
+            button arrowStyles
                 { onPress = Just <| TutorialMsg TutorialAdvance
                 , label = el [ centerX ] <| text "►"
                 }
