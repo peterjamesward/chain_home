@@ -344,8 +344,7 @@ operatorPageLandscape tutorialSubject model =
             --, debugModel model
             ]
         , column [ width <| fillPortion 2, centerX ]
-            [ helpButton
-            , modeSwitchPanel tutorialSubject model
+            [ modeSwitchPanel tutorialSubject model
             , raidStrengthPanel tutorialSubject model
             ]
         ]

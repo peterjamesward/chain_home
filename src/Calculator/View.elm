@@ -61,7 +61,6 @@ calculatorLandscape withExplanations model =
                 , heightGrid withExplanations model.storedElevation
                 ]
             , el [ width (px 40) ] none
-            , helpButton
             ]
         , row
             ([ Border.color lightCharcoal
@@ -89,7 +88,6 @@ calculatorPortrait withExplanations model =
         [ row [ centerX ]
             [ positionGridDisplay withExplanations
                 position
-            , helpButton
             ]
         , column
             (showExplanation withExplanations """The approximate position within the grid square"""

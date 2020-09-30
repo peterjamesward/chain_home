@@ -61,7 +61,6 @@ mapPageLandscape model =
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             ]
-        , helpButton
         ]
 
 
@@ -79,7 +78,6 @@ mapPagePortrait model =
                 ++ showExplanation model.explainModeMap explainMapPage
             )
             [ theMap model
-            , helpButton
             ]
         , checkBoxShowActualTrace model.actualTraceVisibleOnMap
         , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap

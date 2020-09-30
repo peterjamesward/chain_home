@@ -891,63 +891,63 @@ view model =
     }
 
 
-navItem model label action pageId =
+navItem label action isActive withHelp =
     let
+        commonStyles =
+            [ pointer
+            , Event.onClick action
+            , padding 5
+            , Border.color paletteSand
+            , Border.width 2
+            , Border.rounded 3
+            , width fill
+            ]
+
         activeStyles =
-            if model.currPage == pageId then
+            if isActive then
                 [ Background.color flatMidnightBlue
-                , Border.color paletteSand
-                , Border.width 2
-                , Border.rounded 3
                 , Border.widthEach { edges | top = 2 }
                 , Font.color white
-                , Font.bold
-                , width fill
-                , centerX
                 ]
 
             else
                 [ Font.color lightGray
-                , width fill
-                , Border.color paletteSand
-                , Border.width 2
-                , Border.rounded 3
                 , Border.widthEach { edges | bottom = 2, left = 2, right = 2 }
                 ]
     in
-    el
-        ([ pointer
-         , Event.onClick action
-         , padding 5
-         ]
+    row
+        (commonStyles
             ++ disableSelection
             ++ activeStyles
         )
-    <|
-        el [ centerX ] <|
+        [ el [ centerX ] <|
             text label
+        , if isActive && withHelp then
+            helpButton
+
+          else
+            el [] none
+        ]
 
 
 navBar : Model.Model -> Element Msg
 navBar model =
+    let
+        isActive x =
+            model.currPage == x
+    in
     row
         [ width fill
         , Background.color paletteGrey
         , paddingEach { edges | top = 5, bottom = 5 }
         , spaceEvenly
         ]
-        [ navItem model "About" DisplayAboutPage AboutPage
-        , navItem model "Mode selection" DisplayConfiguration InputPage
-        , navItem model "Receiver" DisplayReceiver OperatorPage
-        , navItem model "Calculator" DisplayCalculator CalculatorPage
-        , navItem model "Map" DisplayMapPage MapPage
+        [ navItem "About" DisplayAboutPage (isActive AboutPage) False
+        , navItem "Mode selection" DisplayConfiguration (isActive InputPage) True
+        , navItem "Receiver" DisplayReceiver (isActive OperatorPage) True
+        , navItem "Calculator" DisplayCalculator (isActive CalculatorPage) True
+        , navItem "Map" DisplayMapPage (isActive MapPage) True
         ]
-
-
-
--- Show list of configurations with Checkboxes.
--- This will now be on its own page with elm-ui.
--- Entries are ticked if the relevant tutorial is done, but can be ticked (& un-ticked) manually.
 
 
 setConfig : TargetSelector -> Bool -> Msg
@@ -1052,7 +1052,6 @@ demonstration mode. It will loop constantly until reloaded."""
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
             ]
-        , column [ padding 10, alignRight, alignTop, width <| fillPortion 1 ] [ helpButton ]
         ]
 
 
