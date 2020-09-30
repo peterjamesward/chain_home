@@ -707,7 +707,10 @@ makeNewTarget ( bearing, height ) model =
             model.station
 
         ( newLat, newLong ) =
-            newPosition ( station.latitude, station.longitude ) 160000 (bearing + station.lineOfShoot)
+            newPosition
+                ( station.latitude, station.longitude )
+                (150000 + pseudoRandom * 40000)
+                (bearing + station.lineOfShoot)
 
         pseudoRandom =
             fractional <| abs <| 5000 * sin (toFloat model.modelTime)
