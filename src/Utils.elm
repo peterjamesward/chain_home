@@ -123,3 +123,24 @@ showExplanation visible uiComponentDescription =
 
     else
         []
+
+
+textHeading txt =
+    paragraph
+        [ E.width fill
+        , Font.color white
+        , Font.size 24
+        , centerX
+        ]
+        [ text txt ]
+
+
+blurb txt =
+    paragraph
+        [ spacing 5
+        , Font.size 20
+        , Font.family [ Font.typeface "Helvetica" ]
+        , Font.color white
+        , padding 5
+        ]
+        [ text txt ]

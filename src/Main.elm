@@ -83,7 +83,6 @@ init _ =
       , explainModeMenu = False
       , explainModeReceiver = False
       , explainModeMap = False
-      , newRaid = Nothing
       , timeForNextRaid = Nothing
       , storedPlots = []
       , gameMode = GameNone
@@ -759,9 +758,6 @@ makeNewTarget ( bearing, height ) model =
             , iff = Nothing
             }
 
-        raidIfSelected scenario raidType =
-            raidType
-
         hostileMultiple n =
             if n > 1 then
                 hostileSingle :: hostileMultiple (n - 1)
@@ -775,28 +771,36 @@ makeNewTarget ( bearing, height ) model =
         raidDistribution =
             case modBy model.modelTime 10 of
                 0 ->
-                    raidIfSelected ScenarioFriendly friendlyRaid
+                    friendlyRaid
 
                 1 ->
-                    raidIfSelected ScenarioTwoTogether (hostileMultiple 2)
+                    hostileMultiple 2
 
                 2 ->
-                    raidIfSelected ScenarioTwoTogether (hostileMultiple 2)
+                    hostileMultiple 4
 
                 3 ->
-                    raidIfSelected ScenarioThreeToSix (hostileMultiple 3)
+                    hostileMultiple 8
 
                 4 ->
-                    raidIfSelected ScenarioThreeToSix (hostileMultiple 4)
+                    hostileMultiple 16
 
                 5 ->
-                    raidIfSelected ScenarioThreeToSix (hostileMultiple 5)
+                    hostileMultiple 32
+
+                6 ->
+                    friendlyRaid
+
+                7 ->
+                    friendlyRaid
+
+                8 ->
+                    hostileMultiple 5
 
                 9 ->
-                    raidIfSelected ScenarioThreeToSix (hostileMultiple 16)
+                    hostileMultiple 50
 
-                _ ->
-                    [ hostileSingle ]
+                _ -> []
 
         newTargets =
             List.map
@@ -808,7 +812,6 @@ makeNewTarget ( bearing, height ) model =
     in
     { model
         | targets = newTargets ++ model.targets
-        , newRaid = List.head newTargets
     }
 
 
@@ -993,15 +996,6 @@ inputPageLandscape model =
     let
         buttonAction scenario =
             Just (StartScenario scenario)
-
-        heading txt =
-            paragraph
-                [ width fill
-                , Font.color white
-                , Font.size 24
-                , centerX
-                ]
-                [ text txt ]
     in
     row
         [ E.width fill
@@ -1017,7 +1011,8 @@ inputPageLandscape model =
              ]
                 ++ showExplanation model.explainModeMenu explainRaidTypes
             )
-            [ heading "Tutorials"
+            [ textHeading "Tutorials"
+            , blurb "Each tutorial explains a common scenario."
             , targetSelector model.activeConfigurations
             ]
         , column
@@ -1027,24 +1022,16 @@ inputPageLandscape model =
              ]
                 ++ showExplanation model.explainModeMenu explainPlayLevels
             )
-            [ heading "Test your skills"
-            , Input.button
-                Attr.greenButton
-                { onPress = buttonAction GameSingleRaid
-                , label = el [ centerX ] <| text "One practice raid"
-                }
-            , Input.button
-                Attr.greenButton
-                { onPress = buttonAction GameThreeRaids
-                , label = el [ centerX ] <| text "Three practice raids"
-                }
+            [ textHeading "Test your skills"
+            , blurb "Plot raids as they appear. Expect it to become increasingly busy."
+            , blurb "Check the Map page occasionally to see how well you are doing."
             , Input.button
                 Attr.greenButton
                 { onPress = buttonAction GameUnlimited
                 , label = el [ centerX ] <| text "Unlimited raids"
                 }
-            , heading "Demonstration mode"
-            , text """Clicking the button below will put the application into
+            , textHeading "Demonstration mode"
+            , blurb """Clicking the button below will puts the application into
 demonstration mode. It will loop constantly until reloaded."""
             , Input.button
                 Attr.greyButton
