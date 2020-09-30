@@ -709,7 +709,7 @@ makeNewTarget ( bearing, height ) model =
         ( newLat, newLong ) =
             newPosition
                 ( station.latitude, station.longitude )
-                (150000 + pseudoRandom * 40000)
+                (150000 + pseudoRandom * 10000)
                 (bearing + station.lineOfShoot)
 
         pseudoRandom =
