@@ -687,6 +687,7 @@ saveNewPlot model =
             , bearing = theta
             , time = model.modelTime
             , plotType = UserPlot
+            , strength = 1
             }
     in
     case ( model.calculator.storedAzimuth, model.calculator.storedAzimuthRange ) of
@@ -777,8 +778,15 @@ makeNewTarget ( bearing, height ) model =
     in
     { model
         | targets = newTarget :: model.targets
-        , timeForNextRaid = Just <| model.modelTime + (round <| 60000.0 * pseudoRandom)
+        , timeForNextRaid =
+            if List.length model.targets < 16 then
+                -- Up to a minute between raids, but never more than 16 which is our WebGL limit.
+                Just <| model.modelTime + (round <| 60000.0 * pseudoRandom)
+            else
+                Nothing
     }
+
+
 
 
 selectTransmitAntenna ab reflect =

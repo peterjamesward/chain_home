@@ -65,6 +65,7 @@ targetAtTime station timeNow target =
             , time = timeNow
             , range = rng
             , bearing = theta
+            , strength = target.strength
             }
     in
     { target
@@ -105,6 +106,7 @@ recordCurrentTargetPosition timeNow target =
             , time = timeNow
             , range = target.rangeInMetres
             , bearing = target.theta
+            , strength = target.strength
             }
     in
     { target | positionHistory = newPlot :: target.positionHistory }

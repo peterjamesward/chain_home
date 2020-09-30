@@ -194,14 +194,11 @@ plotPlotter plots =
         ( stationX, stationY ) =
             stationPos
 
-        noMoreThan100Miles plot =
-            plot.range <= 160000
-
         timedPlotStyles =
-            [ r "2.5"
+            [ r "2"
             , stroke "navy"
             , strokeWidth "1"
-            , A.fill "navy"
+            --, A.fill "navy"
             ]
 
         userPlotStyles =
@@ -211,14 +208,14 @@ plotPlotter plots =
             , A.fill "yellow"
             ]
 
-        correlatedPlotStyles =
+        correlatedPlotStyles strength =
             [ r "5"
             , stroke "orange"
             , strokeWidth "1"
-            , A.fill "navy"
+            --, A.fill "navy"
             ]
 
-        plotStyles plotType =
+        plotStyles plotType strength =
             case plotType of
                 UserPlot ->
                     userPlotStyles
@@ -227,14 +224,14 @@ plotPlotter plots =
                     timedPlotStyles
 
                 ActualPlot ->
-                    correlatedPlotStyles
+                    correlatedPlotStyles strength
 
         plotArrow plot =
             Svg.circle
                 ([ cx <| String.fromFloat <| stationX + plot.range * sin plot.bearing * mapScale
                  , cy <| String.fromFloat <| stationY - plot.range * cos plot.bearing * mapScale -- y is +ve downwards!
                  ]
-                    ++ plotStyles plot.plotType
+                    ++ plotStyles plot.plotType plot.strength
                 )
                 []
     in

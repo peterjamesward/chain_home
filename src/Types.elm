@@ -136,4 +136,5 @@ type alias RecordedPlot =
     , time : Int
     , range : Float
     , bearing : Float
+    , strength : Int
     }
