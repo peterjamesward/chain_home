@@ -39,7 +39,6 @@ type alias Model =
     , explainModeMenu : Bool
     , explainModeReceiver : Bool
     , explainModeMap : Bool
-    --, tutorialsCompleted : List TutorialScenario
     , newRaid : Maybe Target
     , timeForNextRaid : Maybe Int
     , storedPlots : List RecordedPlot

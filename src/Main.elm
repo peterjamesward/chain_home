@@ -760,7 +760,7 @@ makeNewTarget ( bearing, height ) model =
             }
 
         raidIfSelected scenario raidType =
-                raidType
+            raidType
 
         hostileMultiple n =
             if n > 1 then
@@ -895,16 +895,24 @@ navItem model label action pageId =
     let
         activeStyles =
             if model.currPage == pageId then
-                [ Background.color paletteDarkGreen
+                [ Background.color flatMidnightBlue
                 , Border.color paletteSand
-                , Border.width 1
+                , Border.width 2
                 , Border.rounded 3
+                , Border.widthEach { edges | top = 2 }
                 , Font.color white
                 , Font.bold
+                , width fill
+                , centerX
                 ]
 
             else
-                [ Font.color paletteLightGreen
+                [ Font.color lightGray
+                , width fill
+                , Border.color paletteSand
+                , Border.width 2
+                , Border.rounded 3
+                , Border.widthEach { edges | bottom = 2, left = 2, right = 2 }
                 ]
     in
     el
@@ -916,21 +924,19 @@ navItem model label action pageId =
             ++ activeStyles
         )
     <|
-        text label
+        el [ centerX ] <|
+            text label
 
 
 navBar : Model.Model -> Element Msg
 navBar model =
     row
         [ width fill
-        , Background.color paletteDarkGreen
-        , Border.color paletteSand
-        , Border.width 2
-        , paddingEach { edges | left = 100, right = 100, top = 5, bottom = 5 }
+        , Background.color paletteGrey
+        , paddingEach { edges | top = 5, bottom = 5 }
         , spaceEvenly
         ]
         [ navItem model "About" DisplayAboutPage AboutPage
-        , navItem model "Demo" Messages.KioskMode OperatorPage
         , navItem model "Mode selection" DisplayConfiguration InputPage
         , navItem model "Receiver" DisplayReceiver OperatorPage
         , navItem model "Calculator" DisplayCalculator CalculatorPage
@@ -955,10 +961,9 @@ setTutorialCompletedState scenario state model =
     model
 
 
-targetSelector : List TargetSelector  -> Element Msg
-targetSelector availableRaidTypes  =
+targetSelector : List TargetSelector -> Element Msg
+targetSelector availableRaidTypes =
     let
-
         display : TargetSelector -> Element Msg
         display g =
             row
@@ -968,7 +973,7 @@ targetSelector availableRaidTypes  =
                 [ Input.button
                     Attr.greenButton
                     { onPress = Just <| TutorialMsg (DisplayTraining g.id)
-                    , label = text g.description
+                    , label = el [ centerX ] <| text g.description
                     }
                 ]
     in
@@ -987,7 +992,16 @@ inputPageLandscape : Model.Model -> Element Msg
 inputPageLandscape model =
     let
         buttonAction scenario =
-                Just (StartScenario scenario)
+            Just (StartScenario scenario)
+
+        heading txt =
+            paragraph
+                [ width fill
+                , Font.color white
+                , Font.size 24
+                , centerX
+                ]
+                [ text txt ]
     in
     row
         [ E.width fill
@@ -1001,36 +1015,27 @@ inputPageLandscape model =
              , alignTop
              , spacing 20
              ]
-                ++ showExplanation model.explainModeMenu
-                    """Click "Learn" to understand each of the types of raid.
-                    As you complete each section, the box will be ticked and raids like
-                    that will appear when you click "Go!".
-                    You can tick or untick them anyway, if you like."""
+                ++ showExplanation model.explainModeMenu explainRaidTypes
             )
-            [ paragraph
-                [ width fill
-                , Font.color white
-                , Font.size 24
-                , centerX
-                ]
-                [ text "Tutorials" ]
+            [ heading "Tutorials"
             , targetSelector model.activeConfigurations
+            , heading "Demonstration mode"
+            , text """Clicking the button below will put the application into
+demonstration mode. It will loop constantly until reloaded."""
+            , Input.button
+                Attr.greyButton
+                { onPress = Just Messages.KioskMode
+                , label = el [ centerX ] <| text "Switch to demo mode"
+                }
             ]
         , column
             ([ padding 20
              , width <| fillPortion 3
              , spacing 20
              ]
-                ++ showExplanation model.explainModeMenu
-                    """Test yourself with a series of incoming raids.
-                    This will only use the types of raid that are ticked."""
+                ++ showExplanation model.explainModeMenu explainPlayLevels
             )
-            [ paragraph
-                [ width fill
-                , Font.color white
-                , Font.size 24
-                ]
-                [ text "Test your skills" ]
+            [ heading "Test your skills"
             , Input.button
                 Attr.greenButton
                 { onPress = buttonAction GameSingleRaid
@@ -1107,24 +1112,16 @@ main =
 explainRaidTypes =
     """
 Click the tutorial buttons to learn how to recognise the common types of raids.
-
-As you complete each tutorial, receive a tick ✔︎.
-
-The ticked raid types will appear in your practice session.
-
-You can tick a box yourself if you're familiar with the scenario.
     """
 
 
+explainPlayLevels : String
 explainPlayLevels =
     """
-Test yourself with one, three, or many incoming raids. This will only use the
-raid types that are ticked.
-
 Raids will come from different directions, at different heights, and on different headings.
 
 You should make several plots for each raid so that Fighter Command can work out
-where the raid is heading. You will be able to see how you perform by looking at the **Map**.
+where the raid is heading. You will be able to see how you perform by looking at the Map.
     """
 
 

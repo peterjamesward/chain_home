@@ -112,8 +112,8 @@ showExplanation visible uiComponentDescription =
                 ]
             <|
                 paragraph
-                    [ spacing 1
-                    , Font.size 16
+                    [ spacing 5
+                    , Font.size 32
                     , Font.family [ Font.typeface "Helvetica" ]
                     , Font.color white
                     , padding 5
