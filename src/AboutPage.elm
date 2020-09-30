@@ -48,23 +48,22 @@ at a Chain Home station during the Battle of Britain in 1940.
 
  __ [Click here for User Guide](img/User%20guide.pdf) __
 
-Using the Menu, under **Learn & Play**, discover how different types of raid
-would appear on the tube, and how the operator would find each raid's bearing, height
-and strength to be passed on to Fighter Command.
+**Mode selection** lets you discover how different types of raid
+ would appear on the tube, and how the operator would find each raid's data
+ to be passed on to Fighter Command.
 
 You can then test your skills with a series of incoming raids.
 
-**Demo** puts the application into a looping demonstration. Reload the page to exit.
-
 **Receiver** is a slightly simplified mock-up of the main operator's control panel.
 
-**Calculator** illustrates the output from the electrical calculator that derives the position and height, and
-collates information for Fighter Command.
+**Calculator** illustrates the output from the electrical calculator that derives
+ the position and height, and collates information for Fighter Command.
 
 **Map** allows you to see how well your plots correspond with the actual raid positions.
 This of course would not have been available to the operator!
 
-Each screen (other than this one) has a green **?** button which will provide some explanation of the elements,
+Each screen (other than this one) has a green **?** button which will
+provide some explanation of the elements,
 
 ## Platforms supported
 

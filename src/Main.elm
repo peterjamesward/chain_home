@@ -1019,14 +1019,6 @@ inputPageLandscape model =
             )
             [ heading "Tutorials"
             , targetSelector model.activeConfigurations
-            , heading "Demonstration mode"
-            , text """Clicking the button below will put the application into
-demonstration mode. It will loop constantly until reloaded."""
-            , Input.button
-                Attr.greyButton
-                { onPress = Just Messages.KioskMode
-                , label = el [ centerX ] <| text "Switch to demo mode"
-                }
             ]
         , column
             ([ padding 20
@@ -1050,6 +1042,14 @@ demonstration mode. It will loop constantly until reloaded."""
                 Attr.greenButton
                 { onPress = buttonAction GameUnlimited
                 , label = el [ centerX ] <| text "Unlimited raids"
+                }
+            , heading "Demonstration mode"
+            , text """Clicking the button below will put the application into
+demonstration mode. It will loop constantly until reloaded."""
+            , Input.button
+                Attr.greyButton
+                { onPress = Just Messages.KioskMode
+                , label = el [ centerX ] <| text "Switch to demo mode"
                 }
             ]
         ]

@@ -52,12 +52,10 @@ mapPageLandscape model =
         ]
         [ theMap model
         , column
-            ([ Element.spacing 50
-             , alignTop
-             , moveDown 100
-             ]
-                ++ showExplanation model.explainModeMap explainMapPage
-            )
+            [ Element.spacing 50
+            , alignTop
+            , moveDown 100
+            ]
             [ checkBoxShowActualTrace model.actualTraceVisibleOnMap
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             ]
@@ -74,9 +72,7 @@ mapPagePortrait model =
         , Element.width Element.fill
         ]
         [ row
-            ([ Element.width Element.fill ]
-                ++ showExplanation model.explainModeMap explainMapPage
-            )
+            [ Element.width Element.fill ]
             [ theMap model
             ]
         , checkBoxShowActualTrace model.actualTraceVisibleOnMap
@@ -96,17 +92,14 @@ mapPage model =
 
 explainMapPage =
     """
-Your plots are relayed to Filter Rooms where they are placed
-on the map. The team there combines your plots with plots from other CH stations
+Your plots are relayed to Filter Rooms and placed
+on the map. The filterer combines your plots with information
 and deduces the most likely position of the raids.
 
 You should make a fresh plot for each raid every minute or thereabouts, so the
 track of the raid becomes clear.
 
-We have the advantage of knowing where our raids are, and you can see
-them plotted here minute by minute.
-
-_TIP:_ If your bearing is a long way south, you may be in Height finding mode.
+The map is provided here only so that you can see your own plots!
 """
 
 
@@ -158,10 +151,12 @@ theMap : Model -> Element Msg
 theMap model =
     -- Sizing this is a bit of a fiddle. Probably cause of stuff I don't know.
     el
-        [ centerX -- Needed!
-        , centerY
-        , Element.width (px 600)
-        ]
+        ([ centerX -- Needed!
+         , centerY
+         , Element.width (px 600)
+         ]
+            ++ showExplanation model.explainModeMap explainMapPage
+        )
     <|
         Element.html <|
             svg
