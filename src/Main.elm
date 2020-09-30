@@ -156,9 +156,14 @@ applyReceiver antenna rawEchoes =
 deriveModelAtTime : Model.Model -> Int -> Model.Model
 deriveModelAtTime model timeNow =
     let
+        eastOfGreenwich t =
+            t.longitude > 0.0
+
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
-            List.map (targetAtTime model.station timeNow) model.targets
+            model.targets
+                |> List.map (targetAtTime model.station timeNow)
+                |> List.filter eastOfGreenwich
 
         inRangeTargets =
             -- Easier to work in polar coordinates here on.
@@ -878,7 +883,7 @@ navItem label action isActive withHelp =
             , padding 5
             , Border.color paletteSand
             , Border.width 2
-            , Border.rounded 3
+            , Border.rounded 6
             , width fill
             ]
 
@@ -1005,7 +1010,7 @@ inputPageLandscape model =
                 { onPress = Just <| StartScenario GameUnlimited
                 , label = el [ centerX ] <| text "BEGIN NEW SESSION"
                 }
-            , el [height (px 10) ] none
+            , el [ height (px 10) ] none
             , textHeading "Demonstration mode"
             , blurb """Clicking the button below will puts the application into
 demonstration mode. It will loop constantly until reloaded."""
