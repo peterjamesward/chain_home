@@ -784,7 +784,7 @@ makeNewTarget ( bearing, height ) model =
         , timeForNextRaid =
             if List.length model.targets < 16 then
                 -- Up to a minute between raids, but never more than 16 which is our WebGL limit.
-                Just <| model.modelTime + (round <| 60000.0 * pseudoRandom)
+                Just <| model.modelTime + (round <| 30000.0 + 30000.0 * pseudoRandom)
 
             else
                 Nothing
