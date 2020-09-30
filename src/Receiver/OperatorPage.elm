@@ -426,13 +426,11 @@ operatorPageWithTutorial tutorial model =
     in
     case tutorialText tutorial model of
         Just someText ->
-            el
-                [ centerX
-                , alignBottom
-                , width fill
-                , below <| tutorialControls showArrows someText
-                ]
-                rawPage
+            column [ width fill ]
+                    [ rawPage
+                    , tutorialControls showArrows someText
+                    ]
 
         _ ->
             rawPage
+

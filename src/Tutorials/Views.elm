@@ -58,13 +58,10 @@ viewCalculatorInTutorial model =
                 InteractiveMode ->
                     False
     in
-    el
-        [ centerX
-        , width fill
-        , alignBottom
-        , below <| tutorialControls showArrows calcText
+    column [ width fill ]
+        [ rawPage
+        , tutorialControls showArrows calcText
         ]
-        rawPage
 
 
 tutorialControls : Bool -> String -> Element Msg

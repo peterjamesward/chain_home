@@ -1005,6 +1005,7 @@ inputPageLandscape model =
                 { onPress = Just <| StartScenario GameUnlimited
                 , label = el [ centerX ] <| text "BEGIN NEW SESSION"
                 }
+            , el [height (px 10) ] none
             , textHeading "Demonstration mode"
             , blurb """Clicking the button below will puts the application into
 demonstration mode. It will loop constantly until reloaded."""

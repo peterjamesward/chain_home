@@ -131,6 +131,8 @@ textHeading txt =
         , Font.color white
         , Font.size 24
         , centerX
+        , Border.widthEach { edges | top = 3 }
+        , padding 10
         ]
         [ text txt ]
 
