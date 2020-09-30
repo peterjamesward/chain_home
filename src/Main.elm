@@ -286,7 +286,11 @@ update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
 update msg model =
     let
         cleanModel =
-            model |> actionExitAction |> actionClearTargets |> actionClearCalculator |> clearHistory
+            model
+                |> actionExitAction
+                |> actionClearTargets
+                |> actionClearCalculator
+                |> clearHistory
 
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
@@ -322,10 +326,6 @@ update msg model =
             ( { cleanModel
                 | currPage = OperatorPage
                 , gameMode = gameMode
-
-                -- Pseudo randomness will suffice at least for now.
-                , timeForNextRaid =
-                    Just <| model.modelTime + truncate (60000 * abs (sin <| toFloat model.modelTime))
               }
             , requestRandomRaid
             )
@@ -659,7 +659,7 @@ update msg model =
             )
 
         RandomRaidGenerated ( bearing, height ) ->
-            ( model |> makeNewTarget ( bearing, height ) |> setNextRandomRaidTime
+            ( makeNewTarget ( bearing, height ) model
             , Cmd.none
             )
 
@@ -697,37 +697,6 @@ saveNewPlot model =
             model
 
 
-setNextRandomRaidTime : Model.Model -> Model.Model
-setNextRandomRaidTime model =
-    -- If there are raids remaining for our current level, line the next one up here.
-    let
-        activeRaidCount =
-            List.length model.targets
-
-        scheduleRaid =
-            { model | timeForNextRaid = Just <| model.modelTime + truncate (120000 * abs (sin <| toFloat model.modelTime)) }
-
-        dontScheduleRaid =
-            { model | timeForNextRaid = Nothing }
-    in
-    case ( model.gameMode, activeRaidCount ) of
-        ( GameNone, _ ) ->
-            dontScheduleRaid
-
-        ( GameSingleRaid, _ ) ->
-            dontScheduleRaid
-
-        ( GameThreeRaids, n ) ->
-            if n < 3 then
-                scheduleRaid
-
-            else
-                dontScheduleRaid
-
-        ( GameUnlimited, _ ) ->
-            scheduleRaid
-
-
 makeNewTarget : ( Float, Float ) -> Model.Model -> Model.Model
 makeNewTarget ( bearing, height ) model =
     -- Create raids along a line of longitude about 100 miles away.
@@ -740,53 +709,50 @@ makeNewTarget ( bearing, height ) model =
             newPosition ( station.latitude, station.longitude ) 160000 (bearing + station.lineOfShoot)
 
         pseudoRandom =
-            fractional <| 5000 * sin (toFloat model.modelTime)
+            fractional <| abs <| 5000 * sin (toFloat model.modelTime)
 
         heading =
             -- Som pseudo randomness in raid heading, which we try to
             -- make interesting in as much as it will pass near the station.
-            degrees 270 + pseudoRandom * degrees 30
+            degrees 250 + pseudoRandom * degrees 40
 
-        hostileSingle : TargetProforma
-        hostileSingle =
+        hostile : Int -> TargetProforma
+        hostile n =
             { latitude = newLat
             , longitude = newLong
             , height = height
             , heading = heading
-            , speed = 300 -- Quicker testing!
-            , strength = 1
+            , speed = 200 + pseudoRandom * 100
+            , strength = n
             , iff = Nothing
             }
 
-        hostileMultiple n =
-            if n > 1 then
-                hostileSingle :: hostileMultiple (n - 1)
-
-            else
-                [ hostileSingle ]
-
         friendlyRaid =
-            [ { hostileSingle | iff = Just (modBy 12 (round model.webGLtime)) } ]
+            let
+                proforma =
+                    hostile 1
+            in
+            { proforma | iff = Just (modBy 12 (round model.webGLtime)) }
 
         raidDistribution =
-            case modBy model.modelTime 10 of
+            case floor <| pseudoRandom * 10 of
                 0 ->
                     friendlyRaid
 
                 1 ->
-                    hostileMultiple 2
+                    hostile 2
 
                 2 ->
-                    hostileMultiple 4
+                    hostile 4
 
                 3 ->
-                    hostileMultiple 8
+                    hostile 8
 
                 4 ->
-                    hostileMultiple 16
+                    hostile 16
 
                 5 ->
-                    hostileMultiple 32
+                    hostile 32
 
                 6 ->
                     friendlyRaid
@@ -795,23 +761,23 @@ makeNewTarget ( bearing, height ) model =
                     friendlyRaid
 
                 8 ->
-                    hostileMultiple 5
+                    hostile 5
 
                 9 ->
-                    hostileMultiple 50
+                    hostile 50
 
-                _ -> []
+                _ ->
+                    hostile 1
 
-        newTargets =
-            List.map
-                (targetFromProforma
-                    model.station
-                    model.modelTime
-                )
+        newTarget =
+            targetFromProforma
+                model.station
+                model.modelTime
                 raidDistribution
     in
     { model
-        | targets = newTargets ++ model.targets
+        | targets = newTarget :: model.targets
+        , timeForNextRaid = Just <| model.modelTime + (round <| 60000.0 * pseudoRandom)
     }
 
 
@@ -993,10 +959,6 @@ targetSelector availableRaidTypes =
 
 inputPageLandscape : Model.Model -> Element Msg
 inputPageLandscape model =
-    let
-        buttonAction scenario =
-            Just (StartScenario scenario)
-    in
     row
         [ E.width fill
         , Font.color lightCharcoal
@@ -1027,8 +989,8 @@ inputPageLandscape model =
             , blurb "Check the Map page occasionally to see how well you are doing."
             , Input.button
                 Attr.greenButton
-                { onPress = buttonAction GameUnlimited
-                , label = el [ centerX ] <| text "Unlimited raids"
+                { onPress = Just <| StartScenario GameUnlimited
+                , label = el [ centerX ] <| text "BEGIN NEW SESSION"
                 }
             , textHeading "Demonstration mode"
             , blurb """Clicking the button below will puts the application into
@@ -1058,16 +1020,6 @@ inputPagePortrait model =
                 :: showExplanation model.explainModeMenu explainPlayLevels
             )
             (text "Hello world.")
-        , Input.button
-            (Attr.greenButton ++ [ width (px 200), height (px 40), centerX ])
-            { onPress = Just (StartScenario GameSingleRaid)
-            , label = el [ centerX ] <| text "One practice raid"
-            }
-        , Input.button
-            (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
-            { onPress = Just (StartScenario GameThreeRaids)
-            , label = el [ centerX ] <| text "Three practice raids"
-            }
         , Input.button
             (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
             { onPress = Just (StartScenario GameUnlimited)
