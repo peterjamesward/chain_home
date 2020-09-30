@@ -785,11 +785,10 @@ makeNewTarget ( bearing, height ) model =
             if List.length model.targets < 16 then
                 -- Up to a minute between raids, but never more than 16 which is our WebGL limit.
                 Just <| model.modelTime + (round <| 60000.0 * pseudoRandom)
+
             else
                 Nothing
     }
-
-
 
 
 selectTransmitAntenna ab reflect =
@@ -906,7 +905,10 @@ navItem label action isActive withHelp =
             helpButton
 
           else
-            el [] none
+            el
+                [ E.height (px 30)
+                ]
+                none
         ]
 
 
