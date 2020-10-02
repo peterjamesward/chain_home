@@ -114,7 +114,7 @@ showExplanation visible uiComponentDescription =
                 paragraph
                     [ spacing 5
                     , Font.size 24
-                    , Font.family [ Font.typeface "Helvetica" ]
+                    , Font.family [ Font.typeface "Times" ]
                     , Font.color white
                     , padding 5
                     ]

@@ -93,13 +93,13 @@ mapPage model =
 explainMapPage =
     """
 Your plots are relayed to Filter Rooms and placed
-on the map. The filterer combines your plots with information
+on the map. The filterer combines your plots with other information
 and deduces the most likely position of the raids.
 
 You should make a fresh plot for each raid every minute or thereabouts, so the
 track of the raid becomes clear.
 
-The map is provided here only so that you can see your own plots!
+The map is provided only so that you can see your own plots!
 """
 
 
