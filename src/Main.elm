@@ -159,20 +159,19 @@ deriveModelAtTime model timeNow =
         eastOfGreenwich t =
             t.longitude > 0.0
 
+        withinRange t =
+            t.rangeInMetres <= 160000
+
         targetsNow =
             -- Where are they, based on origin, bearing, speed, time.
             model.targets
                 |> List.map (targetAtTime model.station timeNow)
                 |> List.filter eastOfGreenwich
-
-        inRangeTargets =
-            -- Easier to work in polar coordinates here on.
-            -- Filter removes raid beyond our range.
-            List.filter (\tgt -> tgt.rangeInMetres < 100 * 1600) targetsNow
+                |> List.filter withinRange
 
         echoSignals =
             -- Deduce echo based on transmitter characteristics.
-            deriveEchoes model.station model.transmitAntenna inRangeTargets
+            deriveEchoes model.station model.transmitAntenna targetsNow
 
         receiveSignals =
             -- Deduce inputs based on receiver characteristics.
@@ -227,7 +226,7 @@ deriveModelAtTime model timeNow =
             { model
                 | modelTime = timeNow
                 , targets = targetsNow
-                , inRangeTargets = inRangeTargets
+                , inRangeTargets = targetsNow
                 , echoes = echoSignals
                 , gonioOutput = gonioOutput
                 , azimuthModeTrace = gonioOutput
@@ -705,7 +704,7 @@ saveNewPlot model =
 
 makeNewTarget : ( Float, Float ) -> Model.Model -> Model.Model
 makeNewTarget ( bearing, height ) model =
-    -- Create raids along a line of longitude about 100 miles away.
+    -- Create raids along an arc about 100 miles away.
     -- This assumes 90degE line of shoot!
     let
         station =
@@ -717,82 +716,56 @@ makeNewTarget ( bearing, height ) model =
                 (150000 + pseudoRandom * 10000)
                 (bearing + station.lineOfShoot)
 
+        raidSequence =
+            List.length model.targets
+
+        raidStrength =
+            max 1 <|
+                min 99 <|
+                    round <|
+                        (pseudoRandom * toFloat (1 + raidSequence * raidSequence))
+
         pseudoRandom =
-            fractional <| abs <| 5000 * sin (toFloat model.modelTime)
+            fractional <| 5000 * sin (toFloat model.modelTime)
 
-        heading =
-            -- Som pseudo randomness in raid heading, which we try to
-            -- make interesting in as much as it will pass near the station.
-            degrees 250 + pseudoRandom * degrees 40
-
-        hostile : Int -> TargetProforma
-        hostile n =
+        hostileProforma : TargetProforma
+        hostileProforma =
             { latitude = newLat
             , longitude = newLong
             , height = height
-            , heading = heading
+            , heading = station.lineOfShoot - pi + (0.5 - pseudoRandom) * degrees 15
             , speed = 200 + pseudoRandom * 100
-            , strength = n
+            , strength = raidStrength
             , iff = Nothing
             }
 
-        friendlyRaid =
-            let
-                proforma =
-                    hostile 1
-            in
-            { proforma | iff = Just (modBy 12 (round model.webGLtime)) }
+        -- Mark some small raids as friendly.
+        makeProforma =
+            if pseudoRandom < 0.1 then
+                { hostileProforma
+                    | iff = Just (modBy 12 (round model.webGLtime))
+                    , strength = 1
+                }
 
-        raidDistribution =
-            case floor <| pseudoRandom * 10 of
-                0 ->
-                    friendlyRaid
-
-                1 ->
-                    hostile 2
-
-                2 ->
-                    hostile 4
-
-                3 ->
-                    hostile 8
-
-                4 ->
-                    hostile 16
-
-                5 ->
-                    hostile 32
-
-                6 ->
-                    friendlyRaid
-
-                7 ->
-                    friendlyRaid
-
-                8 ->
-                    hostile 5
-
-                9 ->
-                    hostile 50
-
-                _ ->
-                    hostile 1
+            else
+                hostileProforma
 
         newTarget =
             targetFromProforma
                 model.station
                 model.modelTime
-                raidDistribution
+                makeProforma
     in
     { model
-        | targets = newTarget :: model.targets
-        , timeForNextRaid =
-            if List.length model.targets < 16 then
-                -- Up to a minute between raids, but never more than 16 which is our WebGL limit.
-                Just <| model.modelTime + (round <| 30000.0 + 30000.0 * pseudoRandom)
+        | targets =
+            if List.length model.targets < 14 then
+                newTarget :: model.targets
 
             else
-                Nothing
+                model.targets
+        , timeForNextRaid =
+            -- Even if we were full up, keep trying as some may go out of range.
+            Just <| model.modelTime + (round <| 40000.0 + 20000.0 * pseudoRandom)
     }
 
 
