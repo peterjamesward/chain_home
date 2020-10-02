@@ -173,7 +173,7 @@ fragmentShader =
         uniform vec3 raid15;
 
         vec3 COL1 = vec3(0.8,0.0,0.0);
-        vec3 COL2 = vec3(0.0,0.8,0.0);
+        vec3 COL2 = vec3(0.0,0.8,0.2);
 
         float cubicPulse( float c, float w, float x ) {
             x = abs(x - c); // NOTE 0 <= x <= +w
@@ -236,60 +236,25 @@ fragmentShader =
             return shape * depth;
         }
 
-        void mainImage( out vec4 fragColor, in vec2 fragCoord )
-        {
-            vec2 uv = fragCoord.xy/iResolution.xy;
-            vec2 uvn = 2.0 * uv - 1.0;
-
-            // Add a noise field (use our existing one).
-            // Lower the resolution of the x line to make the noise less noisy.
-            // add time to the noise parameters so it's animated.
-            // I want a component that is more 'spikey'.
-            float noise = 0.0;
-            noise += sin(uv.x * 256.0 + 0.0) * sin(iTime * 7.0);
-            noise += sin(uv.x * 512.0 + 0.0) * sin(iTime * 5.0);
-            noise += sin(uv.x * 1024.0 + 0.0) * sin(iTime * 11.0);
-            noise /= 40.0;
-
-            // Spikey looking noise.
-            float lumpy = 0.0;
-            lumpy += sin(uv.x * 256.0);
-            lumpy = 0.0 - float(lumpy < -0.8);
-            float lumpyTime = 0.0;
-            lumpyTime += sin(iTime * 13.0) * fract(1000.0 * sin(iTime * 15.0));
-            lumpyTime = float(lumpyTime > 0.9);
-
-            float sawtooth = 0.0;
-            sawtooth = abs(0.5 - fract(uv.x * 20.0));
-            float bumps = 3.0 * lumpy * lumpyTime * sawtooth;
+        float deriveSignalFromFieldsAt(float x) {
 
             // Now expose a section of the field where we have raids.
-            // Note pulse width sqrt(N)/100 looks ok.
-            // These are test raids.
-            //float raid1 = f1 * envelope(0.1, 0.01, uv.x); // One
-            //float raid2 = f2 * envelope(0.3, 0.014142, uv.x);  // Two
-            //float raid3 = mrf * envelope(0.5, 0.03, uv.x); // Three
-            //float raid4 = mrf * envelope(0.7, 0.04, uv.x); // Many
-            //float beamY = bumps + noise + raid1 + raid1 + raid2 + raid3 + raid4;
-
-
-            // Now get actual raids from the uniforms.
-            float r0 = includeRaid(raid0, uv.x);
-            float r1 = includeRaid(raid1, uv.x);
-            float r2 = includeRaid(raid2, uv.x);
-            float r3 = includeRaid(raid3, uv.x);
-            float r4 = includeRaid(raid4, uv.x);
-            float r5 = includeRaid(raid5, uv.x);
-            float r6 = includeRaid(raid6, uv.x);
-            float r7 = includeRaid(raid7, uv.x);
-            float r8 = includeRaid(raid8, uv.x);
-            float r9 = includeRaid(raid9, uv.x);
-            float r10 = includeRaid(raid10, uv.x);
-            float r11 = includeRaid(raid11, uv.x);
-            float r12 = includeRaid(raid12, uv.x);
-            float r13 = includeRaid(raid13, uv.x);
-            float r14 = includeRaid(raid14, uv.x);
-            float r15 = includeRaid(raid15, uv.x);
+            float r0 = includeRaid(raid0, x);
+            float r1 = includeRaid(raid1, x);
+            float r2 = includeRaid(raid2, x);
+            float r3 = includeRaid(raid3, x);
+            float r4 = includeRaid(raid4, x);
+            float r5 = includeRaid(raid5, x);
+            float r6 = includeRaid(raid6, x);
+            float r7 = includeRaid(raid7, x);
+            float r8 = includeRaid(raid8, x);
+            float r9 = includeRaid(raid9, x);
+            float r10 = includeRaid(raid10, x);
+            float r11 = includeRaid(raid11, x);
+            float r12 = includeRaid(raid12, x);
+            float r13 = includeRaid(raid13, x);
+            float r14 = includeRaid(raid14, x);
+            float r15 = includeRaid(raid15, x);
 
             //Combine with artficial phase differences to re-create beating effect.
             // Even though it may be rarely seen.
@@ -327,17 +292,55 @@ fragmentShader =
             combined.y += r14 * sin(iTime * 15.0);
             combined.y += r15 * sin(iTime * 16.0);
 
-            float yBeforeNoise = 0.0 - sqrt(length(combined));
+            return sqrt(length(combined));
+        }
+
+        void mainImage( out vec4 fragColor, in vec2 fragCoord )
+        {
+            vec2 uv = fragCoord.xy/iResolution.xy;
+            vec2 uvn = 2.0 * uv - 1.0;
+            float xMinus = (fragCoord.x - 1.0)/iResolution.x;
+            float xPlus = (fragCoord.x + 1.0)/iResolution.x;
+
+            // Add a noise field (use our existing one).
+            // Lower the resolution of the x line to make the noise less noisy.
+            // add time to the noise parameters so it's animated.
+            // I want a component that is more 'spikey'.
+            float noise = 0.0;
+            noise += sin(uv.x * 256.0 + 0.0) * sin(iTime * 7.0);
+            noise += sin(uv.x * 512.0 + 0.0) * sin(iTime * 5.0);
+            noise += sin(uv.x * 1024.0 + 0.0) * sin(iTime * 11.0);
+            noise /= 40.0;
+
+            // Spikey looking noise.
+            float lumpy = 0.0;
+            lumpy += sin(uv.x * 256.0);
+            lumpy = 0.0 - float(lumpy < -0.8);
+            float lumpyTime = 0.0;
+            lumpyTime += sin(iTime * 13.0) * fract(1000.0 * sin(iTime * 15.0));
+            lumpyTime = float(lumpyTime > 0.9);
+
+            float sawtooth = 0.0;
+            sawtooth = abs(0.5 - fract(uv.x * 20.0));
+            float bumps = 3.0 * lumpy * lumpyTime * sawtooth;
+            float signalAmplitude0 = deriveSignalFromFieldsAt(xMinus);
+            float signalAmplitude1 = deriveSignalFromFieldsAt(uv.x);
+            float signalAmplitude2 = deriveSignalFromFieldsAt(xPlus);
+            float signalAmplitude = (signalAmplitude0 + signalAmplitude1 + signalAmplitude1 + signalAmplitude2)/4.0;
+            float slope = abs(signalAmplitude2 - signalAmplitude0) / 10.0;
 
             // Fiddle with coordinate (needs some work).
-            float beamY = yBeforeNoise - noise + bumps;
+            float beamY = bumps - signalAmplitude - noise;
             beamY = beamY/10.0 + 0.78;
 
+            float beamYprev = (bumps - signalAmplitude0 - noise)/10.0 + 0.78;
+            float beamYnext = (bumps - signalAmplitude2 - noise)/10.0 + 0.78;
+
             //create the beam by simple y distance that falls off quickly.
-            float decay = 28.0;
-            decay -= 8.0 * float(yBeforeNoise < 0.0) * float(uv.y > 0.0);
-            float i = pow(1.0 - abs(uv.y - beamY), decay);
-            //float i = cubicPulse(beamY, 0.02 / abs(beamY), uv.y);
+            float i = pow(1.0 - abs(uv.y - beamY), 30.0);
+            i += pow(1.0 - abs(uv.y - beamYprev), 30.0) * 0.5;
+            i += pow(1.0 - abs(uv.y - beamYnext), 30.0) * 0.5;
+            i /= 2.0;
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
 
