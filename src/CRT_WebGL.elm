@@ -330,11 +330,13 @@ fragmentShader =
             float yBeforeNoise = 0.0 - sqrt(length(combined));
 
             // Fiddle with coordinate (needs some work).
-            float beamY = yBeforeNoise + noise + bumps;
+            float beamY = yBeforeNoise - noise + bumps;
             beamY = beamY/10.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly.
-            float i = pow(1.0 - abs(uv.y - beamY), 28.0);
+            float decay = 28.0;
+            decay -= 8.0 * float(yBeforeNoise < 0.0) * float(uv.y > 0.0);
+            float i = pow(1.0 - abs(uv.y - beamY), decay);
             //float i = cubicPulse(beamY, 0.02 / abs(beamY), uv.y);
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
