@@ -11,7 +11,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Grid exposing (GridPosition, gridLettersList, gridPosition, letterFromGrid)
 import Messages exposing (Msg)
-import Utils exposing (choose, disableSelection, edges, helpButton, showExplanation)
+import Utils exposing (choose, disableSelection, edges, showExplanation)
 
 
 withBorders widget =

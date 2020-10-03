@@ -12,13 +12,13 @@ import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Html.Attributes as H exposing (style)
+import Html.Attributes as H
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import Types exposing (PlotType(..), RecordedPlot)
-import Utils exposing (edges, helpButton, imageLocation, showExplanation)
+import Utils exposing (edges, imageLocation, showExplanation)
 
 
 squareSize =

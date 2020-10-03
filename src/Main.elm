@@ -43,13 +43,12 @@ import Time
 import Tutorials.ActionCodes exposing (TutorialScenario(..))
 import Tutorials.Actions exposing (..)
 import Tutorials.KioskModeTutorial exposing (kioskModeTutorial)
-import Tutorials.Messages as TutorialMsg exposing (TutorialMsg(..))
+import Tutorials.Messages exposing (TutorialMsg(..))
 import Tutorials.Tutorials exposing (tutorialAutomation)
 import Tutorials.Update
 import Tutorials.Views exposing (tutorialText, viewCalculatorInTutorial)
 import Types exposing (..)
 import Utils exposing (..)
-import Zipper
 
 
 init : Flags -> ( Model.Model, Cmd Msg )
@@ -549,12 +548,6 @@ update msg model =
 
         RangeRelease _ ->
             ( { model | rangeDrag = Nothing }
-            , Cmd.none
-            )
-
-        AdjustRangeValue newRange ->
-            ( model
-              --| rangeSlider = newRange }
             , Cmd.none
             )
 

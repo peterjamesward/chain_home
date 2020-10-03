@@ -1,6 +1,6 @@
 module Utils exposing (..)
 
-import Constants exposing (blue, flatMidnightBlue, flatWetAsphalt, paletteDarkGreen, paletteSand, white)
+import Constants exposing (blue, paletteDarkGreen, paletteSand, white)
 import Element as E exposing (..)
 import Element.Background as Background exposing (..)
 import Element.Border as Border exposing (..)

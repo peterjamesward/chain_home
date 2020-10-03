@@ -4,7 +4,7 @@ module Tutorials.Views exposing (..)
 -- to complete the views in Tutorial mode.
 
 import Calculator.View exposing (interpretCalculator)
-import Constants exposing (blue, flatSunflower, lightGray, midGray, tutorialBackground, white)
+import Constants exposing (flatSunflower, lightGray, midGray, tutorialBackground, white)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border

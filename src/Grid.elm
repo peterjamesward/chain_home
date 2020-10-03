@@ -15,17 +15,6 @@ type alias GridPosition =
     }
 
 
-mapGridLettersList : List (List String)
-mapGridLettersList =
-    [ [ "Y", "Z", "V", "W", "X", "Y", "Z" ]
-    , [ "vD", "vE", "wA", "wB", "wC", "wD", "wE" ]
-    , [ "vJ", "vK", "wF", "wG", "wH", "wJ", "wK" ]
-    , [ "vO", "vP", "wL", "wM", "wN", "wO", "wP" ]
-    , [ "vT", "vU", "wQ", "wR", "wS", "wT", "wU" ]
-    , [ "vY", "vZ", "wV", "wW", "wX", "wY", "wZ" ]
-    , [ "D", "E", "A", "B", "C", "D", "E" ]
-    ]
-
 gridLettersList : List (List String)
 gridLettersList =
     [ [ "Y", "Z", "V", "W", "X", "Y", "Z" ]

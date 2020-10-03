@@ -9,12 +9,9 @@ frequency =  20000000.0
 wavelength = lightSpeed / frequency
 
 pulseDuration = 20.0 -- microseconds
-pulseWidth = lightSpeed * pulseDuration / 10000000.0
 
 scaleWidthKilometers = 160
 kmToFeet = 3280
-
-rangeToXFactor = (scaleWidthKilometers * 1000.0)
 
 blue = rgb255 52 101 164
 black = rgb255 0 0 0
@@ -37,4 +34,3 @@ paletteGrey = rgb255 62 62 68
 paletteLightGreen = rgb255 130 183 75
 paletteDarkGreen = rgb255 64 93 39
 paletteSand = rgb255 193 148 106
-beamGreen = rgb255 0 178 0
