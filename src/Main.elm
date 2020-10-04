@@ -139,19 +139,6 @@ subscriptions _ =
         ]
 
 
-applyReceiver : Antenna -> List Echo -> List Echo
-applyReceiver antenna rawEchoes =
-    List.map
-        (\e ->
-            { e
-                | amplitude =
-                    e.amplitude
-                        * antenna.verticalLobeFunction e.alpha
-            }
-        )
-        rawEchoes
-
-
 deriveModelAtTime : Model.Model -> Int -> Model.Model
 deriveModelAtTime model timeNow =
     let
@@ -760,21 +747,6 @@ makeNewTarget ( bearing, height ) model =
             -- Even if we were full up, keep trying as some may go out of range.
             Just <| model.modelTime + (round <| 40000.0 + 20000.0 * pseudoRandom)
     }
-
-
-selectTransmitAntenna ab reflect =
-    case ( ab, reflect ) of
-        ( True, True ) ->
-            transmitAReflector
-
-        ( False, True ) ->
-            transmitBReflector
-
-        ( True, False ) ->
-            transmitANoReflect
-
-        ( False, False ) ->
-            transmitBNoReflect
 
 
 view : Model.Model -> Browser.Document Msg
