@@ -1,7 +1,11 @@
 
 --TODO: Show raid size on map, maybe by size of circle, maybe small raid plaque?
 
---TODO: Overlay on about page to highlight the menu options.
+--TODO: Second station location
+
+--TODO: Collect raid details from server
+
+--TODO: Filter table
 
 --DROP: Our shader does a lot of [sin|cos] x.2^n
 -- and sin 2x == 2 . sin x . cos x, so there's probably a in sin x . cos x that would be 'cheaper'/
