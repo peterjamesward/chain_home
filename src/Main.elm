@@ -693,7 +693,7 @@ makeNewTarget ( bearing, height ) model =
         ( newLat, newLong ) =
             newPosition
                 ( station.latitude, station.longitude )
-                160000
+                159000
                 (bearing + station.lineOfShoot)
 
         raidSequence =
