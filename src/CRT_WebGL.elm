@@ -10,16 +10,27 @@ import Types exposing (Echo, Point)
 import WebGL exposing (Mesh, Shader, clearColor)
 
 
-crt : Float -> List Echo -> Html Msg
-crt time echoes =
+crt : Bool -> Float -> List Echo -> Html Msg
+crt fullScreen time echoes =
+    let
+        styles =
+            if fullScreen then
+                [ width 1800
+                , height 800
+                , style "display" "block"
+                , style "width" "1100px"
+                ]
+
+            else
+                [ width 1800
+                , height 800
+                , style "display" "block"
+                , style "width" "640px"
+                ]
+    in
     WebGL.toHtmlWith
-        [ clearColor 0.02 0.02 0.02 0.0
-        ]
-        [ width 1800
-        , height 800
-        , style "display" "block"
-        , style "width" "640px"
-        ]
+        [ clearColor 0.02 0.02 0.02 0.0 ]
+        styles
         [ WebGL.entity
             vertexShader
             fragmentShader
@@ -87,7 +98,7 @@ echoToVec echoes i =
     case Array.get i echoes of
         Just echo ->
             vec3
-                ( (1 - xLimit)/2 + xLimit * echo.r / 160000)
+                ((1 - xLimit) / 2 + xLimit * echo.r / 160000)
                 (echo.amplitude * 40.0)
                 (toFloat echo.strength)
 

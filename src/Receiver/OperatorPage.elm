@@ -9,6 +9,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import FeatherIcons
 import Goniometer exposing (drawGoniometer)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
@@ -59,9 +60,17 @@ clickableGonioImage tutorialSubject model =
 
 
 rangeSlider model =
+    let
+        ( useWidth, useWidthPx ) =
+            if model.fullScreenCRT then
+                ( 1200, "1200px" )
+
+            else
+                ( 600, "600px" )
+    in
     Input.slider
         [ E.height (E.px 30)
-        , E.width (E.px 610)
+        , E.width (E.px useWidth)
 
         -- Here is where we're creating/styling the "track"
         , E.behindContent
@@ -123,7 +132,7 @@ traceDependingOnMode model =
            )
 
 
-rangeTicks =
+rangeTicks fullScreen =
     let
         tickSize i =
             case ( modBy 10 i, modBy 5 i ) of
@@ -146,8 +155,7 @@ rangeTicks =
                     , fontFamily "monospace"
                     , fontSize "60"
                     ]
-                    [ Svg.text <| String.fromInt i
-                    ]
+                    [ Svg.text <| String.fromInt i ]
                 ]
 
             else
@@ -165,33 +173,48 @@ rangeTicks =
                 []
             ]
                 ++ label i
+
+        view =
+            if fullScreen then
+                [ viewBox "-5 -10 2010 200"
+                , S.width "1400px"
+                , S.height "100px"
+                ]
+
+            else
+                [ viewBox "-5 -10 2010 200"
+                , S.width "600px"
+                , S.height "100px"
+                ]
     in
-    svg
-        [ viewBox "-5 -10 2010 200"
-        , S.width "600px"
-        , S.height "100px"
-        ]
-    <|
-        List.concatMap tick (List.range 0 100)
+    svg view <| List.concatMap tick (List.range 0 100)
 
 
 rangeScale model =
-    el
-        ([ width (px 600)
-         , E.above (rangeSlider model)
-         ]
-            ++ disableSelection
-        )
-    <|
-        html rangeTicks
+    let
+        useWidth =
+            if model.fullScreenCRT then
+                [ width <| px 1600
+
+                --, E.above (rangeSlider model)
+                , moveLeft 170
+                ]
+
+            else
+                [ width <| px 600
+                , E.above (rangeSlider model)
+                ]
+    in
+    el (useWidth ++ disableSelection) <|
+        html <|
+            rangeTicks model.fullScreenCRT
 
 
 rangeSliderAndCRT tutorialSubject model trace =
     column
-        ([ padding 5
-         ]
+        ([ padding 5 ]
             ++ highlightTutorialSubject tutorialSubject UiCRT
-            ++ showExplanation model.explainModeReceiver """The operators "tube", or CRT"""
+            ++ showExplanation model.explainModeReceiver """The operator's "tube", or CRT"""
         )
         [ el
             [ inFront <|
@@ -200,8 +223,20 @@ rangeSliderAndCRT tutorialSubject model trace =
                     , paddingEach { edges | left = 20 }
                     ]
                     (rangeScale model)
+            , inFront <|
+                Input.button [ alignBottom, alignLeft, Font.color lightCharcoal ]
+                    { label =
+                        html <|
+                            FeatherIcons.toHtml [] <|
+                                if model.fullScreenCRT then
+                                    FeatherIcons.minimize
+
+                                else
+                                    FeatherIcons.maximize
+                    , onPress = Just ToggleFullScreenCRT
+                    }
             ]
-            (E.html <| crt model.webGLtime trace)
+            (E.html <| crt model.fullScreenCRT model.webGLtime trace)
         ]
 
 
@@ -322,32 +357,38 @@ raidStrengthPanel tutorialSubject model =
 
 
 operatorPageLandscape tutorialSubject model =
-    row
-        (centerX
-            :: highlightTutorialSubject tutorialSubject UiOperatorPage
-        )
-        [ column [ width <| fillPortion 3, centerX ]
-            [ row []
-                [ el
-                    []
-                    (rangeSliderAndCRT tutorialSubject model <| traceDependingOnMode model)
-                ]
-            , row []
-                [ clickableGonioImage tutorialSubject model
-                , el (highlightTutorialSubject tutorialSubject UiGonioButton) <|
-                    actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                , clickableRangeKnob tutorialSubject model
-                , el (highlightTutorialSubject tutorialSubject UIRangeButton) <|
-                    actionButtonLabelAbove "RANGE" StoreRangeSetting
-                ]
+    if model.fullScreenCRT then
+        el [ padding 20, alignLeft ] <|
+            rangeSliderAndCRT tutorialSubject model <|
+                traceDependingOnMode model
 
-            --, debugModel model
+    else
+        row
+            (centerX
+                :: highlightTutorialSubject tutorialSubject UiOperatorPage
+            )
+            [ column [ width <| fillPortion 3, centerX ]
+                [ row []
+                    [ el
+                        []
+                        (rangeSliderAndCRT tutorialSubject model <| traceDependingOnMode model)
+                    ]
+                , row []
+                    [ clickableGonioImage tutorialSubject model
+                    , el (highlightTutorialSubject tutorialSubject UiGonioButton) <|
+                        actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+                    , clickableRangeKnob tutorialSubject model
+                    , el (highlightTutorialSubject tutorialSubject UIRangeButton) <|
+                        actionButtonLabelAbove "RANGE" StoreRangeSetting
+                    ]
+
+                --, debugModel model
+                ]
+            , column [ width <| fillPortion 2, centerX ]
+                [ modeSwitchPanel tutorialSubject model
+                , raidStrengthPanel tutorialSubject model
+                ]
             ]
-        , column [ width <| fillPortion 2, centerX ]
-            [ modeSwitchPanel tutorialSubject model
-            , raidStrengthPanel tutorialSubject model
-            ]
-        ]
 
 
 debugModel : Model -> Element Msg
@@ -427,10 +468,9 @@ operatorPageWithTutorial tutorial model =
     case tutorialText tutorial model of
         Just someText ->
             column [ width fill ]
-                    [ rawPage
-                    , tutorialControls showArrows someText
-                    ]
+                [ rawPage
+                , tutorialControls showArrows someText
+                ]
 
         _ ->
             rawPage
-

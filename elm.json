@@ -17,6 +17,7 @@
             "elm-explorations/linear-algebra": "1.0.3",
             "elm-explorations/markdown": "1.0.0",
             "elm-explorations/webgl": "1.1.1",
+            "feathericons/elm-feather": "1.5.0",
             "harrysarson/elm-complex": "1.0.5",
             "mdgriffith/elm-ui": "1.1.5",
             "mpizenberg/elm-pointer-events": "4.0.1"
