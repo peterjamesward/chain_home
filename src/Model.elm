@@ -47,6 +47,7 @@ type alias Model =
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
     , applicationMode : ApplicationMode
+    , fullScreenCRT : Bool
     }
 
 
