@@ -90,7 +90,6 @@ init _ =
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
       , applicationMode = InteractiveMode
-      , fullScreenCRT = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -288,11 +287,6 @@ update msg model =
                 Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
     in
     case msg of
-        ToggleFullScreenCRT ->
-            ( { model | fullScreenCRT = not model.fullScreenCRT }
-            , Cmd.none
-            )
-
         Messages.KioskMode ->
             ( { model
                 | applicationMode = Model.KioskMode kioskModeTutorial model.modelTime

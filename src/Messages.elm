@@ -43,4 +43,3 @@ type Msg
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
     | KioskMode
-    | ToggleFullScreenCRT
