@@ -318,7 +318,7 @@ fragmentShader =
             // add time to the noise parameters so it's animated.
             // I want a component that is more 'spikey'.
             float noise = 0.0;
-            noise += sin(uv.x * 256.0 + 0.0) * sin(iTime * 7.0);
+            noise += sin(uv.x * 256.0 + 0.0) * fract(1000.0 * sin(iTime * 15.0)); //sin(iTime * 7.0);
             noise += sin(uv.x * 512.0 + 0.0) * sin(iTime * 5.0);
             noise += sin(uv.x * 1024.0 + 0.0) * sin(iTime * 11.0);
             noise /= 40.0;
@@ -328,8 +328,8 @@ fragmentShader =
             lumpy += sin(uv.x * 256.0);
             lumpy = 0.0 - float(lumpy < -0.8);
             float lumpyTime = 0.0;
-            lumpyTime += sin(iTime * 13.0) * fract(1000.0 * sin(iTime * 15.0));
-            lumpyTime = float(lumpyTime > 0.9);
+            lumpyTime += sin(iTime * 7.0) * fract(1000.0 * sin(iTime * 15.0));
+            lumpyTime = float(lumpyTime > 0.98);
 
             float sawtooth = 0.0;
             sawtooth = abs(0.5 - fract(uv.x * 20.0));
@@ -338,7 +338,7 @@ fragmentShader =
             float signalAmplitude1 = deriveSignalFromFieldsAt(uv.x);
             float signalAmplitude2 = deriveSignalFromFieldsAt(xPlus);
             float signalAmplitude = (signalAmplitude0 + signalAmplitude1 + signalAmplitude1 + signalAmplitude2)/4.0;
-            float slope = abs(signalAmplitude2 - signalAmplitude0) / 10.0;
+            //float slope = abs(signalAmplitude2 - signalAmplitude0) / 10.0;
 
             // Fiddle with coordinate (needs some work).
             float beamY = bumps - signalAmplitude - noise;
