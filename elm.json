@@ -19,6 +19,8 @@
             "elm-explorations/webgl": "1.1.1",
             "feathericons/elm-feather": "1.5.0",
             "harrysarson/elm-complex": "1.0.5",
+            "ianmackenzie/elm-geometry": "3.9.1",
+            "ianmackenzie/elm-units": "2.9.0",
             "mdgriffith/elm-ui": "1.1.5",
             "mpizenberg/elm-pointer-events": "4.0.1"
         },
@@ -27,7 +29,12 @@
             "elm/file": "1.0.5",
             "elm/parser": "1.1.0",
             "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.2"
+            "elm/virtual-dom": "1.0.2",
+            "ianmackenzie/elm-1d-parameter": "1.0.1",
+            "ianmackenzie/elm-float-extra": "1.1.0",
+            "ianmackenzie/elm-interval": "2.0.0",
+            "ianmackenzie/elm-triangular-mesh": "1.1.0",
+            "ianmackenzie/elm-units-interval": "2.3.0"
         }
     },
     "test-dependencies": {

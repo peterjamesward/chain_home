@@ -1,5 +1,10 @@
 module Config exposing (..)
 
+import Angle
+import Direction2d exposing (Direction2d)
+import Length exposing (Meters)
+import Quantity exposing (Quantity)
+import Spherical
 import Station exposing (Station)
 import Target exposing (targetFromProforma)
 import Types exposing (Echo, Target, TargetProforma)
@@ -28,27 +33,66 @@ groundRays =
     ]
 
 
+
 {-
-regularlySpacedTargets : List Echo
-regularlySpacedTargets =
-    let
-        makeTargetAtMiles m =
-            { sequence = 0
-            , r = m * 1600
-            , theta = 0 -- ignored as these are injected after D/F
-            , alpha = 0
-            , strength = 1
-            , phase = 0
-            , duration = 0
-            , amplitude = 10
-            }
-    in
-    List.map makeTargetAtMiles [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90  ]
+   regularlySpacedTargets : List Echo
+   regularlySpacedTargets =
+       let
+           makeTargetAtMiles m =
+               { sequence = 0
+               , r = m * 1600
+               , theta = 0 -- ignored as these are injected after D/F
+               , alpha = 0
+               , strength = 1
+               , phase = 0
+               , duration = 0
+               , amplitude = 10
+               }
+       in
+       List.map makeTargetAtMiles [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90  ]
 -}
 
 
 station =
     bawdsey
+
+
+type World
+    = World
+
+
+targetFromRangeAndBearing : Quantity Float Meters -> Direction2d World -> Int -> TargetProforma
+targetFromRangeAndBearing range bearing strength =
+    let
+        ( atLon, atLat ) =
+            Spherical.cartesianTargetPosition
+                ( station.longitude, station.latitude )
+                (Length.inMeters range)
+                (Angle.inDegrees <| Direction2d.toAngle bearing)
+    in
+    { longitude = Angle.inRadians <| Angle.degrees atLon
+    , latitude = Angle.inRadians <| Angle.degrees atLat
+    , height = 20 -- ,000 ft
+    , heading = Angle.inRadians <| Angle.degrees 270
+    , speed = 200.0 -- mph
+    , strength = strength
+    , iff = Nothing
+    }
+
+
+sharonsRaids =
+    let
+        los =
+            Direction2d.x
+
+        friendly =
+            targetFromRangeAndBearing (Length.miles 75) los 2
+    in
+    [ targetFromRangeAndBearing (Length.miles 50) los 1
+    , targetFromRangeAndBearing (Length.miles 60) los 1
+    , { friendly | iff = Just 1 }
+    , targetFromRangeAndBearing (Length.miles 90) los 20
+    ]
 
 
 bawdsey : Station
@@ -77,8 +121,8 @@ behindStation =
 
 bomber1 : TargetProforma
 bomber1 =
-    { longitude = bawdsey.longitude + degrees 2.0
-    , latitude = bawdsey.latitude + degrees 0.5
+    { longitude = bawdsey.longitude + degrees 1.0
+    , latitude = bawdsey.latitude
     , height = 20 -- ,000 ft
     , heading = degrees 250
     , speed = 200.0 -- mph
@@ -89,8 +133,8 @@ bomber1 =
 
 bomber2 : TargetProforma
 bomber2 =
-    { longitude = bawdsey.longitude + degrees 1.2
-    , latitude = degrees 52.05
+    { longitude = bawdsey.longitude + degrees 1.25
+    , latitude = bawdsey.latitude
     , height = 30.1 -- ,000 ft
     , heading = degrees 280
     , speed = 200.0 -- mph
@@ -102,12 +146,12 @@ bomber2 =
 bomber3 : TargetProforma
 bomber3 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 1.608
-    , latitude = bawdsey.latitude + degrees 0.3
-    , height = 40 -- ,000 ft
+    { longitude = bawdsey.longitude + degrees 1.5
+    , latitude = bawdsey.latitude
+    , height = 20 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
-    , strength = 1
+    , strength = 20
     , iff = Nothing
     }
 
@@ -128,7 +172,7 @@ fighter1 : TargetProforma
 fighter1 =
     -- Starts behind and heads out pretty quick.
     { longitude = bawdsey.longitude + degrees 1.8
-    , latitude = bawdsey.latitude + degrees 0.01
+    , latitude = bawdsey.latitude
     , height = 10 -- ,000 ft
     , heading = degrees 270
     , speed = 300 -- mph
@@ -162,7 +206,7 @@ largeGroup2 n =
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ bomber1 ]
+        [ bomber1, bomber2, bomber3, fighter1 ]
 
 
 trainingMode2 : Int -> List Target
@@ -200,4 +244,5 @@ trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
         [ largeGroup2 12
-        , largeGroup1 60 ]
+        , largeGroup1 60
+        ]
