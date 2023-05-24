@@ -224,7 +224,7 @@ rangeSliderAndCRT tutorialSubject model trace =
                     ]
                     (rangeScale model)
             , inFront <|
-                Input.button [ alignBottom, alignLeft, Font.color lightCharcoal ]
+                Input.button [ alignBottom, alignLeft, Font.color midGray ]
                     { label =
                         html <|
                             FeatherIcons.toHtml [] <|

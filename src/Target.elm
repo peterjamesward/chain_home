@@ -80,7 +80,7 @@ targetAtTime station timeNow target =
                     -- IFF pulses every 6 seconds for 500ms duration.
                     -- Historically it was every 12 seconds for 100ms duration.
                     -- We have made it more visible.
-                    modBy 6 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
+                    modBy 12 (deltaT // 1000) == n && modBy 1000 deltaT > 0 && modBy 1000 deltaT < 500
         , rangeInMetres = rng
         , theta = theta
         , alpha = atan2 heightInMetres rng - asin (heightInMetres / meanRadius)
