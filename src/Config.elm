@@ -1,10 +1,5 @@
 module Config exposing (..)
 
-import Angle
-import Direction2d exposing (Direction2d)
-import Length exposing (Meters)
-import Quantity exposing (Quantity)
-import Spherical
 import Station exposing (Station)
 import Target exposing (targetFromProforma)
 import Types exposing (Echo, Target, TargetProforma)
@@ -33,66 +28,8 @@ groundRays =
     ]
 
 
-
-{-
-   regularlySpacedTargets : List Echo
-   regularlySpacedTargets =
-       let
-           makeTargetAtMiles m =
-               { sequence = 0
-               , r = m * 1600
-               , theta = 0 -- ignored as these are injected after D/F
-               , alpha = 0
-               , strength = 1
-               , phase = 0
-               , duration = 0
-               , amplitude = 10
-               }
-       in
-       List.map makeTargetAtMiles [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90  ]
--}
-
-
 station =
     bawdsey
-
-
-type World
-    = World
-
-
-targetFromRangeAndBearing : Quantity Float Meters -> Direction2d World -> Int -> TargetProforma
-targetFromRangeAndBearing range bearing strength =
-    let
-        ( atLon, atLat ) =
-            Spherical.cartesianTargetPosition
-                ( station.longitude, station.latitude )
-                (Length.inMeters range)
-                (Angle.inDegrees <| Direction2d.toAngle bearing)
-    in
-    { longitude = Angle.inRadians <| Angle.degrees atLon
-    , latitude = Angle.inRadians <| Angle.degrees atLat
-    , height = 20 -- ,000 ft
-    , heading = Angle.inRadians <| Angle.degrees 270
-    , speed = 200.0 -- mph
-    , strength = strength
-    , iff = Nothing
-    }
-
-
-sharonsRaids =
-    let
-        los =
-            Direction2d.x
-
-        friendly =
-            targetFromRangeAndBearing (Length.miles 75) los 2
-    in
-    [ targetFromRangeAndBearing (Length.miles 50) los 1
-    , targetFromRangeAndBearing (Length.miles 60) los 1
-    , { friendly | iff = Just 1 }
-    , targetFromRangeAndBearing (Length.miles 90) los 20
-    ]
 
 
 bawdsey : Station
@@ -203,18 +140,23 @@ largeGroup2 n =
     }
 
 
+sharonMode : Int -> List Target
+sharonMode timeNow =
+    List.map (targetFromProforma station timeNow)
+        [ bomber1, bomber2, bomber3, fighter1 ]
+
+
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ bomber1, bomber2, bomber3, fighter1 ]
+        [ bomber1 ]
 
 
 trainingMode2 : Int -> List Target
 trainingMode2 timeNow =
     -- Two planes same range same heading
     List.map (targetFromProforma station timeNow)
-        [ bomber2
-        ]
+        [ bomber2 ]
 
 
 trainingMode3 : Int -> List Target

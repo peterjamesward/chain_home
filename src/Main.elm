@@ -309,6 +309,7 @@ update msg model =
         SetStartTime time ->
             ( { model
                 | startTime = Time.posixToMillis time
+                , targets = sharonMode <| Time.posixToMillis time
               }
             , Cmd.none
             )
@@ -322,8 +323,9 @@ update msg model =
             ( { cleanModel
                 | currPage = OperatorPage
                 , gameMode = gameMode
+                , targets = sharonMode model.modelTime
               }
-            , requestRandomRaid
+            , Cmd.none --requestRandomRaid
             )
 
         UpdateModel time ->

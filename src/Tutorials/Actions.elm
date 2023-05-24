@@ -161,9 +161,7 @@ actionInitialiseTutorial m =
 
 actionSetupTutorialRaid : Model -> Model
 actionSetupTutorialRaid model =
-    { model
-        | targets = trainingMode model.modelTime
-    }
+    { model | targets = trainingMode model.modelTime }
 
 
 actionCentraliseKnobs : Model -> Model

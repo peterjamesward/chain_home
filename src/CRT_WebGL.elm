@@ -341,7 +341,7 @@ fragmentShader =
             //float slope = abs(signalAmplitude2 - signalAmplitude0) / 10.0;
 
             // Fiddle with coordinate (needs some work).
-            float beamY = bumps - signalAmplitude - noise;
+            float beamY = bumps - signalAmplitude - noise + signalAmplitude * noise;
             beamY = beamY/10.0 + 0.78;
 
             float beamYprev = (bumps - signalAmplitude0 - noise)/10.0 + 0.78;
