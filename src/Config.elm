@@ -25,6 +25,15 @@ groundRays =
       , duration = 0
       , amplitude = 10
       }
+    , { sequence = 0
+      , r = 500
+      , theta = 0 -- ignored as these are injected after D/F
+      , alpha = 0
+      , strength = 1
+      , phase = 0
+      , duration = 10
+      , amplitude = 20
+      }
     ]
 
 
