@@ -498,10 +498,12 @@ fragmentShader =
             // I want a component that is more 'spikey'.
             float noise = cnoise( vec3(fragCoord.x, fract(sin(iTime) * 10000.0), iTime) ) / 10.0;
 
-            // Spikey looking noise with characteristic sudden spikes.
-            float lumpy =  sin(uv.x * 256.0);
+            // Spikey looking noise.
+            float lumpy = 0.0;
+            lumpy += sin(uv.x * 256.0);
             lumpy = 0.0 - float(lumpy < -0.8);
-            float lumpyTime =  sin(iTime * 7.0) * fract(1000.0 * sin(iTime * 15.0));
+            float lumpyTime = 0.0;
+            lumpyTime += sin(iTime * 7.0) * fract(1000.0 * sin(iTime * 15.0));
             lumpyTime = float(lumpyTime > 0.98);
 
             float sawtooth = 0.0;
@@ -517,8 +519,8 @@ fragmentShader =
             float beamY = bumps - signalAmplitude - noise + signalAmplitude * noise;
             beamY = beamY/10.0 + 0.78;
 
-            float beamYprev = (bumps - signalAmplitude0 - noise)/10.0 + 0.78;
-            float beamYnext = (bumps - signalAmplitude2 - noise)/10.0 + 0.78;
+            float beamYprev = (bumps - signalAmplitude0 - noise + signalAmplitude0 * noise)/10.0 + 0.78;
+            float beamYnext = (bumps - signalAmplitude2 - noise + signalAmplitude2 * noise)/10.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly.
             float i = pow(1.0 - abs(uv.y - beamY), 50.0);

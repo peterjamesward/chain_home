@@ -116,7 +116,6 @@ bomber4 =
 
 fighter1 : TargetProforma
 fighter1 =
-    -- Starts behind and heads out pretty quick.
     { longitude = bawdsey.longitude + degrees 1.8
     , latitude = bawdsey.latitude
     , height = 10 -- ,000 ft
@@ -127,9 +126,33 @@ fighter1 =
     }
 
 
+defence1 : TargetProforma
+defence1 =
+    { longitude = bawdsey.longitude + degrees 0.1
+    , latitude = bawdsey.latitude
+    , height = 15 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 4
+    , iff = Just 1
+    }
+
+
+defence2 : TargetProforma
+defence2 =
+    { longitude = bawdsey.longitude + degrees 0.6
+    , latitude = bawdsey.latitude + degrees 0.8
+    , height = 10 -- ,000 ft
+    , heading = degrees 100
+    , speed = 300 -- mph
+    , strength = 4
+    , iff = Just 1
+    }
+
+
 largeGroup1 n =
     { longitude = bawdsey.longitude + degrees 1.8
-    , latitude = bawdsey.latitude + degrees 0.3
+    , latitude = bawdsey.latitude - degrees 0.3
     , height = 25
     , heading = degrees 275
     , speed = 200
@@ -140,8 +163,8 @@ largeGroup1 n =
 
 largeGroup2 n =
     { longitude = bawdsey.longitude + degrees 1.2
-    , latitude = bawdsey.latitude - degrees 0.2
-    , height = 25
+    , latitude = bawdsey.latitude - degrees 1.0
+    , height = 30
     , heading = degrees 265
     , speed = 250
     , strength = n
@@ -152,7 +175,15 @@ largeGroup2 n =
 sharonMode : Int -> List Target
 sharonMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ bomber1, bomber2, bomber3, fighter1 ]
+        [ bomber1
+        , bomber2
+        , bomber3
+        , fighter1
+        , defence1
+        , defence2
+        , largeGroup1 10
+        , largeGroup2 10
+        ]
 
 
 trainingMode : Int -> List Target
