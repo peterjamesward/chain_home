@@ -32,7 +32,7 @@ groundRays =
       , strength = 1
       , phase = 0
       , duration = 10
-      , amplitude = 20
+      , amplitude = 30
       }
     ]
 

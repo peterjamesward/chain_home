@@ -310,8 +310,8 @@ fragmentShader =
         {
             vec2 uv = fragCoord.xy/iResolution.xy;
             vec2 uvn = 2.0 * uv - 1.0;
-            float xMinus = (fragCoord.x - 1.0)/iResolution.x;
-            float xPlus = (fragCoord.x + 1.0)/iResolution.x;
+            float xMinus = (fragCoord.x - 0.6)/iResolution.x;
+            float xPlus = (fragCoord.x + 0.6)/iResolution.x;
 
             // Add a noise field (use our existing one).
             // Lower the resolution of the x line to make the noise less noisy.
@@ -348,9 +348,9 @@ fragmentShader =
             float beamYnext = (bumps - signalAmplitude2 - noise)/10.0 + 0.78;
 
             //create the beam by simple y distance that falls off quickly.
-            float i = pow(1.0 - abs(uv.y - beamY), 30.0);
-            i += pow(1.0 - abs(uv.y - beamYprev), 30.0) * 0.5;
-            i += pow(1.0 - abs(uv.y - beamYnext), 30.0) * 0.5;
+            float i = pow(1.0 - abs(uv.y - beamY), 50.0);
+            i += pow(1.0 - abs(uv.y - beamYprev), 50.0) * 0.5;
+            i += pow(1.0 - abs(uv.y - beamYnext), 50.0) * 0.5;
             i /= 2.0;
 
             vec3 col = vec3(i) * mix(COL1,COL2,i);
