@@ -65,8 +65,8 @@ behindStation =
     }
 
 
-bomber1 : TargetProforma
-bomber1 =
+singleHostile : TargetProforma
+singleHostile =
     { longitude = bawdsey.longitude + degrees 1.0
     , latitude = bawdsey.latitude
     , height = 20 -- ,000 ft
@@ -77,8 +77,8 @@ bomber1 =
     }
 
 
-bomber2 : TargetProforma
-bomber2 =
+pairHostile : TargetProforma
+pairHostile =
     { longitude = bawdsey.longitude + degrees 1.25
     , latitude = bawdsey.latitude
     , height = 30.1 -- ,000 ft
@@ -89,8 +89,8 @@ bomber2 =
     }
 
 
-bomber3 : TargetProforma
-bomber3 =
+groupOf20 : TargetProforma
+groupOf20 =
     -- Try to get 3 and 4 at similar range but differing in azimuth.
     { longitude = bawdsey.longitude + degrees 1.5
     , latitude = bawdsey.latitude
@@ -102,20 +102,8 @@ bomber3 =
     }
 
 
-bomber4 : TargetProforma
-bomber4 =
-    { longitude = bawdsey.longitude + degrees 1.6
-    , latitude = bawdsey.latitude - degrees 0.3
-    , height = 40 -- ,000 ft
-    , heading = degrees 270
-    , speed = 200 -- mph
-    , strength = 1
-    , iff = Nothing
-    }
-
-
-fighter1 : TargetProforma
-fighter1 =
+incomingSingleFriendly : TargetProforma
+incomingSingleFriendly =
     { longitude = bawdsey.longitude + degrees 1.8
     , latitude = bawdsey.latitude
     , height = 10 -- ,000 ft
@@ -126,8 +114,8 @@ fighter1 =
     }
 
 
-defence1 : TargetProforma
-defence1 =
+outgoingFriendlySection : TargetProforma
+outgoingFriendlySection =
     { longitude = bawdsey.longitude + degrees 0.1
     , latitude = bawdsey.latitude
     , height = 15 -- ,000 ft
@@ -138,15 +126,55 @@ defence1 =
     }
 
 
-defence2 : TargetProforma
-defence2 =
-    { longitude = bawdsey.longitude + degrees 0.6
-    , latitude = bawdsey.latitude + degrees 0.8
+outgoingFriendlySection1a : TargetProforma
+outgoingFriendlySection1a =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.4
+    , latitude = bawdsey.latitude + degrees 0.5
     , height = 10 -- ,000 ft
-    , heading = degrees 100
+    , heading = degrees 170
     , speed = 300 -- mph
     , strength = 4
+    , iff = Nothing
+    }
+
+
+outgoingFriendlySection1b : TargetProforma
+outgoingFriendlySection1b =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.4
+    , latitude = bawdsey.latitude + degrees 0.5
+    , height = 10 -- ,000 ft
+    , heading = degrees 170
+    , speed = 300 -- mph
+    , strength = 1
     , iff = Just 1
+    }
+
+
+outgoingFriendlySection2a : TargetProforma
+outgoingFriendlySection2a =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.6
+    , latitude = bawdsey.latitude - degrees 0.4
+    , height = 10 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 3
+    , iff = Nothing
+    }
+
+
+outgoingFriendlySection2b : TargetProforma
+outgoingFriendlySection2b =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.6
+    , latitude = bawdsey.latitude - degrees 0.4
+    , height = 12 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 1
+    , iff = Just 3
     }
 
 
@@ -175,35 +203,50 @@ largeGroup2 n =
 sharonMode : Int -> List Target
 sharonMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ bomber1
-        , bomber2
-        , bomber3
-        , fighter1
-        , defence1
-        , defence2
+        [ singleHostile
+        , pairHostile
+        , groupOf20
+        , incomingSingleFriendly
+        , outgoingFriendlySection
+        , outgoingFriendlySection1a
+        , outgoingFriendlySection1b
+        , outgoingFriendlySection2a
+        , outgoingFriendlySection2b
         , largeGroup1 10
         , largeGroup2 10
         ]
 
 
+bomber4 : TargetProforma
+bomber4 =
+    { longitude = bawdsey.longitude + degrees 1.6
+    , latitude = bawdsey.latitude - degrees 0.3
+    , height = 40 -- ,000 ft
+    , heading = degrees 270
+    , speed = 200 -- mph
+    , strength = 1
+    , iff = Nothing
+    }
+
+
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ bomber1 ]
+        [ singleHostile ]
 
 
 trainingMode2 : Int -> List Target
 trainingMode2 timeNow =
     -- Two planes same range same heading
     List.map (targetFromProforma station timeNow)
-        [ bomber2 ]
+        [ pairHostile ]
 
 
 trainingMode3 : Int -> List Target
 trainingMode3 timeNow =
     -- Two planes same range different headings
     List.map (targetFromProforma station timeNow)
-        [ bomber3
+        [ groupOf20
         , bomber4
         ]
 
@@ -211,7 +254,7 @@ trainingMode3 timeNow =
 trainingModeFriendlyOutbound : Int -> List Target
 trainingModeFriendlyOutbound timeNow =
     List.map (targetFromProforma station timeNow)
-        [ fighter1 ]
+        [ incomingSingleFriendly ]
 
 
 trainingMode3to6 : Int -> List Target

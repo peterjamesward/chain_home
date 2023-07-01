@@ -175,12 +175,12 @@ theMap model =
                     []
                 ]
                     ++ (if model.actualTraceVisibleOnMap then
-                            plotPlotter <| List.concatMap .positionHistory model.targets
+                            List.concatMap (plotPlotter << .positionHistory) model.targets
 
                         else
                             []
                        )
-                    ++ plotPlotter model.storedPlots
+                    ++ plotPlotter (List.take 1 model.storedPlots)
                     ++ ourStation model
 
 
@@ -194,48 +194,47 @@ plotPlotter plots =
         ( stationX, stationY ) =
             stationPos
 
-        timedPlotStyles =
-            [ r "2"
+        timedPlotStyles reduction =
+            [ r <| String.fromFloat <| 4.0 / toFloat reduction
             , stroke "navy"
             , strokeWidth "1"
-            --, A.fill "navy"
+            , A.fill "navy"
             ]
 
-        userPlotStyles =
-            [ r "5"
+        userPlotStyles reduction =
+            [ r <| String.fromFloat <| 5.0 / toFloat reduction
             , stroke "navy"
             , strokeWidth "1"
             , A.fill "yellow"
             ]
 
-        correlatedPlotStyles strength =
-            [ r "5"
+        correlatedPlotStyles strength reduction =
+            [ r "0" --<| String.fromFloat <| 1.0 / toFloat reduction
             , stroke "orange"
-            , strokeWidth "1"
-            --, A.fill "navy"
+            , strokeWidth "0"
             ]
 
-        plotStyles plotType strength =
+        plotStyles plotType strength reduction =
             case plotType of
                 UserPlot ->
-                    userPlotStyles
+                    userPlotStyles reduction
 
                 TimedPlot ->
-                    timedPlotStyles
+                    timedPlotStyles reduction
 
                 ActualPlot ->
-                    correlatedPlotStyles strength
+                    correlatedPlotStyles strength reduction
 
-        plotArrow plot =
+        plotArrow reduction plot =
             Svg.circle
                 ([ cx <| String.fromFloat <| stationX + plot.range * sin plot.bearing * mapScale
                  , cy <| String.fromFloat <| stationY - plot.range * cos plot.bearing * mapScale -- y is +ve downwards!
                  ]
-                    ++ plotStyles plot.plotType plot.strength
+                    ++ plotStyles plot.plotType plot.strength reduction
                 )
                 []
     in
-    List.map plotArrow plots
+    List.map2 plotArrow (List.range 1 5) plots
 
 
 ourStation model =
