@@ -6,9 +6,9 @@ to the GPIO port on a Raspberry Pi (via a level shifter if 5V).
 
 It is possible to run Elm on a Pi, easiest using a Docker container. 
 
-Elm cannot of course read SSI, so here has to be some other process, which could be Node, Python,
+Elm (of course) cannot read SSI, so here has to be some other process, which could be Node, Python,
 anything really to read the goniometer position. Has to get into Elm somehow, for which the key
-options are JS ports, or HTTP.
+options are JS ports, or HTTP GET.
 
 Taking this further, the goniometer could be considered as a network device, self-contained
 with its own HTTP server, so we can easily read from Elm with HTTP and we have a nice clean 
@@ -29,3 +29,6 @@ https://www.robertthasjohn.com/post/how-to-set-up-the-raspberry-pi-pico-for-deve
 But that would only give a goniometer. We will need also range knob, sundry switches and lights
 and (of course) the "tube". Which to do at reasonable cost implies using a proper Pi anyway, so
 why bother with the Pico?
+
+Thus we have a Pi, running Python processes to talk to peripherals, each of which is controlled
+or read using HTTP PUT/GET from Elm which runs in a container with external file system. Sounds OK.
