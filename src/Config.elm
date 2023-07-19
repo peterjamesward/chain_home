@@ -110,7 +110,7 @@ incomingSingleFriendly =
     , heading = degrees 270
     , speed = 300 -- mph
     , strength = 1
-    , iff = Just 1
+    , iff = Just 10
     }
 
 
@@ -122,7 +122,7 @@ outgoingFriendlySection =
     , heading = degrees 70
     , speed = 300 -- mph
     , strength = 4
-    , iff = Just 1
+    , iff = Just 8
     }
 
 
@@ -174,7 +174,7 @@ outgoingFriendlySection2b =
     , heading = degrees 70
     , speed = 300 -- mph
     , strength = 1
-    , iff = Just 3
+    , iff = Just 6
     }
 
 
