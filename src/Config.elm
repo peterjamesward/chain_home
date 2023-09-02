@@ -37,25 +37,6 @@ groundRays =
     ]
 
 
-{-
-regularlySpacedTargets : List Echo
-regularlySpacedTargets =
-    let
-        makeTargetAtMiles m =
-            { sequence = 0
-            , r = m * 1600
-            , theta = 0 -- ignored as these are injected after D/F
-            , alpha = 0
-            , strength = 1
-            , phase = 0
-            , duration = 0
-            , amplitude = 10
-            }
-    in
-    List.map makeTargetAtMiles [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90  ]
--}
-
-
 station =
     bawdsey
 
@@ -81,6 +62,119 @@ behindStation =
     , speed = 200.0 -- mph
     , strength = 1
     , iff = Nothing
+    }
+
+
+singleHostile : TargetProforma
+singleHostile =
+    { longitude = bawdsey.longitude + degrees 1.0
+    , latitude = bawdsey.latitude
+    , height = 20 -- ,000 ft
+    , heading = degrees 250
+    , speed = 200.0 -- mph
+    , strength = 1
+    , iff = Nothing
+    }
+
+
+pairHostile : TargetProforma
+pairHostile =
+    { longitude = bawdsey.longitude + degrees 1.25
+    , latitude = bawdsey.latitude
+    , height = 30.1 -- ,000 ft
+    , heading = degrees 280
+    , speed = 200.0 -- mph
+    , strength = 2
+    , iff = Nothing
+    }
+
+
+groupOf20 : TargetProforma
+groupOf20 =
+    -- Try to get 3 and 4 at similar range but differing in azimuth.
+    { longitude = bawdsey.longitude + degrees 1.5
+    , latitude = bawdsey.latitude
+    , height = 20 -- ,000 ft
+    , heading = degrees 270
+    , speed = 200 -- mph
+    , strength = 20
+    , iff = Nothing
+    }
+
+
+incomingSingleFriendly : TargetProforma
+incomingSingleFriendly =
+    { longitude = bawdsey.longitude + degrees 1.8
+    , latitude = bawdsey.latitude
+    , height = 10 -- ,000 ft
+    , heading = degrees 270
+    , speed = 300 -- mph
+    , strength = 1
+    , iff = Just 10
+    }
+
+
+outgoingFriendlySection : TargetProforma
+outgoingFriendlySection =
+    { longitude = bawdsey.longitude + degrees 0.1
+    , latitude = bawdsey.latitude
+    , height = 15 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 4
+    , iff = Just 8
+    }
+
+
+outgoingFriendlySection1a : TargetProforma
+outgoingFriendlySection1a =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.4
+    , latitude = bawdsey.latitude + degrees 0.5
+    , height = 10 -- ,000 ft
+    , heading = degrees 170
+    , speed = 300 -- mph
+    , strength = 4
+    , iff = Nothing
+    }
+
+
+outgoingFriendlySection1b : TargetProforma
+outgoingFriendlySection1b =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.4
+    , latitude = bawdsey.latitude + degrees 0.5
+    , height = 10 -- ,000 ft
+    , heading = degrees 170
+    , speed = 300 -- mph
+    , strength = 1
+    , iff = Just 1
+    }
+
+
+outgoingFriendlySection2a : TargetProforma
+outgoingFriendlySection2a =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.6
+    , latitude = bawdsey.latitude - degrees 0.4
+    , height = 10 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 3
+    , iff = Nothing
+    }
+
+
+outgoingFriendlySection2b : TargetProforma
+outgoingFriendlySection2b =
+    -- Split into two, so that one aircraft has IFF on.
+    { longitude = bawdsey.longitude + degrees 0.6
+    , latitude = bawdsey.latitude - degrees 0.4
+    , height = 12 -- ,000 ft
+    , heading = degrees 70
+    , speed = 300 -- mph
+    , strength = 1
+    , iff = Just 6
     }
 
 
@@ -168,6 +262,23 @@ largeGroup2 n =
     }
 
 
+sharonMode : Int -> List Target
+sharonMode timeNow =
+    List.map (targetFromProforma station timeNow)
+        [ singleHostile
+        , pairHostile
+        , groupOf20
+        , incomingSingleFriendly
+        , outgoingFriendlySection
+        , outgoingFriendlySection1a
+        , outgoingFriendlySection1b
+        , outgoingFriendlySection2a
+        , outgoingFriendlySection2b
+        , largeGroup1 10
+        , largeGroup2 10
+        ]
+
+
 trainingMode : Int -> List Target
 trainingMode timeNow =
     List.map (targetFromProforma station timeNow)
@@ -209,4 +320,5 @@ trainingMassRaids : Int -> List Target
 trainingMassRaids timeNow =
     List.map (targetFromProforma station timeNow) <|
         [ largeGroup2 12
-        , largeGroup1 60 ]
+        , largeGroup1 60
+        ]
