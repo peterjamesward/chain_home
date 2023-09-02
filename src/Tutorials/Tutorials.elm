@@ -36,6 +36,9 @@ tutorialFromId id =
         ScenarioThreeToSix ->
             tutorial3to6
 
+        ScenarioSharon ->
+            tutorialSharon
+
         ScenarioFriendly ->
             tutorialIFF
 
@@ -43,11 +46,29 @@ tutorialFromId id =
             kioskModeTutorial
 
 
+tutorialSharon : Maybe (Zipper.Zipper TutorialEntry)
+tutorialSharon =
+    Zipper.fromList
+        [ TutorialEntry
+            UiDummy
+            [ ActionInitialiseTutorial
+            , ActionCentraliseKnobs
+            , ActionClearTargets
+            , ActionSetupSharon
+            , ActionShowOperator
+            --, ActionExitTutorial
+            ]
+            noStateActions
+            noExitActions
+            (TextConstant "")
+        ]
+
+
 tutorialBasic : Maybe (Zipper.Zipper TutorialEntry)
 tutorialBasic =
     Zipper.fromList
         [ TutorialEntry
-            UiDummy
+            UiOperatorPage
             [ ActionInitialiseTutorial
             , ActionCentraliseKnobs
             , ActionClearTargets
@@ -208,7 +229,7 @@ tutorialBasic =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , tutorialCloseStep ScenarioBasic
         ]
@@ -334,7 +355,7 @@ tutorial2SameBearing =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , tutorialCloseStep ScenarioTwoTogether
         ]
@@ -430,7 +451,7 @@ tutorial2DifferentBearings =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , TutorialEntry
             UiGoniometer
@@ -448,7 +469,7 @@ tutorial2DifferentBearings =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , tutorialCloseStep ScenarioTwoSeparate
         ]
@@ -574,7 +595,7 @@ tutorial3to6 =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , tutorialCloseStep ScenarioThreeToSix
         ]
@@ -701,7 +722,7 @@ tutorialIFF =
             UiCalculator
             [ ActionShowCalculator ]
             noStateActions
-            [ ActionShowOperator ]
+            [ ActionShowOperatorInTutorialMode ]
             TextInterpretCalculator
         , tutorialCloseStep ScenarioFriendly
         ]
