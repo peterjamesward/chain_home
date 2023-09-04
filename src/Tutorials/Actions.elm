@@ -100,6 +100,9 @@ performTheAction a model =
                 ActionSetupRaid ->
                     actionSetupTutorialRaid
 
+                ActionSetupSharon ->
+                    actionSetupSharon
+
                 ActionSetupRaidFriendlyOutbound ->
                     actionSetupRaidFriendlyOutbound
 
@@ -123,6 +126,9 @@ performTheAction a model =
 
                 ActionShowOperator ->
                     actionShowOperator
+
+                ActionShowOperatorInTutorialMode ->
+                    actionShowOperatorInTutorialMode
 
                 ActionStopGonioAwayFromRaidBearing ->
                     actionStopGonioAwayFromRaidBearing
@@ -164,6 +170,11 @@ actionSetupTutorialRaid model =
     { model
         | targets = trainingMode model.modelTime
     }
+
+
+actionSetupSharon : Model -> Model
+actionSetupSharon model =
+    { model | targets = sharonMode model.modelTime }
 
 
 actionCentraliseKnobs : Model -> Model
@@ -292,9 +303,13 @@ actionShowCalculator model =
     { model | currPage = CalculatorInTutorial }
 
 
+actionShowOperatorInTutorialMode : Model -> Model
+actionShowOperatorInTutorialMode model =
+    { model | currPage = OperatorPageInTutorial }
+
 actionShowOperator : Model -> Model
 actionShowOperator model =
-    { model | currPage = OperatorPageInTutorial }
+    { model | currPage = OperatorPage }
 
 
 actionShowSplashPage : Model -> Model

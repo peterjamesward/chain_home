@@ -13,6 +13,7 @@ type TutorialScenario
     | ScenarioThreeToSix
     | ScenarioFriendly
     | ScenarioKioskMode
+    | ScenarioSharon
 
 
 type
@@ -39,11 +40,13 @@ type
     | ActionSeekElevation Bool
     | ActionSeekElevationOfNumberedTarget Bool Int
     | ActionSetupRaid
+    | ActionSetupSharon
     | ActionSetupRaidFriendlyOutbound
     | ActionSetupRaid2DifferentBearings
     | ActionSetupRaid3to6
     | ActionSetupRaid2SameBearing
     | ActionShowCalculator
+    | ActionShowOperatorInTutorialMode
     | ActionShowOperator
     | ActionStopGonioAwayFromRaidBearing
     | ActionStoreBearing

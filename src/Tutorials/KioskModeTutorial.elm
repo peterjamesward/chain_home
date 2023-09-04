@@ -164,7 +164,7 @@ demoOnes =
         [ ActionShowCalculator
         ]
         noStateActions
-        [ ActionShowOperator
+        [ ActionShowOperatorInTutorialMode
         , ActionClearCalculator
         ]
         TextInterpretCalculator
@@ -266,7 +266,7 @@ demoOnes =
         [ ActionShowCalculator
         ]
         noStateActions
-        [ ActionShowOperator
+        [ ActionShowOperatorInTutorialMode
         , ActionClearCalculator
         ]
         TextInterpretCalculator
@@ -376,7 +376,7 @@ demoTwosAndThrees =
         UiCalculator
         [ ActionShowCalculator ]
         noStateActions
-        [ ActionShowOperator
+        [ ActionShowOperatorInTutorialMode
         , ActionEndHeightMode
         , ActionClearCalculator
         ]
@@ -444,7 +444,7 @@ demoTwosAndThrees =
         UiCalculator
         [ ActionShowCalculator ]
         noStateActions
-        [ ActionShowOperator ]
+        [ ActionShowOperatorInTutorialMode ]
         TextInterpretCalculator
     , TutorialEntry
         UiGoniometer
@@ -462,7 +462,7 @@ demoTwosAndThrees =
         UiCalculator
         [ ActionShowCalculator ]
         noStateActions
-        [ ActionShowOperator ]
+        [ ActionShowOperatorInTutorialMode ]
         TextInterpretCalculator
     , TutorialEntry
         UiRangeKnob
@@ -550,7 +550,7 @@ demoTwosAndThrees =
         UiCalculator
         [ ActionShowCalculator ]
         noStateActions
-        [ ActionShowOperator
+        [ ActionShowOperatorInTutorialMode
         , ActionEndHeightMode
         ]
         TextInterpretCalculator
@@ -564,7 +564,7 @@ demoMassRaids =
         , ActionMassRaids
         , ActionCentraliseKnobs
         , ActionClearCalculator
-        , ActionShowOperator
+        , ActionShowOperatorInTutorialMode
         , ActionEndHeightMode
         ]
         [ ActionSwingGoniometer ]
@@ -664,7 +664,7 @@ demoMassRaids =
         [ ActionShowCalculator
         ]
         noStateActions
-        [ ActionShowOperator
+        [ ActionShowOperatorInTutorialMode
         , ActionClearCalculator
         ]
         TextInterpretCalculator
@@ -683,7 +683,7 @@ demoFinale =
         , ActionSetupRaidFriendlyOutbound
         , ActionMassRaids
         , ActionCentraliseKnobs
-        , ActionShowOperator
+        , ActionShowOperatorInTutorialMode
         ]
         []
         noExitActions

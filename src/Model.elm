@@ -71,4 +71,5 @@ availableTargetOptions =
     , TargetSelector ScenarioTwoSeparate False "Two aircraft at the same range"
     , TargetSelector ScenarioThreeToSix False "Three to six planes in formation"
     , TargetSelector ScenarioFriendly False "A friendly aircraft with IFF"
+    , TargetSelector ScenarioSharon False "Sample mix"
     ]
