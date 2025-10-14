@@ -196,6 +196,54 @@ fragmentShader =
             return fract(sin(dot(pos.xyz, vec3(70.9898, 78.233, 32.4355))) * 43758.5453123);
         }
 
+        float cubic(float x) {
+            return x * x * (3.0 - 2.0 * x) ;
+        }
+
+        // A "two plane" field pulsates.
+        float f2(float x) {
+            return 2.0 * sin(iTime * 3.0);
+        }
+
+        // Think of this as a mass raid "field", deliberately messy.
+        float fn(float x) {
+            float f = 0.0;
+            f += sin(x * 512.0 + 0.0) * sin(iTime * 9.0);
+            f += sin(x * 256.0 + 0.0) * sin(iTime * 8.0);
+            f += sin(x * 128.0 + 0.0) * sin(iTime * 6.0);
+            f += sin(x * 64.0 + 0.1) * sin(iTime * 4.0);
+            f += sin(x * 32.0 + 0.2) * sin(iTime * 3.0);
+            f /= 5.0;
+            return f;
+        }
+
+        float includeRaid(vec4 raid, float x) {
+            // Note lack of flow control means we calculate all options here!
+            float f1Component = float(raid.z == 1.0);
+            float f2Component = f2(x) * float(raid.z == 2.0);
+            float fnComponent = fn(x) * float(raid.z > 2.0);
+            float depth = raid.y * clamp(0.0,1.0,f1Component + f2Component + fnComponent);
+            return depth;
+        }
+
+       // We need an envelope with cubic sidewalls and a flat top.
+       // So this is a variant of "cubicPulse".
+       // Aim is that this will work in all cases.
+       // l = left edge (not centre)
+       // w = width of flat top
+       // x = the location to be evaluated
+        float envelope( float l, float w, float x ) {
+            float cubicWidth = 0.06;
+            float leadingEdgeX = (x - l)/cubicWidth;
+            float trailingEdgeX = (l + w - x)/cubicWidth;
+            leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
+            trailingEdgeX = clamp(trailingEdgeX, 0.0, 1.0);
+            float leadingEdgeY = cubic(leadingEdgeX);
+            float trailingEdgeY = cubic(trailingEdgeX);
+
+            return min(leadingEdgeY, trailingEdgeY);
+        }
+
         // Each raid has an amplitude (x) and a phase (y).
         vec2 raidContribution(vec4 raid, vec2 xy) {
             // x and y in [0,1],
@@ -205,18 +253,23 @@ fragmentShader =
             // If x = range, return amplitude.
             // As x moves away from range, use smoothstep.
             float xDist = abs ( xy.x - raid.x );
-            float amp = raid.y;
+            float amp = includeRaid(raid, xy.x) ;//raid.y;
 
             // Increase factor here to get a narrower pulse!
-            float xDistForCube = clamp(0.0, 1.0, xDist * 20.0);
-            float smoothed = smoothstep(1.0, 0.0, xDistForCube);
+            //float xDistForCube = clamp(0.0, 1.0, xDist * 20.0);
+            //float smoothed = smoothstep(1.0, 0.0, xDistForCube);
 
+            // Using previous 'envelope' function.
+            float smoothed = envelope(raid.x, sqrt(raid.z)/10.0, xy.x);
+
+            // Return phase shifted vector for 'correct' addition.
             return vec2(amp * smoothed * cos(raid.w), amp * smoothed * sin(raid.w));
         }
 
         // NOTE: Important to separate the notions of:
         // 1, The deflection of the beam caused by echoes.
         // 2, The brightness of a pixel caused by distance from beam.
+        // 3. Some randomness makes it more "real".
 
         float deriveSignalFromFieldsAt(vec2 xy) {
             // Each raid has a TBD signature that contributes to deflection.
@@ -238,9 +291,7 @@ fragmentShader =
             deflection += raidContribution(raid14, xy);
             deflection += raidContribution(raid15, xy);
 
-            float amplitude = clamp(1.0 - deflection.x, 0.0, 0.95);
-
-            //TODO: raids with >1 target
+            float amplitude = clamp(1.0 - length(deflection), 0.0, 0.95);
 
             // Intensity decays rapidly away from derived deflection.
             // Increase factor to focus the beam
