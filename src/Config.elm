@@ -7,7 +7,8 @@ import Types exposing (Echo, Target, TargetProforma)
 
 groundRays : List Echo
 groundRays =
-    [ { sequence = 0
+    [
+    { sequence = 0
       , r = 5000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
@@ -23,7 +24,7 @@ groundRays =
       , strength = 1
       , phase = 0
       , duration = 0
-      , amplitude = 10
+      , amplitude = 7
       }
     , { sequence = 0
       , r = 500
@@ -32,7 +33,7 @@ groundRays =
       , strength = 1
       , phase = 0
       , duration = 10
-      , amplitude = 30
+      , amplitude = 6
       }
     ]
 
@@ -71,7 +72,7 @@ singleHostile =
     , latitude = bawdsey.latitude
     , height = 20 -- ,000 ft
     , heading = degrees 250
-    , speed = 200.0 -- mph
+    , speed = 0 --200.0 -- mph
     , strength = 1
     , iff = Nothing
     }
