@@ -1,6 +1,12 @@
 
 = TODO
 
+* Fix alignment with range scale (by moving the range scale prefbly).
+* Range is front edge of dip.
+* Better shaped dip.
+* Make dip wider for larger raids.
+* Fluctuations on larger raids.
+
 == Hardware
 
 Make an external goniometer (and probably a range knob too).
