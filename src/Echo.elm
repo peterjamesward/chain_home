@@ -24,17 +24,13 @@ deriveEchoes station txAntenna targets =
             , amplitude =
                 if target.iffActive then
                     -- When IFF cuts in we can ignore the tx lobes!
-                    6
-                    -- Or something else that looks nice.
+                    5.0
 
                 else
                     abs <|
                         -- Combine the lobe functions
                         txAntenna.horizontalLobeFunction (angleFromLineOfSheet target)
                             * txAntenna.verticalLobeFunction target.alpha
-                            -- and ad-hoc adjustment for range
-                            / logBase 10 (1 + target.rangeInMetres)
-                            ^ 1.2
             }
     in
     List.map2 echoFromDirectBeam

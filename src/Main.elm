@@ -132,7 +132,8 @@ slideRangeSlider range keys =
 subscriptions : Model.Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Time.every 40 UpdateModel
+        [ Sub.none
+        , Time.every 40 UpdateModel
         , onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
