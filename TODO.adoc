@@ -1,11 +1,10 @@
 
 = TODO
 
-* Fix alignment with range scale (by moving the range scale prefbly).
-* Range is front edge of dip.
-* Better shaped dip.
-* Make dip wider for larger raids.
-* Fluctuations on larger raids.
+* Move and size range scale to above CRT.
+* IFF needs to be more of a spike, not the whole raid!
+    - Need to encode in a vec4. #Maybe -ve strength!#
+* Local echoes don't look great.
 
 == Hardware
 
@@ -28,34 +27,5 @@ python -> elm : websockets
 elm -> display : render
 ....
 
-== Shader
 
-Having read about SDF, think there is cleaner way to make a nice glowing line.
-
-Each raid has:
-
-TODO: Fix amplitudes as the "fixed" echoes are 4, 10, 30
-and some targets are > 1. More sensibly, should be limited to [0,1].
-From console output, looks like amplitude is more like [0,10].
-Stacked dipole outputs '8' units of power, maybe more with reflector.
-I should know but...
-
-TODO: Resize the WebGL window but *not* by scaling inside; make the window smaller!
-
-- range
-- amplitude (derived from range, theta, phi from LOS)
-- size (number of aircraft)
-
-For size > 1, there should be a small range spread and a fluctuating signal to depict interference effects.
-In fact, every raid has a curve which could be cubic or error function, and that will provide basic shape.
-
-Also like to do something with planar and vertical spread of large raids.
-
-I suspect I can deal with various raid sizes and the general "beating" by being consistent with phase, which may just be fractional range module wavelength. Net signal is vector addition over aircraft, which are space separated and hence with phase differences.
-
-Deflection for any range should be sum of raid deflections. Most raids will be outside of the area of interest for most range values.
-
-Pixel distance from net displacement gives intensity; also perhaps cubic or error function.
-
-Raids are passed in a fixed size array, limitation of Elm-GLSL interface.
 
