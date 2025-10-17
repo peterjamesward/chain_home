@@ -15,25 +15,25 @@ groundRays =
       , strength = 1
       , phase = 0
       , duration = 0
-      , amplitude = 4
+      , amplitude = 40
       }
     , { sequence = 0
       , r = 8000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , strength = 1
-      , phase = 0
+      , phase = 2
       , duration = 0
-      , amplitude = 7
+      , amplitude = 70
       }
     , { sequence = 0
-      , r = 500
+      , r = 1000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , strength = 1
-      , phase = 0
+      , phase = 4
       , duration = 10
-      , amplitude = 6
+      , amplitude = 60
       }
     ]
 
@@ -149,7 +149,7 @@ outgoingFriendlySection1b =
     , heading = degrees 170
     , speed = 300 -- mph
     , strength = 1
-    , iff = Just 1
+    , iff = Just 2
     }
 
 
@@ -193,7 +193,7 @@ largeGroup1 n =
 largeGroup2 n =
     { longitude = bawdsey.longitude + degrees 1.2
     , latitude = bawdsey.latitude - degrees 1.0
-    , height = 30
+    , height = 25
     , heading = degrees 265
     , speed = 250
     , strength = n
@@ -204,17 +204,17 @@ largeGroup2 n =
 sharonMode : Int -> List Target
 sharonMode timeNow =
     List.map (targetFromProforma station timeNow)
-        [ singleHostile
-        , pairHostile
-        , groupOf20
-        , incomingSingleFriendly
-        , outgoingFriendlySection
-        , outgoingFriendlySection1a
-        , outgoingFriendlySection1b
-        , outgoingFriendlySection2a
-        , outgoingFriendlySection2b
-        , largeGroup1 10
-        , largeGroup2 10
+        [ --singleHostile
+        --, pairHostile
+        --, groupOf20
+         incomingSingleFriendly
+        --, outgoingFriendlySection
+        --, outgoingFriendlySection1a
+        --, outgoingFriendlySection1b
+        --, outgoingFriendlySection2a
+        --, outgoingFriendlySection2b
+        --, largeGroup1 100
+        --, largeGroup2 200
         ]
 
 

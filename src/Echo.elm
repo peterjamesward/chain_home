@@ -13,30 +13,33 @@ deriveEchoes station txAntenna targets =
         angleFromLineOfSheet target =
             target.theta - station.lineOfShoot
 
+        strengthGivenLobes target =
+            abs <|
+                -- Combine the lobe functions
+                txAntenna.horizontalLobeFunction (angleFromLineOfSheet target)
+                    * txAntenna.verticalLobeFunction target.alpha
+
         echoFromDirectBeam target seq =
             { sequence = seq
             , r = target.rangeInMetres
             , theta = target.theta
             , alpha = target.alpha
-            , strength = target.strength
-            , phase = normalise (target.rangeInMetres / wavelength)
-            , duration = pulseDuration
-            , amplitude =
+            , strength =
                 if target.iffActive then
-                    -- When IFF cuts in we can ignore the tx lobes!
-                    5.0
+                    0 - target.strength
 
                 else
-                    abs <|
-                        -- Combine the lobe functions
-                        txAntenna.horizontalLobeFunction (angleFromLineOfSheet target)
-                            * txAntenna.verticalLobeFunction target.alpha
+                    target.strength
+            , phase = normalise (target.rangeInMetres / wavelength)
+            , duration = pulseDuration
+            , amplitude = strengthGivenLobes target
             }
     in
     List.map2 echoFromDirectBeam
         targets
     <|
         List.range 1 (List.length targets)
+
 
 
 -- Handy function for debuggery.

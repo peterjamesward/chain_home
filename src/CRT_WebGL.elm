@@ -97,7 +97,7 @@ normaliseEcho echo =
         (echo.r / 160000)
         -- empirically seems to be [0, 10], map to [0,1]
         (logBase 10 (1 + echo.amplitude) / 8.0)
-        -- number of craft.
+        -- number of craft, -ve if IFF active!!!
         (toFloat echo.strength)
         echo.phase
 
@@ -116,8 +116,8 @@ uniforms time echoes =
         echoArray =
             Array.fromList <| List.map normaliseEcho echoes
 
-        _ =
-            Debug.log "Amplitudes" echoArray
+        --_ =
+        --    Debug.log "Amplitudes" echoArray
     in
     -- Apologies this is chugly but the Elm GLSL parser does not accept array, for now.
     { iResolution = vec3 1600 800 0
@@ -219,51 +219,75 @@ fragmentShader =
 
         float includeRaid(vec4 raid, float x) {
             // Note lack of flow control means we calculate all options here!
-            float f1Component = float(raid.z == 1.0);
-            float f2Component = f2(x) * float(raid.z == 2.0);
-            float fnComponent = fn(x) * float(raid.z > 2.0);
-            float depth = raid.y * clamp(0.0,1.0,f1Component + f2Component + fnComponent);
+            float f1Component = float(abs(raid.z) == 1.0);
+            float f2Component = f2(x) * float(abs(raid.z) == 2.0);
+            float fnComponent = fn(x) * float(abs(raid.z) > 2.0);
+            float depth = abs(raid.y) * clamp(0.0,1.0,f1Component + f2Component + fnComponent);
             return depth;
         }
 
        // We need an envelope with cubic sidewalls and a flat top.
        // So this is a variant of "cubicPulse".
        // Aim is that this will work in all cases.
-       // l = left edge (not centre)
+       // range = range of raid is start of near slope.
        // w = width of flat top
        // x = the location to be evaluated
-        float envelope( float l, float w, float x ) {
-            float cubicWidth = 0.06;
-            float leadingEdgeX = (x - l)/cubicWidth;
-            float trailingEdgeX = (l + w - x)/cubicWidth;
-            leadingEdgeX = clamp(leadingEdgeX, 0.0, 1.0);
-            trailingEdgeX = clamp(trailingEdgeX, 0.0, 1.0);
-            float leadingEdgeY = cubic(leadingEdgeX);
-            float trailingEdgeY = cubic(trailingEdgeX);
+        float envelope( float range, float w, float x ) {
+            // Key x points determine the shape.
+            float fixedSlopeWidth = 0.02;
+            float startNearSlope = range;
+            float endNearSlope = startNearSlope + fixedSlopeWidth;
+            float startFarSlope = endNearSlope + w;
+            float endFarSlope = startFarSlope + fixedSlopeWidth;
 
-            return min(leadingEdgeY, trailingEdgeY);
+            // Each section contributes to possible shape.
+            float nearSlopeContribution = cubic((x - startNearSlope) / fixedSlopeWidth);
+            float farSlopeContribution = cubic((endFarSlope - x) / fixedSlopeWidth);
+            float raidContribution = 0.0;
+
+            // All contributions are clamped in [0,1].
+            nearSlopeContribution = clamp(nearSlopeContribution, 0.0, 1.0);
+            farSlopeContribution = clamp(farSlopeContribution, 0.0, 1.0);
+
+            // Contributions only have effect within their domains.
+            nearSlopeContribution = nearSlopeContribution * float (x >= startNearSlope) * float(x <= endNearSlope);
+            raidContribution = 1.0 * float( x >= endNearSlope) * float(x < startFarSlope);
+            farSlopeContribution = farSlopeContribution * float (x >= startFarSlope) * float(x < endFarSlope);
+
+            return (nearSlopeContribution + raidContribution + farSlopeContribution);
+        }
+
+        // Some value smoothing by locally averaging nearby x may help transitions...
+        float withDamping(float range, float w, float x) {
+            float v1 = envelope(range,w,x - 0.01);
+            float v2 = envelope(range,w,x);
+            float v3 = envelope(range,w,x + 0.01);
+            return (v1 + v2 + v2 + v3) / 4.0;
         }
 
         // Each raid has an amplitude (x) and a phase (y).
         vec2 raidContribution(vec4 raid, vec2 xy) {
             // x and y in [0,1],
             // raid.x is range in [0,1].
-            // raid.y is calculated amplitude nominally in [0,1] ??
+            // raid.y is calculated amplitude nominally in [0,1] (-ve if IFF)
+            // raid.z is number of craft
+            // raid.w is signal phase because they add as vectors.
 
             // If x = range, return amplitude.
-            // As x moves away from range, use smoothstep.
-            float xDist = abs ( xy.x - raid.x );
-            float amp = includeRaid(raid, xy.x) ;//raid.y;
-
-            // Increase factor here to get a narrower pulse!
-            //float xDistForCube = clamp(0.0, 1.0, xDist * 20.0);
-            //float smoothed = smoothstep(1.0, 0.0, xDistForCube);
+            float amp = includeRaid(raid, xy.x) ;
 
             // Using previous 'envelope' function.
-            float smoothed = envelope(raid.x, sqrt(raid.z)/10.0, xy.x);
+            float smoothed = withDamping(raid.x, (raid.z)/100.0, xy.x);
+
+            // Add IFF when strength is negative.
+            // IFF is deep and narrow and adds to the general raid shape;
+            // generally, only one craft has IFF on.
+            float iff = 3.0 * withDamping(raid.x, 0.01, xy.x) * float(raid.z < 0.0);
+
+            float combined = smoothed + iff;
 
             // Return phase shifted vector for 'correct' addition.
-            return vec2(amp * smoothed * cos(raid.w), amp * smoothed * sin(raid.w));
+            return vec2(amp * combined * cos(raid.w), amp * combined * sin(raid.w));
         }
 
         // NOTE: Important to separate the notions of:
@@ -291,7 +315,10 @@ fragmentShader =
             deflection += raidContribution(raid14, xy);
             deflection += raidContribution(raid15, xy);
 
-            float amplitude = clamp(1.0 - length(deflection), 0.0, 0.95);
+            float amplitude = clamp(1.0 - length(deflection), 0.0, 0.98);
+
+            // Small random fluctuations of beam deflection
+            amplitude += (random(vec3(xy, iTime)) - 0.5) / 100.0;
 
             // Intensity decays rapidly away from derived deflection.
             // Increase factor to focus the beam
@@ -300,7 +327,7 @@ fragmentShader =
 
             // Add some simple random noise, strong near the beam.
             float d3 = random(vec3(xy, iTime));
-            float randomSpread = clamp(0.0,d3,pow(1.0 - abs(amplitude - xy.y),32.0));
+            float randomSpread = clamp(0.0,d3,pow(1.0 - abs(amplitude - xy.y),128.0));
 
             return  intensity + randomSpread;
         }
