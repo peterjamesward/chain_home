@@ -8,10 +8,6 @@ Have large buttons with images for specific raid setups as practice.
 
 Move and size range scale to above CRT.
 
-IFF needs to be more of a spike, not the whole raid!
-    - Need to encode in a vec4. #Maybe -ve strength!
-> (I think this is done)
-
 Local echoes don't look great.
 
 Bring back more noise!
