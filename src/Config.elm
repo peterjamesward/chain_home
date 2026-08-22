@@ -2,20 +2,19 @@ module Config exposing (..)
 
 import Station exposing (Station)
 import Target exposing (targetFromProforma)
-import Types exposing (Echo, Target, TargetProforma)
+import Types exposing (Echo, Scenario, Target, TargetProforma)
 
 
 groundRays : List Echo
 groundRays =
-    [
-    { sequence = 0
+    [ { sequence = 0
       , r = 5000
       , theta = 0 -- ignored as these are injected after D/F
       , alpha = 0
       , strength = 1
       , phase = 0
       , duration = 0
-      , amplitude = 40
+      , amplitude = 3800
       }
     , { sequence = 0
       , r = 8000
@@ -24,7 +23,7 @@ groundRays =
       , strength = 1
       , phase = 2
       , duration = 0
-      , amplitude = 70
+      , amplitude = 8400
       }
     , { sequence = 0
       , r = 1000
@@ -33,7 +32,7 @@ groundRays =
       , strength = 1
       , phase = 4
       , duration = 10
-      , amplitude = 60
+      , amplitude = 12200
       }
     ]
 
@@ -201,21 +200,24 @@ largeGroup2 n =
     }
 
 
-sharonMode : Int -> List Target
+sharonMode : Int -> Scenario
 sharonMode timeNow =
-    List.map (targetFromProforma station timeNow)
-        [ --singleHostile
-        --, pairHostile
-        --, groupOf20
-         incomingSingleFriendly
-        --, outgoingFriendlySection
-        --, outgoingFriendlySection1a
-        --, outgoingFriendlySection1b
-        --, outgoingFriendlySection2a
-        --, outgoingFriendlySection2b
-        --, largeGroup1 100
-        --, largeGroup2 200
-        ]
+    Scenario
+        "Lots of stuff"
+    <|
+        List.map (targetFromProforma station timeNow)
+            [ singleHostile
+            , pairHostile
+            , groupOf20
+            , incomingSingleFriendly
+            , outgoingFriendlySection
+            , outgoingFriendlySection1a
+            , outgoingFriendlySection1b
+            , outgoingFriendlySection2a
+            , outgoingFriendlySection2b
+            , largeGroup1 100
+            , largeGroup2 200
+            ]
 
 
 bomber4 : TargetProforma
@@ -230,45 +232,70 @@ bomber4 =
     }
 
 
-trainingMode : Int -> List Target
+scenarioList timeNow =
+    List.map
+        (\mode -> mode timeNow)
+        [ trainingMode
+        , trainingMode2
+        , trainingMode3
+        , trainingMode3to6
+        , trainingModeFriendlyOutbound
+        , trainingMassRaids
+        ]
+
+
+trainingMode : Int -> Scenario
 trainingMode timeNow =
-    List.map (targetFromProforma station timeNow)
-        [ singleHostile ]
+    Scenario
+        "One hostile incoming"
+    <|
+        List.map (targetFromProforma station timeNow) [ singleHostile ]
 
 
-trainingMode2 : Int -> List Target
+trainingMode2 : Int -> Scenario
 trainingMode2 timeNow =
-    -- Two planes same range same heading
-    List.map (targetFromProforma station timeNow)
-        [ pairHostile ]
+    Scenario
+        "Two craft same range same heading"
+    <|
+        List.map (targetFromProforma station timeNow)
+            [ pairHostile ]
 
 
-trainingMode3 : Int -> List Target
+trainingMode3 : Int -> Scenario
 trainingMode3 timeNow =
-    -- Two planes same range different headings
-    List.map (targetFromProforma station timeNow)
-        [ groupOf20
-        , bomber4
-        ]
+    Scenario
+        "Two craft same range different headings"
+    <|
+        List.map (targetFromProforma station timeNow)
+            [ groupOf20
+            , bomber4
+            ]
 
 
-trainingModeFriendlyOutbound : Int -> List Target
+trainingModeFriendlyOutbound : Int -> Scenario
 trainingModeFriendlyOutbound timeNow =
-    List.map (targetFromProforma station timeNow)
-        [ incomingSingleFriendly ]
+    Scenario
+        "IFF outbound"
+    <|
+        List.map (targetFromProforma station timeNow)
+            [ incomingSingleFriendly ]
 
 
-trainingMode3to6 : Int -> List Target
+trainingMode3to6 : Int -> Scenario
 trainingMode3to6 timeNow =
-    -- Four aircraft close together
-    -- Wonder if it will work using them twice!
-    List.map (targetFromProforma station timeNow) <|
-        [ largeGroup1 6 ]
+    Scenario
+        "Group of 4 to 6"
+    <|
+        List.map (targetFromProforma station timeNow) <|
+            [ largeGroup1 6 ]
 
 
-trainingMassRaids : Int -> List Target
+trainingMassRaids : Int -> Scenario
 trainingMassRaids timeNow =
-    List.map (targetFromProforma station timeNow) <|
-        [ largeGroup2 12
-        , largeGroup1 60
-        ]
+    Scenario
+        "Two large groups"
+    <|
+        List.map (targetFromProforma station timeNow) <|
+            [ largeGroup2 12
+            , largeGroup1 60
+            ]

@@ -1,8 +1,6 @@
 module Messages exposing (..)
 
 import Time exposing (..)
-import Tutorials.ActionCodes exposing (TutorialScenario)
-import Tutorials.Messages exposing (TutorialMsg)
 import Types exposing (..)
 
 
@@ -12,7 +10,7 @@ type Msg
     | UpdateModel Time.Posix -- Time for model updates
     | SetStartTime Time.Posix
     | StartScenario GameMode
-    | SetConfigStateMsg TutorialScenario Bool
+    | SetConfigStateMsg Bool
     | DisplayReceiver
     | DisplayConfiguration
     | DisplayCalculator
@@ -39,7 +37,6 @@ type Msg
     | ExplainModeToggle
     | RandomRaidGenerated ( Float, Float )
     | ToggleMenu Bool
-    | TutorialMsg TutorialMsg
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
     | KioskMode

@@ -1,4 +1,4 @@
-module Receiver.OperatorPage exposing (operatorPage, operatorPageWithTutorial)
+module Receiver.OperatorPage exposing (operatorPage)
 
 import CRT_WebGL exposing (crt)
 import Calculator.View exposing (pressGonioNext)
@@ -14,18 +14,16 @@ import Goniometer exposing (drawGoniometer)
 import Html.Attributes exposing (style)
 import Html.Events.Extra.Pointer as Pointer
 import Messages exposing (..)
-import Model exposing (ApplicationMode(..), Model)
+import Model exposing (Model)
 import PushButtons exposing (..)
 import Range exposing (drawRangeKnob)
 import Svg exposing (polygon, svg)
 import Svg.Attributes as S exposing (fontFamily, fontSize, points, stroke, strokeWidth, textAnchor, viewBox, x, x1, x2, y, y1, y2)
-import Tutorials.Tutorials exposing (findTutorialSubject, highlightTutorialSubject)
-import Tutorials.Views exposing (tutorialControls, tutorialText)
 import Types exposing (..)
 import Utils exposing (commonStyles, disableSelection, edges, helpButton, showExplanation)
 
 
-clickableRangeKnob tutorialSubject model =
+clickableRangeKnob model =
     el
         ([ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
          , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
@@ -34,13 +32,12 @@ clickableRangeKnob tutorialSubject model =
          , width (px 200)
          , pointer
          ]
-            ++ highlightTutorialSubject tutorialSubject UiRangeKnob
             ++ showExplanation model.explainModeReceiver """Range knob"""
         )
         (html <| drawRangeKnob model.rangeKnobAngle)
 
 
-clickableGonioImage tutorialSubject model =
+clickableGonioImage model =
     let
         theta =
             model.goniometerAzimuth + model.station.lineOfShoot
@@ -53,7 +50,6 @@ clickableGonioImage tutorialSubject model =
          , width fill
          , pointer
          ]
-            ++ highlightTutorialSubject tutorialSubject UiGoniometer
             ++ showExplanation model.explainModeReceiver """Goniometer"""
         )
         (html <| drawGoniometer theta)
@@ -195,8 +191,6 @@ rangeScale model =
         useWidth =
             if model.fullScreenCRT then
                 [ width <| px 1600
-
-                --, E.above (rangeSlider model)
                 , moveLeft 170
                 ]
 
@@ -210,20 +204,16 @@ rangeScale model =
             rangeTicks model.fullScreenCRT
 
 
-rangeSliderAndCRT tutorialSubject model trace =
+rangeSliderAndCRT model trace =
     column
-        ([ padding 5 ]
-            ++ highlightTutorialSubject tutorialSubject UiCRT
-            ++ showExplanation model.explainModeReceiver """The operator's "tube", or CRT"""
-        )
+        [ spacing 0 ]
         [ el
+            [ width fill
+            , paddingEach { edges | left = 20 }
+            ]
+            (rangeScale model)
+        , el
             [ inFront <|
-                el
-                    [ width fill
-                    , paddingEach { edges | left = 20 }
-                    ]
-                    (rangeScale model)
-            , inFront <|
                 Input.button [ alignBottom, alignLeft, Font.color midGray ]
                     { label =
                         html <|
@@ -240,13 +230,10 @@ rangeSliderAndCRT tutorialSubject model trace =
         ]
 
 
-modeSwitchPanel tutorialSubject model =
+modeSwitchPanel model =
     column
-        (commonStyles
-            ++ highlightTutorialSubject tutorialSubject UiSwitchPanel
-            ++ showExplanation model.explainModeReceiver """Mode switches"""
-        )
-        [ row (commonStyles ++ highlightTutorialSubject tutorialSubject UiClear)
+        commonStyles
+        [ row commonStyles
             [ actionButtonLabelAbove "CLEAR" ResetInputState
             ]
         , row
@@ -280,9 +267,9 @@ modeSwitchPanel tutorialSubject model =
             (Border.widthEach { edges | left = 1, right = 1, bottom = 1 }
                 :: commonStyles
             )
-            [ el ([ centerX, width <| fillPortion 1 ] ++ highlightTutorialSubject tutorialSubject UiSense) <|
+            [ el [ centerX, width <| fillPortion 1 ] <|
                 actionButtonLabelAboveWithIndicator "SENSE" model.reflector (EnableReflector (not model.reflector))
-            , el ([ centerX, width <| fillPortion 1 ] ++ highlightTutorialSubject tutorialSubject UiHeight) <|
+            , el [ centerX, width <| fillPortion 1 ] <|
                 actionButtonLabelAbove "HEIGHT" <|
                     SelectGoniometerMode
                         (case model.goniometerMode of
@@ -293,7 +280,7 @@ modeSwitchPanel tutorialSubject model =
                                 Elevation
                         )
             ]
-        , row (commonStyles ++ highlightTutorialSubject tutorialSubject UiOperatorPrompts)
+        , row commonStyles
             [ el [ centerX, width <| fillPortion 1 ] <|
                 indicatorLabelBelow "PRESS\nGONIO" <|
                     pressGonioNext model.calculator
@@ -305,7 +292,7 @@ modeSwitchPanel tutorialSubject model =
         ]
 
 
-raidStrengthPanel tutorialSubject model =
+raidStrengthPanel model =
     let
         strength =
             model.calculator.storedStrength
@@ -318,7 +305,6 @@ raidStrengthPanel tutorialSubject model =
         ]
         [ row
             (commonStyles
-                ++ highlightTutorialSubject tutorialSubject UiRaidStrength
                 ++ showExplanation model.explainModeReceiver """Raid strength entry buttons"""
             )
             [ column
@@ -356,37 +342,27 @@ raidStrengthPanel tutorialSubject model =
         ]
 
 
-operatorPageLandscape tutorialSubject model =
+operatorPageLandscape model =
     if model.fullScreenCRT then
         el [ padding 20, alignLeft ] <|
-            rangeSliderAndCRT tutorialSubject model <|
+            rangeSliderAndCRT model <|
                 traceDependingOnMode model
 
     else
         row
-            (centerX
-                :: highlightTutorialSubject tutorialSubject UiOperatorPage
-            )
+            [ centerX ]
             [ column [ width <| fillPortion 3, centerX ]
-                [ row []
-                    [ el
-                        []
-                        (rangeSliderAndCRT tutorialSubject model <| traceDependingOnMode model)
-                    ]
+                [ rangeSliderAndCRT model <| traceDependingOnMode model
                 , row []
-                    [ clickableGonioImage tutorialSubject model
-                    , el (highlightTutorialSubject tutorialSubject UiGonioButton) <|
-                        actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                    , clickableRangeKnob tutorialSubject model
-                    , el (highlightTutorialSubject tutorialSubject UIRangeButton) <|
-                        actionButtonLabelAbove "RANGE" StoreRangeSetting
+                    [ clickableGonioImage model
+                    , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+                    , clickableRangeKnob model
+                    , actionButtonLabelAbove "RANGE" StoreRangeSetting
                     ]
-
-                --, debugModel model
                 ]
             , column [ width <| fillPortion 2, centerX ]
-                [ modeSwitchPanel tutorialSubject model
-                , raidStrengthPanel tutorialSubject model
+                [ modeSwitchPanel model
+                , raidStrengthPanel model
                 ]
             ]
 
@@ -403,74 +379,33 @@ debugModel model =
                 ]
 
 
-operatorPagePortrait tutorialSubject model =
+operatorPagePortrait model =
     column
-        (highlightTutorialSubject tutorialSubject UiOperatorPage)
+        []
         [ row []
             [ el
                 []
-                (rangeSliderAndCRT tutorialSubject model <| traceDependingOnMode model)
+                (rangeSliderAndCRT model <| traceDependingOnMode model)
             ]
         , row
-            (highlightTutorialSubject tutorialSubject UiBothKnobs)
-            [ clickableGonioImage tutorialSubject model
-            , el (highlightTutorialSubject tutorialSubject UiGonioButton) <|
-                actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-            , clickableRangeKnob tutorialSubject model
-            , el (highlightTutorialSubject tutorialSubject UIRangeButton) <|
-                actionButtonLabelAbove "RANGE" StoreRangeSetting
+            []
+            [ clickableGonioImage model
+            , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+            , clickableRangeKnob model
+            , actionButtonLabelAbove "RANGE" StoreRangeSetting
             , el [ alignBottom ] helpButton
             ]
         , row [ width <| fillPortion 2, centerX ]
-            [ modeSwitchPanel tutorialSubject model
-            , raidStrengthPanel tutorialSubject model
+            [ modeSwitchPanel model
+            , raidStrengthPanel model
             ]
         ]
 
 
 operatorPage model =
-    let
-        tutorialSubject =
-            case model.applicationMode of
-                TutorialMode tutorial ->
-                    findTutorialSubject tutorial
-
-                Model.KioskMode tutorial _ ->
-                    findTutorialSubject tutorial
-
-                _ ->
-                    Nothing
-    in
     case model.outputDevice.orientation of
         Landscape ->
-            operatorPageLandscape tutorialSubject model
+            operatorPageLandscape model
 
         Portrait ->
-            operatorPagePortrait tutorialSubject model
-
-
-operatorPageWithTutorial tutorial model =
-    let
-        rawPage =
-            operatorPage model
-
-        showArrows =
-            case model.applicationMode of
-                TutorialMode _ ->
-                    True
-
-                Model.KioskMode _ _ ->
-                    False
-
-                InteractiveMode ->
-                    False
-    in
-    case tutorialText tutorial model of
-        Just someText ->
-            column [ width fill ]
-                [ rawPage
-                , tutorialControls showArrows someText
-                ]
-
-        _ ->
-            rawPage
+            operatorPagePortrait model
