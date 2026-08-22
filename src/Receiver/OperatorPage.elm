@@ -20,20 +20,18 @@ import Range exposing (drawRangeKnob)
 import Svg exposing (polygon, svg)
 import Svg.Attributes as S exposing (fontFamily, fontSize, points, stroke, strokeWidth, textAnchor, viewBox, x, x1, x2, y, y1, y2)
 import Types exposing (..)
-import Utils exposing (commonStyles, disableSelection, edges, helpButton, showExplanation)
+import Utils exposing (commonStyles, disableSelection, edges)
 
 
 clickableRangeKnob model =
     el
-        ([ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
-         , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
-         , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
-         , htmlAttribute <| style "touch-action" "none"
-         , width (px 200)
-         , pointer
-         ]
-            ++ showExplanation model.explainModeReceiver """Range knob"""
-        )
+        [ htmlAttribute <| Pointer.onDown (\event -> RangeGrab event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onMove (\event -> RangeMove event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onUp (\event -> RangeRelease event.pointer.offsetPos)
+        , htmlAttribute <| style "touch-action" "none"
+        , width (px 200)
+        , pointer
+        ]
         (html <| drawRangeKnob model.rangeKnobAngle)
 
 
@@ -43,15 +41,13 @@ clickableGonioImage model =
             model.goniometerAzimuth + model.station.lineOfShoot
     in
     el
-        ([ htmlAttribute <| Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
-         , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
-         , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
-         , htmlAttribute <| style "touch-action" "none"
-         , width fill
-         , pointer
-         ]
-            ++ showExplanation model.explainModeReceiver """Goniometer"""
-        )
+        [ htmlAttribute <| Pointer.onDown (\event -> GonioGrab event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onMove (\event -> GonioMove event.pointer.offsetPos)
+        , htmlAttribute <| Pointer.onUp (\event -> GonioRelease event.pointer.offsetPos)
+        , htmlAttribute <| style "touch-action" "none"
+        , width fill
+        , pointer
+        ]
         (html <| drawGoniometer theta)
 
 
@@ -304,9 +300,7 @@ raidStrengthPanel model =
         , centerX
         ]
         [ row
-            (commonStyles
-                ++ showExplanation model.explainModeReceiver """Raid strength entry buttons"""
-            )
+            commonStyles
             [ column
                 [ Font.size 18
                 , Font.bold
@@ -393,7 +387,6 @@ operatorPagePortrait model =
             , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
             , clickableRangeKnob model
             , actionButtonLabelAbove "RANGE" StoreRangeSetting
-            , el [ alignBottom ] helpButton
             ]
         , row [ width <| fillPortion 2, centerX ]
             [ modeSwitchPanel model

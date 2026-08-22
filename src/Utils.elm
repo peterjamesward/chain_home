@@ -76,55 +76,6 @@ commonStyles =
     ]
 
 
-helpButton : Element Msg
-helpButton =
-    el
-        [ E.alignRight
-        , E.alignTop
-        , Border.color white
-        , Border.width 1
-        , Border.rounded 15
-        , Background.color paletteDarkGreen
-        , Font.color white
-        , Font.size 12
-        , Font.bold
-        , Font.center
-        , paddingEach { edges | top = 6 }
-        , E.height (px 30)
-        , E.width (px 30)
-        , pointer
-        , onClick ExplainModeToggle
-        ]
-    <|
-        text "?"
-
-
-showExplanation visible uiComponentDescription =
-    if visible then
-        [ inFront <|
-            el
-                [ centerX
-                , centerY
-                , Background.color blue
-                , Border.color white
-                , Border.width 1
-                , Border.rounded 5
-                ]
-            <|
-                paragraph
-                    [ spacing 5
-                    , Font.size 24
-                    , Font.family [ Font.typeface "Times" ]
-                    , Font.color white
-                    , padding 5
-                    ]
-                    [ text uiComponentDescription ]
-        ]
-
-    else
-        []
-
-
 textHeading txt =
     paragraph
         [ E.width fill

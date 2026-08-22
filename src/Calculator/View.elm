@@ -11,7 +11,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Grid exposing (GridPosition, gridLettersList, gridPosition, letterFromGrid)
 import Messages exposing (Msg)
-import Utils exposing (choose, disableSelection, edges, showExplanation)
+import Utils exposing (choose, disableSelection, edges)
 
 
 withBorders widget =
@@ -63,12 +63,10 @@ calculatorLandscape withExplanations model =
             , el [ width (px 40) ] none
             ]
         , row
-            ([ Border.color lightCharcoal
-             , Border.width 1
-             , centerX
-             ]
-                ++ showExplanation withExplanations """The approximate position within the grid square"""
-            )
+            [ Border.color lightCharcoal
+            , Border.width 1
+            , centerX
+            ]
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -90,9 +88,7 @@ calculatorPortrait withExplanations model =
                 position
             ]
         , column
-            (showExplanation withExplanations """The approximate position within the grid square"""
-                ++ [ centerX ]
-            )
+            [ centerX ]
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
@@ -164,18 +160,17 @@ positionGridDisplay withExplanations position =
                     (List.range -3 3)
                     letters
     in
-    el (showExplanation withExplanations """The 100km map grid square containing the raid""") <|
-        column
-            [ centerX
-            , padding 10
-            , spacingXY 5 5
-            , Border.color lightCharcoal
-            , Border.width 1
-            ]
-        <|
-            List.map2 displayGridRow
-                (List.reverse <| List.range -3 3)
-                gridLettersList
+    column
+        [ centerX
+        , padding 10
+        , spacingXY 5 5
+        , Border.color lightCharcoal
+        , Border.width 1
+        ]
+    <|
+        List.map2 displayGridRow
+            (List.reverse <| List.range -3 3)
+            gridLettersList
 
 
 strengthDisplay : Bool -> Maybe Int -> Element Msg
@@ -196,15 +191,14 @@ strengthDisplay withExplanations strength =
                 )
                 (text label)
     in
-    el (showExplanation withExplanations """Estimate of number of planes in raid""") <|
-        row
-            [ spacing 20
-            , paddingEach { edges | left = 10 }
-            ]
-        <|
-            List.map2 makeIt
-                [ "1", "2", "3", "6", "9", "12", "18" ]
-                [ 1, 2, 3, 6, 9, 12, 18 ]
+    row
+        [ spacing 20
+        , paddingEach { edges | left = 10 }
+        ]
+    <|
+        List.map2 makeIt
+            [ "1", "2", "3", "6", "9", "12", "18" ]
+            [ 1, 2, 3, 6, 9, 12, 18 ]
 
 
 maybeBoolDisplay : String -> Maybe Bool -> Element Msg
@@ -251,44 +245,44 @@ heightGrid withExplanations storedHeight =
                 [ text label ]
     in
     -- Height is in '000 feet, sourced from config data!
-    el (width fill :: showExplanation withExplanations """The approximate height of the raid""") <|
-        column
-            [ padding 20
-            , spacingXY 0 10
-            , Border.color lightCharcoal
-            , Border.width 1
-            ]
-            [ row [ spacing 20 ] <|
-                List.map3
-                    (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                    [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5" ]
-                    (List.range 0 11)
-                    (List.range 1 12)
-            , row [ spacing 20 ] <|
-                List.map3
-                    (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                    [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10", "10.5", "11", "11.5" ]
-                    (List.range 12 23)
-                    (List.range 13 24)
-            , row [ spacing 20 ] <|
-                List.map3
-                    (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                    [ "12", "12.5", "13", "13.5", "14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5" ]
-                    (List.range 24 35)
-                    (List.range 25 36)
-            , row [ spacing 20 ] <|
-                List.map3
-                    (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                    [ "18", "18.5", "19", "19.5", "20", "21", "22", "23", "24", "25", "26", "27" ]
-                    [ 36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54 ]
-                    [ 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56 ]
-            , row [ alignLeft, spacing 20 ] <|
-                List.map3
-                    (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
-                    [ "28", "29", "30", "30+" ]
-                    [ 56, 58, 60, 62 ]
-                    [ 58, 60, 62, 9999 ]
-            ]
+    column
+        [ padding 20
+        , spacingXY 0 10
+        , Border.color lightCharcoal
+        , Border.width 1
+        , width fill
+        ]
+        [ row [ spacing 20 ] <|
+            List.map3
+                (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
+                [ ".5-", ".5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5" ]
+                (List.range 0 11)
+                (List.range 1 12)
+        , row [ spacing 20 ] <|
+            List.map3
+                (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
+                [ "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10", "10.5", "11", "11.5" ]
+                (List.range 12 23)
+                (List.range 13 24)
+        , row [ spacing 20 ] <|
+            List.map3
+                (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
+                [ "12", "12.5", "13", "13.5", "14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5" ]
+                (List.range 24 35)
+                (List.range 25 36)
+        , row [ spacing 20 ] <|
+            List.map3
+                (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
+                [ "18", "18.5", "19", "19.5", "20", "21", "22", "23", "24", "25", "26", "27" ]
+                [ 36, 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54 ]
+                [ 37, 38, 39, 40, 42, 44, 46, 48, 50, 52, 54, 56 ]
+        , row [ alignLeft, spacing 20 ] <|
+            List.map3
+                (\label low high -> lamp label (toFloat low * 500) (toFloat high * 500))
+                [ "28", "29", "30", "30+" ]
+                [ 56, 58, 60, 62 ]
+                [ 58, 60, 62, 9999 ]
+        ]
 
 
 digitDisplayLamp : Maybe Int -> Int -> Element Msg
