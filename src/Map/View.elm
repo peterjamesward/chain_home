@@ -18,7 +18,7 @@ import Model exposing (Model)
 import Svg exposing (..)
 import Svg.Attributes as A exposing (..)
 import Types exposing (PlotType(..), RecordedPlot)
-import Utils exposing (edges, imageLocation, showExplanation)
+import Utils exposing (edges, imageLocation)
 
 
 squareSize =
@@ -151,12 +151,10 @@ theMap : Model -> Element Msg
 theMap model =
     -- Sizing this is a bit of a fiddle. Probably cause of stuff I don't know.
     el
-        ([ centerX -- Needed!
-         , centerY
-         , Element.width (px 600)
-         ]
-            ++ showExplanation model.explainModeMap explainMapPage
-        )
+        [ centerX -- Needed!
+        , centerY
+        , Element.width (px 600)
+        ]
     <|
         Element.html <|
             svg

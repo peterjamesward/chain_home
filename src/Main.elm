@@ -194,11 +194,6 @@ deriveModelAtTime model timeNow =
     }
 
 
-clearHistory : Model.Model -> Model.Model
-clearHistory model =
-    { model | storedPlots = [] }
-
-
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
 update msg model =
     let
@@ -652,7 +647,7 @@ view model =
     }
 
 
-navItem label action isActive withHelp =
+navItem label action isActive =
     let
         commonStyles =
             [ pointer
@@ -683,14 +678,10 @@ navItem label action isActive withHelp =
         )
         [ el [ centerX ] <|
             text label
-        , if isActive && withHelp then
-            helpButton
-
-          else
-            el
-                [ E.height (px 30)
-                ]
-                none
+        , el
+            [ E.height (px 30)
+            ]
+            none
         ]
 
 
@@ -706,11 +697,11 @@ navBar model =
         , paddingEach { edges | top = 5, bottom = 5 }
         , spaceEvenly
         ]
-        [ navItem "About" DisplayAboutPage (isActive AboutPage) False
-        , navItem "Mode selection" DisplayConfiguration (isActive InputPage) True
-        , navItem "Receiver" DisplayReceiver (isActive OperatorPage) True
-        , navItem "Calculator" DisplayCalculator (isActive CalculatorPage) True
-        , navItem "Map" DisplayMapPage (isActive MapPage) True
+        [ navItem "About" DisplayAboutPage (isActive AboutPage)
+        , navItem "Mode selection" DisplayConfiguration (isActive InputPage)
+        , navItem "Receiver" DisplayReceiver (isActive OperatorPage)
+        , navItem "Calculator" DisplayCalculator (isActive CalculatorPage)
+        , navItem "Map" DisplayMapPage (isActive MapPage)
         ]
 
 
@@ -750,24 +741,20 @@ inputPage model =
         , spacing 30
         ]
         [ column
-            ([ padding 20
-             , width <| fillPortion 3
-             , alignTop
-             , spacing 20
-             ]
-                ++ showExplanation model.explainModeMenu explainRaidTypes
-            )
+            [ padding 20
+            , width <| fillPortion 3
+            , alignTop
+            , spacing 20
+            ]
             [ textHeading "Practice"
             , blurb "Explore common scenarios."
             , targetSelector (Config.scenarioList model.modelTime)
             ]
         , column
-            ([ padding 20
-             , width <| fillPortion 3
-             , spacing 20
-             ]
-                ++ showExplanation model.explainModeMenu explainPlayLevels
-            )
+            [ padding 20
+            , width <| fillPortion 3
+            , spacing 20
+            ]
             [ textHeading "Test your skills"
             , blurb "Plot raids as they appear. Expect it to become increasingly busy."
             , blurb "Check the Map page occasionally to see how well you are doing."
@@ -789,22 +776,6 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
-
-
-explainRaidTypes =
-    """
-Click the tutorial buttons to learn how to recognise the common types of raids.
-    """
-
-
-explainPlayLevels : String
-explainPlayLevels =
-    """
-Raids will come from different directions, at different heights, and on different headings.
-
-You should make several plots for each raid so that Fighter Command can work out
-where the raid is heading. You will be able to see how you perform by looking at the Map.
-    """
 
 
 recordCurrentTargetPositions : Model.Model -> Model.Model
