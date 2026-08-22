@@ -33,20 +33,13 @@ import Platform.Cmd exposing (Cmd)
 import Random
 import Range exposing (rangeTurnAngle)
 import Receiver exposing (goniometerMix)
-import Receiver.OperatorPage exposing (operatorPage, operatorPageWithTutorial)
+import Receiver.OperatorPage exposing (operatorPage)
 import Spherical exposing (newPosition)
 import SplashPage exposing (splashPage)
 import Station exposing (..)
 import Target exposing (..)
 import Task
 import Time
-import Tutorials.ActionCodes exposing (TutorialScenario(..))
-import Tutorials.Actions exposing (..)
-import Tutorials.KioskModeTutorial exposing (kioskModeTutorial)
-import Tutorials.Messages exposing (TutorialMsg(..))
-import Tutorials.Tutorials exposing (tutorialAutomation)
-import Tutorials.Update
-import Tutorials.Views exposing (tutorialText, viewCalculatorInTutorial)
 import Types exposing (..)
 import Utils exposing (..)
 
@@ -69,7 +62,6 @@ init _ =
       , gonioOutput = []
       , keys = noKeys
       , gonioDrag = Nothing
-      , activeConfigurations = availableTargetOptions
       , rangeSlider = 50.0
       , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
@@ -89,7 +81,6 @@ init _ =
       , calculator = Calculator.init
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
-      , applicationMode = InteractiveMode
       , fullScreenCRT = False
       }
     , Task.perform SetStartTime Time.now
@@ -187,46 +178,20 @@ deriveModelAtTime model timeNow =
         newRangeKnobPosition =
             -- Map 0..100 onto -pi..+pi
             (newRangeSliderPosition - 50) * degrees 175 / 50
-
-        ( newMode, actionCodeList ) =
-            case model.applicationMode of
-                InteractiveMode ->
-                    ( InteractiveMode, [] )
-
-                TutorialMode tutorial ->
-                    let
-                        ( newTut, actions ) =
-                            tutorialAutomation tutorial
-                    in
-                    ( TutorialMode newTut, actions )
-
-                Model.KioskMode tutorial ticks ->
-                    let
-                        ( newTut, actions ) =
-                            tutorialAutomation tutorial
-                    in
-                    ( Model.KioskMode newTut ticks, actions )
-
-        postTutorialModel =
-            applyTutorialActions actionCodeList preTutorialModel
-
-        preTutorialModel =
-            { model
-                | modelTime = timeNow
-                , targets = targetsNow
-                , inRangeTargets = targetsNow
-                , echoes = echoSignals
-                , gonioOutput = gonioOutput
-                , azimuthModeTrace = gonioOutput
-                , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
-                , rangeSlider = newRangeSliderPosition
-                , rangeKnobAngle = newRangeKnobPosition
-                , elevation_A_trace = heightMode_A_Outputs
-                , elevation_B_trace = heightMode_B_Outputs
-            }
     in
-    --Wrapping this in automation allows the Tutorials to do anything.
-    { postTutorialModel | applicationMode = newMode }
+    { model
+        | modelTime = timeNow
+        , targets = targetsNow
+        , inRangeTargets = targetsNow
+        , echoes = echoSignals
+        , gonioOutput = gonioOutput
+        , azimuthModeTrace = gonioOutput
+        , goniometerAzimuth = swingGoniometer model.goniometerAzimuth model.keys
+        , rangeSlider = newRangeSliderPosition
+        , rangeKnobAngle = newRangeKnobPosition
+        , elevation_A_trace = heightMode_A_Outputs
+        , elevation_B_trace = heightMode_B_Outputs
+    }
 
 
 clearHistory : Model.Model -> Model.Model
@@ -234,56 +199,9 @@ clearHistory model =
     { model | storedPlots = [] }
 
 
-kioskAutomation : Model.Model -> Model.Model
-kioskAutomation model =
-    let
-        howLongTheStringIs tut =
-            String.length <| Maybe.withDefault "" <| tutorialText tut model
-
-        advance =
-            let
-                ( newModel, _ ) =
-                    update (TutorialMsg TutorialAdvance) model
-            in
-            startOverIfAtEnd newModel
-
-        startOverIfAtEnd m =
-            case m.applicationMode of
-                Model.KioskMode (Just _) _ ->
-                    m
-
-                Model.KioskMode Nothing _ ->
-                    { m
-                        | applicationMode = Model.KioskMode kioskModeTutorial m.modelTime
-                        , currPage = SplashPage
-                    }
-
-                _ ->
-                    m
-    in
-    -- KioskTimer being not Nothing forces the looping demo.
-    case model.applicationMode of
-        Model.KioskMode tut lastTime ->
-            if model.modelTime - lastTime > howLongTheStringIs tut * 80 then
-                advance
-
-            else
-                model
-
-        _ ->
-            model
-
-
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
 update msg model =
     let
-        cleanModel =
-            model
-                |> actionExitAction
-                |> actionClearTargets
-                |> actionClearCalculator
-                |> clearHistory
-
         requestRandomRaid =
             Random.generate RandomRaidGenerated <|
                 Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
@@ -291,14 +209,6 @@ update msg model =
     case msg of
         ToggleFullScreenCRT ->
             ( { model | fullScreenCRT = not model.fullScreenCRT }
-            , Cmd.none
-            )
-
-        Messages.KioskMode ->
-            ( { model
-                | applicationMode = Model.KioskMode kioskModeTutorial model.modelTime
-                , currPage = SplashPage
-              }
             , Cmd.none
             )
 
@@ -310,7 +220,7 @@ update msg model =
         SetStartTime time ->
             ( { model
                 | startTime = Time.posixToMillis time
-                , targets = sharonMode <| Time.posixToMillis time
+                , targets = []
               }
             , Cmd.none
             )
@@ -321,12 +231,13 @@ update msg model =
             )
 
         StartScenario gameMode ->
-            ( { cleanModel
+            ( { model
                 | currPage = OperatorPage
                 , gameMode = gameMode
-                , targets = sharonMode model.modelTime
+                , targets = .targets <| sharonMode model.modelTime
               }
-            , Cmd.none --requestRandomRaid
+            , Cmd.none
+              --requestRandomRaid
             )
 
         UpdateModel time ->
@@ -346,7 +257,7 @@ update msg model =
                     else
                         m
             in
-            ( deriveModelAtTime (kioskAutomation model) (Time.posixToMillis time)
+            ( deriveModelAtTime model (Time.posixToMillis time)
                 |> resetRaidDue
             , if raidIsDue then
                 requestRandomRaid
@@ -371,11 +282,6 @@ update msg model =
 
                 _ ->
                     model
-            , Cmd.none
-            )
-
-        SetConfigStateMsg index newState ->
-            ( setTutorialCompletedState index newState model
             , Cmd.none
             )
 
@@ -416,58 +322,6 @@ update msg model =
                 | currPage = MapPage
                 , isMenuOpen = False
               }
-            , Cmd.none
-            )
-
-        TutorialMsg tutMsg ->
-            ( case model.applicationMode of
-                TutorialMode tut ->
-                    let
-                        ( ts, acts ) =
-                            Tutorials.Update.update tutMsg tut
-
-                        newModel =
-                            applyTutorialActions acts model
-                    in
-                    { newModel
-                        | applicationMode = TutorialMode ts
-                    }
-
-                Model.KioskMode tut ticks ->
-                    let
-                        ( ts, acts ) =
-                            Tutorials.Update.update tutMsg tut
-
-                        newModel =
-                            applyTutorialActions acts model
-                    in
-                    { newModel
-                        | applicationMode =
-                            Model.KioskMode ts <|
-                                if ts == tut then
-                                    ticks
-
-                                else
-                                    model.modelTime
-                    }
-
-                InteractiveMode ->
-                    let
-                        ( ts, acts ) =
-                            Tutorials.Update.update tutMsg Nothing
-
-                        newModel =
-                            applyTutorialActions acts model
-                    in
-                    { newModel
-                        | applicationMode =
-                            case ts of
-                                Just x ->
-                                    TutorialMode (Just x)
-
-                                _ ->
-                                    InteractiveMode
-                    }
             , Cmd.none
             )
 
@@ -647,7 +501,7 @@ update msg model =
             )
 
         ResetInputState ->
-            ( actionClearCalculator model
+            ( { model | calculator = Calculator.init }
             , Cmd.none
             )
 
@@ -766,28 +620,11 @@ view model =
                 OperatorPage ->
                     operatorPage model
 
-                OperatorPageInTutorial ->
-                    case model.applicationMode of
-                        TutorialMode tut ->
-                            operatorPageWithTutorial tut model
-
-                        Model.KioskMode tut _ ->
-                            operatorPageWithTutorial tut model
-
-                        InteractiveMode ->
-                            operatorPage model
-
                 InputPage ->
                     inputPage model
 
                 CalculatorPage ->
                     Calculator.View.view model.outputDevice model.calculator
-
-                CalculatorInTutorial ->
-                    viewCalculatorInTutorial model
-
-                TrainingPage ->
-                    operatorPage model
 
                 AboutPage ->
                     aboutPage
@@ -807,15 +644,8 @@ view model =
             ]
           <|
             column
-                [ E.width E.fill
-                ]
-                [ case model.applicationMode of
-                    Model.KioskMode _ _ ->
-                        row [ height (px 40) ]
-                            []
-
-                    _ ->
-                        navBar model
+                [ E.width E.fill ]
+                [ navBar model
                 , content
                 ]
         ]
@@ -884,21 +714,10 @@ navBar model =
         ]
 
 
-setConfig : TargetSelector -> Bool -> Msg
-setConfig selector newState =
-    SetConfigStateMsg selector.id newState
-
-
-setTutorialCompletedState : TutorialScenario -> Bool -> Model.Model -> Model.Model
-setTutorialCompletedState scenario state model =
-    -- Functionality removed 2020-09-28
-    model
-
-
-targetSelector : List TargetSelector -> Element Msg
-targetSelector availableRaidTypes =
+targetSelector : List Scenario -> Element Msg
+targetSelector scenarios =
     let
-        display : TargetSelector -> Element Msg
+        display : Scenario -> Element Msg
         display g =
             row
                 [ spacing 10
@@ -906,7 +725,7 @@ targetSelector availableRaidTypes =
                 ]
                 [ Input.button
                     Attr.greenButton
-                    { onPress = Just <| TutorialMsg (DisplayTraining g.id)
+                    { onPress = Nothing
                     , label = el [ centerX ] <| text g.description
                     }
                 ]
@@ -919,11 +738,11 @@ targetSelector availableRaidTypes =
     <|
         List.map
             display
-            availableRaidTypes
+            scenarios
 
 
-inputPageLandscape : Model.Model -> Element Msg
-inputPageLandscape model =
+inputPage : Model.Model -> Element Msg
+inputPage model =
     row
         [ E.width fill
         , Font.color lightCharcoal
@@ -938,9 +757,9 @@ inputPageLandscape model =
              ]
                 ++ showExplanation model.explainModeMenu explainRaidTypes
             )
-            [ textHeading "Tutorials"
-            , blurb "Each tutorial explains a common scenario."
-            , targetSelector model.activeConfigurations
+            [ textHeading "Practice"
+            , blurb "Explore common scenarios."
+            , targetSelector (Config.scenarioList model.modelTime)
             ]
         , column
             ([ padding 20
@@ -958,49 +777,8 @@ inputPageLandscape model =
                 , label = el [ centerX ] <| text "BEGIN NEW SESSION"
                 }
             , el [ height (px 10) ] none
-            , textHeading "Demonstration mode"
-            , blurb """Clicking the button below will puts the application into
-demonstration mode. It will loop constantly until reloaded."""
-            , Input.button
-                Attr.greyButton
-                { onPress = Just Messages.KioskMode
-                , label = el [ centerX ] <| text "Switch to demo mode"
-                }
             ]
         ]
-
-
-inputPagePortrait : Model.Model -> Element Msg
-inputPagePortrait model =
-    column
-        [ E.width fill
-        , Font.color lightCharcoal
-        , paddingEach { edges | left = 50, right = 50, top = 40 }
-        , spacing 20
-        ]
-        [ helpButton
-        , targetSelector
-            model.activeConfigurations
-        , el
-            (width fill
-                :: showExplanation model.explainModeMenu explainPlayLevels
-            )
-            (text "Hello world.")
-        , Input.button
-            (Attr.greyButton ++ [ width (px 200), height (px 40), centerX ])
-            { onPress = Just (StartScenario GameUnlimited)
-            , label = el [ centerX ] <| text "Unlimited raids"
-            }
-        ]
-
-
-inputPage model =
-    case model.outputDevice.orientation of
-        Landscape ->
-            inputPageLandscape model
-
-        Portrait ->
-            inputPagePortrait model
 
 
 main : Program Flags Model.Model Msg

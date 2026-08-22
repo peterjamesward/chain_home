@@ -4,8 +4,6 @@ import Calculator.Model
 import Element exposing (Device)
 import Keys exposing (Keys)
 import Station exposing (Station)
-import Tutorials.ActionCodes exposing (TutorialScenario(..))
-import Tutorials.Model exposing (Tutorial)
 import Types exposing (..)
 
 
@@ -26,7 +24,6 @@ type alias Model =
     , gonioOutput : List Echo
     , keys : Keys
     , gonioDrag : Maybe ( Angle, Point ) -- angle and mouse position when mouse down
-    , activeConfigurations : List TargetSelector
     , rangeSlider : Range
     , outputDevice : Device
     , rangeDrag : Maybe ( Angle, Point )
@@ -46,29 +43,5 @@ type alias Model =
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
-    , applicationMode : ApplicationMode
     , fullScreenCRT : Bool
     }
-
-
-type ApplicationMode
-    = InteractiveMode
-    | TutorialMode Tutorial
-    | KioskMode Tutorial Int
-
-
-type alias TargetSelector =
-    { id : TutorialScenario
-    , active : Bool -- Whether this group is active (dynamic)
-    , description : String -- e.g. "mass raid"
-    }
-
-
-availableTargetOptions : List TargetSelector
-availableTargetOptions =
-    [ TargetSelector ScenarioBasic False "One aircraft"
-    , TargetSelector ScenarioTwoTogether False "Two aircraft in close formation"
-    , TargetSelector ScenarioTwoSeparate False "Two aircraft at the same range"
-    , TargetSelector ScenarioThreeToSix False "Three to six planes in formation"
-    , TargetSelector ScenarioFriendly False "A friendly aircraft with IFF"
-    ]

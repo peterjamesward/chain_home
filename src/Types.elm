@@ -8,10 +8,7 @@ type alias Angle =
 type Page
     = InputPage
     | OperatorPage
-    | OperatorPageInTutorial
     | CalculatorPage
-    | CalculatorInTutorial
-    | TrainingPage
     | AboutPage
     | MapPage
     | SplashPage
@@ -91,37 +88,14 @@ type alias Echo =
     }
 
 
-type UiComponent
-    = UiOperatorPage
-    | UiRangeScale
-    | UiCRT
-    | UiGoniometer
-    | UiRangeKnob
-    | UiBothKnobs
-    | UiSwitchPanel
-    | UiRaidStrength
-    | UiOperatorPrompts
-    | UiAB
-    | UiHeight
-    | UiSense
-    | UiClear
-    | UiCalcStrength
-    | UiGonioButton
-    | UIRangeButton
-    | UiCalcGrid
-    | UiCalcHeight
-    | UiCalcOffset
-    | UiCalculator
-    | UiConfigOptions
-    | UiGoButton
-    | UiMapPage
-    | UiDummy
+type alias Scenario =
+    { description : String
+    , targets : List Target
+    }
 
 
 type GameMode
-    = GameSingleRaid
-    | GameThreeRaids
-    | GameUnlimited
+    = GameUnlimited
     | GameNone
 
 
