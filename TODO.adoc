@@ -1,14 +1,15 @@
 
 = TODO
 
-Remove all the tutorial stuff.
-Replace it with a YouTube video.
+*Move back to main branch in git instead of shader experiments!!!!*
+
+Replace Tutorials with a YouTube video.
 
 Have large buttons with images for specific raid setups as practice.
 
 Move and size range scale to above CRT.
 
-Local echoes don't look great.
+Make IFF peak narrower (it's only one craft, not the group).
 
 Bring back more noise!
 
