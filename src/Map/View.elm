@@ -42,8 +42,8 @@ stationPos =
     )
 
 
-mapPageLandscape : Model -> Element Msg
-mapPageLandscape model =
+mapPage : Model -> Element Msg
+mapPage model =
     row
         [ centerX
         , paddingEach { edges | left = 40, right = 40, top = 50 }
@@ -60,47 +60,6 @@ mapPageLandscape model =
             , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
             ]
         ]
-
-
-mapPagePortrait : Model.Model -> Element Msg
-mapPagePortrait model =
-    column
-        [ centerX
-        , alignTop
-        , paddingEach { edges | left = 50, right = 50 }
-        , Element.spacing 20
-        , Element.width Element.fill
-        ]
-        [ row
-            [ Element.width Element.fill ]
-            [ theMap model
-            ]
-        , checkBoxShowActualTrace model.actualTraceVisibleOnMap
-        , checkBoxShowRangeCircle model.rangeCircleVisibleOnMap
-        ]
-
-
-mapPage : Model.Model -> Element Msg
-mapPage model =
-    case model.outputDevice.orientation of
-        Landscape ->
-            mapPageLandscape model
-
-        Portrait ->
-            mapPagePortrait model
-
-
-explainMapPage =
-    """
-Your plots are relayed to Filter Rooms and placed
-on the map. The filterer combines your plots with other information
-and deduces the most likely position of the raids.
-
-You should make a fresh plot for each raid every minute or thereabouts, so the
-track of the raid becomes clear.
-
-The map is provided only so that you can see your own plots!
-"""
 
 
 checkBoxShowRangeCircle visible =

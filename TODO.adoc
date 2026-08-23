@@ -1,8 +1,6 @@
 
 = TODO
 
-*Move back to main branch in git instead of shader experiments!!!!*
-
 Replace Tutorials with a YouTube video.
 
 Have large buttons with images for specific raid setups as practice.

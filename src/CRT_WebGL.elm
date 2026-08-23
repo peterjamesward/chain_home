@@ -11,23 +11,15 @@ import Types exposing (Echo, Point)
 import WebGL exposing (Mesh, Shader, clearColor)
 
 
-crt : Bool -> Float -> List Echo -> Html Msg
-crt fullScreen time echoes =
+crt : Float -> List Echo -> Html Msg
+crt time echoes =
     let
         styles =
-            if fullScreen then
-                [ width 1800
-                , height 800
-                , style "display" "block"
-                , style "width" "1100px"
-                ]
-
-            else
-                [ width 1800
-                , height 800
-                , style "display" "block"
-                , style "width" "640px"
-                ]
+            [ width 1800
+            , height 800
+            , style "display" "block"
+            , style "width" "640px"
+            ]
     in
     WebGL.toHtmlWith
         [ clearColor 0.02 0.02 0.02 0.0 ]

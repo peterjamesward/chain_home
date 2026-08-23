@@ -21,7 +21,6 @@ type Msg
     | GonioMove Point
     | GonioRelease Point
     | AdjustRangeValue Float
-    | DeviceResize Int Int
     | RangeGrab Point
     | RangeMove Point
     | RangeRelease Point
@@ -39,5 +38,3 @@ type Msg
     | ToggleMenu Bool
     | SetActualTraceVisible Bool
     | SetRangeCircleVisible Bool
-    | KioskMode
-    | ToggleFullScreenCRT

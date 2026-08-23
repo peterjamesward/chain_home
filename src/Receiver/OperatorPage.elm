@@ -52,17 +52,9 @@ clickableGonioImage model =
 
 
 rangeSlider model =
-    let
-        ( useWidth, useWidthPx ) =
-            if model.fullScreenCRT then
-                ( 1200, "1200px" )
-
-            else
-                ( 600, "600px" )
-    in
     Input.slider
         [ E.height (E.px 30)
-        , E.width (E.px useWidth)
+        , E.width (E.px 600)
 
         -- Here is where we're creating/styling the "track"
         , E.behindContent
@@ -124,7 +116,7 @@ traceDependingOnMode model =
            )
 
 
-rangeTicks fullScreen =
+rangeTicks =
     let
         tickSize i =
             case ( modBy 10 i, modBy 5 i ) of
@@ -167,17 +159,10 @@ rangeTicks fullScreen =
                 ++ label i
 
         view =
-            if fullScreen then
-                [ viewBox "-5 -10 2010 200"
-                , S.width "1400px"
-                , S.height "100px"
-                ]
-
-            else
-                [ viewBox "-5 -10 2010 200"
-                , S.width "600px"
-                , S.height "100px"
-                ]
+            [ viewBox "-5 -10 2010 200"
+            , S.width "600px"
+            , S.height "100px"
+            ]
     in
     svg view <| List.concatMap tick (List.range 0 100)
 
@@ -185,19 +170,13 @@ rangeTicks fullScreen =
 rangeScale model =
     let
         useWidth =
-            if model.fullScreenCRT then
-                [ width <| px 1600
-                , moveLeft 170
-                ]
-
-            else
-                [ width <| px 600
-                , E.above (rangeSlider model)
-                ]
+            [ width <| px 600
+            , E.above (rangeSlider model)
+            ]
     in
     el (useWidth ++ disableSelection) <|
         html <|
-            rangeTicks model.fullScreenCRT
+            rangeTicks
 
 
 rangeSliderAndCRT model trace =
@@ -208,21 +187,7 @@ rangeSliderAndCRT model trace =
             , paddingEach { edges | left = 20 }
             ]
             (rangeScale model)
-        , el
-            [ inFront <|
-                Input.button [ alignBottom, alignLeft, Font.color midGray ]
-                    { label =
-                        html <|
-                            FeatherIcons.toHtml [] <|
-                                if model.fullScreenCRT then
-                                    FeatherIcons.minimize
-
-                                else
-                                    FeatherIcons.maximize
-                    , onPress = Just ToggleFullScreenCRT
-                    }
-            ]
-            (E.html <| crt model.fullScreenCRT model.webGLtime trace)
+        , E.html <| crt model.webGLtime trace
         ]
 
 
@@ -336,69 +301,20 @@ raidStrengthPanel model =
         ]
 
 
-operatorPageLandscape model =
-    if model.fullScreenCRT then
-        el [ padding 20, alignLeft ] <|
-            rangeSliderAndCRT model <|
-                traceDependingOnMode model
-
-    else
-        row
-            [ centerX ]
-            [ column [ width <| fillPortion 3, centerX ]
-                [ rangeSliderAndCRT model <| traceDependingOnMode model
-                , row []
-                    [ clickableGonioImage model
-                    , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-                    , clickableRangeKnob model
-                    , actionButtonLabelAbove "RANGE" StoreRangeSetting
-                    ]
-                ]
-            , column [ width <| fillPortion 2, centerX ]
-                [ modeSwitchPanel model
-                , raidStrengthPanel model
+operatorPage model =
+    row
+        [ centerX ]
+        [ column [ width <| fillPortion 3, centerX ]
+            [ rangeSliderAndCRT model <| traceDependingOnMode model
+            , row []
+                [ clickableGonioImage model
+                , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
+                , clickableRangeKnob model
+                , actionButtonLabelAbove "RANGE" StoreRangeSetting
                 ]
             ]
-
-
-debugModel : Model -> Element Msg
-debugModel model =
-    case model.targets of
-        [] ->
-            text "No targets"
-
-        t :: _ ->
-            row [ spacing 10 ]
-                [ text <| String.fromFloat t.height
-                ]
-
-
-operatorPagePortrait model =
-    column
-        []
-        [ row []
-            [ el
-                []
-                (rangeSliderAndCRT model <| traceDependingOnMode model)
-            ]
-        , row
-            []
-            [ clickableGonioImage model
-            , actionButtonLabelAbove "GONIO" StoreGoniometerSetting
-            , clickableRangeKnob model
-            , actionButtonLabelAbove "RANGE" StoreRangeSetting
-            ]
-        , row [ width <| fillPortion 2, centerX ]
+        , column [ width <| fillPortion 2, centerX ]
             [ modeSwitchPanel model
             , raidStrengthPanel model
             ]
         ]
-
-
-operatorPage model =
-    case model.outputDevice.orientation of
-        Landscape ->
-            operatorPageLandscape model
-
-        Portrait ->
-            operatorPagePortrait model

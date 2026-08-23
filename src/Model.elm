@@ -25,7 +25,6 @@ type alias Model =
     , keys : Keys
     , gonioDrag : Maybe ( Angle, Point ) -- angle and mouse position when mouse down
     , rangeSlider : Range
-    , outputDevice : Device
     , rangeDrag : Maybe ( Angle, Point )
     , rangeKnobAngle : Angle
     , goniometerMode : GoniometerMode
@@ -43,5 +42,4 @@ type alias Model =
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
-    , fullScreenCRT : Bool
     }

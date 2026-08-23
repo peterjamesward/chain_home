@@ -1,4 +1,4 @@
-module Calculator.View exposing (interpretCalculator, pressGonioNext, view)
+module Calculator.View exposing (pressGonioNext, view)
 
 {-
    Mimic the output panel for the electronic calculator.
@@ -9,7 +9,7 @@ import Constants exposing (..)
 import Element exposing (..)
 import Element.Border as Border
 import Element.Font as Font
-import Grid exposing (GridPosition, gridLettersList, gridPosition, letterFromGrid)
+import Grid exposing (GridPosition, gridLettersList, gridPosition)
 import Messages exposing (Msg)
 import Utils exposing (choose, disableSelection, edges)
 
@@ -22,18 +22,8 @@ withBorders widget =
         widget
 
 
-view : Device -> Model -> Element Msg
-view device model =
-    case device.orientation of
-        Landscape ->
-            calculatorLandscape model.explainMode model
-
-        Portrait ->
-            calculatorPortrait model.explainMode model
-
-
-calculatorLandscape : Bool -> Model -> Element Msg
-calculatorLandscape withExplanations model =
+view : Model -> Element Msg
+view model =
     let
         position =
             gridPosition model.storedAzimuthRange model.storedAzimuth
@@ -42,7 +32,7 @@ calculatorLandscape withExplanations model =
         [ centerX, centerY ]
         [ el [ height (px 100) ] none
         , row [ spacing 10, padding 5, centerX, centerY ]
-            [ positionGridDisplay withExplanations position
+            [ positionGridDisplay position
             , column [ spacing 10, alignLeft, width fill ]
                 [ withBorders <|
                     row
@@ -50,7 +40,7 @@ calculatorLandscape withExplanations model =
                         , spacing 10
                         , width fill
                         ]
-                        [ strengthDisplay withExplanations model.storedStrength
+                        [ strengthDisplay model.storedStrength
                         , maybeBoolDisplay "+" model.storedStrengthPlus
                         , maybeBoolDisplay "F" model.storedFriendly
                         , column []
@@ -58,7 +48,7 @@ calculatorLandscape withExplanations model =
                             , none
                             ]
                         ]
-                , heightGrid withExplanations model.storedElevation
+                , heightGrid model.storedElevation
                 ]
             , el [ width (px 40) ] none
             ]
@@ -70,34 +60,6 @@ calculatorLandscape withExplanations model =
             [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
             , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
             ]
-        ]
-
-
-calculatorPortrait : Bool -> Model -> Element Msg
-calculatorPortrait withExplanations model =
-    let
-        position =
-            gridPosition model.storedAzimuthRange model.storedAzimuth
-    in
-    column
-        [ centerX
-        , width fill
-        ]
-        [ row [ centerX ]
-            [ positionGridDisplay withExplanations
-                position
-            ]
-        , column
-            [ centerX ]
-            [ offsetDisplay <| Maybe.map .gridSquareOffsetEast position
-            , offsetDisplay <| Maybe.map .gridSquareOffsetNorth position
-            ]
-        , row [ centerX ]
-            [ strengthDisplay withExplanations model.storedStrength
-            , maybeBoolDisplay "+" model.storedStrengthPlus
-            , maybeBoolDisplay "F" model.storedFriendly
-            ]
-        , heightGrid withExplanations model.storedElevation
         ]
 
 
@@ -134,8 +96,8 @@ buttonStyle enabled colour =
         ++ disableSelection
 
 
-positionGridDisplay : Bool -> Maybe GridPosition -> Element Msg
-positionGridDisplay withExplanations position =
+positionGridDisplay : Maybe GridPosition -> Element Msg
+positionGridDisplay position =
     let
         thisIsTheSquare e n =
             case position of
@@ -173,8 +135,8 @@ positionGridDisplay withExplanations position =
             gridLettersList
 
 
-strengthDisplay : Bool -> Maybe Int -> Element Msg
-strengthDisplay withExplanations strength =
+strengthDisplay : Maybe Int -> Element Msg
+strengthDisplay strength =
     let
         thisIsTheSquare n =
             case strength of
@@ -219,8 +181,8 @@ maybeBoolDisplay label b =
         (text label)
 
 
-heightGrid : Bool -> Maybe Float -> Element Msg
-heightGrid withExplanations storedHeight =
+heightGrid : Maybe Float -> Element Msg
+heightGrid storedHeight =
     let
         theRightHeight low high =
             case storedHeight of
@@ -324,65 +286,6 @@ offsetDisplay offset =
         [ significantDigit <| Maybe.map (\n -> n // 10) offset
         , significantDigit <| Maybe.map (modBy 10) offset
         ]
-
-
-interpretCalculator : Calculator.Model.Model -> String
-interpretCalculator model =
-    let
-        gridPos =
-            gridPosition model.storedAzimuthRange model.storedAzimuth
-
-        letter =
-            letterFromGrid gridPos
-
-        twoDigits x =
-            String.fromInt (x // 10) ++ String.fromInt (modBy 10 x)
-    in
-    "The raid grid position is "
-        ++ (case ( gridPos, letter ) of
-                ( Just grid, Just g ) ->
-                    g
-                        ++ twoDigits grid.gridSquareOffsetEast
-                        ++ twoDigits grid.gridSquareOffsetNorth
-
-                _ ->
-                    "unknown"
-           )
-        ++ ", height "
-        ++ (case model.storedElevation of
-                Just h ->
-                    if h >= 1 then
-                        (String.fromInt <| truncate h)
-                            ++ " thousand feet"
-
-                    else
-                        "below one thousand feet"
-
-                Nothing ->
-                    "unknown"
-           )
-        ++ ", strength "
-        ++ (case model.storedStrengthPlus of
-                Just True ->
-                    "more than "
-
-                _ ->
-                    ""
-           )
-        ++ (case model.storedStrength of
-                Just n ->
-                    String.fromInt n
-
-                _ ->
-                    " unknown"
-           )
-        ++ (case model.storedFriendly of
-                Just True ->
-                    ", friendly."
-
-                _ ->
-                    "."
-           )
 
 
 pressGonioNext : Model -> Bool

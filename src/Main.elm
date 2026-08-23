@@ -63,7 +63,6 @@ init _ =
       , keys = noKeys
       , gonioDrag = Nothing
       , rangeSlider = 50.0
-      , outputDevice = { class = Desktop, orientation = Landscape }
       , rangeDrag = Nothing
       , rangeKnobAngle = 0.0
       , goniometerMode = Azimuth
@@ -81,7 +80,6 @@ init _ =
       , calculator = Calculator.init
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
-      , fullScreenCRT = False
       }
     , Task.perform SetStartTime Time.now
     )
@@ -128,7 +126,6 @@ subscriptions _ =
         , onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
-        , onResize (\w h -> DeviceResize w h)
         ]
 
 
@@ -202,11 +199,6 @@ update msg model =
                 Random.pair (Random.float -(degrees 45) (degrees 45)) (Random.float 5 30)
     in
     case msg of
-        ToggleFullScreenCRT ->
-            ( { model | fullScreenCRT = not model.fullScreenCRT }
-            , Cmd.none
-            )
-
         TimeDelta dt ->
             ( { model | webGLtime = model.webGLtime + dt / 100.0 }
             , Cmd.none
@@ -393,11 +385,6 @@ update msg model =
 
         RangeRelease _ ->
             ( { model | rangeDrag = Nothing }
-            , Cmd.none
-            )
-
-        DeviceResize w h ->
-            ( { model | outputDevice = classifyDevice { width = w, height = h } }
             , Cmd.none
             )
 
@@ -619,7 +606,7 @@ view model =
                     inputPage model
 
                 CalculatorPage ->
-                    Calculator.View.view model.outputDevice model.calculator
+                    Calculator.View.view model.calculator
 
                 AboutPage ->
                     aboutPage
