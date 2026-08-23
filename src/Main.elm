@@ -75,11 +75,11 @@ init _ =
       , explainModeMap = False
       , timeForNextRaid = Nothing
       , storedPlots = []
-      , gameMode = GameNone
       , isMenuOpen = False
       , calculator = Calculator.init
       , actualTraceVisibleOnMap = False
       , rangeCircleVisibleOnMap = False
+      , gameMode = GameIdle
       }
     , Task.perform SetStartTime Time.now
     )
@@ -217,14 +217,25 @@ update msg model =
             , Cmd.none
             )
 
-        StartScenario gameMode ->
+        StartScenario scenario ->
             ( { model
                 | currPage = OperatorPage
-                , gameMode = gameMode
-                , targets = .targets <| sharonMode model.modelTime
+                , targets =
+                    List.map
+                        (targetFromProforma station model.modelTime)
+                        scenario.targets
+                , gameMode = GameScenario
               }
             , Cmd.none
-              --requestRandomRaid
+            )
+
+        StartRandomRaids ->
+            ( { model
+                | currPage = OperatorPage
+                , targets = []
+                , gameMode = GameRandom
+              }
+            , requestRandomRaid
             )
 
         UpdateModel time ->
@@ -603,7 +614,7 @@ view model =
                     operatorPage model
 
                 InputPage ->
-                    inputPage model
+                    modeSelectionPage model
 
                 CalculatorPage ->
                     Calculator.View.view model.calculator
@@ -703,7 +714,7 @@ targetSelector scenarios =
                 ]
                 [ Input.button
                     Attr.greenButton
-                    { onPress = Nothing
+                    { onPress = Just (StartScenario g)
                     , label = el [ centerX ] <| text g.description
                     }
                 ]
@@ -713,14 +724,11 @@ targetSelector scenarios =
         , spacing 20
         , width fill
         ]
-    <|
-        List.map
-            display
-            scenarios
+        (List.map display scenarios)
 
 
-inputPage : Model.Model -> Element Msg
-inputPage model =
+modeSelectionPage : Model.Model -> Element Msg
+modeSelectionPage model =
     row
         [ E.width fill
         , Font.color lightCharcoal
@@ -747,8 +755,8 @@ inputPage model =
             , blurb "Check the Map page occasionally to see how well you are doing."
             , Input.button
                 Attr.greenButton
-                { onPress = Just <| StartScenario GameUnlimited
-                , label = el [ centerX ] <| text "BEGIN NEW SESSION"
+                { onPress = Just <| StartRandomRaids
+                , label = el [ centerX ] <| text "Random!"
                 }
             , el [ height (px 10) ] none
             ]

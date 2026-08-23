@@ -37,9 +37,9 @@ type alias Model =
     , explainModeMap : Bool
     , timeForNextRaid : Maybe Int
     , storedPlots : List RecordedPlot
-    , gameMode : GameMode
     , isMenuOpen : Bool
     , calculator : Calculator.Model.Model
     , actualTraceVisibleOnMap : Bool
     , rangeCircleVisibleOnMap : Bool
+    , gameMode : GameMode
     }

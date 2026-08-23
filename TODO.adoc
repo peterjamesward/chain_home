@@ -3,9 +3,13 @@
 
 Replace Tutorials with a YouTube video.
 
-Have large buttons with images for specific raid setups as practice.
+Random mode to have more raids added as time passes.
+
+Have scenario large buttons with images.
 
 Make IFF peak narrower (it's only one craft, not the group).
+
+Check logic for two at same range different azimuth as gonio seems to find the midpoint.
 
 Bring back more noise!
 

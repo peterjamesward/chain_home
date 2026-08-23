@@ -89,19 +89,6 @@ pairHostile =
     }
 
 
-groupOf20 : TargetProforma
-groupOf20 =
-    -- Try to get 3 and 4 at similar range but differing in azimuth.
-    { longitude = bawdsey.longitude + degrees 1.5
-    , latitude = bawdsey.latitude
-    , height = 20 -- ,000 ft
-    , heading = degrees 270
-    , speed = 200 -- mph
-    , strength = 20
-    , iff = Nothing
-    }
-
-
 incomingSingleFriendly : TargetProforma
 incomingSingleFriendly =
     { longitude = bawdsey.longitude + degrees 1.8
@@ -200,31 +187,24 @@ largeGroup2 n =
     }
 
 
-sharonMode : Int -> Scenario
-sharonMode timeNow =
-    Scenario
-        "Lots of stuff"
-    <|
-        List.map (targetFromProforma station timeNow)
-            [ singleHostile
-            , pairHostile
-            , groupOf20
-            , incomingSingleFriendly
-            , outgoingFriendlySection
-            , outgoingFriendlySection1a
-            , outgoingFriendlySection1b
-            , outgoingFriendlySection2a
-            , outgoingFriendlySection2b
-            , largeGroup1 100
-            , largeGroup2 200
-            ]
-
-
 bomber4 : TargetProforma
 bomber4 =
     { longitude = bawdsey.longitude + degrees 1.6
     , latitude = bawdsey.latitude - degrees 0.3
     , height = 40 -- ,000 ft
+    , heading = degrees 270
+    , speed = 200 -- mph
+    , strength = 1
+    , iff = Nothing
+    }
+
+
+oneOfTwoAtSameRange : TargetProforma
+oneOfTwoAtSameRange =
+    -- Try to get this and bomber4 at similar range but differing in azimuth.
+    { longitude = bawdsey.longitude + degrees 1.6
+    , latitude = bawdsey.latitude + degrees 0.3
+    , height = 20 -- ,000 ft
     , heading = degrees 270
     , speed = 200 -- mph
     , strength = 1
@@ -248,54 +228,43 @@ trainingMode : Int -> Scenario
 trainingMode timeNow =
     Scenario
         "One hostile incoming"
-    <|
-        List.map (targetFromProforma station timeNow) [ singleHostile ]
+        [ singleHostile ]
 
 
 trainingMode2 : Int -> Scenario
 trainingMode2 timeNow =
     Scenario
         "Two craft same range same heading"
-    <|
-        List.map (targetFromProforma station timeNow)
-            [ pairHostile ]
+        [ pairHostile ]
 
 
 trainingMode3 : Int -> Scenario
 trainingMode3 timeNow =
     Scenario
         "Two craft same range different headings"
-    <|
-        List.map (targetFromProforma station timeNow)
-            [ groupOf20
-            , bomber4
-            ]
+        [ bomber4
+        , oneOfTwoAtSameRange
+        ]
 
 
 trainingModeFriendlyOutbound : Int -> Scenario
 trainingModeFriendlyOutbound timeNow =
     Scenario
         "IFF outbound"
-    <|
-        List.map (targetFromProforma station timeNow)
-            [ incomingSingleFriendly ]
+        [ incomingSingleFriendly ]
 
 
 trainingMode3to6 : Int -> Scenario
 trainingMode3to6 timeNow =
     Scenario
         "Group of 4 to 6"
-    <|
-        List.map (targetFromProforma station timeNow) <|
-            [ largeGroup1 6 ]
+        [ largeGroup1 6 ]
 
 
 trainingMassRaids : Int -> Scenario
 trainingMassRaids timeNow =
     Scenario
         "Two large groups"
-    <|
-        List.map (targetFromProforma station timeNow) <|
-            [ largeGroup2 12
-            , largeGroup1 60
-            ]
+        [ largeGroup2 12
+        , largeGroup1 60
+        ]

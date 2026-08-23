@@ -90,13 +90,14 @@ type alias Echo =
 
 type alias Scenario =
     { description : String
-    , targets : List Target
+    , targets : List TargetProforma
     }
 
 
 type GameMode
-    = GameUnlimited
-    | GameNone
+    = GameScenario
+    | GameRandom
+    | GameIdle
 
 
 type PlotType
