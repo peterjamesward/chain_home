@@ -1,1 +1,0 @@
-module ReceiverPage.Model exposing (..)

@@ -53,8 +53,10 @@ clickableGonioImage model =
 
 rangeSlider model =
     Input.slider
-        [ E.height (E.px 30)
-        , E.width (E.px 600)
+        [ E.height (E.px 10)
+        , E.width (E.px 640)
+        , padding 0
+        , E.moveDown 10
 
         -- Here is where we're creating/styling the "track"
         , E.behindContent
@@ -159,35 +161,29 @@ rangeTicks =
                 ++ label i
 
         view =
-            [ viewBox "-5 -10 2010 200"
-            , S.width "600px"
-            , S.height "100px"
+            [ viewBox "0 0 2010 20"
+            , S.width "640px"
+            , S.height "80px"
             ]
     in
     svg view <| List.concatMap tick (List.range 0 100)
 
 
-rangeScale model =
-    let
-        useWidth =
-            [ width <| px 600
-            , E.above (rangeSlider model)
-            ]
-    in
-    el (useWidth ++ disableSelection) <|
-        html <|
-            rangeTicks
-
-
 rangeSliderAndCRT model trace =
     column
-        [ spacing 0 ]
+        [ paddingEach { top = 40, bottom = 0, left = 0, right = 0 }
+        , spacing 0
+        ]
         [ el
-            [ width fill
-            , paddingEach { edges | left = 20 }
-            ]
-            (rangeScale model)
-        , E.html <| crt model.webGLtime trace
+            (centerX
+                :: E.above (rangeSlider model)
+                :: Background.color (rgb 0.02 0.02 0.02)
+                :: disableSelection
+            )
+          <|
+            html <|
+                rangeTicks
+        , html <| crt model.webGLtime trace
         ]
 
 

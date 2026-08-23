@@ -5,8 +5,6 @@ Replace Tutorials with a YouTube video.
 
 Have large buttons with images for specific raid setups as practice.
 
-Move and size range scale to above CRT.
-
 Make IFF peak narrower (it's only one craft, not the group).
 
 Bring back more noise!
