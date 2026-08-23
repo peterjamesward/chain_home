@@ -299,7 +299,7 @@ raidStrengthPanel model =
 
 operatorPage model =
     row
-        [ centerX ]
+        [ centerX, spacing 50 ]
         [ column [ width <| fillPortion 3, centerX ]
             [ rangeSliderAndCRT model <| traceDependingOnMode model
             , row []
