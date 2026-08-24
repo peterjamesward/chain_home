@@ -240,23 +240,25 @@ update msg model =
 
         TimeTicker time ->
             let
+                updatedModel =
+                    deriveModelAtTime model (Time.posixToMillis time)
+
                 raidIsDue =
-                    case model.timeForNextRaid of
+                    case updatedModel.timeForNextRaid of
                         Nothing ->
                             False
 
                         Just due ->
                             Time.posixToMillis time > due
 
-                resetRaidDue m =
+                modelResetIfRaidDue =
                     if raidIsDue then
-                        { m | timeForNextRaid = Nothing }
+                        { updatedModel | timeForNextRaid = Nothing }
 
                     else
-                        m
+                        updatedModel
             in
-            ( deriveModelAtTime model (Time.posixToMillis time)
-                |> resetRaidDue
+            ( modelResetIfRaidDue
             , if raidIsDue then
                 requestRandomRaid
 
