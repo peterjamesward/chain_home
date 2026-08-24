@@ -7,7 +7,7 @@ import Types exposing (..)
 type Msg
     = NoOp
     | TimeDelta Float -- WebGL animation time
-    | UpdateModel Time.Posix -- Time for model updates
+    | TimeTicker Time.Posix -- Time for model updates
     | SetStartTime Time.Posix
     | StartScenario Scenario
     | StartRandomRaids
@@ -33,7 +33,6 @@ type Msg
     | RaidStrength Int
     | RaidStrengthPlus
     | RaidFriendly
-    | ExplainModeToggle
     | RandomRaidGenerated ( Float, Float )
     | ToggleMenu Bool
     | SetActualTraceVisible Bool

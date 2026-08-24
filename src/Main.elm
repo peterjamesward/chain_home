@@ -122,7 +122,7 @@ subscriptions : Model.Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Sub.none
-        , Time.every 40 UpdateModel
+        , Time.every 40 TimeTicker
         , onAnimationFrameDelta TimeDelta
         , onKeyUp (D.map (KeyChanged False) (D.field "key" D.string))
         , onKeyDown (D.map (KeyChanged True) (D.field "key" D.string))
@@ -238,7 +238,7 @@ update msg model =
             , requestRandomRaid
             )
 
-        UpdateModel time ->
+        TimeTicker time ->
             let
                 raidIsDue =
                     case model.timeForNextRaid of
@@ -262,25 +262,6 @@ update msg model =
 
               else
                 Cmd.none
-            )
-
-        ExplainModeToggle ->
-            ( case model.currPage of
-                InputPage ->
-                    { model | explainModeMenu = not model.explainModeMenu }
-
-                OperatorPage ->
-                    { model | explainModeReceiver = not model.explainModeReceiver }
-
-                CalculatorPage ->
-                    { model | calculator = toggleExplainMode model.calculator }
-
-                MapPage ->
-                    { model | explainModeMap = not model.explainModeMap }
-
-                _ ->
-                    model
-            , Cmd.none
             )
 
         DisplayReceiver ->

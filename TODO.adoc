@@ -4,6 +4,7 @@
 Replace Tutorials with a YouTube video.
 
 Random mode to have more raids added as time passes.
+> Main.updateModel is nvg.
 
 Have scenario large buttons with images.
 
